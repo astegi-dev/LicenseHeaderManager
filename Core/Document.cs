@@ -13,33 +13,35 @@
 #endregion
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using EnvDTE;
-using Language = LicenseHeaderManager.Options.Language;
+using System.Text;
 using System.Text.RegularExpressions;
+using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Utils;
+using Language = Core.Language;
 
-namespace LicenseHeaderManager.Headers
+namespace Core
 {
   public class Document
   {
     internal readonly DocumentHeader _header;
     internal readonly Language _language;
     internal readonly IEnumerable<string> _keywords;
-    internal readonly TextDocument _document;
+    internal readonly string _documentFilePath;
     internal readonly CommentParser _commentParser;
     internal readonly string _lineEndingInDocument;
     private string _documentTextCache;
 
-    public Document (TextDocument document, Language language, string[] lines, ProjectItem projectItem, IEnumerable<string> keywords = null)
+    public Document (string documentFilePath, Language language, string[] headerLines, IEnumerable<string> keywords = null)
     {
-      _document = document;
+      _documentFilePath = documentFilePath;
 
       _lineEndingInDocument = NewLineManager.DetectMostFrequentLineEnd (GetText());
 
 
-      string inputText = CreateInputText (lines);
-      _header = new DocumentHeader (document, inputText, new DocumentHeaderProperties (projectItem));
+      string headerText = CreateHeaderText (headerLines);
+      _header = new DocumentHeader (documentFilePath, headerText, new DocumentHeaderProperties ());
       _keywords = keywords;
 
       _language = language;
@@ -47,23 +49,43 @@ namespace LicenseHeaderManager.Headers
       _commentParser = new CommentParser (language.LineComment, language.BeginComment, language.EndComment, language.BeginRegion, language.EndRegion);
     }
 
-    private string CreateInputText (string[] lines)
-    {
-      if (lines == null)
-        return null;
-
-      var inputText = string.Join (_lineEndingInDocument, lines);
-      inputText += _lineEndingInDocument;
-
-      return inputText;
-    }
-
-    public bool ValidateHeader ()
+    public bool ValidateHeader()
     {
       if (_header.IsEmpty)
         return true;
       else
-        return LicenseHeader.Validate (_header.Text, _commentParser);
+        return LicenseHeader.Validate(_header.Text, _commentParser);
+    }
+
+    public void ReplaceHeaderIfNecessary()
+    {
+      var skippedText = SkipText();
+      if (!string.IsNullOrEmpty(skippedText))
+        RemoveHeader(skippedText);
+
+      string existingHeader = GetExistingHeader();
+
+      if (!_header.IsEmpty)
+      {
+        if (existingHeader != _header.Text)
+          ReplaceHeader(existingHeader, _header.Text);
+      }
+      else
+        RemoveHeader(existingHeader);
+
+      if (!string.IsNullOrEmpty(skippedText))
+        AddHeader(skippedText);
+    }
+
+    private string CreateHeaderText (string[] headerLines)
+    {
+      if (headerLines == null)
+        return null;
+
+      var inputText = string.Join (_lineEndingInDocument, headerLines);
+      inputText += _lineEndingInDocument;
+
+      return inputText;
     }
 
     private string GetText ()
@@ -78,12 +100,7 @@ namespace LicenseHeaderManager.Headers
 
     private void RefreshText ()
     {
-      _documentTextCache = GetText (_document.StartPoint, _document.EndPoint);
-    }
-
-    private string GetText (TextPoint start, TextPoint end)
-    {
-      return _document.CreateEditPoint (start).GetText (end);
+      _documentTextCache = File.ReadAllText(_documentFilePath);
     }
 
     private string GetExistingHeader ()
@@ -94,26 +111,6 @@ namespace LicenseHeaderManager.Headers
         return header;
       else
         return string.Empty;
-    }
-
-    public void ReplaceHeaderIfNecessary ()
-    {
-      var skippedText = SkipText();
-      if (!string.IsNullOrEmpty (skippedText))
-        RemoveHeader (skippedText);
-
-      string existingHeader = GetExistingHeader();
-
-      if (!_header.IsEmpty)
-      {
-        if (existingHeader != _header.Text)
-          ReplaceHeader (existingHeader, _header.Text);
-      }
-      else
-        RemoveHeader (existingHeader);
-
-      if (!string.IsNullOrEmpty (skippedText))
-        AddHeader (skippedText);
     }
 
     private string SkipText ()
@@ -137,31 +134,25 @@ namespace LicenseHeaderManager.Headers
     {
       if (!string.IsNullOrEmpty (header))
       {
-        var start = _document.CreateEditPoint (_document.StartPoint);
-        start.Insert (header);
+        var sb = new StringBuilder();
+        var newContent = sb.Append(header).Append(_lineEndingInDocument).Append(GetText()).ToString();
+        File.WriteAllText(_documentFilePath, newContent);
         RefreshText();
       }
     }
 
-    private EditPoint EndOfHeader (string header, TextPoint start = null)
+    private int HeaderLength (string header)
     {
-      if (start == null)
-        start = _document.CreateEditPoint (_document.StartPoint);
-      var end = _document.CreateEditPoint (start);
-
-      var headerLengthInCursorSteps = NewLineManager.ReplaceAllLineEnds (header, " ").Length;
-      end.CharRight (headerLengthInCursorSteps);
-
-      return end;
+      return NewLineManager.ReplaceAllLineEnds (header, " ").Length;
     }
 
     private void RemoveHeader (string header)
     {
       if (!string.IsNullOrEmpty (header))
       {
-        var start = _document.CreateEditPoint (_document.StartPoint);
-        var end = EndOfHeader (header, _document.StartPoint);
-        start.Delete (end);
+        var endIndexOfHeader = HeaderLength (header);
+        var newContent = GetText().Substring(endIndexOfHeader);
+        File.WriteAllText(_documentFilePath, newContent);
         RefreshText();
       }
     }

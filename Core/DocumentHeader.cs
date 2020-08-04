@@ -15,15 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using EnvDTE;
 using System.IO;
 
 namespace LicenseHeaderManager.Headers
 {
   internal class DocumentHeader
   {
-    private readonly string _text;
-    private readonly FileInfo _fileInfo;
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 
     public DocumentHeader (string documentFilePath, string text, IEnumerable<DocumentHeaderProperty> properties)
@@ -33,8 +30,8 @@ namespace LicenseHeaderManager.Headers
 
       _properties = properties;
 
-      _fileInfo = CreateFileInfo(documentFilePath);
-      _text = CreateText (text);
+      FileInfo = CreateFileInfo(documentFilePath);
+      Text = CreateText (text);
     }
 
     private FileInfo CreateFileInfo (string pathToDocument)
@@ -70,17 +67,11 @@ namespace LicenseHeaderManager.Headers
 
     public bool IsEmpty
     {
-      get { return _text == null; }
+      get { return Text == null; }
     }
 
-    public FileInfo FileInfo
-    {
-      get { return _fileInfo; }
-    }
+        public FileInfo FileInfo { get; }
 
-    public string Text
-    {
-      get { return _text; }
+        public string Text { get; }
     }
-  }
 }

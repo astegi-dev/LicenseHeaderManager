@@ -15,19 +15,18 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using EnvDTE;
+using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Utils;
 
-namespace LicenseHeaderManager.Headers
+namespace Core
 {
   class DocumentHeaderProperties : IEnumerable<DocumentHeaderProperty>
   {
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 
-    public DocumentHeaderProperties (ProjectItem projectItem)
+    public DocumentHeaderProperties ()
     {
-      _properties = CreateProperties (projectItem);
+      _properties = CreateProperties ();
     }
 
     public IEnumerator<DocumentHeaderProperty> GetEnumerator ()
@@ -40,11 +39,8 @@ namespace LicenseHeaderManager.Headers
       return GetEnumerator();
     }
 
-    private IEnumerable<DocumentHeaderProperty> CreateProperties (ProjectItem projectItem)
+    private IEnumerable<DocumentHeaderProperty> CreateProperties ()
     {
-      if (projectItem == null)
-        throw new ArgumentNullException ("projectItem");
-
       List<DocumentHeaderProperty> properties = new List<DocumentHeaderProperty>()
                                                 {
                                                   new DocumentHeaderProperty (
@@ -120,9 +116,9 @@ namespace LicenseHeaderManager.Headers
       }
       catch (Exception e)
       {
-        OutputWindowHandler.WriteMessage ("Could not get proper file path capitalization.");
+        /*OutputWindowHandler.WriteMessage ("Could not get proper file path capitalization.");
         OutputWindowHandler.WriteMessage ("Falling back to path as we receive it from 'FileInfo'.");
-        OutputWindowHandler.WriteMessage (e.ToString());
+        OutputWindowHandler.WriteMessage (e.ToString());*/
 
         //Use the FilePath in the same capitalization as we got it
         return fileInfo.FullName;
@@ -137,9 +133,9 @@ namespace LicenseHeaderManager.Headers
       }
       catch (Exception e)
       {
-        OutputWindowHandler.WriteMessage ("Could not get proper file name capitalization.");
+        /*OutputWindowHandler.WriteMessage ("Could not get proper file name capitalization.");
         OutputWindowHandler.WriteMessage ("Falling back to name as we receive it from 'FileInfo'.");
-        OutputWindowHandler.WriteMessage (e.ToString());
+        OutputWindowHandler.WriteMessage (e.ToString());*/
 
         //Use the FileName in the same capitalization as we got it
         return fileInfo.Name;

@@ -211,8 +211,6 @@
     <Compile Include="OutputWindowHandler.cs" />
     <Compile Include="PackageCommands\AddLicenseHeaderToAllFilesInProjectCommand.cs" />
     <Compile Include="PackageCommands\AddLicenseHeaderToAllFilesInSolutionCommand.cs" />
-    <Compile Include="Headers\CreateDocumentResult.cs" />
-    <Compile Include="Headers\Document.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="Headers\DocumentHeader.cs" />
     <Compile Include="Headers\DocumentHeaderProperties.cs" />
@@ -223,7 +221,6 @@
     <Compile Include="Headers\LineEndInformation.cs" />
     <Compile Include="Headers\NewLineManager.cs" />
     <Compile Include="Headers\ParseException.cs" />
-    <Compile Include="Headers\CommentParser.cs" />
     <Compile Include="Headers\UserInfo.cs" />
     <Compile Include="Interfaces\ILicenseHeaderExtension.cs" />
     <Compile Include="Interfaces\ILinkedFileFilter.cs" />
@@ -393,6 +390,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{b8d94ed6-4b73-443e-aba0-2c373b9e6735}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
