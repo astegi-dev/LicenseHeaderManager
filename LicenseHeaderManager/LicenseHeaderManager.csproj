@@ -200,6 +200,7 @@
     <Compile Include="ButtonHandler\ButtonHandlerFactory.cs" />
     <Compile Include="ButtonHandler\AddLicenseHeaderToAllProjectsButtonHandler.cs" />
     <Compile Include="ButtonHandler\SolutionLevelButtonThreadWorker.cs" />
+    <Compile Include="Headers\Document.cs" />
     <Compile Include="PackageCommands\AddNewSolutionLicenseHeaderDefinitionFileCommand.cs" />
     <Compile Include="PackageCommands\OpenSolutionLicenseHeaderDefinitionFileCommand.cs" />
     <Compile Include="PackageCommands\RemoveSolutionLicenseHeaderDefinitionFileCommand.cs" />
