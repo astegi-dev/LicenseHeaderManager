@@ -15,7 +15,7 @@
 using System;
 using System.IO;
 
-namespace LicenseHeaderManager.Utils
+namespace Core
 {
   public class PathUtility
   {

@@ -200,6 +200,8 @@
     <Compile Include="ButtonHandler\ButtonHandlerFactory.cs" />
     <Compile Include="ButtonHandler\AddLicenseHeaderToAllProjectsButtonHandler.cs" />
     <Compile Include="ButtonHandler\SolutionLevelButtonThreadWorker.cs" />
+    <Compile Include="Headers\CommentParser.cs" />
+    <Compile Include="Headers\CreateDocumentResult.cs" />
     <Compile Include="Headers\Document.cs" />
     <Compile Include="PackageCommands\AddNewSolutionLicenseHeaderDefinitionFileCommand.cs" />
     <Compile Include="PackageCommands\OpenSolutionLicenseHeaderDefinitionFileCommand.cs" />
@@ -391,12 +393,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj">
-      <Project>{b8d94ed6-4b73-443e-aba0-2c373b9e6735}</Project>
-      <Name>Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>

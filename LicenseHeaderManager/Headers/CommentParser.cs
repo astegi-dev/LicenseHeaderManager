@@ -14,8 +14,9 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using LicenseHeaderManager.Interfaces;
 
-namespace Core
+namespace LicenseHeaderManager.Headers
 {
   /// <summary>
   /// Detects a comment block at the beginning of a text block and returns it (if any).
@@ -103,7 +104,7 @@ namespace Core
         var firstNewLine = NewLineManager.NextLineEndPositionInformation (_text, start, _position - start);
         if (firstNewLine != null)
         {
-          int afterFirstNewLine = firstNewLine.Index + firstNewLine.LineEndLength;
+          int afterFirstNewLine = firstNewLine.Index + firstNewLine.LineEndLenght;
           int nextNewLine = NewLineManager.NextLineEndPosition (_text, afterFirstNewLine, _position - afterFirstNewLine);
           //more than one NewLine (= at least one empty line)
           if (nextNewLine > 0)

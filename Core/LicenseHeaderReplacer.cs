@@ -12,14 +12,13 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using Core.Properties;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Core;
+using Core.Properties;
 
-namespace LicenseHeaderManager.Headers
+namespace Core
 {
   public class LicenseHeaderReplacer
   {

@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.IO;
+using System.Text.RegularExpressions;
 
-namespace LicenseHeaderManager.Headers
+namespace Core
 {
   internal class DocumentHeader
   {

@@ -22,23 +22,26 @@ namespace LicenseHeaderManager.Headers
 {
   internal class DocumentHeader
   {
+    private readonly TextDocument _document;
     private readonly string _text;
     private readonly FileInfo _fileInfo;
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 
-    public DocumentHeader (string documentFilePath, string text, IEnumerable<DocumentHeaderProperty> properties)
+    public DocumentHeader (TextDocument document, string text, IEnumerable<DocumentHeaderProperty> properties)
     {
-      if (documentFilePath == null) throw new ArgumentNullException ("document");
+      if (document == null) throw new ArgumentNullException ("document");
       if (properties == null) throw new ArgumentNullException ("properties");
 
+      _document = document;
       _properties = properties;
 
-      _fileInfo = CreateFileInfo(documentFilePath);
+      _fileInfo = CreateFileInfo();
       _text = CreateText (text);
     }
 
-    private FileInfo CreateFileInfo (string pathToDocument)
+    private FileInfo CreateFileInfo ()
     {
+      string pathToDocument = _document.Parent.FullName;
 
       if (File.Exists (pathToDocument))
       {

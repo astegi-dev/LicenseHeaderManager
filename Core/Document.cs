@@ -17,8 +17,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using LicenseHeaderManager.Headers;
-using LicenseHeaderManager.Utils;
 using Language = Core.Language;
 
 namespace Core
@@ -135,23 +133,17 @@ namespace Core
       if (!string.IsNullOrEmpty (header))
       {
         var sb = new StringBuilder();
-        var newContent = sb.Append(header).Append(_lineEndingInDocument).Append(GetText()).ToString();
+        var newContent = sb.Append(header).Append(GetText()).ToString();
         File.WriteAllText(_documentFilePath, newContent);
         RefreshText();
       }
-    }
-
-    private int HeaderLength (string header)
-    {
-      return NewLineManager.ReplaceAllLineEnds (header, " ").Length;
     }
 
     private void RemoveHeader (string header)
     {
       if (!string.IsNullOrEmpty (header))
       {
-        var endIndexOfHeader = HeaderLength (header);
-        var newContent = GetText().Substring(endIndexOfHeader);
+        var newContent = GetText().Substring(header.Length);
         File.WriteAllText(_documentFilePath, newContent);
         RefreshText();
       }

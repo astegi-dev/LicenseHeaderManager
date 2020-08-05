@@ -13,8 +13,9 @@
 #endregion
 
 using System;
+using Core.Properties;
 
-namespace LicenseHeaderManager.Headers
+namespace Core
 {
   [Serializable]
   public class ParseException : Exception

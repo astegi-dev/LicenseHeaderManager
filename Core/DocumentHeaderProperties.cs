@@ -15,8 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using LicenseHeaderManager.Headers;
-using LicenseHeaderManager.Utils;
 
 namespace Core
 {

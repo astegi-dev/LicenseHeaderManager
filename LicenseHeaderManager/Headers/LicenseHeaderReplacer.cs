@@ -272,6 +272,7 @@ namespace LicenseHeaderManager.Headers
           textDocument,
           language,
           header,
+          item,
           optionsPage.UseRequiredKeywords
               ? optionsPage.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
               : null);

@@ -14,7 +14,7 @@
 
 using System;
 
-namespace LicenseHeaderManager.Headers
+namespace Core
 {
   internal class DocumentHeaderProperty
   {
