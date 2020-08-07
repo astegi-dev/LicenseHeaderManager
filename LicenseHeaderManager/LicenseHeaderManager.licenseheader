@@ -1,6 +1,9 @@
-﻿extensions: .cs
-// first line copyright
-// second line
+﻿extensions: .cs .js
+// first line %Project%,%Namespace%
+// second line copyright123
+
+// first line
+// second line copyright456
 extensions: .xaml
 <!--
 Copyright (c) rubicon IT GmbH

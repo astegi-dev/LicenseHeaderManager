@@ -1,10 +1,5 @@
 ﻿using NUnit.Framework;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework.Constraints;
 
 namespace Core.Tests
 {
@@ -24,7 +19,7 @@ namespace Core.Tests
       var replacer = new LicenseHeaderReplacer(languages, new [] {"1"});
 
       var headers = new Dictionary<string, string[]>();
-      headers.Add(".cs", new[] { "//1", "//2", "//3" });
+      headers.Add(".cs", new[] { "// first line 1", "// second line", "// copyright" });
       var res = replacer.RemoveOrReplaceHeader(@"C:\Users\gabriel.ratschiller\Desktop\TestFile.cs", headers);
     }
 

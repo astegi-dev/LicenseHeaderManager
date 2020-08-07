@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Core.Properties;
 
 namespace Core
@@ -48,7 +49,7 @@ namespace Core
     /// <param name="documentPath">The project item.</param>
     /// <param name="headers">A dictionary of headers using the file extension as key and the header as value or null if headers should only be removed.</param>
     /// <param name="calledbyUser">Specifies whether the command was called by the user (as opposed to automatically by a linked command or by ItemAdded)</param>
-    public string RemoveOrReplaceHeader (string documentPath, IDictionary<string, string[]> headers, bool calledbyUser = true)
+    public Task<string> RemoveOrReplaceHeader (string documentPath, IDictionary<string, string[]> headers, bool calledbyUser = true)
     {
       var message = "";
       try

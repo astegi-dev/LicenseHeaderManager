@@ -469,6 +469,7 @@ namespace LicenseHeaderManager
     #region command handlers
     private void AddLicenseHeaderCallback (object sender, EventArgs e)
     {
+      MessageBox.Show("AddLicenseHeaderCallback");
       var item = GetActiveProjectItem();
       AddLicenseHeaderToItem (item, !_isCalledByLinkedCommand);
     }
@@ -491,7 +492,7 @@ namespace LicenseHeaderManager
       }
     }
 
-    private void AddLicenseHeaderToProjectItemCallback (object sender, EventArgs e)
+    private async void AddLicenseHeaderToProjectItemCallback (object sender, EventArgs e)
     {
       var args = e as OleMenuCmdEventArgs;
       if (args == null) return;
@@ -501,7 +502,12 @@ namespace LicenseHeaderManager
 
       if (item != null && ProjectItemInspection.IsPhysicalFile (item) && !ProjectItemInspection.IsLicenseHeader (item))
       {
-        AddLicenseHeaderToItem (item, !_isCalledByLinkedCommand);
+        var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem(item);
+        var keywords = OptionsPage.UseRequiredKeywords
+          ? OptionsPage.RequiredKeywords.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(k => k.Trim())
+          : null;
+        var replacer = new Core.LicenseHeaderReplacer(LanguagesPage.Languages.Select(x => new Core.Language{Extensions = x.Extensions, BeginComment = x.BeginComment, BeginRegion = x.BeginRegion, EndComment = x.EndComment, EndRegion = x.EndRegion, LineComment = x.LineComment, SkipExpression = x.SkipExpression}), keywords);
+        await replacer.RemoveOrReplaceHeader(item.Document.FullName, headers, true);
       }
     }
 
