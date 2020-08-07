@@ -31,6 +31,8 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
     /// </summary>
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
+    private readonly OleMenuCommand _menuItem;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AddHeaderToProjectItemCommandAsync"/> class.
     /// Adds our command handlers for menu (commands must exist in the command table file)
@@ -43,8 +45,19 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      var menuItem = new OleMenuCommand (this.Execute, menuCommandID);
-      commandService.AddCommand (menuItem);
+      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
+      _menuItem.BeforeQueryStatus += OnQueryProjectItemCommandStatus;
+      commandService.AddCommand (_menuItem);
+    }
+
+    private void OnQueryProjectItemCommandStatus(object sender, EventArgs e)
+    {
+      var visible = false;
+
+      if (ServiceProvider.GetSolutionExplorerItem() is ProjectItem item)
+        visible = ServiceProvider.ShouldBeVisible(item);
+
+      _menuItem.Visible = visible;
     }
 
     /// <summary>

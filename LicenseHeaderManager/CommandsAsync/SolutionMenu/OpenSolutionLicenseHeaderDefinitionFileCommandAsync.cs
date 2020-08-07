@@ -22,10 +22,7 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     /// </summary>
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
-    /// <summary>
-    /// VS Package that provides this command, not null.
-    /// </summary>
-    private readonly AsyncPackage package;
+    private readonly OleMenuCommand _menuItem;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="OpenSolutionLicenseHeaderDefinitionFileCommandAsync"/> class.
@@ -35,12 +32,18 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     /// <param name="commandService">Command service to add command to, not null.</param>
     private OpenSolutionLicenseHeaderDefinitionFileCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
     {
-      this.package = package ?? throw new ArgumentNullException (nameof (package));
+      ServiceProvider = (LicenseHeadersPackage)package ?? throw new ArgumentNullException(nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof (commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      var menuItem = new OleMenuCommand(this.Execute, menuCommandID);
-      commandService.AddCommand (menuItem);
+      _menuItem = new OleMenuCommand(this.Execute, menuCommandID);
+      _menuItem.BeforeQueryStatus += OnQuerySolutionCommandStatus;
+      commandService.AddCommand (_menuItem);
+    }
+
+    private void OnQuerySolutionCommandStatus(object sender, EventArgs e)
+    {
+      _menuItem.Enabled = ServiceProvider.SolutionHeaderDefinitionExists();
     }
 
     /// <summary>
@@ -55,12 +58,9 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     /// <summary>
     /// Gets the service provider from the owner package.
     /// </summary>
-    private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
+    private LicenseHeadersPackage ServiceProvider
     {
-      get
-      {
-        return this.package;
-      }
+      get;
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
 
       // Show a message box to prove we were here
       VsShellUtilities.ShowMessageBox (
-          this.package,
+          ServiceProvider,
           message,
           title,
           OLEMSGICON.OLEMSGICON_INFO,

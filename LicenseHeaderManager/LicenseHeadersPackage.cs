@@ -318,13 +318,13 @@ namespace LicenseHeaderManager
       _removeSolutionHeaderDefinitionFileCommand.Enabled = solutionHeaderDefinitionExists;
     }
 
-    private bool SolutionHeaderDefinitionExists ()
+    public bool SolutionHeaderDefinitionExists ()
     {
       string solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (_dte.Solution);
       return File.Exists (solutionHeaderDefinitionFilePath);
     }
 
-    private bool ShouldBeVisible (ProjectItem item)
+    public bool ShouldBeVisible (ProjectItem item)
     {
       bool visible = false;
 
@@ -339,7 +339,7 @@ namespace LicenseHeaderManager
       return visible;
     }
 
-    private ProjectItem GetActiveProjectItem ()
+    public ProjectItem GetActiveProjectItem ()
     {
       try
       {

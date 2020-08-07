@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Globalization;
+using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
@@ -22,10 +23,7 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     /// </summary>
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
-    /// <summary>
-    /// VS Package that provides this command, not null.
-    /// </summary>
-    private readonly AsyncPackage package;
+    private readonly OleMenuCommand _menuItem;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AddLicenseHeaderToAllFilesInProjectCommandAsync"/> class.
@@ -35,12 +33,26 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     /// <param name="commandService">Command service to add command to, not null.</param>
     private AddLicenseHeaderToAllFilesInProjectCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
     {
-      this.package = package ?? throw new ArgumentNullException (nameof (package));
+      ServiceProvider = (LicenseHeadersPackage)package ?? throw new ArgumentNullException(nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof (commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      var menuItem = new OleMenuCommand(this.Execute, menuCommandID);
-      commandService.AddCommand (menuItem);
+      _menuItem = new OleMenuCommand(this.Execute, menuCommandID);
+      _menuItem.BeforeQueryStatus += OnQueryAllFilesCommandStatus;
+      commandService.AddCommand (_menuItem);
+    }
+
+    private void OnQueryAllFilesCommandStatus(object sender, EventArgs e)
+    {
+      bool visible;
+
+      var obj = ServiceProvider.GetSolutionExplorerItem();
+      if (obj is ProjectItem item)
+        visible = ServiceProvider.ShouldBeVisible(item);
+      else
+        visible = obj is Project;
+
+      _menuItem.Visible = visible;
     }
 
     /// <summary>
@@ -55,12 +67,9 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     /// <summary>
     /// Gets the service provider from the owner package.
     /// </summary>
-    private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
+    private LicenseHeadersPackage ServiceProvider
     {
-      get
-      {
-        return this.package;
-      }
+      get;
     }
 
     /// <summary>
@@ -92,7 +101,7 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
 
       // Show a message box to prove we were here
       VsShellUtilities.ShowMessageBox (
-          this.package,
+          ServiceProvider,
           message,
           title,
           OLEMSGICON.OLEMSGICON_INFO,
