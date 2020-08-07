@@ -91,7 +91,7 @@ namespace Core
         message = $"{ex.Message} {documentPath}";
       }
 
-      return message;
+      return Task.FromResult (message);;
     }
 
     public static bool IsLicenseHeader(string documentPath)

@@ -200,6 +200,24 @@
     <Compile Include="ButtonHandler\ButtonHandlerFactory.cs" />
     <Compile Include="ButtonHandler\AddLicenseHeaderToAllProjectsButtonHandler.cs" />
     <Compile Include="ButtonHandler\SolutionLevelButtonThreadWorker.cs" />
+    <Compile Include="CommandsAsync\FolderMenu\AddExistingLicenseHeaderDefinitionFileToFolderCommandAsync.cs" />
+    <Compile Include="CommandsAsync\ProjectMenu\AddExistingLicenseHeaderDefinitionFileToProjectCommandAsync.cs" />
+    <Compile Include="CommandsAsync\ProjectItemMenu\AddHeaderToProjectItemCommandAsync.cs" />
+    <Compile Include="CommandsAsync\EditorMenu\AddLicenseHeaderEditorAdvancedMenuCommandAsync.cs" />
+    <Compile Include="CommandsAsync\FolderMenu\AddLicenseHeaderToAllFilesInFolderCommandAsync.cs" />
+    <Compile Include="CommandsAsync\ProjectMenu\AddLicenseHeaderToAllFilesInProjectCommandAsync.cs" />
+    <Compile Include="CommandsAsync\SolutionMenu\AddLicenseHeaderToAllFilesInSolutionCommandAsync.cs" />
+    <Compile Include="CommandsAsync\FolderMenu\AddNewLicenseHeaderDefinitionFileToFolderCommandAsync.cs" />
+    <Compile Include="CommandsAsync\ProjectMenu\AddNewLicenseHeaderDefinitionFileToProjectCommandAsync.cs" />
+    <Compile Include="CommandsAsync\SolutionMenu\AddNewSolutionLicenseHeaderDefinitionFileCommandAsync.cs" />
+    <Compile Include="CommandsAsync\ProjectMenu\LicenseHeaderOptionsCommandAsync.cs" />
+    <Compile Include="CommandsAsync\SolutionMenu\OpenSolutionLicenseHeaderDefinitionFileCommandAsync.cs" />
+    <Compile Include="CommandsAsync\ProjectItemMenu\RemoveHeaderFromProjectItemCommandAsync.cs" />
+    <Compile Include="CommandsAsync\EditorMenu\RemoveLicenseHeaderEditorAdvancedMenuCommandAsync.cs" />
+    <Compile Include="CommandsAsync\FolderMenu\RemoveLicenseHeaderFromAllFilesInFolderCommandAsync.cs" />
+    <Compile Include="CommandsAsync\ProjectMenu\RemoveLicenseHeaderFromAllFilesInProjectCommandAsync.cs" />
+    <Compile Include="CommandsAsync\SolutionMenu\RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync.cs" />
+    <Compile Include="CommandsAsync\SolutionMenu\RemoveSolutionLicenseHeaderDefinitionFileCommandAsync.cs" />
     <Compile Include="Headers\CommentParser.cs" />
     <Compile Include="Headers\CreateDocumentResult.cs" />
     <Compile Include="Headers\Document.cs" />
@@ -401,6 +419,7 @@
       <Name>Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>
