@@ -12,6 +12,7 @@ using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
+using LicenseHeaderReplacer = Core.LicenseHeaderReplacer;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
@@ -111,19 +112,8 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
         return;
 
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
-      var keywords = ServiceProvider.OptionsPage.UseRequiredKeywords
-          ? ServiceProvider.OptionsPage.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
-          : null;
-      var replacer = new Core.LicenseHeaderReplacer (
-          ServiceProvider.LanguagesPage.Languages.Select (
-              x => new Core.Language
-                   {
-                       Extensions = x.Extensions, BeginComment = x.BeginComment, BeginRegion = x.BeginRegion, EndComment = x.EndComment, EndRegion = x.EndRegion,
-                       LineComment = x.LineComment, SkipExpression = x.SkipExpression
-                   }),
-          keywords);
 
-      var result = await replacer.RemoveOrReplaceHeader (item.Document.FullName, headers, true);
+      var result = await ServiceProvider.GetLicenseHeaderReplacer().RemoveOrReplaceHeader (item.Document.FullName, headers, true);
       if (!string.IsNullOrEmpty (result))
         MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
     }

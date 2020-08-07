@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.IO;
+using Core;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -93,17 +95,13 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
     private void Execute (object sender, EventArgs e)
     {
       ThreadHelper.ThrowIfNotOnUIThread ();
-      string message = string.Format (CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType ().FullName);
-      string title = "RemoveHeaderFromProjectItemCommandAsync";
 
-      // Show a message box to prove we were here
-      VsShellUtilities.ShowMessageBox (
-          ServiceProvider,
-          message,
-          title,
-          OLEMSGICON.OLEMSGICON_INFO,
-          OLEMSGBUTTON.OLEMSGBUTTON_OK,
-          OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+      if (!(e is OleMenuCmdEventArgs args))
+        return;
+
+      var item = args.InValue as ProjectItem ?? ServiceProvider.GetSolutionExplorerItem() as ProjectItem;
+      if (item != null && Path.GetExtension(item.Name) != LicenseHeader.Extension)
+        ServiceProvider._licenseReplacer.RemoveOrReplaceHeaderRecursive(item, null, false);
     }
   }
 }

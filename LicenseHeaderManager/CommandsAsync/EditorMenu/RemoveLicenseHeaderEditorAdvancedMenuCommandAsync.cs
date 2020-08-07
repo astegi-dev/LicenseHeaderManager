@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Globalization;
 using Microsoft.VisualStudio.Shell;
@@ -95,17 +96,14 @@ namespace LicenseHeaderManager.CommandsAsync.EditorMenu
     private void Execute (object sender, EventArgs e)
     {
       ThreadHelper.ThrowIfNotOnUIThread ();
-      string message = string.Format (CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType ().FullName);
-      string title = "RemoveLicenseHeaderEditorAdvancedMenuCommandAsync";
 
-      // Show a message box to prove we were here
-      VsShellUtilities.ShowMessageBox (
-          ServiceProvider,
-          message,
-          title,
-          OLEMSGICON.OLEMSGICON_INFO,
-          OLEMSGBUTTON.OLEMSGBUTTON_OK,
-          OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+      var item = ServiceProvider.GetActiveProjectItem();
+      if (item == null)
+        return;
+      
+      // TODO call Core
+      ServiceProvider._licenseReplacer.RemoveOrReplaceHeader(item, null, true);
+
     }
   }
 }

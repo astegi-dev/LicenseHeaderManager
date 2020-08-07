@@ -114,7 +114,7 @@ namespace LicenseHeaderManager
     private OleMenuCommand _removeSolutionHeaderDefinitionFileCommand;
 
 
-    private LicenseHeaderReplacer _licenseReplacer;
+    public LicenseHeaderReplacer _licenseReplacer;
 
 
     /// <summary>
@@ -355,7 +355,7 @@ namespace LicenseHeaderManager
       }
     }
 
-    private bool _isCalledByLinkedCommand = false;
+    public bool _isCalledByLinkedCommand = false;
 
     public object GetSolutionExplorerItem ()
     {
@@ -496,12 +496,11 @@ namespace LicenseHeaderManager
     #region command handlers
     private void AddLicenseHeaderCallback (object sender, EventArgs e)
     {
-      MessageBox.Show ("AddLicenseHeaderCallback");
       var item = GetActiveProjectItem ();
       AddLicenseHeaderToItem (item, !_isCalledByLinkedCommand);
     }
 
-    private void AddLicenseHeaderToItem (ProjectItem item, bool calledByUser)
+    public void AddLicenseHeaderToItem (ProjectItem item, bool calledByUser)
     {
       if (item == null || ProjectItemInspection.IsLicenseHeader (item))
         return;
@@ -532,12 +531,16 @@ namespace LicenseHeaderManager
       if (item != null && ProjectItemInspection.IsPhysicalFile (item) && !ProjectItemInspection.IsLicenseHeader (item))
       {
         var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem(item);
-        var keywords = OptionsPage.UseRequiredKeywords
-            ? OptionsPage.RequiredKeywords.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(k => k.Trim())
-            : null;
-        var replacer = new Core.LicenseHeaderReplacer(LanguagesPage.Languages.Select(x => new Core.Language{Extensions = x.Extensions, BeginComment = x.BeginComment, BeginRegion = x.BeginRegion, EndComment = x.EndComment, EndRegion = x.EndRegion, LineComment = x.LineComment, SkipExpression = x.SkipExpression}), keywords);
-        await replacer.RemoveOrReplaceHeader(item.Document.FullName, headers, true);
+        await GetLicenseHeaderReplacer().RemoveOrReplaceHeader(item.Document.FullName, headers, true);
       }
+    }
+
+    public Core.LicenseHeaderReplacer GetLicenseHeaderReplacer()
+    {
+      var keywords = OptionsPage.UseRequiredKeywords
+        ? OptionsPage.RequiredKeywords.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(k => k.Trim())
+        : null;
+      return new Core.LicenseHeaderReplacer(LanguagesPage.Languages.Select(x => new Core.Language { Extensions = x.Extensions, BeginComment = x.BeginComment, BeginRegion = x.BeginRegion, EndComment = x.EndComment, EndRegion = x.EndRegion, LineComment = x.LineComment, SkipExpression = x.SkipExpression }), keywords);
     }
 
     private void RemoveLicenseHeaderCallback (object sender, EventArgs e)
