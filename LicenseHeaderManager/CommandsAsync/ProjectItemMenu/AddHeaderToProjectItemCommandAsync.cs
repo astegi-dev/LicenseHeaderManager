@@ -1,8 +1,17 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using EnvDTE;
+using LicenseHeaderManager.Headers;
+using LicenseHeaderManager.Options;
+using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Threading;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
@@ -23,11 +32,6 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
     /// <summary>
-    /// VS Package that provides this command, not null.
-    /// </summary>
-    private readonly AsyncPackage package;
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="AddHeaderToProjectItemCommandAsync"/> class.
     /// Adds our command handlers for menu (commands must exist in the command table file)
     /// </summary>
@@ -35,33 +39,23 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
     /// <param name="commandService">Command service to add command to, not null.</param>
     private AddHeaderToProjectItemCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
     {
-      this.package = package ?? throw new ArgumentNullException (nameof (package));
-      commandService = commandService ?? throw new ArgumentNullException (nameof (commandService));
+      ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
+      commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      var menuItem = new MenuCommand (this.Execute, menuCommandID);
+      var menuItem = new OleMenuCommand (this.Execute, menuCommandID);
       commandService.AddCommand (menuItem);
     }
 
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static AddHeaderToProjectItemCommandAsync Instance
-    {
-      get;
-      private set;
-    }
+    public static AddHeaderToProjectItemCommandAsync Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
     /// </summary>
-    private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
-    {
-      get
-      {
-        return this.package;
-      }
-    }
+    private LicenseHeadersPackage ServiceProvider { get; }
 
     /// <summary>
     /// Initializes the singleton instance of the command.
@@ -87,17 +81,38 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
     private void Execute (object sender, EventArgs e)
     {
       ThreadHelper.ThrowIfNotOnUIThread ();
-      string message = string.Format (CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType ().FullName);
-      string title = "AddHeaderToProjectItemCommandAsync";
 
-      // Show a message box to prove we were here
-      VsShellUtilities.ShowMessageBox (
-          this.package,
-          message,
-          title,
-          OLEMSGICON.OLEMSGICON_INFO,
-          OLEMSGBUTTON.OLEMSGBUTTON_OK,
-          OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+      if (!(e is OleMenuCmdEventArgs args))
+        return;
+
+      ExecuteInternalAsync (args).FireAndForget();
+    }
+
+    private async Task ExecuteInternalAsync (OleMenuCmdEventArgs args)
+    {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+      var item = args.InValue as ProjectItem ?? ServiceProvider.GetSolutionExplorerItem() as ProjectItem;
+
+      if (item == null || !ProjectItemInspection.IsPhysicalFile (item) || ProjectItemInspection.IsLicenseHeader (item))
+        return;
+
+      var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
+      var keywords = ServiceProvider.OptionsPage.UseRequiredKeywords
+          ? ServiceProvider.OptionsPage.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
+          : null;
+      var replacer = new Core.LicenseHeaderReplacer (
+          ServiceProvider.LanguagesPage.Languages.Select (
+              x => new Core.Language
+                   {
+                       Extensions = x.Extensions, BeginComment = x.BeginComment, BeginRegion = x.BeginRegion, EndComment = x.EndComment, EndRegion = x.EndRegion,
+                       LineComment = x.LineComment, SkipExpression = x.SkipExpression
+                   }),
+          keywords);
+
+      var result = await replacer.RemoveOrReplaceHeader (item.Document.FullName, headers, true);
+      if (!string.IsNullOrEmpty (result))
+        MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
     }
   }
 }
