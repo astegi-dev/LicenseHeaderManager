@@ -80,6 +80,11 @@ namespace LicenseHeaderManager.CommandsAsync.EditorMenu
       Instance = new AddLicenseHeaderEditorAdvancedMenuCommandAsync (package, commandService);
     }
 
+    public void Invoke()
+    {
+      _menuItem.Invoke();
+    }
+
     /// <summary>
     /// This function is the callback used to execute the command when the menu item is clicked.
     /// See the constructor to see how the menu item is associated with this function using
