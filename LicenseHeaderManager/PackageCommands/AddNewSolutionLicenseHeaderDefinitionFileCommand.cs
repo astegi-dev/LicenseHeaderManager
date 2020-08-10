@@ -31,10 +31,10 @@ namespace LicenseHeaderManager.PackageCommands
 
     public void Execute (Solution solution)
     {
-      string solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (solution);
+      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (solution);
 
       // Add file
-      string defaultLicenseHeaderFileText = this._defaultHeaderDefinitionFunc();
+      var defaultLicenseHeaderFileText = this._defaultHeaderDefinitionFunc();
 
       File.WriteAllText (solutionHeaderDefinitionFilePath, defaultLicenseHeaderFileText, Encoding.UTF8);
 

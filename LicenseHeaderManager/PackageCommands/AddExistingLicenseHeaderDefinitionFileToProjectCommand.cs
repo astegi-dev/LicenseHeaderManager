@@ -18,6 +18,7 @@ using System.Linq;
 using System.Windows;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.Win32;
 
 namespace LicenseHeaderManager.PackageCommands
@@ -47,10 +48,10 @@ namespace LicenseHeaderManager.PackageCommands
 
     private ProjectItem AddFileToProject (ProjectItems projectItems, string licenseHeaderDefinitionFileName)
     {
-      int fileCountBefore = projectItems.Count;
+      var fileCountBefore = projectItems.Count;
       var newProjectItem = projectItems.AddFromFile (licenseHeaderDefinitionFileName);
 
-      int fileCountAfter = projectItems.Count;
+      var fileCountAfter = projectItems.Count;
       if (fileCountBefore == fileCountAfter)
       {
         MessageBox.Show (
@@ -72,7 +73,7 @@ namespace LicenseHeaderManager.PackageCommands
       dialog.DereferenceLinks = true;
       dialog.Filter = "License Header Definitions|*" + LicenseHeader.Extension;
       dialog.InitialDirectory = Path.GetDirectoryName (fileName);
-      bool? result = dialog.ShowDialog();
+      var result = dialog.ShowDialog();
 
       if (result.HasValue && result.Value)
         return dialog.FileName;

@@ -45,7 +45,7 @@ namespace LicenseHeaderManager.PackageCommands
     {
       if (solution == null) return;
 
-      IDictionary<string, string[]> solutionHeaderDefinitions = LicenseHeaderFinder.GetHeaderDefinitionForSolution (solution);
+      var solutionHeaderDefinitions = LicenseHeaderFinder.GetHeaderDefinitionForSolution (solution);
 
       var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
       var projectsInSolution = allSolutionProjectsSearcher.GetAllProjects (solution);
@@ -67,7 +67,7 @@ namespace LicenseHeaderManager.PackageCommands
       {
         // Some projects are not covered by a header.
 
-        bool someProjectsHaveDefinition = projectsWithLicenseHeaderFile.Count > 0;
+        var someProjectsHaveDefinition = projectsWithLicenseHeaderFile.Count > 0;
         if (someProjectsHaveDefinition)
         {
           // Some projects have a header. Ask the user if they want to add an existing header to the uncovered projects.
@@ -128,17 +128,17 @@ namespace LicenseHeaderManager.PackageCommands
 
     private void AddLicenseHeaderToProjects (List<Project> projectsInSolution)
     {
-      int progressCount = 1;
-      int projectCount = projectsInSolution.Count;
+      var progressCount = 1;
+      var projectCount = projectsInSolution.Count;
 
-      foreach (Project project in projectsInSolution)
+      foreach (var project in projectsInSolution)
       {
         _solutionUpdateViewModel.ProgressText = string.Format (
             "Currently updating '{0}'. Updating {1}/{2} Projects.",
             project.Name,
             progressCount,
             projectCount);
-        new AddLicenseHeaderToAllFilesInProjectCommand (_licenseReplacer).Execute (project);
+        new AddLicenseHeaderToAllFilesInProjectCommandDelegate (_licenseReplacer).Execute (project);
         progressCount++;
       }
     }

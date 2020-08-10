@@ -1,6 +1,8 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Globalization;
+using EnvDTE;
+using LicenseHeaderManager.PackageCommands;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
@@ -23,11 +25,6 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
     /// <summary>
-    /// VS Package that provides this command, not null.
-    /// </summary>
-    private readonly AsyncPackage package;
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="AddExistingLicenseHeaderDefinitionFileToFolderCommandAsync"/> class.
     /// Adds our command handlers for menu (commands must exist in the command table file)
     /// </summary>
@@ -35,33 +32,23 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
     /// <param name="commandService">Command service to add command to, not null.</param>
     private AddExistingLicenseHeaderDefinitionFileToFolderCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
     {
-      this.package = package ?? throw new ArgumentNullException (nameof (package));
-      commandService = commandService ?? throw new ArgumentNullException (nameof (commandService));
+      ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
+      commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      var menuItem = new OleMenuCommand(this.Execute, menuCommandID);
+      var menuItem = new OleMenuCommand (this.Execute, menuCommandID);
       commandService.AddCommand (menuItem);
     }
 
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static AddExistingLicenseHeaderDefinitionFileToFolderCommandAsync Instance
-    {
-      get;
-      private set;
-    }
+    public static AddExistingLicenseHeaderDefinitionFileToFolderCommandAsync Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
     /// </summary>
-    private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
-    {
-      get
-      {
-        return this.package;
-      }
-    }
+    private LicenseHeadersPackage ServiceProvider { get; }
 
     /// <summary>
     /// Initializes the singleton instance of the command.
@@ -73,7 +60,7 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
-      OleMenuCommandService commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
+      var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
       Instance = new AddExistingLicenseHeaderDefinitionFileToFolderCommandAsync (package, commandService);
     }
 
@@ -86,18 +73,38 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
     /// <param name="e">Event args.</param>
     private void Execute (object sender, EventArgs e)
     {
-      ThreadHelper.ThrowIfNotOnUIThread ();
-      string message = string.Format (CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType ().FullName);
-      string title = "AddExistingLicenseHeaderDefinitionFileToFolderCommandAsync";
+      ThreadHelper.ThrowIfNotOnUIThread();
 
-      // Show a message box to prove we were here
-      VsShellUtilities.ShowMessageBox (
-          this.package,
-          message,
-          title,
-          OLEMSGICON.OLEMSGICON_INFO,
-          OLEMSGBUTTON.OLEMSGBUTTON_OK,
-          OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+      var project = ServiceProvider.GetSolutionExplorerItem() as Project;
+      var projectItem = ServiceProvider.GetSolutionExplorerItem() as ProjectItem;
+
+      string fileName;
+
+      if (project != null)
+      {
+        fileName = project.FileName;
+      }
+      else if (projectItem != null)
+      {
+        fileName = projectItem.Name;
+      }
+      else
+      {
+        return;
+      }
+
+      ProjectItems projectItems = null;
+
+      if (project != null)
+      {
+        projectItems = project.ProjectItems;
+      }
+      else if (projectItem != null)
+      {
+        projectItems = projectItem.ProjectItems;
+      }
+
+      new AddExistingLicenseHeaderDefinitionFileToProjectCommand().AddDefinitionFileToOneProject (fileName, projectItems);
     }
   }
 }

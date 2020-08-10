@@ -2,6 +2,7 @@
 using System.ComponentModel.Design;
 using System.Globalization;
 using EnvDTE;
+using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
@@ -82,7 +83,7 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
-      OleMenuCommandService commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
+      var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
       Instance = new RemoveLicenseHeaderFromAllFilesInProjectCommandAsync (package, commandService);
     }
 
@@ -96,17 +97,9 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     private void Execute (object sender, EventArgs e)
     {
       ThreadHelper.ThrowIfNotOnUIThread ();
-      string message = string.Format (CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType ().FullName);
-      string title = "RemoveLicenseHeaderFromAllFilesInProjectCommandAsync";
 
-      // Show a message box to prove we were here
-      VsShellUtilities.ShowMessageBox (
-          ServiceProvider,
-          message,
-          title,
-          OLEMSGICON.OLEMSGICON_INFO,
-          OLEMSGBUTTON.OLEMSGBUTTON_OK,
-          OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+      var obj = ServiceProvider.GetSolutionExplorerItem();
+      ServiceProvider.RemoveLicenseHeadersFromAllFilesAsync(obj).FireAndForget();
     }
   }
 }

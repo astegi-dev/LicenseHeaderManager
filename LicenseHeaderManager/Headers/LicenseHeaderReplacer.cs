@@ -58,7 +58,7 @@ namespace LicenseHeaderManager.Headers
         Document document;
         bool wasOpen;
 
-        CreateDocumentResult result = TryCreateDocument (item, out document, out wasOpen, headers);
+        var result = TryCreateDocument (item, out document, out wasOpen, headers);
         string message;
 
         switch (result)
@@ -112,21 +112,21 @@ namespace LicenseHeaderManager.Headers
     /// <param name="searchForLicenseHeaders"></param>
     public int RemoveOrReplaceHeaderRecursive (ProjectItem item, IDictionary<string, string[]> headers, bool searchForLicenseHeaders = true)
     {
-      int headersFound = 0;
+      var headersFound = 0;
       bool wasOpen;
 
       Document document;
       if (TryCreateDocument (item, out document, out wasOpen, headers) == CreateDocumentResult.DocumentCreated)
       {
         // item.Saved is not implemented for web_folders, therefore this check must be after the TryCreateDocument
-        bool isSaved = item.Saved;
+        var isSaved = item.Saved;
 
         string message;
-        bool replace = true;
+        var replace = true;
 
         if (!document.ValidateHeader())
         {
-          string extension = Path.GetExtension (item.Name);
+          var extension = Path.GetExtension (item.Name);
           if (!_extensionsWithInvalidHeaders.TryGetValue (extension, out replace))
           {
             message = string.Format (Resources.Warning_InvalidLicenseHeader, extension).Replace (@"\n", "\n");

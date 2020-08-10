@@ -31,7 +31,7 @@ namespace LicenseHeaderManager.Utils
 
     public void Handle (LicenseHeaderReplacer licenseHeaderReplacer, ILinkedFileFilter linkedFileFilter)
     {
-      foreach (ProjectItem projectItem in linkedFileFilter.ToBeProgressed)
+      foreach (var projectItem in linkedFileFilter.ToBeProgressed)
       {
         var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (projectItem);
         licenseHeaderReplacer.RemoveOrReplaceHeader (projectItem, headers, true);
@@ -39,10 +39,10 @@ namespace LicenseHeaderManager.Utils
 
       if (linkedFileFilter.NoLicenseHeaderFile.Any() || linkedFileFilter.NotInSolution.Any())
       {
-        List<ProjectItem> notProgressedItems =
+        var notProgressedItems =
             linkedFileFilter.NoLicenseHeaderFile.Concat (linkedFileFilter.NotInSolution).ToList();
 
-        List<string> notProgressedNames = notProgressedItems.Select (x => x.Name).ToList();
+        var notProgressedNames = notProgressedItems.Select (x => x.Name).ToList();
 
         Message +=
             string.Format (Resources.LinkedFileUpdateInformation, string.Join ("\n", notProgressedNames))

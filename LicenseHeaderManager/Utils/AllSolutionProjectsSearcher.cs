@@ -23,7 +23,7 @@ namespace LicenseHeaderManager.Utils
   {
     public List<Project> GetAllProjects (Solution solution)
     {
-      List<Project> projectList = new List<Project>();
+      var projectList = new List<Project>();
       PopulateProjectsList (solution, projectList);
 
       return projectList;
@@ -59,7 +59,7 @@ namespace LicenseHeaderManager.Utils
 
     private IEnumerable<Project> GetSolutionFolderProjects (Project project)
     {
-      List<Project> list = new List<Project>();
+      var list = new List<Project>();
       for (var i = 1; i <= project.ProjectItems.Count; i++)
       {
         var subProject = project.ProjectItems.Item (i).SubProject;

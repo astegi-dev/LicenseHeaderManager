@@ -57,7 +57,7 @@ namespace LicenseHeaderManager.Headers
       _text = text;
       _regionStarts = new Stack<int>();
 
-      for (string token = GetToken(); HandleToken (token); token = GetToken())
+      for (var token = GetToken(); HandleToken (token); token = GetToken())
       {
       }
 
@@ -78,7 +78,7 @@ namespace LicenseHeaderManager.Headers
       if (SkipWhiteSpaces())
         return null;
 
-      int start = _position;
+      var start = _position;
       for (; _position < _text.Length && !char.IsWhiteSpace (_text, _position); _position++)
       {
       }
@@ -87,7 +87,7 @@ namespace LicenseHeaderManager.Headers
 
     private bool SkipWhiteSpaces ()
     {
-      int start = _position;
+      var start = _position;
 
       //move to next real character
       for (; _position < _text.Length && char.IsWhiteSpace (_text, _position); _position++)
@@ -104,8 +104,8 @@ namespace LicenseHeaderManager.Headers
         var firstNewLine = NewLineManager.NextLineEndPositionInformation (_text, start, _position - start);
         if (firstNewLine != null)
         {
-          int afterFirstNewLine = firstNewLine.Index + firstNewLine.LineEndLenght;
-          int nextNewLine = NewLineManager.NextLineEndPosition (_text, afterFirstNewLine, _position - afterFirstNewLine);
+          var afterFirstNewLine = firstNewLine.Index + firstNewLine.LineEndLenght;
+          var nextNewLine = NewLineManager.NextLineEndPosition (_text, afterFirstNewLine, _position - afterFirstNewLine);
           //more than one NewLine (= at least one empty line)
           if (nextNewLine > 0)
             return true;
@@ -179,7 +179,7 @@ namespace LicenseHeaderManager.Headers
       {
         SetStarted();
 
-        string firstPart = token;
+        var firstPart = token;
         token = GetToken();
 
         if ((firstPart + " " + token) == EndRegion)

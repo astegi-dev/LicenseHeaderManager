@@ -34,7 +34,7 @@ namespace LicenseHeaderManager.Headers
     public static IDictionary<string, string[]> GetHeaderDefinitionForItem (ProjectItem projectItem)
     {
       // First search for the definition within the project
-      IDictionary<string, string[]> headerDefinition = SearchWithinProjectGetHeaderDefinitionForItem (projectItem);
+      var headerDefinition = SearchWithinProjectGetHeaderDefinitionForItem (projectItem);
       if (headerDefinition != null)
       {
         return headerDefinition;
@@ -95,10 +95,10 @@ namespace LicenseHeaderManager.Headers
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
     public static IDictionary<string, string[]> GetHeaderDefinitionForSolution (Solution solution)
     {
-      string solutionDirectory = Path.GetDirectoryName (solution.FullName);
-      string solutionFileName = Path.GetFileName (solution.FullName);
+      var solutionDirectory = Path.GetDirectoryName (solution.FullName);
+      var solutionFileName = Path.GetFileName (solution.FullName);
 
-      string solutionHeaderFilePath = Path.Combine (solutionDirectory, solutionFileName + LicenseHeader.Extension);
+      var solutionHeaderFilePath = Path.Combine (solutionDirectory, solutionFileName + LicenseHeader.Extension);
       if (File.Exists (solutionHeaderFilePath))
       {
         return LoadHeaderDefinition (solutionHeaderFilePath);

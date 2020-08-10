@@ -21,7 +21,7 @@ namespace LicenseHeaderManager.Utils
   {
     private static string GetProperDirectoryCapitalization (DirectoryInfo dirInfo)
     {
-      DirectoryInfo parentDirInfo = dirInfo.Parent;
+      var parentDirInfo = dirInfo.Parent;
 
       if (null == parentDirInfo)
         return dirInfo.Root.FullName;
@@ -36,7 +36,7 @@ namespace LicenseHeaderManager.Utils
       if (fileInfo == null)
         throw new ArgumentNullException ("fileInfo");
 
-      DirectoryInfo dirInfo = fileInfo.Directory;
+      var dirInfo = fileInfo.Directory;
 
       var properDirectory = GetProperDirectoryCapitalization (dirInfo);
       return Path.Combine (

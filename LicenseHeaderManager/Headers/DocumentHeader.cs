@@ -32,7 +32,7 @@ namespace LicenseHeaderManager.Headers
 
     private FileInfo CreateFileInfo ()
     {
-      string pathToDocument = _document.Parent.FullName;
+      var pathToDocument = _document.Parent.FullName;
 
       if (File.Exists (pathToDocument))
       {
@@ -48,9 +48,9 @@ namespace LicenseHeaderManager.Headers
         return null;
       }
 
-      string finalText = inputText;
+      var finalText = inputText;
 
-      foreach (DocumentHeaderProperty property in _properties)
+      foreach (var property in _properties)
       {
         if (property.CanCreateValue (this))
         {

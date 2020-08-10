@@ -1,8 +1,10 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Globalization;
+﻿using EnvDTE;
+using LicenseHeaderManager.PackageCommands;
+using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using System;
+using System.ComponentModel.Design;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
@@ -23,11 +25,6 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
     /// <summary>
-    /// VS Package that provides this command, not null.
-    /// </summary>
-    private readonly AsyncPackage package;
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync"/> class.
     /// Adds our command handlers for menu (commands must exist in the command table file)
     /// </summary>
@@ -35,33 +32,23 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     /// <param name="commandService">Command service to add command to, not null.</param>
     private RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
     {
-      this.package = package ?? throw new ArgumentNullException (nameof (package));
-      commandService = commandService ?? throw new ArgumentNullException (nameof (commandService));
+      ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
+      commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      var menuItem = new OleMenuCommand(this.Execute, menuCommandID);
+      var menuItem = new OleMenuCommand (this.Execute, menuCommandID);
       commandService.AddCommand (menuItem);
     }
 
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync Instance
-    {
-      get;
-      private set;
-    }
+    public static RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
     /// </summary>
-    private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
-    {
-      get
-      {
-        return this.package;
-      }
-    }
+    private LicenseHeadersPackage ServiceProvider { get; }
 
     /// <summary>
     /// Initializes the singleton instance of the command.
@@ -73,7 +60,7 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
-      OleMenuCommandService commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
+      var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
       Instance = new RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync (package, commandService);
     }
 
@@ -86,18 +73,34 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     /// <param name="e">Event args.</param>
     private void Execute (object sender, EventArgs e)
     {
-      ThreadHelper.ThrowIfNotOnUIThread ();
-      string message = string.Format (CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType ().FullName);
-      string title = "RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync";
+      ThreadHelper.ThrowIfNotOnUIThread();
 
-      // Show a message box to prove we were here
-      VsShellUtilities.ShowMessageBox (
-          this.package,
-          message,
-          title,
-          OLEMSGICON.OLEMSGICON_INFO,
-          OLEMSGBUTTON.OLEMSGBUTTON_OK,
-          OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+      ExecuteInternalAsync().FireAndForget();
+    }
+
+    private async Task ExecuteInternalAsync ()
+    {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+      var solution = ServiceProvider._dte.Solution;
+      var statusBar = (IVsStatusbar) await ServiceProvider.GetServiceAsync (typeof (SVsStatusbar));
+      var removeLicenseHeaderFromAllProjects = new RemoveLicenseHeaderFromAllFilesInSolutionCommand (statusBar, ServiceProvider._licenseReplacer);
+      var resharperSuspended = CommandUtility.ExecuteCommandIfExists ("ReSharper_Suspend", ServiceProvider._dte);
+
+      try
+      {
+        removeLicenseHeaderFromAllProjects.Execute (solution);
+      }
+      catch (Exception exception)
+      {
+        MessageBoxHelper.Information (
+            $"The command '{removeLicenseHeaderFromAllProjects.GetCommandName()}' failed with the exception '{exception.Message}'. See Visual Studio Output Window for Details.");
+        OutputWindowHandler.WriteMessage (exception.ToString());
+      }
+
+      if (resharperSuspended)
+      {
+        CommandUtility.ExecuteCommand ("ReSharper_Resume", ServiceProvider._dte);
+      }
     }
   }
 }

@@ -32,7 +32,7 @@ namespace LicenseHeaderManager.ButtonHandler
 
     public void Run (object solutionObject)
     {
-      Solution solution = solutionObject as Solution;
+      var solution = solutionObject as Solution;
       if (solution == null) return;
 
       try

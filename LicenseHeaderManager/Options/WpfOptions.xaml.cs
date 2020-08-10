@@ -38,7 +38,7 @@ namespace LicenseHeaderManager.Options
     private void Add (object sender, RoutedEventArgs e)
     {
       var dialog = new WpfCommandDialog (new LinkedCommand(), Page.Commands);
-      bool? result = dialog.ShowDialog();
+      var result = dialog.ShowDialog();
       if (result.HasValue && result.Value)
         Page.LinkedCommands.Add (dialog.Command);
     }

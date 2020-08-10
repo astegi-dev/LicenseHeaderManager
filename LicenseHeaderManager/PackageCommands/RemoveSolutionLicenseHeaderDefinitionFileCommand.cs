@@ -32,7 +32,7 @@ namespace LicenseHeaderManager.PackageCommands
 
     public void Execute (Solution solution)
     {
-      string solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (solution);
+      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (solution);
 
       // Look for and close the document if it exists
       foreach (EnvDTE.Document document in solution.DTE.Documents)

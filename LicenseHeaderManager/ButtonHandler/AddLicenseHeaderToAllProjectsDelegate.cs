@@ -23,12 +23,12 @@ using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.ButtonHandler
 {
-  public class AddLicenseHeaderToAllProjectsButtonHandler
+  public class AddLicenseHeaderToAllProjectsDelegate
   {
     private readonly LicenseHeaderReplacer _licenseReplacer;
     private readonly DTE2 _dte2;
 
-    public AddLicenseHeaderToAllProjectsButtonHandler (LicenseHeaderReplacer licenseReplacer, DTE2 dte2)
+    public AddLicenseHeaderToAllProjectsDelegate (LicenseHeaderReplacer licenseReplacer, DTE2 dte2)
     {
       _licenseReplacer = licenseReplacer;
       _dte2 = dte2;
@@ -47,7 +47,7 @@ namespace LicenseHeaderManager.ButtonHandler
 
       dialog.Closing += DialogOnClosing;
       _resharperSuspended = CommandUtility.ExecuteCommandIfExists ("ReSharper_Suspend", _dte2);
-      Dispatcher uiDispatcher = Dispatcher.CurrentDispatcher;
+      var uiDispatcher = Dispatcher.CurrentDispatcher;
 
       buttonThreadWorker.ThreadDone += (o, args) =>
       {
@@ -57,6 +57,7 @@ namespace LicenseHeaderManager.ButtonHandler
 
       _solutionUpdateThread = new System.Threading.Thread (buttonThreadWorker.Run)
                                   { IsBackground = true };
+      _solutionUpdateThread.SetApartmentState (System.Threading.ApartmentState.STA);
       _solutionUpdateThread.Start (_dte2.Solution);
 
       dialog.ShowModal();

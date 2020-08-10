@@ -203,7 +203,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ButtonHandler\ButtonHandlerFactory.cs" />
-    <Compile Include="ButtonHandler\AddLicenseHeaderToAllProjectsButtonHandler.cs" />
+    <Compile Include="ButtonHandler\AddLicenseHeaderToAllProjectsDelegate.cs" />
     <Compile Include="ButtonHandler\SolutionLevelButtonThreadWorker.cs" />
     <Compile Include="CommandsAsync\FolderMenu\AddExistingLicenseHeaderDefinitionFileToFolderCommandAsync.cs" />
     <Compile Include="CommandsAsync\ProjectMenu\AddExistingLicenseHeaderDefinitionFileToProjectCommandAsync.cs" />
@@ -235,7 +235,7 @@
     <Compile Include="Headers\NewLineConst.cs" />
     <Compile Include="Interfaces\ICommentParser.cs" />
     <Compile Include="OutputWindowHandler.cs" />
-    <Compile Include="PackageCommands\AddLicenseHeaderToAllFilesInProjectCommand.cs" />
+    <Compile Include="PackageCommands\AddLicenseHeaderToAllFilesInProjectCommandDelegate.cs" />
     <Compile Include="PackageCommands\AddLicenseHeaderToAllFilesInSolutionCommand.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="Headers\DocumentHeader.cs" />
@@ -307,7 +307,7 @@
     <Compile Include="Options\WpfCommandDialog.xaml.cs">
       <DependentUpon>WpfCommandDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ReturnObjects\AddLicenseHeaderToAllFilesReturn.cs" />
+    <Compile Include="ResultObjects\AddLicenseHeaderToAllFilesResult.cs" />
     <Compile Include="SolutionUpdateViewModels\RelayCommand.cs" />
     <Compile Include="SolutionUpdateViews\SolutionUpdateDialog.xaml.cs">
       <DependentUpon>SolutionUpdateDialog.xaml</DependentUpon>
@@ -395,7 +395,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="JavaScript1.js" />
     <Content Include="VsixInformation\Icon.png">
       <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

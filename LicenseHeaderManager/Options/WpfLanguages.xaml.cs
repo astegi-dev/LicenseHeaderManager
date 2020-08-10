@@ -43,7 +43,7 @@ namespace LicenseHeaderManager.Options
     {
       var dialog = new WpfLanguageDialog();
       dialog.Language = new Language();
-      bool? result = dialog.ShowDialog();
+      var result = dialog.ShowDialog();
       if (result.HasValue && result.Value)
         _page.Languages.Add (dialog.Language);
     }
@@ -75,10 +75,10 @@ namespace LicenseHeaderManager.Options
 
       var dialog = new WpfLanguageDialog();
       dialog.Language = copy;
-      bool? result = dialog.ShowDialog();
+      var result = dialog.ShowDialog();
       if (result.HasValue && result.Value)
       {
-        int index = _page.Languages.IndexOf (language);
+        var index = _page.Languages.IndexOf (language);
         _page.Languages.RemoveAt (index);
         _page.Languages.Insert (index, copy);
       }

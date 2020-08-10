@@ -38,7 +38,7 @@ namespace LicenseHeaderManager.Headers
       _lineEndingInDocument = NewLineManager.DetectMostFrequentLineEnd (GetText());
 
 
-      string inputText = CreateInputText (lines);
+      var inputText = CreateInputText (lines);
       _header = new DocumentHeader (document, inputText, new DocumentHeaderProperties (projectItem));
       _keywords = keywords;
 
@@ -88,7 +88,7 @@ namespace LicenseHeaderManager.Headers
 
     private string GetExistingHeader ()
     {
-      string header = _commentParser.Parse (GetText());
+      var header = _commentParser.Parse (GetText());
 
       if (_keywords == null || _keywords.Any (k => header.ToLower().Contains (k.ToLower())))
         return header;
@@ -102,7 +102,7 @@ namespace LicenseHeaderManager.Headers
       if (!string.IsNullOrEmpty (skippedText))
         RemoveHeader (skippedText);
 
-      string existingHeader = GetExistingHeader();
+      var existingHeader = GetExistingHeader();
 
       if (!_header.IsEmpty)
       {

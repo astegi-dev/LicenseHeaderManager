@@ -45,11 +45,11 @@ namespace LicenseHeaderManager.PackageCommands
       var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
       var projectsInSolution = allSolutionProjectsSearcher.GetAllProjects (solution);
 
-      int progressCount = 1;
-      int projectCount = projectsInSolution.Count;
+      var progressCount = 1;
+      var projectCount = projectsInSolution.Count;
       var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectCommand (_licenseReplacer);
 
-      foreach (Project project in projectsInSolution)
+      foreach (var project in projectsInSolution)
       {
         _statusBar.SetText (string.Format (Resources.UpdateSolution, progressCount, projectCount));
         removeAllLicenseHeadersCommand.Execute (project);

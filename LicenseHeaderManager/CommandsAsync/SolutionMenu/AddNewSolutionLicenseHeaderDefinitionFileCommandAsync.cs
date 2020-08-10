@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Globalization;
+using LicenseHeaderManager.PackageCommands;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
@@ -32,16 +33,16 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     /// <param name="commandService">Command service to add command to, not null.</param>
     private AddNewSolutionLicenseHeaderDefinitionFileCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
     {
-      ServiceProvider = (LicenseHeadersPackage)package ?? throw new ArgumentNullException(nameof(package));
-      commandService = commandService ?? throw new ArgumentNullException (nameof (commandService));
+      ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
+      commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      _menuItem = new OleMenuCommand(this.Execute, menuCommandID);
+      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
       _menuItem.BeforeQueryStatus += OnQuerySolutionCommandStatus;
       commandService.AddCommand (_menuItem);
     }
 
-    private void OnQuerySolutionCommandStatus(object sender, EventArgs e)
+    private void OnQuerySolutionCommandStatus (object sender, EventArgs e)
     {
       _menuItem.Enabled = !ServiceProvider.SolutionHeaderDefinitionExists();
     }
@@ -49,19 +50,12 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static AddNewSolutionLicenseHeaderDefinitionFileCommandAsync Instance
-    {
-      get;
-      private set;
-    }
+    public static AddNewSolutionLicenseHeaderDefinitionFileCommandAsync Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
     /// </summary>
-    private LicenseHeadersPackage ServiceProvider
-    {
-      get;
-    }
+    private LicenseHeadersPackage ServiceProvider { get; }
 
     /// <summary>
     /// Initializes the singleton instance of the command.
@@ -73,7 +67,7 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
-      OleMenuCommandService commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
+      var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
       Instance = new AddNewSolutionLicenseHeaderDefinitionFileCommandAsync (package, commandService);
     }
 
@@ -86,18 +80,9 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     /// <param name="e">Event args.</param>
     private void Execute (object sender, EventArgs e)
     {
-      ThreadHelper.ThrowIfNotOnUIThread ();
-      string message = string.Format (CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType ().FullName);
-      string title = "AddNewSolutionLicenseHeaderDefinitionFileCommandAsync";
+      ThreadHelper.ThrowIfNotOnUIThread();
 
-      // Show a message box to prove we were here
-      VsShellUtilities.ShowMessageBox (
-          ServiceProvider,
-          message,
-          title,
-          OLEMSGICON.OLEMSGICON_INFO,
-          OLEMSGBUTTON.OLEMSGBUTTON_OK,
-          OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+      AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Execute (ServiceProvider._dte.Solution);
     }
   }
 }

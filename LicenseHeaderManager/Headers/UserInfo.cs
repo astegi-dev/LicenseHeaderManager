@@ -85,7 +85,7 @@ namespace LicenseHeaderManager.Headers
       }
       catch (Exception e)
       {
-        string OutputMessage = string.Format (Resources.UserInfo_LookupFailure_Information, e).Replace (@"\n", "\n");
+        var OutputMessage = string.Format (Resources.UserInfo_LookupFailure_Information, e).Replace (@"\n", "\n");
 
         if (e is FileNotFoundException)
         {

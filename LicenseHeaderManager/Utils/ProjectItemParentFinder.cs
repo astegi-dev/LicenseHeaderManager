@@ -84,13 +84,13 @@ namespace LicenseHeaderManager.Utils
       {
         var parentProperty = projectItem.Object.GetType().GetProperty ("Parent").GetValue (projectItem.Object, null);
         var parentUrl = parentProperty.GetType().GetProperty ("Url").GetValue (parentProperty, null) as string;
-        ProjectItem projectItemParent = projectItem.DTE.Solution.FindProjectItem (parentUrl);
+        var projectItemParent = projectItem.DTE.Solution.FindProjectItem (parentUrl);
 
         //If the ProjectItemParent could not be found by "FindProjectItem" this means we are probably a Folder at TopLevel 
         //and only the ContainingProject is above us.
         if (projectItemParent == null)
         {
-          Project containingProject = projectItem.ContainingProject;
+          var containingProject = projectItem.ContainingProject;
 
           if (containingProject.FullName != parentUrl)
           {

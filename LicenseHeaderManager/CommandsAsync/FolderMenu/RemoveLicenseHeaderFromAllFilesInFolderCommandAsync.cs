@@ -2,6 +2,7 @@
 using System.ComponentModel.Design;
 using System.Globalization;
 using EnvDTE;
+using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
@@ -21,7 +22,7 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
     /// <summary>
     /// Command menu group (command set GUID).
     /// </summary>
-    public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
+    public static readonly Guid CommandSet = new Guid("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
     private readonly OleMenuCommand _menuItem;
 
@@ -31,15 +32,15 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
     /// </summary>
     /// <param name="package">Owner package, not null.</param>
     /// <param name="commandService">Command service to add command to, not null.</param>
-    private RemoveLicenseHeaderFromAllFilesInFolderCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
+    private RemoveLicenseHeaderFromAllFilesInFolderCommandAsync(AsyncPackage package, OleMenuCommandService commandService)
     {
       ServiceProvider = (LicenseHeadersPackage)package ?? throw new ArgumentNullException(nameof(package));
-      commandService = commandService ?? throw new ArgumentNullException (nameof (commandService));
+      commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-      var menuCommandID = new CommandID (CommandSet, CommandId);
+      var menuCommandID = new CommandID(CommandSet, CommandId);
       _menuItem = new OleMenuCommand(this.Execute, menuCommandID);
       _menuItem.BeforeQueryStatus += OnQueryAllFilesCommandStatus;
-      commandService.AddCommand (_menuItem);
+      commandService.AddCommand(_menuItem);
     }
 
     private void OnQueryAllFilesCommandStatus(object sender, EventArgs e)
@@ -48,7 +49,7 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
 
       var obj = ServiceProvider.GetSolutionExplorerItem();
       if (obj is ProjectItem item)
-        visible = ServiceProvider.ShouldBeVisible(item);
+        visible = ProjectItemInspection.IsFolder(item) || ServiceProvider.ShouldBeVisible(item);
       else
         visible = obj is Project;
 
@@ -76,14 +77,14 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
     /// Initializes the singleton instance of the command.
     /// </summary>
     /// <param name="package">Owner package, not null.</param>
-    public static async Task InitializeAsync (AsyncPackage package)
+    public static async Task InitializeAsync(AsyncPackage package)
     {
       // Switch to the main thread - the call to AddCommand in RemoveLicenseHeaderFromAllFilesInFolderCommandAsync's constructor requires
       // the UI thread.
-      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
-      OleMenuCommandService commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
-      Instance = new RemoveLicenseHeaderFromAllFilesInFolderCommandAsync (package, commandService);
+      var commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
+      Instance = new RemoveLicenseHeaderFromAllFilesInFolderCommandAsync(package, commandService);
     }
 
     /// <summary>
@@ -93,20 +94,12 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
     /// </summary>
     /// <param name="sender">Event sender.</param>
     /// <param name="e">Event args.</param>
-    private void Execute (object sender, EventArgs e)
+    private void Execute(object sender, EventArgs e)
     {
-      ThreadHelper.ThrowIfNotOnUIThread ();
-      string message = string.Format (CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType ().FullName);
-      string title = "RemoveLicenseHeaderFromAllFilesInFolderCommandAsync";
+      ThreadHelper.ThrowIfNotOnUIThread();
 
-      // Show a message box to prove we were here
-      VsShellUtilities.ShowMessageBox (
-          ServiceProvider,
-          message,
-          title,
-          OLEMSGICON.OLEMSGICON_INFO,
-          OLEMSGBUTTON.OLEMSGBUTTON_OK,
-          OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+      var obj = ServiceProvider.GetSolutionExplorerItem();
+      ServiceProvider.RemoveLicenseHeadersFromAllFilesAsync(obj).FireAndForget();
     }
   }
 }

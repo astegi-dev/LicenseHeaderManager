@@ -33,23 +33,23 @@ namespace LicenseHeaderManager.CommandsAsync.EditorMenu
     /// <param name="commandService">Command service to add command to, not null.</param>
     private RemoveLicenseHeaderEditorAdvancedMenuCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
     {
-      ServiceProvider = (LicenseHeadersPackage)package ?? throw new ArgumentNullException(nameof(package));
-      commandService = commandService ?? throw new ArgumentNullException (nameof (commandService));
+      ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
+      commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      _menuItem = new OleMenuCommand(this.Execute, menuCommandID);
+      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
       _menuItem.BeforeQueryStatus += OnQueryEditCommandStatus;
       commandService.AddCommand (_menuItem);
     }
 
-    private void OnQueryEditCommandStatus(object sender, EventArgs e)
+    private void OnQueryEditCommandStatus (object sender, EventArgs e)
     {
-      bool visible = false;
+      var visible = false;
 
       var item = ServiceProvider.GetActiveProjectItem();
       if (item != null)
       {
-        visible = ServiceProvider.ShouldBeVisible(item);
+        visible = ServiceProvider.ShouldBeVisible (item);
       }
 
       _menuItem.Visible = visible;
@@ -58,19 +58,12 @@ namespace LicenseHeaderManager.CommandsAsync.EditorMenu
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static RemoveLicenseHeaderEditorAdvancedMenuCommandAsync Instance
-    {
-      get;
-      private set;
-    }
+    public static RemoveLicenseHeaderEditorAdvancedMenuCommandAsync Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
     /// </summary>
-    private LicenseHeadersPackage ServiceProvider
-    {
-      get;
-    }
+    private LicenseHeadersPackage ServiceProvider { get; }
 
     /// <summary>
     /// Initializes the singleton instance of the command.
@@ -82,7 +75,7 @@ namespace LicenseHeaderManager.CommandsAsync.EditorMenu
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
-      OleMenuCommandService commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
+      var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
       Instance = new RemoveLicenseHeaderEditorAdvancedMenuCommandAsync (package, commandService);
     }
 
@@ -95,15 +88,14 @@ namespace LicenseHeaderManager.CommandsAsync.EditorMenu
     /// <param name="e">Event args.</param>
     private void Execute (object sender, EventArgs e)
     {
-      ThreadHelper.ThrowIfNotOnUIThread ();
+      ThreadHelper.ThrowIfNotOnUIThread();
 
       var item = ServiceProvider.GetActiveProjectItem();
       if (item == null)
         return;
-      
-      // TODO call Core
-      ServiceProvider._licenseReplacer.RemoveOrReplaceHeader(item, null, true);
 
+      // TODO call Core
+      ServiceProvider._licenseReplacer.RemoveOrReplaceHeader (item, null, true);
     }
   }
 }

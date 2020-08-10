@@ -1,7 +1,12 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.Linq;
 using EnvDTE;
+using LicenseHeaderManager.Headers;
+using LicenseHeaderManager.PackageCommands;
+using LicenseHeaderManager.Utils;
+using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
@@ -33,22 +38,22 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     /// <param name="commandService">Command service to add command to, not null.</param>
     private AddLicenseHeaderToAllFilesInProjectCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
     {
-      ServiceProvider = (LicenseHeadersPackage)package ?? throw new ArgumentNullException(nameof(package));
-      commandService = commandService ?? throw new ArgumentNullException (nameof (commandService));
+      ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
+      commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      _menuItem = new OleMenuCommand(this.Execute, menuCommandID);
+      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
       _menuItem.BeforeQueryStatus += OnQueryAllFilesCommandStatus;
       commandService.AddCommand (_menuItem);
     }
 
-    private void OnQueryAllFilesCommandStatus(object sender, EventArgs e)
+    private void OnQueryAllFilesCommandStatus (object sender, EventArgs e)
     {
       bool visible;
 
       var obj = ServiceProvider.GetSolutionExplorerItem();
       if (obj is ProjectItem item)
-        visible = ServiceProvider.ShouldBeVisible(item);
+        visible = ServiceProvider.ShouldBeVisible (item);
       else
         visible = obj is Project;
 
@@ -58,19 +63,12 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static AddLicenseHeaderToAllFilesInProjectCommandAsync Instance
-    {
-      get;
-      private set;
-    }
+    public static AddLicenseHeaderToAllFilesInProjectCommandAsync Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
     /// </summary>
-    private LicenseHeadersPackage ServiceProvider
-    {
-      get;
-    }
+    private LicenseHeadersPackage ServiceProvider { get; }
 
     /// <summary>
     /// Initializes the singleton instance of the command.
@@ -82,7 +80,7 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
-      OleMenuCommandService commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
+      var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
       Instance = new AddLicenseHeaderToAllFilesInProjectCommandAsync (package, commandService);
     }
 
@@ -95,18 +93,26 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     /// <param name="e">Event args.</param>
     private void Execute (object sender, EventArgs e)
     {
-      ThreadHelper.ThrowIfNotOnUIThread ();
-      string message = string.Format (CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType ().FullName);
-      string title = "AddLicenseHeaderToAllFilesInProjectCommandAsync";
+      ThreadHelper.ThrowIfNotOnUIThread();
 
-      // Show a message box to prove we were here
-      VsShellUtilities.ShowMessageBox (
-          ServiceProvider,
-          message,
-          title,
-          OLEMSGICON.OLEMSGICON_INFO,
-          OLEMSGBUTTON.OLEMSGBUTTON_OK,
-          OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+      ExecuteInternalAsync().FireAndForget();
+    }
+
+    private async Task ExecuteInternalAsync ()
+    {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+      var obj = ServiceProvider.GetSolutionExplorerItem();
+      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectCommandDelegate (ServiceProvider._licenseReplacer);
+
+      var statusBar = (IVsStatusbar) await ServiceProvider.GetServiceAsync (typeof (SVsStatusbar));
+      Assumes.Present (statusBar);
+
+      statusBar.SetText (Resources.UpdatingFiles);
+      var addLicenseHeaderToAllFilesReturn = addLicenseHeaderToAllFilesCommand.Execute (obj);
+      statusBar.SetText (string.Empty);
+
+      ServiceProvider.HandleLinkedFilesAndShowMessageBox (addLicenseHeaderToAllFilesReturn.LinkedItems);
+      ServiceProvider.HandleAddLicenseHeaderToAllFilesInProjectReturn (obj, addLicenseHeaderToAllFilesReturn);
     }
   }
 }

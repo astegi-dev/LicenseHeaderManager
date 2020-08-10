@@ -128,9 +128,9 @@ namespace LicenseHeaderManager.Options
       var command = item as Command;
       if (command != null)
       {
-        char[] chars = new[] { ' ', '.' };
-        string[] parts = command.Name.Split (chars, StringSplitOptions.RemoveEmptyEntries);
-        string[] queries = search.Text.Split (chars, StringSplitOptions.RemoveEmptyEntries);
+        var chars = new[] { ' ', '.' };
+        var parts = command.Name.Split (chars, StringSplitOptions.RemoveEmptyEntries);
+        var queries = search.Text.Split (chars, StringSplitOptions.RemoveEmptyEntries);
         return queries.All (q => parts.Any (p => p.ToLower().Contains (q.ToLower())));
       }
       return false;

@@ -1,18 +1,10 @@
-﻿using System;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
-using EnvDTE;
-using LicenseHeaderManager.Headers;
-using LicenseHeaderManager.Options;
+﻿using EnvDTE;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
-using LicenseHeaderReplacer = Core.LicenseHeaderReplacer;
+using System;
+using System.ComponentModel.Design;
+using System.Windows;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
@@ -30,7 +22,7 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
     /// <summary>
     /// Command menu group (command set GUID).
     /// </summary>
-    public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
+    public static readonly Guid CommandSet = new Guid("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
     private readonly OleMenuCommand _menuItem;
 
@@ -40,15 +32,15 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
     /// </summary>
     /// <param name="package">Owner package, not null.</param>
     /// <param name="commandService">Command service to add command to, not null.</param>
-    private AddHeaderToProjectItemCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
+    private AddHeaderToProjectItemCommandAsync(AsyncPackage package, OleMenuCommandService commandService)
     {
-      ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
-      commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
+      ServiceProvider = (LicenseHeadersPackage)package ?? throw new ArgumentNullException(nameof(package));
+      commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-      var menuCommandID = new CommandID (CommandSet, CommandId);
-      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
+      var menuCommandID = new CommandID(CommandSet, CommandId);
+      _menuItem = new OleMenuCommand(this.Execute, menuCommandID);
       _menuItem.BeforeQueryStatus += OnQueryProjectItemCommandStatus;
-      commandService.AddCommand (_menuItem);
+      commandService.AddCommand(_menuItem);
     }
 
     private void OnQueryProjectItemCommandStatus(object sender, EventArgs e)
@@ -75,14 +67,14 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
     /// Initializes the singleton instance of the command.
     /// </summary>
     /// <param name="package">Owner package, not null.</param>
-    public static async Task InitializeAsync (AsyncPackage package)
+    public static async Task InitializeAsync(AsyncPackage package)
     {
       // Switch to the main thread - the call to AddCommand in AddHeaderToProjectItemCommandAsync's constructor requires
       // the UI thread.
-      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
-      OleMenuCommandService commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
-      Instance = new AddHeaderToProjectItemCommandAsync (package, commandService);
+      var commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
+      Instance = new AddHeaderToProjectItemCommandAsync(package, commandService);
     }
 
     /// <summary>
@@ -92,30 +84,29 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
     /// </summary>
     /// <param name="sender">Event sender.</param>
     /// <param name="e">Event args.</param>
-    private void Execute (object sender, EventArgs e)
+    private void Execute(object sender, EventArgs e)
     {
-      ThreadHelper.ThrowIfNotOnUIThread ();
+      ThreadHelper.ThrowIfNotOnUIThread();
 
       if (!(e is OleMenuCmdEventArgs args))
         return;
 
-      ExecuteInternalAsync (args).FireAndForget();
+      ExecuteInternalAsync(args).FireAndForget();
     }
 
-    private async Task ExecuteInternalAsync (OleMenuCmdEventArgs args)
+    private async Task ExecuteInternalAsync(OleMenuCmdEventArgs args)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-      var item = args.InValue as ProjectItem ?? ServiceProvider.GetSolutionExplorerItem() as ProjectItem;
+      if (!(args.InValue is ProjectItem item))
+        item = ServiceProvider.GetSolutionExplorerItem() as ProjectItem;
 
-      if (item == null || !ProjectItemInspection.IsPhysicalFile (item) || ProjectItemInspection.IsLicenseHeader (item))
+      if (item == null || !ProjectItemInspection.IsPhysicalFile(item) || ProjectItemInspection.IsLicenseHeader(item))
         return;
 
-      var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
-
-      var result = await ServiceProvider.GetLicenseHeaderReplacer().RemoveOrReplaceHeader (item.Document.FullName, headers, true);
-      if (!string.IsNullOrEmpty (result))
-        MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+      var result = await ServiceProvider.AddLicenseHeaderToItemAsync(item, !ServiceProvider._isCalledByLinkedCommand);
+      if (!string.IsNullOrEmpty(result))
+        MessageBox.Show($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
     }
   }
 }

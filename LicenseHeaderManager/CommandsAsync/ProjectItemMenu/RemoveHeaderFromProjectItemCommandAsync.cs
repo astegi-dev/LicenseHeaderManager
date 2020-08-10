@@ -1,11 +1,9 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Globalization;
-using System.IO;
-using Core;
+﻿using Core;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
+using System;
+using System.ComponentModel.Design;
+using System.IO;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
@@ -81,7 +79,7 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectItemMenu
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
-      OleMenuCommandService commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
+      var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
       Instance = new RemoveHeaderFromProjectItemCommandAsync (package, commandService);
     }
 

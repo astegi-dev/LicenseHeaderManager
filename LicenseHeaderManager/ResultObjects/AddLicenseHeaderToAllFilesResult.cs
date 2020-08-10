@@ -12,18 +12,19 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using System;
 using System.Collections.Generic;
 using EnvDTE;
 
-namespace LicenseHeaderManager.ReturnObjects
+namespace LicenseHeaderManager.ResultObjects
 {
-  class AddLicenseHeaderToAllFilesReturn
+  public class AddLicenseHeaderToAllFilesResult
   {
     public int CountSubLicenseHeadersFound { get; set; }
     public bool BaseHeaderFound { get; set; }
     public List<ProjectItem> LinkedItems { get; set; }
 
-    public AddLicenseHeaderToAllFilesReturn (int countSubLicenseHeadersFound, bool baseHeaderFound, List<ProjectItem> linkedItems)
+    public AddLicenseHeaderToAllFilesResult (int countSubLicenseHeadersFound, bool baseHeaderFound, List<ProjectItem> linkedItems)
     {
       CountSubLicenseHeadersFound = countSubLicenseHeadersFound;
       BaseHeaderFound = baseHeaderFound;

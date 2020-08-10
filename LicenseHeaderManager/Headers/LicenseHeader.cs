@@ -65,14 +65,14 @@ namespace LicenseHeaderManager.Headers
 
     public static string GetHeaderDefinitionFilePathForSolution (Solution solution)
     {
-      string solutionDirectory = Path.GetDirectoryName (solution.FullName);
-      string solutionFileName = Path.GetFileName (solution.FullName);
+      var solutionDirectory = Path.GetDirectoryName (solution.FullName);
+      var solutionFileName = Path.GetFileName (solution.FullName);
       return Path.Combine (solutionDirectory, solutionFileName + LicenseHeader.Extension);
     }
 
     public static bool ShowQuestionForAddingLicenseHeaderFile (Project activeProject, IDefaultLicenseHeaderPage page)
     {
-      string message = string.Format (Resources.Error_NoHeaderDefinition, activeProject.Name).Replace (@"\n", "\n");
+      var message = string.Format (Resources.Error_NoHeaderDefinition, activeProject.Name).Replace (@"\n", "\n");
       var messageBoxResult = MessageBox.Show (message, Resources.Error, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
       if (messageBoxResult != MessageBoxResult.Yes)
         return false;
@@ -96,7 +96,7 @@ namespace LicenseHeaderManager.Headers
 
       if (newProjectItem == null)
       {
-        string message = string.Format (Resources.Error_CreatingFile).Replace (@"\n", "\n");
+        var message = string.Format (Resources.Error_CreatingFile).Replace (@"\n", "\n");
         MessageBox.Show (message, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error);
       }
 
@@ -136,7 +136,7 @@ namespace LicenseHeaderManager.Headers
         window.Activate();
         return true;
       }
-      string message = string.Format (Resources.Error_CreatingFile).Replace (@"\n", "\n");
+      var message = string.Format (Resources.Error_CreatingFile).Replace (@"\n", "\n");
       MessageBox.Show (message, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error);
       return false;
     }

@@ -98,7 +98,7 @@ namespace LicenseHeaderManager.Options
 
     private void AddDefaultSkipExpressions_1_1_4 ()
     {
-      bool updated = false;
+      var updated = false;
 
       //add SkipExpression for XML-based languages to replicate the previous hardcoded skipping of XML declarations
       UpdateLanguages (
@@ -116,7 +116,7 @@ namespace LicenseHeaderManager.Options
 
     private void AddDefaultRegionSettings_1_2_1 ()
     {
-      bool updated = false;
+      var updated = false;
 
       //add regions for CS files
       UpdateLanguages (
@@ -147,7 +147,7 @@ namespace LicenseHeaderManager.Options
 
     private void AdjustDefaultXmlSkipExpression_1_2_2 ()
     {
-      bool updated = false;
+      var updated = false;
       // SkipExpression for XML-based languages was suboptimal, it didn't work for nearly empty files 
       UpdateLanguages (
           new[] { ".htm", ".html", ".xhtml", ".xml", ".resx" },
@@ -180,7 +180,7 @@ namespace LicenseHeaderManager.Options
     private void AddXmlXsd_1_3_2 ()
     {
       //Add a default rule for config/xsd
-      bool added = false;
+      var added = false;
 
       added |= AddExtensionToExistingExtension (".xml", ".config");
       added |= AddExtensionToExistingExtension (".xml", ".xsd");

@@ -57,8 +57,8 @@ namespace LicenseHeaderManager.Utils
       if (string.IsNullOrEmpty (searchString))
         throw new ArgumentNullException ("searchString");
 
-      int idx = 0;
-      int count = 0;
+      var idx = 0;
+      var count = 0;
       while ((idx = inputString.IndexOf (searchString, idx)) != -1)
       {
         idx += searchString.Length;

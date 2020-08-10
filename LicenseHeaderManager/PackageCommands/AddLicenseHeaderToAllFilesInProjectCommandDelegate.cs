@@ -15,28 +15,28 @@
 using System.Collections.Generic;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
-using LicenseHeaderManager.ReturnObjects;
+using LicenseHeaderManager.ResultObjects;
 using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.PackageCommands
 {
-  internal class AddLicenseHeaderToAllFilesInProjectCommand
+  internal class AddLicenseHeaderToAllFilesInProjectCommandDelegate
   {
     private LicenseHeaderReplacer _licenseReplacer;
 
-    public AddLicenseHeaderToAllFilesInProjectCommand (LicenseHeaderReplacer licenseReplacer)
+    public AddLicenseHeaderToAllFilesInProjectCommandDelegate (LicenseHeaderReplacer licenseReplacer)
     {
       _licenseReplacer = licenseReplacer;
     }
 
-    public AddLicenseHeaderToAllFilesReturn Execute (object projectOrProjectItem)
+    public AddLicenseHeaderToAllFilesResult Execute (object projectOrProjectItem)
     {
       var project = projectOrProjectItem as Project;
       var projectItem = projectOrProjectItem as ProjectItem;
 
-      int countSubLicenseHeadersFound = 0;
+      var countSubLicenseHeadersFound = 0;
       IDictionary<string, string[]> headers = null;
-      List<ProjectItem> linkedItems = new List<ProjectItem>();
+      var linkedItems = new List<ProjectItem>();
 
       if (project != null || projectItem != null)
       {
@@ -63,7 +63,7 @@ namespace LicenseHeaderManager.PackageCommands
         }
       }
 
-      return new AddLicenseHeaderToAllFilesReturn (countSubLicenseHeadersFound, headers == null, linkedItems);
+      return new AddLicenseHeaderToAllFilesResult (countSubLicenseHeadersFound, headers == null, linkedItems);
     }
   }
 }

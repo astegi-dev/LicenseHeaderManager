@@ -31,7 +31,7 @@ namespace LicenseHeaderManager.PackageCommands
 
     public void Execute (Solution solution)
     {
-      string solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (solution);
+      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (solution);
 
       if (File.Exists (solutionHeaderDefinitionFilePath))
       {

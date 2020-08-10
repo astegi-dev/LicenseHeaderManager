@@ -39,9 +39,9 @@ namespace LicenseHeaderManager.Utils
 
     public void Filter (List<ProjectItem> projectItems)
     {
-      foreach (ProjectItem projectItem in projectItems)
+      foreach (var projectItem in projectItems)
       {
-        ProjectItem foundProjectItem = solution.FindProjectItem (projectItem.Name);
+        var foundProjectItem = solution.FindProjectItem (projectItem.Name);
         if (foundProjectItem == null)
           NotInSolution.Add (projectItem);
         else

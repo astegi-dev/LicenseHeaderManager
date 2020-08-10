@@ -93,6 +93,7 @@ namespace Core
           OutputMessage = string.Format (Resources.UserInfo_LookupFailure_FileNotFoundException_Information).Replace (@"\n", "\n");
         }
 
+        // OutputWindowHandler.WriteMessage(OutputMessage);
         _displayName = Resources.UserInfo_UnknownDisplayNameString;
         _lookupSuccessful = false;
       }
