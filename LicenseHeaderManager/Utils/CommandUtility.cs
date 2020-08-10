@@ -19,7 +19,7 @@ using EnvDTE80;
 
 namespace LicenseHeaderManager.Utils
 {
-  public class CommandUtility
+  public static class CommandUtility
   {
     public static bool ExecuteCommandIfExists (string command, DTE2 dte)
     {

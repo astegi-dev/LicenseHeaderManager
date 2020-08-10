@@ -205,6 +205,7 @@
     <Compile Include="ButtonHandler\ButtonHandlerFactory.cs" />
     <Compile Include="ButtonHandler\AddLicenseHeaderToAllProjectsDelegate.cs" />
     <Compile Include="ButtonHandler\SolutionLevelButtonThreadWorker.cs" />
+    <Compile Include="CommandsAsync\Common\FolderProjectMenuHelper.cs" />
     <Compile Include="CommandsAsync\FolderMenu\AddExistingLicenseHeaderDefinitionFileToFolderCommandAsync.cs" />
     <Compile Include="CommandsAsync\ProjectMenu\AddExistingLicenseHeaderDefinitionFileToProjectCommandAsync.cs" />
     <Compile Include="CommandsAsync\ProjectItemMenu\AddHeaderToProjectItemCommandAsync.cs" />
@@ -228,12 +229,12 @@
     <Compile Include="Headers\Document.cs" />
     <Compile Include="Utils\ProjectItemParentFinder.cs" />
     <Compile Include="Interfaces\ISolutionLevelCommand.cs" />
-    <Compile Include="PackageCommands\AddExistingLicenseHeaderDefinitionFileToProjectCommand.cs" />
+    <Compile Include="Utils\ExistingLicenseHeaderDefinitionFileAdder.cs" />
     <Compile Include="Headers\NewLineConst.cs" />
     <Compile Include="Interfaces\ICommentParser.cs" />
     <Compile Include="OutputWindowHandler.cs" />
-    <Compile Include="PackageCommands\AddLicenseHeaderToAllFilesInProjectCommandDelegate.cs" />
-    <Compile Include="PackageCommands\AddLicenseHeaderToAllFilesInSolutionCommand.cs" />
+    <Compile Include="CommandsAsync\Common\AddLicenseHeaderToAllFilesInProjectHelper.cs" />
+    <Compile Include="CommandsAsync\Common\AddLicenseHeaderToAllFilesInSolutionHelper.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="Headers\DocumentHeader.cs" />
     <Compile Include="Headers\DocumentHeaderProperties.cs" />
@@ -281,8 +282,8 @@
     <Compile Include="Options\WpfLanguages.xaml.cs">
       <DependentUpon>WpfLanguages.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PackageCommands\RemoveLicenseHeaderFromAllFilesInProjectCommand.cs" />
-    <Compile Include="PackageCommands\RemoveLicenseHeaderFromAllFilesInSolutionCommand.cs" />
+    <Compile Include="CommandsAsync\Common\RemoveLicenseHeaderFromAllFilesInProjectHelper.cs" />
+    <Compile Include="CommandsAsync\Common\RemoveLicenseHeaderFromAllFilesInSolutionHelper.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -428,6 +429,7 @@
     <Analyzer Include="..\packages\Microsoft.VisualStudio.Threading.Analyzers.16.6.13\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\Microsoft.VisualStudio.Threading.Analyzers.16.6.13\analyzers\cs\Microsoft.VisualStudio.Threading.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>

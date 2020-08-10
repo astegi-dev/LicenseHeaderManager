@@ -14,20 +14,10 @@
 
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel.Design;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using EnvDTE;
 using EnvDTE80;
 using LicenseHeaderManager.ButtonHandler;
-using LicenseHeaderManager.CommandsAsync;
+using LicenseHeaderManager.CommandsAsync.Common;
 using LicenseHeaderManager.CommandsAsync.EditorMenu;
 using LicenseHeaderManager.CommandsAsync.FolderMenu;
 using LicenseHeaderManager.CommandsAsync.ProjectItemMenu;
@@ -36,13 +26,21 @@ using LicenseHeaderManager.CommandsAsync.SolutionMenu;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.Options;
-using LicenseHeaderManager.PackageCommands;
 using LicenseHeaderManager.ResultObjects;
 using LicenseHeaderManager.Utils;
 using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using Document = LicenseHeaderManager.Headers.Document;
 using Task = System.Threading.Tasks.Task;
 
@@ -211,13 +209,7 @@ namespace LicenseHeaderManager
       var visible = false;
 
       if (ProjectItemInspection.IsPhysicalFile (item))
-      {
-        Document document;
-        bool wasOpen;
-
-        visible = _licenseReplacer.TryCreateDocument (item, out document, out wasOpen) ==
-                  CreateDocumentResult.DocumentCreated;
-      }
+        visible = _licenseReplacer.TryCreateDocument (item, out _, out _) == CreateDocumentResult.DocumentCreated;
 
       return visible;
     }
@@ -414,7 +406,7 @@ namespace LicenseHeaderManager
     private void AddLicenseHeadersToAllFilesInProjectCallback (object sender, EventArgs e)
     {
       var obj = GetSolutionExplorerItem();
-      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectCommandDelegate (_licenseReplacer);
+      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (_licenseReplacer);
 
       var statusBar = (IVsStatusbar) GetService (typeof (SVsStatusbar));
       statusBar.SetText (Resources.UpdatingFiles);
@@ -454,9 +446,7 @@ namespace LicenseHeaderManager
           // If another projet has a license header, offer to add a link to the existing one.
           if (MessageBoxHelper.DoYouWant (Resources.Question_AddExistingDefinitionFileToProject))
           {
-            new AddExistingLicenseHeaderDefinitionFileToProjectCommand().AddDefinitionFileToOneProject (
-                currentProject.FileName,
-                currentProject.ProjectItems);
+            ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (currentProject.FileName, currentProject.ProjectItems);
 
             AddLicenseHeadersToAllFilesInProjectCallback ((object) project ?? projectItem, null);
           }
@@ -488,19 +478,6 @@ namespace LicenseHeaderManager
             MessageBoxButton.OK,
             MessageBoxImage.Information);
       }
-    }
-
-    public async Task RemoveLicenseHeadersFromAllFilesAsync (object obj)
-    {
-      await JoinableTaskFactory.SwitchToMainThreadAsync (DisposalToken);
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectCommand (_licenseReplacer);
-
-      var statusBar = (IVsStatusbar) await GetServiceAsync (typeof (SVsStatusbar));
-      statusBar.SetText (Resources.UpdatingFiles);
-
-      removeAllLicenseHeadersCommand.Execute (obj);
-
-      statusBar.SetText (String.Empty);
     }
 
     private void AddNewSolutionLicenseHeaderDefinitionFileCallback (object sender, EventArgs e)

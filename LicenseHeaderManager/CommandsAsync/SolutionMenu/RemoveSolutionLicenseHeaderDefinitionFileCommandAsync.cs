@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
-using LicenseHeaderManager.PackageCommands;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;

@@ -1,4 +1,5 @@
 #region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,43 +11,39 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
-using Microsoft.VisualStudio.Shell;
 using Microsoft.Win32;
 
-namespace LicenseHeaderManager.PackageCommands
+namespace LicenseHeaderManager.Utils
 {
-  public class AddExistingLicenseHeaderDefinitionFileToProjectCommand
+  public static class ExistingLicenseHeaderDefinitionFileAdder
   {
-    public ProjectItem AddDefinitionFileToOneProject (string fileName, ProjectItems projectItems)
+    public static ProjectItem AddDefinitionFileToOneProject (string fileName, ProjectItems projectItems)
     {
       var licenseHeaderDefinitionFileName = OpenFileDialogForExistingFile (fileName);
 
-      if (licenseHeaderDefinitionFileName == string.Empty) return null;
-
-      return AddFileToProject (projectItems, licenseHeaderDefinitionFileName);
+      return licenseHeaderDefinitionFileName == string.Empty ? null : AddFileToProject (projectItems, licenseHeaderDefinitionFileName);
     }
 
-    public void AddDefinitionFileToMultipleProjects (List<Project> projects)
+    public static void AddDefinitionFileToMultipleProjects (List<Project> projects)
     {
       var licenseHeaderDefinitionFileName = OpenFileDialogForExistingFile (projects.First().DTE.Solution.FullName);
-
       if (licenseHeaderDefinitionFileName == string.Empty) return;
 
       foreach (var project in projects)
-      {
         AddFileToProject (project.ProjectItems, licenseHeaderDefinitionFileName);
-      }
     }
 
-    private ProjectItem AddFileToProject (ProjectItems projectItems, string licenseHeaderDefinitionFileName)
+    private static ProjectItem AddFileToProject (ProjectItems projectItems, string licenseHeaderDefinitionFileName)
     {
       var fileCountBefore = projectItems.Count;
       var newProjectItem = projectItems.AddFromFile (licenseHeaderDefinitionFileName);
@@ -64,7 +61,7 @@ namespace LicenseHeaderManager.PackageCommands
       return newProjectItem;
     }
 
-    private string OpenFileDialogForExistingFile (string fileName)
+    private static string OpenFileDialogForExistingFile (string fileName)
     {
       FileDialog dialog = new OpenFileDialog();
       dialog.CheckFileExists = true;

@@ -12,16 +12,17 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using System;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 
-namespace LicenseHeaderManager.PackageCommands
+namespace LicenseHeaderManager.CommandsAsync.Common
 {
-  public class RemoveLicenseHeaderFromAllFilesInProjectCommand
+  public class RemoveLicenseHeaderFromAllFilesInProjectHelper
   {
-    private LicenseHeaderReplacer _licenseReplacer;
+    private readonly LicenseHeaderReplacer _licenseReplacer;
 
-    public RemoveLicenseHeaderFromAllFilesInProjectCommand (LicenseHeaderReplacer licenseReplacer)
+    public RemoveLicenseHeaderFromAllFilesInProjectHelper (LicenseHeaderReplacer licenseReplacer)
     {
       _licenseReplacer = licenseReplacer;
     }
@@ -30,7 +31,8 @@ namespace LicenseHeaderManager.PackageCommands
     {
       var project = projectOrProjectItem as Project;
       var item = projectOrProjectItem as ProjectItem;
-      if (project == null && item == null) return;
+      if (project == null && item == null)
+        return;
 
       _licenseReplacer.ResetExtensionsWithInvalidHeaders();
       if (project != null)

@@ -16,8 +16,8 @@ using System;
 using System.ComponentModel;
 using System.Windows.Threading;
 using EnvDTE80;
+using LicenseHeaderManager.CommandsAsync.Common;
 using LicenseHeaderManager.Headers;
-using LicenseHeaderManager.PackageCommands;
 using LicenseHeaderManager.SolutionUpdateViewModels;
 using LicenseHeaderManager.Utils;
 
@@ -40,7 +40,7 @@ namespace LicenseHeaderManager.ButtonHandler
     public void HandleButton (object sender, EventArgs e)
     {
       var solutionUpdateViewModel = new SolutionUpdateViewModel();
-      var addHeaderToAllProjectsCommand = new AddLicenseHeaderToAllFilesInSolutionCommand (_licenseReplacer, solutionUpdateViewModel);
+      var addHeaderToAllProjectsCommand = new AddLicenseHeaderToAllFilesInSolutionHelper (_licenseReplacer, solutionUpdateViewModel);
       var buttonThreadWorker = new SolutionLevelButtonThreadWorker (addHeaderToAllProjectsCommand);
       var dialog = new SolutionUpdateDialog (solutionUpdateViewModel);
 

@@ -1,10 +1,10 @@
 ﻿using EnvDTE;
-using LicenseHeaderManager.PackageCommands;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
+using LicenseHeaderManager.CommandsAsync.Common;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
@@ -83,7 +83,7 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var solution = ServiceProvider._dte.Solution;
       var statusBar = (IVsStatusbar) await ServiceProvider.GetServiceAsync (typeof (SVsStatusbar));
-      var removeLicenseHeaderFromAllProjects = new RemoveLicenseHeaderFromAllFilesInSolutionCommand (statusBar, ServiceProvider._licenseReplacer);
+      var removeLicenseHeaderFromAllProjects = new RemoveLicenseHeaderFromAllFilesInSolutionHelper (statusBar, ServiceProvider._licenseReplacer);
       var resharperSuspended = CommandUtility.ExecuteCommandIfExists ("ReSharper_Suspend", ServiceProvider._dte);
 
       try

@@ -12,19 +12,20 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 #endregion
 
+using System;
 using System.Collections.Generic;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.ResultObjects;
 using LicenseHeaderManager.Utils;
 
-namespace LicenseHeaderManager.PackageCommands
+namespace LicenseHeaderManager.CommandsAsync.Common
 {
-  internal class AddLicenseHeaderToAllFilesInProjectCommandDelegate
+  internal class AddLicenseHeaderToAllFilesInProjectHelper
   {
     private LicenseHeaderReplacer _licenseReplacer;
 
-    public AddLicenseHeaderToAllFilesInProjectCommandDelegate (LicenseHeaderReplacer licenseReplacer)
+    public AddLicenseHeaderToAllFilesInProjectHelper (LicenseHeaderReplacer licenseReplacer)
     {
       _licenseReplacer = licenseReplacer;
     }
