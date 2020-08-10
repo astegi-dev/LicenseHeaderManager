@@ -77,7 +77,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     {
       var project = projectOrProjectItem as Project;
       var projectItem = projectOrProjectItem as ProjectItem;
-      var files = new List<string>();
+      var files = new List<Items>();
 
       var countSubLicenseHeadersFound = 0;
       IDictionary<string, string[]> headers = null;
@@ -117,15 +117,15 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return new AddLicenseHeaderToAllFilesResult(countSubLicenseHeadersFound, headers == null, linkedItems);
     }
 
-    private ICollection<string> GetFilesToProcess(ProjectItem item, IDictionary<string, string[]> headers, out int countSubLicenseHeaders, bool searchForLicenseHeaders = true)
+    private ICollection<Items> GetFilesToProcess(ProjectItem item, IDictionary<string, string[]> headers, out int countSubLicenseHeaders, bool searchForLicenseHeaders = true)
     {
-      var files = new List<string>();
+      var files = new List<Items>();
       countSubLicenseHeaders = 0;
 
       if (item.ProjectItems == null)
         return files;
 
-      files.Add(item.Name);
+      files.Add(new Items(item, headers));
 
       var childHeaders = headers;
       if (searchForLicenseHeaders)

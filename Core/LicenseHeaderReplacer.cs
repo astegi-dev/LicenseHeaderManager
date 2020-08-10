@@ -99,6 +99,12 @@ namespace Core
       return Task.FromResult (message);;
     }
 
+    public int RemoveOrReplaceHeaderCore(object obj)
+    {
+      var result = RemoveOrReplaceHeader(null, null, null, true);
+      return 0;
+    }
+
     public static bool IsLicenseHeader(string documentPath)
     {
       return Path.GetExtension(documentPath) == LicenseHeader.Extension;
