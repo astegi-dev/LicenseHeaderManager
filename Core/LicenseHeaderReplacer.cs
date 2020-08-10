@@ -104,18 +104,46 @@ namespace Core
       return Task.FromResult (message);
     }
 
-    public async Task<IDictionary<string, string>> RemoveOrReplaceHeader (IEnumerable<LicenseHeaderInput> licenseHeaders, bool calledByUser = true)
+    public Task<Dictionary<string, string>> RemoveOrReplaceHeader (IEnumerable<LicenseHeaderInput> licenseHeaders, bool calledByUser = true)
     {
       var errors = new Dictionary<string, string>();
 
-      foreach (var licenseHeaderInfo in licenseHeaders)
+      foreach (var header in licenseHeaders)
       {
-        var currentResult = await RemoveOrReplaceHeader (licenseHeaderInfo.DocumentPath, licenseHeaderInfo.Headers, licenseHeaderInfo.AdditionalProperties, calledByUser);
-        if (!string.IsNullOrEmpty (currentResult))
-          errors.Add (licenseHeaderInfo.DocumentPath, currentResult);
-      }
+        Document document;
 
-      return errors;
+        if (TryCreateDocument(header.DocumentPath, out document, header.AdditionalProperties, header.Headers) == CreateDocumentResult.DocumentCreated)
+        {
+          string message;
+          var replace = true;
+
+          /*if (!document.ValidateHeader())
+          {
+            var extension = Path.GetExtension(header.DocumentPath);
+            if (!_extensionsWithInvalidHeaders.TryGetValue(extension, out replace))
+            {
+              message = string.Format(Resources.Warning_InvalidLicenseHeader, extension).Replace(@"\n", "\n");
+              replace = MessageBox.Show(message, Resources.Warning, MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No)
+                        == MessageBoxResult.Yes;
+              _extensionsWithInvalidHeaders[extension] = replace;
+            }
+          }*/
+
+          if (replace)
+          {
+            try
+            {
+              document.ReplaceHeaderIfNecessary();
+            }
+            catch (ParseException)
+            {
+              message = string.Format(Resources.Error_InvalidLicenseHeader, header.DocumentPath).Replace(@"\n", "\n");
+              errors.Add(header.DocumentPath, message);
+            }
+          }
+        }
+      }
+      return Task.FromResult(errors);
     }
 
     public static bool IsLicenseHeader (string documentPath)

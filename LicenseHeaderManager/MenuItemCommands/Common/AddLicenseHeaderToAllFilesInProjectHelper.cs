@@ -140,13 +140,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         return files;
 
       if (item.FileCount == 1 && System.IO.File.Exists(item.FileNames[1]))
-      {
-        files.Add (new LicenseHeaderInput (item.FileNames[1], headers, /* TODO */ null));
-      }
-      else if (item.Document != null && System.IO.File.Exists(item.Document.FullName))
-      {
-        files.Add (new LicenseHeaderInput (item.Document.FullName, headers, /* TODO */ null));
-      }
+        files.Add(new LicenseHeaderInput(item.FileNames[1], headers, item.GetAdditionalProperties()));
 
       var childHeaders = headers;
       if (searchForLicenseHeaders)
