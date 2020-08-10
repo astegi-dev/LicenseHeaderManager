@@ -46,17 +46,17 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var obj = serviceProvider.GetSolutionExplorerItem();
-      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (serviceProvider._licenseReplacer, serviceProvider.GetLicenseHeaderReplacer());
+      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (serviceProvider.GetLicenseHeaderReplacer());
 
       var statusBar = (IVsStatusbar) await serviceProvider.GetServiceAsync (typeof (SVsStatusbar));
       Assumes.Present (statusBar);
 
       statusBar.SetText (Resources.UpdatingFiles);
-      var addLicenseHeaderToAllFilesReturn = addLicenseHeaderToAllFilesCommand.Execute (obj);
+      var addLicenseHeaderToAllFilesReturn = await addLicenseHeaderToAllFilesCommand.ExecuteAsync (obj);
       statusBar.SetText (string.Empty);
 
       serviceProvider.HandleLinkedFilesAndShowMessageBox (addLicenseHeaderToAllFilesReturn.LinkedItems);
-      serviceProvider.HandleAddLicenseHeaderToAllFilesInProjectReturn (obj, addLicenseHeaderToAllFilesReturn);
+      serviceProvider.HandleAddLicenseHeaderToAllFilesInProjectReturnAsync (obj, addLicenseHeaderToAllFilesReturn).FireAndForget();
     }
 
     public static void AddNewLicenseHeaderDefinitionFile (LicenseHeadersPackage serviceProvider)

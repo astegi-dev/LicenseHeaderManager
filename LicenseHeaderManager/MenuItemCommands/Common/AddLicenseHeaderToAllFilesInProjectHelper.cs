@@ -25,62 +25,19 @@ using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.ResultObjects;
 using LicenseHeaderManager.Utils;
-using LicenseHeaderReplacer = LicenseHeaderManager.Headers.LicenseHeaderReplacer;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
   internal class AddLicenseHeaderToAllFilesInProjectHelper
   {
-    private LicenseHeaderReplacer _licenseReplacer;
     private Core.LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public AddLicenseHeaderToAllFilesInProjectHelper (
-        LicenseHeaderReplacer licenseReplacer,
-        Core.LicenseHeaderReplacer licenseHeaderReplacer)
+    public AddLicenseHeaderToAllFilesInProjectHelper (Core.LicenseHeaderReplacer licenseHeaderReplacer)
     {
       _licenseHeaderReplacer = licenseHeaderReplacer;
-      _licenseReplacer = licenseReplacer;
     }
 
-    public AddLicenseHeaderToAllFilesResult Execute (object projectOrProjectItem)
-    {
-      var project = projectOrProjectItem as Project;
-      var projectItem = projectOrProjectItem as ProjectItem;
-
-      var countSubLicenseHeadersFound = 0;
-      IDictionary<string, string[]> headers = null;
-      var linkedItems = new List<ProjectItem>();
-
-      if (project != null || projectItem != null)
-      {
-        _licenseReplacer.ResetExtensionsWithInvalidHeaders();
-        ProjectItems projectItems;
-
-        if (project != null)
-        {
-          headers = LicenseHeaderFinder.GetHeaderDefinitionForProjectWithFallback (project);
-          projectItems = project.ProjectItems;
-        }
-        else
-        {
-          headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (projectItem);
-          projectItems = projectItem.ProjectItems;
-        }
-
-        foreach (ProjectItem item in projectItems)
-        {
-          if (ProjectItemInspection.IsPhysicalFile (item) && ProjectItemInspection.IsLink (item))
-            linkedItems.Add (item);
-          else
-            countSubLicenseHeadersFound = _licenseReplacer.RemoveOrReplaceHeaderRecursive (item, headers);
-        }
-      }
-
-      Execute1 (projectOrProjectItem);
-      return new AddLicenseHeaderToAllFilesResult (countSubLicenseHeadersFound, headers == null, linkedItems);
-    }
-
-    public async Task<AddLicenseHeaderToAllFilesResult> Execute1 (object projectOrProjectItem)
+    public async Task<AddLicenseHeaderToAllFilesResult> ExecuteAsync (object projectOrProjectItem)
     {
       var project = projectOrProjectItem as Project;
       var projectItem = projectOrProjectItem as ProjectItem;

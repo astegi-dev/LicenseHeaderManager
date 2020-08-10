@@ -12,7 +12,6 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 
 namespace LicenseHeaderManager.ButtonHandler
@@ -20,19 +19,17 @@ namespace LicenseHeaderManager.ButtonHandler
   class ButtonHandlerFactory
   {
     private readonly ILicenseHeaderExtension _licenseHeadersPackage;
-    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
     private Core.LicenseHeaderReplacer _licenseHeaderReplacerCore;
 
-    public ButtonHandlerFactory (ILicenseHeaderExtension licenseHeadersPackage, LicenseHeaderReplacer licenseHeaderReplacer, Core.LicenseHeaderReplacer licenseHeaderReplacerCore)
+    public ButtonHandlerFactory (ILicenseHeaderExtension licenseHeadersPackage, Core.LicenseHeaderReplacer licenseHeaderReplacerCore)
     {
       _licenseHeaderReplacerCore = licenseHeaderReplacerCore;
       _licenseHeadersPackage = licenseHeadersPackage;
-      _licenseHeaderReplacer = licenseHeaderReplacer;
     }
 
     public AddLicenseHeaderToAllProjectsDelegate CreateAddLicenseHeaderToAllProjectsButtonHandler ()
     {
-      return new AddLicenseHeaderToAllProjectsDelegate (_licenseHeaderReplacer, _licenseHeaderReplacerCore, _licenseHeadersPackage.Dte2);
+      return new AddLicenseHeaderToAllProjectsDelegate (_licenseHeaderReplacerCore, _licenseHeadersPackage.Dte2);
     }
   }
 }

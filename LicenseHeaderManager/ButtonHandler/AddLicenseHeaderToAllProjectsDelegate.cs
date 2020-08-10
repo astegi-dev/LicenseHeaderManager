@@ -16,7 +16,6 @@ using System;
 using System.ComponentModel;
 using System.Windows.Threading;
 using EnvDTE80;
-using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.SolutionUpdateViewModels;
 using LicenseHeaderManager.Utils;
@@ -25,13 +24,11 @@ namespace LicenseHeaderManager.ButtonHandler
 {
   public class AddLicenseHeaderToAllProjectsDelegate
   {
-    private readonly LicenseHeaderReplacer _licenseReplacer;
     private readonly DTE2 _dte2;
 
-    public AddLicenseHeaderToAllProjectsDelegate (LicenseHeaderReplacer licenseReplacer, Core.LicenseHeaderReplacer licenseHeaderReplacer, DTE2 dte2)
+    public AddLicenseHeaderToAllProjectsDelegate (Core.LicenseHeaderReplacer licenseHeaderReplacer, DTE2 dte2)
     {
       this._licenseHeaderReplacer = licenseHeaderReplacer;
-      _licenseReplacer = licenseReplacer;
       _dte2 = dte2;
     }
 
@@ -42,7 +39,7 @@ namespace LicenseHeaderManager.ButtonHandler
     public void HandleButton (object sender, EventArgs e)
     {
       var solutionUpdateViewModel = new SolutionUpdateViewModel();
-      var addHeaderToAllProjectsCommand = new AddLicenseHeaderToAllFilesInSolutionHelper (_licenseReplacer, _licenseHeaderReplacer, solutionUpdateViewModel);
+      var addHeaderToAllProjectsCommand = new AddLicenseHeaderToAllFilesInSolutionHelper (_licenseHeaderReplacer, solutionUpdateViewModel);
       var buttonThreadWorker = new SolutionLevelButtonThreadWorker (addHeaderToAllProjectsCommand);
       var dialog = new SolutionUpdateDialog (solutionUpdateViewModel);
 

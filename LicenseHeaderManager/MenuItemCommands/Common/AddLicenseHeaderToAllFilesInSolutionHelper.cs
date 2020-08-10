@@ -31,15 +31,13 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     private const string c_commandName = "Add LicenseHeader to all files in Solution";
     private const int MaxProjectsWithoutDefinitionFileShownInMessage = 5;
 
-    private readonly LicenseHeaderReplacer _licenseReplacer;
     private readonly SolutionUpdateViewModel _solutionUpdateViewModel;
     private Core.LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public AddLicenseHeaderToAllFilesInSolutionHelper (LicenseHeaderReplacer licenseReplacer, Core.LicenseHeaderReplacer licenseHeaderReplacer,
+    public AddLicenseHeaderToAllFilesInSolutionHelper (Core.LicenseHeaderReplacer licenseHeaderReplacer,
       SolutionUpdateViewModel solutionUpdateViewModel)
     {
       _licenseHeaderReplacer = licenseHeaderReplacer;
-      _licenseReplacer = licenseReplacer;
       _solutionUpdateViewModel = solutionUpdateViewModel;
     }
 
@@ -133,7 +131,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return MessageBoxHelper.DoYouWant (message);
     }
 
-    private void AddLicenseHeaderToProjects (List<Project> projectsInSolution)
+    private async void AddLicenseHeaderToProjects (List<Project> projectsInSolution)
     {
       var progressCount = 1;
       var projectCount = projectsInSolution.Count;
@@ -145,7 +143,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
             project.Name,
             progressCount,
             projectCount);
-        new AddLicenseHeaderToAllFilesInProjectHelper (_licenseReplacer, _licenseHeaderReplacer).Execute (project);
+        await new AddLicenseHeaderToAllFilesInProjectHelper (_licenseHeaderReplacer).ExecuteAsync (project);
         progressCount++;
       }
     }

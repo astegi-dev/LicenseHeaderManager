@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Windows;
+using Core;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
@@ -98,7 +99,7 @@ namespace LicenseHeaderManager.MenuItemCommands.EditorMenu
 
     private async Task ExecuteInternalAsync (string path)
     {
-      var result = await ServiceProvider.GetLicenseHeaderReplacer().RemoveOrReplaceHeader (path, null);
+      var result = await ServiceProvider.GetLicenseHeaderReplacer().RemoveOrReplaceHeader (new LicenseHeaderInput(path, null));
       if (!string.IsNullOrEmpty (result))
         MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
     }

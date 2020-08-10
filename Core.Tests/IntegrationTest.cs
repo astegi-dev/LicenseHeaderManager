@@ -20,7 +20,7 @@ namespace Core.Tests
 
       var headers = new Dictionary<string, string[]>();
       headers.Add(".cs", new[] { "// first line 1", "// second line", "// copyright" });
-      var res = replacer.RemoveOrReplaceHeader(@"C:\Users\gabriel.ratschiller\Desktop\TestFile.cs", headers, null);
+      var res = replacer.RemoveOrReplaceHeader(new LicenseHeaderInput(@"C:\Users\gabriel.ratschiller\Desktop\TestFile.cs", headers, null));
     }
 
   }

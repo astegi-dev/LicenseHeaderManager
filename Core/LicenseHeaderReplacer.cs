@@ -48,27 +48,23 @@ namespace Core
     /// <summary>
     /// Removes or replaces the header of a given project item.
     /// </summary>
-    /// <param name="documentPath">The project item.</param>
-    /// <param name="headers">A dictionary of headers using the file extension as key and the header as value or null if headers should only be removed.</param>
-    /// <param name="additionalProperties"></param>
+    /// <param name="licenseHeaderInput">The licenseHeaderInput item.</param>
     /// <param name="calledbyUser">Specifies whether the command was called by the user (as opposed to automatically by a linked command or by ItemAdded)</param>
     public Task<string> RemoveOrReplaceHeader (
-        string documentPath,
-        IDictionary<string, string[]> headers,
-        IEnumerable<DocumentHeaderProperty> additionalProperties = null,
+        LicenseHeaderInput licenseHeaderInput,
         bool calledbyUser = true)
     {
       var message = "";
       try
       {
-        var result = TryCreateDocument (documentPath, out var document, additionalProperties, headers);
+        var result = TryCreateDocument (licenseHeaderInput.DocumentPath, out var document, licenseHeaderInput.AdditionalProperties, licenseHeaderInput.Headers);
 
         switch (result)
         {
           case CreateDocumentResult.DocumentCreated:
             if (!document.ValidateHeader())
             {
-              message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (documentPath)).Replace (@"\n", "\n");
+              message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).Replace (@"\n", "\n");
               break;
             }
 
@@ -78,12 +74,12 @@ namespace Core
             }
             catch (ParseException)
             {
-              message = string.Format (Resources.Error_InvalidLicenseHeader, documentPath).Replace (@"\n", "\n");
+              message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).Replace (@"\n", "\n");
             }
 
             break;
           case CreateDocumentResult.LanguageNotFound:
-            message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (documentPath)).Replace (@"\n", "\n");
+            message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).Replace (@"\n", "\n");
             break;
           case CreateDocumentResult.EmptyHeader:
             break;
@@ -98,7 +94,7 @@ namespace Core
       }
       catch (ArgumentException ex)
       {
-        message = $"{ex.Message} {documentPath}";
+        message = $"{ex.Message} {licenseHeaderInput.DocumentPath}";
       }
 
       return Task.FromResult (message);

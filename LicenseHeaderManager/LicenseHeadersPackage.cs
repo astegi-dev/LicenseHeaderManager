@@ -35,13 +35,17 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Core;
 using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.MenuItemCommands.EditorMenu;
 using LicenseHeaderManager.MenuItemCommands.FolderMenu;
 using LicenseHeaderManager.MenuItemCommands.ProjectItemMenu;
 using LicenseHeaderManager.MenuItemCommands.ProjectMenu;
 using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
+using CreateDocumentResult = LicenseHeaderManager.Headers.CreateDocumentResult;
 using Document = LicenseHeaderManager.Headers.Document;
+using LicenseHeader = LicenseHeaderManager.Headers.LicenseHeader;
+using LicenseHeaderReplacer = LicenseHeaderManager.Headers.LicenseHeaderReplacer;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager
@@ -118,7 +122,7 @@ namespace LicenseHeaderManager
       _dte = await GetServiceAsync (typeof (DTE)) as DTE2;
       Assumes.Present (_dte);
       _addedItems = new Stack<ProjectItem>();
-      var buttonHandlerFactory = new ButtonHandlerFactory (this, _licenseReplacer, GetLicenseHeaderReplacer());
+      var buttonHandlerFactory = new ButtonHandlerFactory (this, GetLicenseHeaderReplacer());
       _addLicenseHeaderToAllProjectsDelegate = buttonHandlerFactory.CreateAddLicenseHeaderToAllProjectsButtonHandler();
 
       await AddHeaderToProjectItemCommand.InitializeAsync (this);
@@ -385,7 +389,7 @@ namespace LicenseHeaderManager
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
       if (headers != null)
       {
-        return await GetLicenseHeaderReplacer().RemoveOrReplaceHeader (item.Document.FullName, headers, item.GetAdditionalProperties(), calledByUser);
+        return await GetLicenseHeaderReplacer().RemoveOrReplaceHeader (new LicenseHeaderInput(item.Document.FullName, headers, item.GetAdditionalProperties()), calledByUser);
       }
 
       var page = (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));
@@ -403,24 +407,24 @@ namespace LicenseHeaderManager
       return new Core.LicenseHeaderReplacer (LanguagesPage.Languages.Select (Options.Language.ToCoreLanguage), keywords);
     }
 
-    private void AddLicenseHeadersToAllFilesInProjectCallback (object sender, EventArgs e)
+    private async Task AddLicenseHeadersToAllFilesInProjectCallbackAsync (object sender, EventArgs e)
     {
       var obj = GetSolutionExplorerItem();
-      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (_licenseReplacer, GetLicenseHeaderReplacer());
+      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (GetLicenseHeaderReplacer());
 
       var statusBar = (IVsStatusbar) GetService (typeof (SVsStatusbar));
       statusBar.SetText (Resources.UpdatingFiles);
 
-      var addLicenseHeaderToAllFilesReturn = addLicenseHeaderToAllFilesCommand.Execute (obj);
+      var addLicenseHeaderToAllFilesReturn = await addLicenseHeaderToAllFilesCommand.ExecuteAsync (obj);
 
       statusBar.SetText (String.Empty);
 
       HandleLinkedFilesAndShowMessageBox (addLicenseHeaderToAllFilesReturn.LinkedItems);
 
-      HandleAddLicenseHeaderToAllFilesInProjectReturn (obj, addLicenseHeaderToAllFilesReturn);
+      await HandleAddLicenseHeaderToAllFilesInProjectReturnAsync (obj, addLicenseHeaderToAllFilesReturn);
     }
 
-    public void HandleAddLicenseHeaderToAllFilesInProjectReturn (
+    public async Task HandleAddLicenseHeaderToAllFilesInProjectReturnAsync (
         object obj,
         AddLicenseHeaderToAllFilesResult addLicenseHeaderToAllFilesResult)
     {
@@ -448,7 +452,7 @@ namespace LicenseHeaderManager
           {
             ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (currentProject.FileName, currentProject.ProjectItems);
 
-            AddLicenseHeadersToAllFilesInProjectCallback ((object) project ?? projectItem, null);
+            await AddLicenseHeadersToAllFilesInProjectCallbackAsync ((object) project ?? projectItem, null);
           }
         }
         else
