@@ -1,10 +1,9 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Globalization;
-using EnvDTE;
-using LicenseHeaderManager.PackageCommands;
+﻿using EnvDTE;
+using LicenseHeaderManager.CommandsAsync.Common;
+using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
+using System;
+using System.ComponentModel.Design;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
@@ -75,36 +74,7 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      var project = ServiceProvider.GetSolutionExplorerItem() as Project;
-      var projectItem = ServiceProvider.GetSolutionExplorerItem() as ProjectItem;
-
-      string fileName;
-
-      if (project != null)
-      {
-        fileName = project.FileName;
-      }
-      else if (projectItem != null)
-      {
-        fileName = projectItem.Name;
-      }
-      else
-      {
-        return;
-      }
-
-      ProjectItems projectItems = null;
-
-      if (project != null)
-      {
-        projectItems = project.ProjectItems;
-      }
-      else if (projectItem != null)
-      {
-        projectItems = projectItem.ProjectItems;
-      }
-
-      new AddExistingLicenseHeaderDefinitionFileToProjectCommand().AddDefinitionFileToOneProject (fileName, projectItems);
+      new FolderProjectMenuHelper().AddExistingLicenseHeaderDefinitionFile (ServiceProvider);
     }
   }
 }

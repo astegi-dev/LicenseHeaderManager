@@ -1,11 +1,10 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Globalization;
-using EnvDTE;
+﻿using EnvDTE;
+using LicenseHeaderManager.CommandsAsync.Common;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Options;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
+using System;
+using System.ComponentModel.Design;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.CommandsAsync.FolderMenu
@@ -76,20 +75,7 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      var page = (DefaultLicenseHeaderPage) ServiceProvider.GetDialogPage (typeof (DefaultLicenseHeaderPage));
-      var solutionItem = ServiceProvider.GetSolutionExplorerItem();
-      var project = solutionItem as Project;
-      if (project == null)
-      {
-        if (solutionItem is ProjectItem projectItem)
-          LicenseHeader.AddLicenseHeaderDefinitionFile (projectItem, page);
-      }
-
-      if (project == null)
-        return;
-
-      var licenseHeaderDefinitionFile = LicenseHeader.AddHeaderDefinitionFile (project, page);
-      licenseHeaderDefinitionFile.Open (EnvDTE.Constants.vsViewKindCode).Activate();
+      new FolderProjectMenuHelper().AddNewLicenseHeaderDefinitionFile (ServiceProvider);
     }
   }
 }

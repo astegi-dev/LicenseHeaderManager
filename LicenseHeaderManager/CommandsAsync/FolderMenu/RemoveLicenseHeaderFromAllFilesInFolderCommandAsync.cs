@@ -1,10 +1,9 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Globalization;
-using EnvDTE;
+﻿using EnvDTE;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
+using System;
+using System.ComponentModel.Design;
+using LicenseHeaderManager.CommandsAsync.Common;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.CommandsAsync.FolderMenu
@@ -98,8 +97,7 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      var obj = ServiceProvider.GetSolutionExplorerItem();
-      ServiceProvider.RemoveLicenseHeadersFromAllFilesAsync(obj).FireAndForget();
+      new FolderProjectMenuHelper().RemoveLicenseHeadersFromAllFilesAsync(ServiceProvider).FireAndForget();
     }
   }
 }

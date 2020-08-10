@@ -2,11 +2,9 @@
 using System.ComponentModel.Design;
 using System.Globalization;
 using EnvDTE;
-using LicenseHeaderManager.PackageCommands;
+using LicenseHeaderManager.CommandsAsync.Common;
 using LicenseHeaderManager.Utils;
-using Microsoft;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.CommandsAsync.FolderMenu
@@ -52,7 +50,7 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
 
       var obj = ServiceProvider.GetSolutionExplorerItem();
       if (obj is ProjectItem item)
-        visible = ProjectItemInspection.IsFolder(item) || ServiceProvider.ShouldBeVisible (item);
+        visible = ProjectItemInspection.IsFolder (item) || ServiceProvider.ShouldBeVisible (item);
       else
         visible = obj is Project;
 
@@ -94,24 +92,7 @@ namespace LicenseHeaderManager.CommandsAsync.FolderMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      ExecuteInternalAsync().FireAndForget();
-    }
-
-    private async Task ExecuteInternalAsync ()
-    {
-      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-      var obj = ServiceProvider.GetSolutionExplorerItem();
-      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectCommandDelegate (ServiceProvider._licenseReplacer);
-
-      var statusBar = (IVsStatusbar) await ServiceProvider.GetServiceAsync (typeof (SVsStatusbar));
-      Assumes.Present (statusBar);
-
-      statusBar.SetText (Resources.UpdatingFiles);
-      var addLicenseHeaderToAllFilesReturn = addLicenseHeaderToAllFilesCommand.Execute (obj);
-      statusBar.SetText (string.Empty);
-
-      ServiceProvider.HandleLinkedFilesAndShowMessageBox (addLicenseHeaderToAllFilesReturn.LinkedItems);
-      ServiceProvider.HandleAddLicenseHeaderToAllFilesInProjectReturn (obj, addLicenseHeaderToAllFilesReturn);
+      new FolderProjectMenuHelper().AddLicenseHeaderToAllFilesAsync (ServiceProvider).FireAndForget();
     }
   }
 }

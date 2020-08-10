@@ -1,10 +1,9 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Globalization;
-using EnvDTE;
+﻿using EnvDTE;
+using LicenseHeaderManager.CommandsAsync.Common;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
+using System;
+using System.ComponentModel.Design;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
@@ -34,22 +33,22 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     /// <param name="commandService">Command service to add command to, not null.</param>
     private RemoveLicenseHeaderFromAllFilesInProjectCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
     {
-      ServiceProvider = (LicenseHeadersPackage)package ?? throw new ArgumentNullException(nameof(package));
-      commandService = commandService ?? throw new ArgumentNullException (nameof (commandService));
+      ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
+      commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      _menuItem = new OleMenuCommand(this.Execute, menuCommandID);
+      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
       _menuItem.BeforeQueryStatus += OnQueryAllFilesCommandStatus;
       commandService.AddCommand (_menuItem);
     }
 
-    private void OnQueryAllFilesCommandStatus(object sender, EventArgs e)
+    private void OnQueryAllFilesCommandStatus (object sender, EventArgs e)
     {
       bool visible;
 
       var obj = ServiceProvider.GetSolutionExplorerItem();
       if (obj is ProjectItem item)
-        visible = ServiceProvider.ShouldBeVisible(item);
+        visible = ServiceProvider.ShouldBeVisible (item);
       else
         visible = obj is Project;
 
@@ -59,19 +58,12 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static RemoveLicenseHeaderFromAllFilesInProjectCommandAsync Instance
-    {
-      get;
-      private set;
-    }
+    public static RemoveLicenseHeaderFromAllFilesInProjectCommandAsync Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
     /// </summary>
-    private LicenseHeadersPackage ServiceProvider
-    {
-      get;
-    }
+    private LicenseHeadersPackage ServiceProvider { get; }
 
     /// <summary>
     /// Initializes the singleton instance of the command.
@@ -96,10 +88,9 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     /// <param name="e">Event args.</param>
     private void Execute (object sender, EventArgs e)
     {
-      ThreadHelper.ThrowIfNotOnUIThread ();
+      ThreadHelper.ThrowIfNotOnUIThread();
 
-      var obj = ServiceProvider.GetSolutionExplorerItem();
-      ServiceProvider.RemoveLicenseHeadersFromAllFilesAsync(obj).FireAndForget();
+      new FolderProjectMenuHelper().RemoveLicenseHeadersFromAllFilesAsync (ServiceProvider).FireAndForget();
     }
   }
 }
