@@ -59,6 +59,7 @@
     <Compile Include="ICommentParser.cs" />
     <Compile Include="Language.cs" />
     <Compile Include="LicenseHeader.cs" />
+    <Compile Include="LicenseHeaderInput.cs" />
     <Compile Include="LicenseHeaderPreparer.cs" />
     <Compile Include="LicenseHeaderReplacer.cs" />
     <Compile Include="LineEndInformation.cs" />

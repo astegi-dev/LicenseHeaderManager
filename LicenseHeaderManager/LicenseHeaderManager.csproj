@@ -227,7 +227,6 @@
     <Compile Include="Headers\CommentParser.cs" />
     <Compile Include="Headers\CreateDocumentResult.cs" />
     <Compile Include="Headers\Document.cs" />
-    <Compile Include="Utils\Items.cs" />
     <Compile Include="Utils\ProjectItemParentFinder.cs" />
     <Compile Include="Interfaces\ISolutionLevelCommand.cs" />
     <Compile Include="Utils\ExistingLicenseHeaderDefinitionFileAdder.cs" />

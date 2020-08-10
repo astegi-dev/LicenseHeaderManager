@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -69,6 +71,7 @@ namespace Core
               message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (documentPath)).Replace (@"\n", "\n");
               break;
             }
+
             try
             {
               document.ReplaceHeaderIfNecessary();
@@ -77,6 +80,7 @@ namespace Core
             {
               message = string.Format (Resources.Error_InvalidLicenseHeader, documentPath).Replace (@"\n", "\n");
             }
+
             break;
           case CreateDocumentResult.LanguageNotFound:
             message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (documentPath)).Replace (@"\n", "\n");
@@ -88,6 +92,7 @@ namespace Core
             {
               message = string.Format (Resources.Error_NoHeaderFound).Replace (@"\n", "\n");
             }
+
             break;
         }
       }
@@ -96,18 +101,26 @@ namespace Core
         message = $"{ex.Message} {documentPath}";
       }
 
-      return Task.FromResult (message);;
+      return Task.FromResult (message);
     }
 
-    public int RemoveOrReplaceHeaderCore(object obj)
+    public async Task<IDictionary<string, string>> RemoveOrReplaceHeader (IEnumerable<LicenseHeaderInput> licenseHeaders, bool calledByUser = true)
     {
-      var result = RemoveOrReplaceHeader(null, null, null, true);
-      return 0;
+      var errors = new Dictionary<string, string>();
+
+      foreach (var licenseHeaderInfo in licenseHeaders)
+      {
+        var currentResult = await RemoveOrReplaceHeader (licenseHeaderInfo.DocumentPath, licenseHeaderInfo.Headers, licenseHeaderInfo.AdditionalProperties, calledByUser);
+        if (!string.IsNullOrEmpty (currentResult))
+          errors.Add (licenseHeaderInfo.DocumentPath, currentResult);
+      }
+
+      return errors;
     }
 
-    public static bool IsLicenseHeader(string documentPath)
+    public static bool IsLicenseHeader (string documentPath)
     {
-      return Path.GetExtension(documentPath) == LicenseHeader.Extension;
+      return Path.GetExtension (documentPath) == LicenseHeader.Extension;
     }
 
     /// <summary>
@@ -130,7 +143,7 @@ namespace Core
         return CreateDocumentResult.LicenseHeaderDocument;
 
       var language = _languages
-        .FirstOrDefault(x => x.Extensions.Any(y => documentPath.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
+          .FirstOrDefault (x => x.Extensions.Any (y => documentPath.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
 
       if (language == null)
         return CreateDocumentResult.LanguageNotFound;
@@ -139,8 +152,8 @@ namespace Core
       if (headers != null)
       {
         var extension = headers.Keys
-          .OrderByDescending (x => x.Length)
-          .FirstOrDefault(x => documentPath.EndsWith (x, StringComparison.OrdinalIgnoreCase));
+            .OrderByDescending (x => x.Length)
+            .FirstOrDefault (x => documentPath.EndsWith (x, StringComparison.OrdinalIgnoreCase));
 
         if (extension == null)
         {
