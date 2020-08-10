@@ -28,19 +28,21 @@ namespace LicenseHeaderManager.ButtonHandler
     private readonly LicenseHeaderReplacer _licenseReplacer;
     private readonly DTE2 _dte2;
 
-    public AddLicenseHeaderToAllProjectsDelegate (LicenseHeaderReplacer licenseReplacer, DTE2 dte2)
+    public AddLicenseHeaderToAllProjectsDelegate (LicenseHeaderReplacer licenseReplacer, Core.LicenseHeaderReplacer licenseHeaderReplacer, DTE2 dte2)
     {
+      this._licenseHeaderReplacer = licenseHeaderReplacer;
       _licenseReplacer = licenseReplacer;
       _dte2 = dte2;
     }
 
     private System.Threading.Thread _solutionUpdateThread;
     private bool _resharperSuspended;
+    private Core.LicenseHeaderReplacer _licenseHeaderReplacer;
 
     public void HandleButton (object sender, EventArgs e)
     {
       var solutionUpdateViewModel = new SolutionUpdateViewModel();
-      var addHeaderToAllProjectsCommand = new AddLicenseHeaderToAllFilesInSolutionHelper (_licenseReplacer, solutionUpdateViewModel);
+      var addHeaderToAllProjectsCommand = new AddLicenseHeaderToAllFilesInSolutionHelper (_licenseReplacer, _licenseHeaderReplacer, solutionUpdateViewModel);
       var buttonThreadWorker = new SolutionLevelButtonThreadWorker (addHeaderToAllProjectsCommand);
       var dialog = new SolutionUpdateDialog (solutionUpdateViewModel);
 

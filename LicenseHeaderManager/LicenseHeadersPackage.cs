@@ -118,7 +118,7 @@ namespace LicenseHeaderManager
       _dte = await GetServiceAsync (typeof (DTE)) as DTE2;
       Assumes.Present (_dte);
       _addedItems = new Stack<ProjectItem>();
-      var buttonHandlerFactory = new ButtonHandlerFactory (this, _licenseReplacer);
+      var buttonHandlerFactory = new ButtonHandlerFactory (this, _licenseReplacer, GetLicenseHeaderReplacer());
       _addLicenseHeaderToAllProjectsDelegate = buttonHandlerFactory.CreateAddLicenseHeaderToAllProjectsButtonHandler();
 
       await AddHeaderToProjectItemCommand.InitializeAsync (this);
@@ -406,7 +406,7 @@ namespace LicenseHeaderManager
     private void AddLicenseHeadersToAllFilesInProjectCallback (object sender, EventArgs e)
     {
       var obj = GetSolutionExplorerItem();
-      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (_licenseReplacer);
+      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (_licenseReplacer, GetLicenseHeaderReplacer());
 
       var statusBar = (IVsStatusbar) GetService (typeof (SVsStatusbar));
       statusBar.SetText (Resources.UpdatingFiles);

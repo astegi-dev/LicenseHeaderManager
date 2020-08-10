@@ -21,16 +21,18 @@ namespace LicenseHeaderManager.ButtonHandler
   {
     private readonly ILicenseHeaderExtension _licenseHeadersPackage;
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
+    private Core.LicenseHeaderReplacer _licenseHeaderReplacerCore;
 
-    public ButtonHandlerFactory (ILicenseHeaderExtension licenseHeadersPackage, LicenseHeaderReplacer licenseHeaderReplacer)
+    public ButtonHandlerFactory (ILicenseHeaderExtension licenseHeadersPackage, LicenseHeaderReplacer licenseHeaderReplacer, Core.LicenseHeaderReplacer licenseHeaderReplacerCore)
     {
+      _licenseHeaderReplacerCore = licenseHeaderReplacerCore;
       _licenseHeadersPackage = licenseHeadersPackage;
       _licenseHeaderReplacer = licenseHeaderReplacer;
     }
 
     public AddLicenseHeaderToAllProjectsDelegate CreateAddLicenseHeaderToAllProjectsButtonHandler ()
     {
-      return new AddLicenseHeaderToAllProjectsDelegate (_licenseHeaderReplacer, _licenseHeadersPackage.Dte2);
+      return new AddLicenseHeaderToAllProjectsDelegate (_licenseHeaderReplacer, _licenseHeaderReplacerCore, _licenseHeadersPackage.Dte2);
     }
   }
 }

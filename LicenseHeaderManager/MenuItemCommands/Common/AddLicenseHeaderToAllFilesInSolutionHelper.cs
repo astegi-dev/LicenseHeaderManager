@@ -33,9 +33,12 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     private readonly LicenseHeaderReplacer _licenseReplacer;
     private readonly SolutionUpdateViewModel _solutionUpdateViewModel;
+    private Core.LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public AddLicenseHeaderToAllFilesInSolutionHelper (LicenseHeaderReplacer licenseReplacer, SolutionUpdateViewModel solutionUpdateViewModel)
+    public AddLicenseHeaderToAllFilesInSolutionHelper (LicenseHeaderReplacer licenseReplacer, Core.LicenseHeaderReplacer licenseHeaderReplacer,
+      SolutionUpdateViewModel solutionUpdateViewModel)
     {
+      _licenseHeaderReplacer = licenseHeaderReplacer;
       _licenseReplacer = licenseReplacer;
       _solutionUpdateViewModel = solutionUpdateViewModel;
     }
@@ -142,7 +145,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
             project.Name,
             progressCount,
             projectCount);
-        new AddLicenseHeaderToAllFilesInProjectHelper (_licenseReplacer).Execute (project);
+        new AddLicenseHeaderToAllFilesInProjectHelper (_licenseReplacer, _licenseHeaderReplacer).Execute (project);
         progressCount++;
       }
     }

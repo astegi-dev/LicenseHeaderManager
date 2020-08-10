@@ -14,6 +14,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.ResultObjects;
@@ -24,13 +26,16 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
   internal class AddLicenseHeaderToAllFilesInProjectHelper
   {
     private LicenseHeaderReplacer _licenseReplacer;
+    private Core.LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public AddLicenseHeaderToAllFilesInProjectHelper (LicenseHeaderReplacer licenseReplacer)
+    public AddLicenseHeaderToAllFilesInProjectHelper(LicenseHeaderReplacer licenseReplacer,
+      Core.LicenseHeaderReplacer licenseHeaderReplacer)
     {
+      _licenseHeaderReplacer = licenseHeaderReplacer;
       _licenseReplacer = licenseReplacer;
     }
 
-    public AddLicenseHeaderToAllFilesResult Execute (object projectOrProjectItem)
+    public AddLicenseHeaderToAllFilesResult Execute(object projectOrProjectItem)
     {
       var project = projectOrProjectItem as Project;
       var projectItem = projectOrProjectItem as ProjectItem;
@@ -46,25 +51,101 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
         if (project != null)
         {
-          headers = LicenseHeaderFinder.GetHeaderDefinitionForProjectWithFallback (project);
+          headers = LicenseHeaderFinder.GetHeaderDefinitionForProjectWithFallback(project);
           projectItems = project.ProjectItems;
         }
         else
         {
-          headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (projectItem);
+          headers = LicenseHeaderFinder.GetHeaderDefinitionForItem(projectItem);
           projectItems = projectItem.ProjectItems;
         }
 
         foreach (ProjectItem item in projectItems)
         {
-          if (ProjectItemInspection.IsPhysicalFile (item) && ProjectItemInspection.IsLink (item))
-            linkedItems.Add (item);
+          if (ProjectItemInspection.IsPhysicalFile(item) && ProjectItemInspection.IsLink(item))
+            linkedItems.Add(item);
           else
-            countSubLicenseHeadersFound = _licenseReplacer.RemoveOrReplaceHeaderRecursive (item, headers);
+            countSubLicenseHeadersFound = _licenseReplacer.RemoveOrReplaceHeaderRecursive(item, headers);
         }
       }
 
-      return new AddLicenseHeaderToAllFilesResult (countSubLicenseHeadersFound, headers == null, linkedItems);
+      Execute1(projectOrProjectItem);
+      return new AddLicenseHeaderToAllFilesResult(countSubLicenseHeadersFound, headers == null, linkedItems);
+    }
+
+    public AddLicenseHeaderToAllFilesResult Execute1(object projectOrProjectItem)
+    {
+      var project = projectOrProjectItem as Project;
+      var projectItem = projectOrProjectItem as ProjectItem;
+      var files = new List<string>();
+
+      var countSubLicenseHeadersFound = 0;
+      IDictionary<string, string[]> headers = null;
+      var linkedItems = new List<ProjectItem>();
+
+      if (project != null || projectItem != null)
+      {
+        _licenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
+        ProjectItems projectItems;
+
+        if (project != null)
+        {
+          headers = LicenseHeaderFinder.GetHeaderDefinitionForProjectWithFallback(project);
+          projectItems = project.ProjectItems;
+        }
+        else
+        {
+          headers = LicenseHeaderFinder.GetHeaderDefinitionForItem(projectItem);
+          projectItems = projectItem.ProjectItems;
+        }
+        
+        foreach (ProjectItem item in projectItems)
+        {
+          if (ProjectItemInspection.IsPhysicalFile(item) && ProjectItemInspection.IsLink(item))
+          {
+            linkedItems.Add(item);
+
+          }
+          else
+          {
+            files.AddRange(GetFilesToProcess(item, headers, out var subLicenseHeaders));
+            countSubLicenseHeadersFound = subLicenseHeaders;
+          }
+        }
+      }
+
+      return new AddLicenseHeaderToAllFilesResult(countSubLicenseHeadersFound, headers == null, linkedItems);
+    }
+
+    private ICollection<string> GetFilesToProcess(ProjectItem item, IDictionary<string, string[]> headers, out int countSubLicenseHeaders, bool searchForLicenseHeaders = true)
+    {
+      var files = new List<string>();
+      countSubLicenseHeaders = 0;
+
+      if (item.ProjectItems == null)
+        return files;
+
+      files.Add(item.Name);
+
+      var childHeaders = headers;
+      if (searchForLicenseHeaders)
+      {
+        childHeaders = LicenseHeaderFinder.SearchItemsDirectlyGetHeaderDefinition(item.ProjectItems);
+        if (childHeaders != null)
+          countSubLicenseHeaders++;
+        else
+          childHeaders = headers;
+      }
+
+      foreach (ProjectItem child in item.ProjectItems)
+      {
+        // headersFound += GetFilesToProcess(child, childHeaders, searchForLicenseHeaders);
+        var subFiles = GetFilesToProcess(child, childHeaders, out var subLicenseHeaders, searchForLicenseHeaders);
+        files.AddRange(subFiles);
+        countSubLicenseHeaders += subLicenseHeaders;
+      }
+
+      return files;
     }
   }
 }

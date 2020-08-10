@@ -46,7 +46,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var obj = serviceProvider.GetSolutionExplorerItem();
-      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (serviceProvider._licenseReplacer);
+      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (serviceProvider._licenseReplacer, serviceProvider.GetLicenseHeaderReplacer());
 
       var statusBar = (IVsStatusbar) await serviceProvider.GetServiceAsync (typeof (SVsStatusbar));
       Assumes.Present (statusBar);
