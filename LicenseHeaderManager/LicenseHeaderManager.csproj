@@ -226,9 +226,6 @@
     <Compile Include="Headers\CommentParser.cs" />
     <Compile Include="Headers\CreateDocumentResult.cs" />
     <Compile Include="Headers\Document.cs" />
-    <Compile Include="PackageCommands\AddNewSolutionLicenseHeaderDefinitionFileCommand.cs" />
-    <Compile Include="PackageCommands\OpenSolutionLicenseHeaderDefinitionFileCommand.cs" />
-    <Compile Include="PackageCommands\RemoveSolutionLicenseHeaderDefinitionFileCommand.cs" />
     <Compile Include="Utils\ProjectItemParentFinder.cs" />
     <Compile Include="Interfaces\ISolutionLevelCommand.cs" />
     <Compile Include="PackageCommands\AddExistingLicenseHeaderDefinitionFileToProjectCommand.cs" />

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.IO;
+using EnvDTE;
+using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.PackageCommands;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -82,7 +85,19 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      RemoveSolutionLicenseHeaderDefinitionFileCommand.Instance.Execute (ServiceProvider._dte.Solution);
+      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (ServiceProvider._dte.Solution);
+
+      // Look for and close the document representing the license header definition file if it exists
+      foreach (EnvDTE.Document document in ServiceProvider._dte.Solution.DTE.Documents)
+      {
+        if (!string.Equals (solutionHeaderDefinitionFilePath, document.FullName, StringComparison.OrdinalIgnoreCase))
+          continue;
+
+        document.Close();
+      }
+
+      if (File.Exists (solutionHeaderDefinitionFilePath))
+        File.Delete (solutionHeaderDefinitionFilePath);
     }
   }
 }

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.IO;
+using EnvDTE;
+using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.PackageCommands;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -82,7 +85,10 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      OpenSolutionLicenseHeaderDefinitionFileCommand.Instance.Execute (ServiceProvider._dte.Solution);
+      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution(ServiceProvider._dte.Solution);
+
+      if (File.Exists(solutionHeaderDefinitionFilePath))
+        ServiceProvider._dte.Solution.DTE.OpenFile (EnvDTE.Constants.vsViewKindTextView, solutionHeaderDefinitionFilePath).Activate();
     }
   }
 }

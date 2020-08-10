@@ -127,7 +127,10 @@ namespace LicenseHeaderManager
       await RemoveHeaderFromProjectItemCommandAsync.InitializeAsync (this);
       await AddLicenseHeaderToAllFilesInSolutionCommandAsync.InitializeAsync (this);
       await RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync.InitializeAsync (this);
-      await AddNewSolutionLicenseHeaderDefinitionFileCommandAsync.InitializeAsync (this);
+      await AddNewSolutionLicenseHeaderDefinitionFileCommandAsync.InitializeAsync (
+          this,
+          _dte?.Solution,
+          () => ((DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage))).LicenseHeaderFileText);
       await OpenSolutionLicenseHeaderDefinitionFileCommandAsync.InitializeAsync (this);
       await RemoveSolutionLicenseHeaderDefinitionFileCommandAsync.InitializeAsync (this);
       await AddLicenseHeaderToAllFilesInProjectCommandAsync.InitializeAsync (this);
@@ -141,15 +144,6 @@ namespace LicenseHeaderManager
       await AddNewLicenseHeaderDefinitionFileToFolderCommandAsync.InitializeAsync (this);
       await AddLicenseHeaderEditorAdvancedMenuCommandAsync.InitializeAsync (this);
       await RemoveLicenseHeaderEditorAdvancedMenuCommandAsync.InitializeAsync (this);
-      //register commands
-      var mcs = await GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
-      if (mcs != null)
-      {
-        AddNewSolutionLicenseHeaderDefinitionFileCommand.Initialize (
-            () => ((DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage))).LicenseHeaderFileText);
-        OpenSolutionLicenseHeaderDefinitionFileCommand.Initialize();
-        RemoveSolutionLicenseHeaderDefinitionFileCommand.Initialize();
-      }
 
 
       //register ItemAdded event handler
@@ -511,7 +505,7 @@ namespace LicenseHeaderManager
 
     private void AddNewSolutionLicenseHeaderDefinitionFileCallback (object sender, EventArgs e)
     {
-      AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Execute (_dte.Solution);
+      AddNewSolutionLicenseHeaderDefinitionFileCommandAsync.Instance.Invoke (_dte.Solution);
     }
 
     #endregion

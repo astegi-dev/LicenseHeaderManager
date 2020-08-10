@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
+using LicenseHeaderManager.CommandsAsync.SolutionMenu;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.SolutionUpdateViewModels;
@@ -81,7 +82,7 @@ namespace LicenseHeaderManager.PackageCommands
           // No projects have definition. Ask the user if they want to add a solution level header definition.
           if (MessageBoxHelper.DoYouWant (Resources.Question_AddNewLicenseHeaderDefinitionForSolution))
           {
-            AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Execute (solution);
+            AddNewSolutionLicenseHeaderDefinitionFileCommandAsync.Instance.Invoke (solution);
 
             if (!MessageBoxHelper.DoYouWant (Resources.Question_StopForConfiguringDefinitionFilesSingleFile))
             {

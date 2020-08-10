@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.Windows;
+using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
@@ -94,8 +96,14 @@ namespace LicenseHeaderManager.CommandsAsync.EditorMenu
       if (item == null)
         return;
 
-      // TODO call Core
-      ServiceProvider._licenseReplacer.RemoveOrReplaceHeader (item, null, true);
+      ExecuteInternalAsync (item.Document.FullName).FireAndForget();
+    }
+
+    private async Task ExecuteInternalAsync (string path)
+    {
+      var result = await ServiceProvider.GetLicenseHeaderReplacer().RemoveOrReplaceHeader (path, null);
+      if (!string.IsNullOrEmpty (result))
+        MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
     }
   }
 }
