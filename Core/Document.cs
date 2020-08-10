@@ -30,7 +30,12 @@ namespace Core
     internal readonly string _lineEndingInDocument;
     private string _documentTextCache;
 
-    public Document (string documentFilePath, Language language, string[] headerLines, IEnumerable<string> keywords = null)
+    public Document (
+        string documentFilePath,
+        Language language,
+        string[] headerLines,
+        IEnumerable<DocumentHeaderProperty> additionalProperties = null,
+        IEnumerable<string> keywords = null)
     {
       _documentFilePath = documentFilePath;
 
@@ -38,7 +43,7 @@ namespace Core
 
 
       string headerText = CreateHeaderText (headerLines);
-      _header = new DocumentHeader (documentFilePath, headerText, new DocumentHeaderProperties ());
+      _header = new DocumentHeader (documentFilePath, headerText, new DocumentHeaderProperties (additionalProperties));
       _keywords = keywords;
 
       _language = language;

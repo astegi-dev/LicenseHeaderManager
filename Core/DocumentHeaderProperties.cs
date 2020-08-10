@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Core
 {
@@ -24,9 +25,9 @@ namespace Core
   {
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 
-    public DocumentHeaderProperties ()
+    public DocumentHeaderProperties (IEnumerable<DocumentHeaderProperty> additionalProperties = null)
     {
-      _properties = CreateProperties();
+      _properties = CreateProperties(additionalProperties);
     }
 
     public IEnumerator<DocumentHeaderProperty> GetEnumerator ()
@@ -39,72 +40,63 @@ namespace Core
       return GetEnumerator();
     }
 
-    private IEnumerable<DocumentHeaderProperty> CreateProperties ()
+    private IEnumerable<DocumentHeaderProperty> CreateProperties (IEnumerable<DocumentHeaderProperty> additionalProperties)
     {
-      List<DocumentHeaderProperty> properties = new List<DocumentHeaderProperty>()
-                                                {
-                                                    new DocumentHeaderProperty (
-                                                        "%FullFileName%",
-                                                        documentHeader => documentHeader.FileInfo != null,
-                                                        documentHeader => GetProperFilePathCapitalization (documentHeader.FileInfo)),
-                                                    new DocumentHeaderProperty (
-                                                        "%FileName%",
-                                                        documentHeader => documentHeader.FileInfo != null,
-                                                        documentHeader => GetProperFileNameCapitalization (documentHeader.FileInfo)),
-                                                    new DocumentHeaderProperty (
-                                                        "%CreationYear%",
-                                                        documentHeader => documentHeader.FileInfo != null,
-                                                        documentHeader => documentHeader.FileInfo.CreationTime.Year.ToString()),
-                                                    new DocumentHeaderProperty (
-                                                        "%CreationMonth%",
-                                                        documentHeader => documentHeader.FileInfo != null,
-                                                        documentHeader => documentHeader.FileInfo.CreationTime.Month.ToString()),
-                                                    new DocumentHeaderProperty (
-                                                        "%CreationDay%",
-                                                        documentHeader => documentHeader.FileInfo != null,
-                                                        documentHeader => documentHeader.FileInfo.CreationTime.Day.ToString()),
-                                                    new DocumentHeaderProperty (
-                                                        "%CreationTime%",
-                                                        documentHeader => documentHeader.FileInfo != null,
-                                                        documentHeader => documentHeader.FileInfo.CreationTime.ToShortTimeString()),
-                                                    new DocumentHeaderProperty (
-                                                        "%CurrentYear%",
-                                                        documentHeader => true,
-                                                        documentHeader => DateTime.Now.Year.ToString()),
-                                                    new DocumentHeaderProperty (
-                                                        "%CurrentMonth%",
-                                                        documentHeader => true,
-                                                        documentHeader => DateTime.Now.Month.ToString()),
-                                                    new DocumentHeaderProperty (
-                                                        "%CurrentDay%",
-                                                        documentHeader => true,
-                                                        documentHeader => DateTime.Now.Day.ToString()),
-                                                    new DocumentHeaderProperty (
-                                                        "%CurrentTime%",
-                                                        documentHeader => true,
-                                                        documentHeader => DateTime.Now.ToShortTimeString()),
-                                                    new DocumentHeaderProperty (
-                                                        "%UserName%",
-                                                        documentHeader => UserInfo.Name != null,
-                                                        documentHeader => UserInfo.Name),
-                                                    new DocumentHeaderProperty (
-                                                        "%UserDisplayName%",
-                                                        documentHeader => UserInfo.DisplayName != null,
-                                                        documentHeader => UserInfo.DisplayName)
-                                                    /*new DocumentHeaderProperty (
-                                                        "%Project%",
-                                                        documentHeader => projectItem.ContainingProject != null,
-                                                        documentHeader => projectItem.ContainingProject.Name),
-                                                    new DocumentHeaderProperty (
-                                                        "%Namespace%",
-                                                        documentHeader =>
-                                                          projectItem.FileCodeModel != null &&
-                                                          projectItem.FileCodeModel.CodeElements.Cast<CodeElement>()
-                                                              .Any (ce => ce.Kind == vsCMElement.vsCMElementNamespace),
-                                                        documentHeader =>
-                                                          projectItem.FileCodeModel.CodeElements.Cast<CodeElement>()
-                                                              .First (ce => ce.Kind == vsCMElement.vsCMElementNamespace).Name)*/
-                                                };
+      var properties = new List<DocumentHeaderProperty>
+                       {
+                           new DocumentHeaderProperty (
+                               "%FullFileName%",
+                               documentHeader => documentHeader.FileInfo != null,
+                               documentHeader => GetProperFilePathCapitalization (documentHeader.FileInfo)),
+                           new DocumentHeaderProperty (
+                               "%FileName%",
+                               documentHeader => documentHeader.FileInfo != null,
+                               documentHeader => GetProperFileNameCapitalization (documentHeader.FileInfo)),
+                           new DocumentHeaderProperty (
+                               "%CreationYear%",
+                               documentHeader => documentHeader.FileInfo != null,
+                               documentHeader => documentHeader.FileInfo.CreationTime.Year.ToString()),
+                           new DocumentHeaderProperty (
+                               "%CreationMonth%",
+                               documentHeader => documentHeader.FileInfo != null,
+                               documentHeader => documentHeader.FileInfo.CreationTime.Month.ToString()),
+                           new DocumentHeaderProperty (
+                               "%CreationDay%",
+                               documentHeader => documentHeader.FileInfo != null,
+                               documentHeader => documentHeader.FileInfo.CreationTime.Day.ToString()),
+                           new DocumentHeaderProperty (
+                               "%CreationTime%",
+                               documentHeader => documentHeader.FileInfo != null,
+                               documentHeader => documentHeader.FileInfo.CreationTime.ToShortTimeString()),
+                           new DocumentHeaderProperty (
+                               "%CurrentYear%",
+                               documentHeader => true,
+                               documentHeader => DateTime.Now.Year.ToString()),
+                           new DocumentHeaderProperty (
+                               "%CurrentMonth%",
+                               documentHeader => true,
+                               documentHeader => DateTime.Now.Month.ToString()),
+                           new DocumentHeaderProperty (
+                               "%CurrentDay%",
+                               documentHeader => true,
+                               documentHeader => DateTime.Now.Day.ToString()),
+                           new DocumentHeaderProperty (
+                               "%CurrentTime%",
+                               documentHeader => true,
+                               documentHeader => DateTime.Now.ToShortTimeString()),
+                           new DocumentHeaderProperty (
+                               "%UserName%",
+                               documentHeader => UserInfo.Name != null,
+                               documentHeader => UserInfo.Name),
+                           new DocumentHeaderProperty (
+                               "%UserDisplayName%",
+                               documentHeader => UserInfo.DisplayName != null,
+                               documentHeader => UserInfo.DisplayName)
+                       };
+
+      additionalProperties ??= Enumerable.Empty<DocumentHeaderProperty>();
+      properties.AddRange (additionalProperties);
+
       return properties;
     }
 

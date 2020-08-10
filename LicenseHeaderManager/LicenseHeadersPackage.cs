@@ -399,7 +399,7 @@ namespace LicenseHeaderManager
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
       if (headers != null)
       {
-        return await GetLicenseHeaderReplacer().RemoveOrReplaceHeader (item.Document.FullName, headers, calledByUser);
+        return await GetLicenseHeaderReplacer().RemoveOrReplaceHeader (item.Document.FullName, headers, item.GetAdditionalProperties(), calledByUser);
       }
 
       var page = (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));

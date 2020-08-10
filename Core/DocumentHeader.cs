@@ -21,7 +21,7 @@ using System.Text.RegularExpressions;
 
 namespace Core
 {
-  internal class DocumentHeader
+  public class DocumentHeader
   {
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 

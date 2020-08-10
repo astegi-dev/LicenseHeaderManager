@@ -321,7 +321,7 @@
     <Compile Include="Utils\MessageBoxHelper.cs" />
     <Compile Include="Utils\PathUtility.cs" />
     <Compile Include="Utils\ProjectItemInspection.cs" />
-    <Compile Include="Utils\StringExtensions.cs" />
+    <Compile Include="Utils\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

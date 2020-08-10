@@ -95,19 +95,6 @@ namespace LicenseHeaderManager.Headers
                                "%UserDisplayName%",
                                documentHeader => UserInfo.DisplayName != null,
                                documentHeader => UserInfo.DisplayName)
-                           /*new DocumentHeaderProperty (
-                                                      "%Project%",
-                                                      documentHeader => projectItem.ContainingProject != null,
-                                                      documentHeader => projectItem.ContainingProject.Name),
-                                                  new DocumentHeaderProperty (
-                                                      "%Namespace%",
-                                                      documentHeader =>
-                                                        projectItem.FileCodeModel != null &&
-                                                        projectItem.FileCodeModel.CodeElements.Cast<CodeElement>()
-                                                            .Any (ce => ce.Kind == vsCMElement.vsCMElementNamespace),
-                                                      documentHeader =>
-                                                        projectItem.FileCodeModel.CodeElements.Cast<CodeElement>()
-                                                            .First (ce => ce.Kind == vsCMElement.vsCMElementNamespace).Name)*/
                        };
       return properties;
     }

@@ -48,13 +48,18 @@ namespace Core
     /// </summary>
     /// <param name="documentPath">The project item.</param>
     /// <param name="headers">A dictionary of headers using the file extension as key and the header as value or null if headers should only be removed.</param>
+    /// <param name="additionalProperties"></param>
     /// <param name="calledbyUser">Specifies whether the command was called by the user (as opposed to automatically by a linked command or by ItemAdded)</param>
-    public Task<string> RemoveOrReplaceHeader (string documentPath, IDictionary<string, string[]> headers, bool calledbyUser = true)
+    public Task<string> RemoveOrReplaceHeader (
+        string documentPath,
+        IDictionary<string, string[]> headers,
+        IEnumerable<DocumentHeaderProperty> additionalProperties = null,
+        bool calledbyUser = true)
     {
       var message = "";
       try
       {
-        var result = TryCreateDocument (documentPath, out var document, headers);
+        var result = TryCreateDocument (documentPath, out var document, additionalProperties, headers);
 
         switch (result)
         {
@@ -104,11 +109,13 @@ namespace Core
     /// </summary>
     /// <param name="documentPath">The project item.</param>
     /// <param name="document">The document which was created or null if an error occured (see return value).</param>
+    /// <param name="additionalProperties"></param>
     /// <param name="headers">A dictionary of headers using the file extension as key and the header as value or null if headers should only be removed.</param>
     /// <returns>A value indicating the result of the operation. Document will be null unless DocumentCreated is returned.</returns>
     public CreateDocumentResult TryCreateDocument (
         string documentPath,
         out Document document,
+        IEnumerable<DocumentHeaderProperty> additionalProperties = null,
         IDictionary<string, string[]> headers = null)
     {
       document = null;
@@ -142,7 +149,7 @@ namespace Core
         }
       }
 
-      document = new Document (documentPath, language, header, _keywords);
+      document = new Document (documentPath, language, header, additionalProperties, _keywords);
 
       return CreateDocumentResult.DocumentCreated;
     }

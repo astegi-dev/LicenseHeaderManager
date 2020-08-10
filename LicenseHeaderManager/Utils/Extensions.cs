@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,18 +11,44 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
+using EnvDTE;
+using Microsoft.VisualStudio.Shell;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace LicenseHeaderManager.Utils
 {
-  internal static class StringExtensions
+  internal static class Extensions
   {
+    public static IEnumerable<Core.DocumentHeaderProperty> GetAdditionalProperties (this ProjectItem item)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
 
-    public static void FireAndForget (this Task task)
+      return new List<Core.DocumentHeaderProperty>
+             {
+                 new Core.DocumentHeaderProperty (
+                     "%Project%",
+                     documentHeader => item.ContainingProject != null,
+                     documentHeader => item.ContainingProject.Name),
+                 new Core.DocumentHeaderProperty (
+                     "%Namespace%",
+                     documentHeader =>
+                         item.FileCodeModel != null &&
+                         item.FileCodeModel.CodeElements.Cast<CodeElement>()
+                             .Any (ce => ce.Kind == vsCMElement.vsCMElementNamespace),
+                     documentHeader =>
+                         item.FileCodeModel.CodeElements.Cast<CodeElement>()
+                             .First (ce => ce.Kind == vsCMElement.vsCMElementNamespace).Name)
+             };
+    }
+
+    public static void FireAndForget (this System.Threading.Tasks.Task task)
     {
       // note: this code is inspired by a tweet from Ben Adams: https://twitter.com/ben_a_adams/status/1045060828700037125
       // Only care about tasks that may fault (not completed) or are faulted,
@@ -35,7 +62,7 @@ namespace LicenseHeaderManager.Utils
 
       // Allocate the async/await state machine only when needed for performance reason.
       // More info about the state machine: https://blogs.msdn.microsoft.com/seteplia/2017/11/30/dissecting-the-async-methods-in-c/
-      static async Task ForgetAwaited (Task task)
+      static async System.Threading.Tasks.Task ForgetAwaited (System.Threading.Tasks.Task task)
       {
         try
         {
@@ -64,6 +91,7 @@ namespace LicenseHeaderManager.Utils
         idx += searchString.Length;
         count++;
       }
+
       return count;
     }
   }
