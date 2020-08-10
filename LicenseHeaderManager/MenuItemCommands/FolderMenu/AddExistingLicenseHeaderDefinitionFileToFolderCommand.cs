@@ -1,23 +1,20 @@
-﻿using EnvDTE;
-using LicenseHeaderManager.Headers;
-using LicenseHeaderManager.Options;
-using Microsoft.VisualStudio.Shell;
-using System;
+﻿using System;
 using System.ComponentModel.Design;
-using LicenseHeaderManager.CommandsAsync.Common;
+using LicenseHeaderManager.MenuItemCommands.Common;
+using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
-namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
+namespace LicenseHeaderManager.MenuItemCommands.FolderMenu
 {
   /// <summary>
   /// Command handler
   /// </summary>
-  internal sealed class AddNewLicenseHeaderDefinitionFileToProjectCommandAsync
+  internal sealed class AddExistingLicenseHeaderDefinitionFileToFolderCommand
   {
     /// <summary>
     /// Command ID.
     /// </summary>
-    public const int CommandId = 4136;
+    public const int CommandId = 4142;
 
     /// <summary>
     /// Command menu group (command set GUID).
@@ -25,12 +22,12 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AddNewLicenseHeaderDefinitionFileToProjectCommandAsync"/> class.
+    /// Initializes a new instance of the <see cref="AddExistingLicenseHeaderDefinitionFileToFolderCommand"/> class.
     /// Adds our command handlers for menu (commands must exist in the command table file)
     /// </summary>
     /// <param name="package">Owner package, not null.</param>
     /// <param name="commandService">Command service to add command to, not null.</param>
-    private AddNewLicenseHeaderDefinitionFileToProjectCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
+    private AddExistingLicenseHeaderDefinitionFileToFolderCommand (AsyncPackage package, OleMenuCommandService commandService)
     {
       ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
@@ -43,7 +40,7 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static AddNewLicenseHeaderDefinitionFileToProjectCommandAsync Instance { get; private set; }
+    public static AddExistingLicenseHeaderDefinitionFileToFolderCommand Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
@@ -56,12 +53,12 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     /// <param name="package">Owner package, not null.</param>
     public static async Task InitializeAsync (AsyncPackage package)
     {
-      // Switch to the main thread - the call to AddCommand in AddNewLicenseHeaderDefinitionFileToProjectAsync's constructor requires
+      // Switch to the main thread - the call to AddCommand in AddExistingLicenseHeaderDefinitionFileToFolderCommand's constructor requires
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
       var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
-      Instance = new AddNewLicenseHeaderDefinitionFileToProjectCommandAsync (package, commandService);
+      Instance = new AddExistingLicenseHeaderDefinitionFileToFolderCommand (package, commandService);
     }
 
     /// <summary>
@@ -75,7 +72,7 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      new FolderProjectMenuHelper().AddNewLicenseHeaderDefinitionFile(ServiceProvider);
+      new FolderProjectMenuHelper().AddExistingLicenseHeaderDefinitionFile (ServiceProvider);
     }
   }
 }

@@ -16,8 +16,8 @@ using System;
 using System.ComponentModel;
 using System.Windows.Threading;
 using EnvDTE80;
-using LicenseHeaderManager.CommandsAsync.Common;
 using LicenseHeaderManager.Headers;
+using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.SolutionUpdateViewModels;
 using LicenseHeaderManager.Utils;
 

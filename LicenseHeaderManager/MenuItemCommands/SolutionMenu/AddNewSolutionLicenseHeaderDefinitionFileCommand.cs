@@ -1,20 +1,19 @@
-﻿using EnvDTE;
-using LicenseHeaderManager.Headers;
-using Microsoft.VisualStudio.Shell;
-using System;
+﻿using System;
 using System.ComponentModel.Design;
 using System.IO;
 using System.Text;
+using EnvDTE;
+using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Utils;
+using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
-using Microsoft.VisualStudio.Threading;
 
-namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
+namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
 {
   /// <summary>
   /// Command handler
   /// </summary>
-  internal sealed class AddNewSolutionLicenseHeaderDefinitionFileCommandAsync
+  internal sealed class AddNewSolutionLicenseHeaderDefinitionFileCommand
   {
     /// <summary>
     /// Command ID.
@@ -31,14 +30,14 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     private readonly Func<string> _defaultHeaderDefinitionFunc;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AddNewSolutionLicenseHeaderDefinitionFileCommandAsync"/> class.
+    /// Initializes a new instance of the <see cref="AddNewSolutionLicenseHeaderDefinitionFileCommand"/> class.
     /// Adds our command handlers for menu (commands must exist in the command table file)
     /// </summary>
     /// <param name="package">Owner package, not null.</param>
     /// <param name="commandService">Command service to add command to, not null.</param>
     /// <param name="solution">The solution for which <paramref name="package"/> has been initialized</param>
     /// <param name="defaultHeaderDefinitionFunc">Function that returns the currently configured default license header definition as string</param>
-    private AddNewSolutionLicenseHeaderDefinitionFileCommandAsync (
+    private AddNewSolutionLicenseHeaderDefinitionFileCommand (
         AsyncPackage package,
         OleMenuCommandService commandService,
         Solution solution,
@@ -64,7 +63,7 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static AddNewSolutionLicenseHeaderDefinitionFileCommandAsync Instance { get; private set; }
+    public static AddNewSolutionLicenseHeaderDefinitionFileCommand Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
@@ -79,12 +78,12 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     /// <param name="defaultHeaderDefinitionFunc">Function that returns the currently configured default license header definition as string</param>
     public static async Task InitializeAsync (AsyncPackage package, Solution solution, Func<string> defaultHeaderDefinitionFunc)
     {
-      // Switch to the main thread - the call to AddCommand in AddNewSolutionLicenseHeaderDefinitionFileCommandAsync's constructor requires
+      // Switch to the main thread - the call to AddCommand in AddNewSolutionLicenseHeaderDefinitionFileCommand's constructor requires
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
       var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
-      Instance = new AddNewSolutionLicenseHeaderDefinitionFileCommandAsync (package, commandService, solution, defaultHeaderDefinitionFunc);
+      Instance = new AddNewSolutionLicenseHeaderDefinitionFileCommand (package, commandService, solution, defaultHeaderDefinitionFunc);
     }
 
     public void Invoke (Solution solution)

@@ -1,48 +1,64 @@
 ﻿using System;
-using System.ComponentModel;
 using System.ComponentModel.Design;
-using System.Globalization;
+using EnvDTE;
+using LicenseHeaderManager.MenuItemCommands.Common;
+using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 
-namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
+namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
 {
   /// <summary>
   /// Command handler
   /// </summary>
-  internal sealed class AddLicenseHeaderToAllFilesInSolutionCommandAsync
+  internal sealed class AddLicenseHeaderToAllFilesInProjectCommand
   {
     /// <summary>
     /// Command ID.
     /// </summary>
-    public const int CommandId = 4130;
+    public const int CommandId = 4135;
 
     /// <summary>
     /// Command menu group (command set GUID).
     /// </summary>
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
+    private readonly OleMenuCommand _menuItem;
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="AddLicenseHeaderToAllFilesInSolutionCommandAsync"/> class.
+    /// Initializes a new instance of the <see cref="AddLicenseHeaderToAllFilesInProjectCommand"/> class.
     /// Adds our command handlers for menu (commands must exist in the command table file)
     /// </summary>
     /// <param name="package">Owner package, not null.</param>
     /// <param name="commandService">Command service to add command to, not null.</param>
-    private AddLicenseHeaderToAllFilesInSolutionCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
+    private AddLicenseHeaderToAllFilesInProjectCommand (AsyncPackage package, OleMenuCommandService commandService)
     {
       ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      var menuItem = new OleMenuCommand (this.Execute, menuCommandID);
-      commandService.AddCommand (menuItem);
+      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
+      _menuItem.BeforeQueryStatus += OnQueryAllFilesCommandStatus;
+      commandService.AddCommand (_menuItem);
+    }
+
+    private void OnQueryAllFilesCommandStatus (object sender, EventArgs e)
+    {
+      bool visible;
+
+      var obj = ServiceProvider.GetSolutionExplorerItem();
+      if (obj is ProjectItem item)
+        visible = ServiceProvider.ShouldBeVisible (item);
+      else
+        visible = obj is Project;
+
+      _menuItem.Visible = visible;
     }
 
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static AddLicenseHeaderToAllFilesInSolutionCommandAsync Instance { get; private set; }
+    public static AddLicenseHeaderToAllFilesInProjectCommand Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
@@ -55,12 +71,12 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     /// <param name="package">Owner package, not null.</param>
     public static async Task InitializeAsync (AsyncPackage package)
     {
-      // Switch to the main thread - the call to AddCommand in AddLicenceHeaderToAllFilesInSolutionCommandAsync's constructor requires
+      // Switch to the main thread - the call to AddCommand in AddLicenseHeaderToAllFilesInProjectCommand's constructor requires
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
       var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
-      Instance = new AddLicenseHeaderToAllFilesInSolutionCommandAsync (package, commandService);
+      Instance = new AddLicenseHeaderToAllFilesInProjectCommand (package, commandService);
     }
 
     /// <summary>
@@ -74,8 +90,7 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      // TODO examine simplification of SolutionLevelButtonThreadWorker, AddLicenseHeaderToAllProjectsDelegate and ButtonHandlerFactory, afterwards encapsulate corresponding logic within this class
-      ServiceProvider._addLicenseHeaderToAllProjectsDelegate.HandleButton (sender, e);
+      new FolderProjectMenuHelper().AddLicenseHeaderToAllFilesAsync (ServiceProvider).FireAndForget();
     }
   }
 }

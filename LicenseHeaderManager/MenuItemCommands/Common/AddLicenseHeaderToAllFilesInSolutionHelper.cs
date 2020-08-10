@@ -18,13 +18,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
-using LicenseHeaderManager.CommandsAsync.SolutionMenu;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
+using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
 using LicenseHeaderManager.SolutionUpdateViewModels;
 using LicenseHeaderManager.Utils;
 
-namespace LicenseHeaderManager.CommandsAsync.Common
+namespace LicenseHeaderManager.MenuItemCommands.Common
 {
   public class AddLicenseHeaderToAllFilesInSolutionHelper : ISolutionLevelCommand
   {
@@ -85,7 +85,7 @@ namespace LicenseHeaderManager.CommandsAsync.Common
           // No projects have definition. Ask the user if they want to add a solution level header definition.
           if (MessageBoxHelper.DoYouWant (Resources.Question_AddNewLicenseHeaderDefinitionForSolution))
           {
-            AddNewSolutionLicenseHeaderDefinitionFileCommandAsync.Instance.Invoke (solution);
+            AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (solution);
 
             if (!MessageBoxHelper.DoYouWant (Resources.Question_StopForConfiguringDefinitionFilesSingleFile))
             {

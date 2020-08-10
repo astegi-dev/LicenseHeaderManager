@@ -158,7 +158,7 @@
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddHeaderToProjectItemCommandAsync" priority="0x0100" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddHeaderToProjectItemCommand" priority="0x0100" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="ProjectItemSubMenuGroup" />
         <Icon guid="guidImages" id="bmpAddLicenseHeader" />
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -168,7 +168,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidRemoveHeaderFromProjectItemCommandAsync" priority="0x0200" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidRemoveHeaderFromProjectItemCommand" priority="0x0200" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="ProjectItemSubMenuGroup" />
         <Icon guid="guidImages" id="bmpRemoveLicenseHeader" />
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -178,7 +178,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddLicenceHeaderToAllFilesInSolutionCommandAsync" priority="0x0100" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddLicenseHeaderToAllFilesInSolutionCommand" priority="0x0100" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="SolutionSubMenuGroup1" />
         <Icon guid="guidImages" id="bmpAddLicenseHeadersToAllFiles" />
         <Strings>
@@ -186,14 +186,14 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidRemoveLicenseHeaderFromAllFilesInSolutionCommandAsync" priority="0x0200" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidRemoveLicenseHeaderFromAllFilesInSolutionCommand" priority="0x0200" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="SolutionSubMenuGroup1" />
         <Icon guid="guidImages" id="bmpRemoveLicenseHeadersFromAllFiles" />
         <Strings>
           <ButtonText>Remove License Headers from All Files</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddNewSolutionLicenseHeaderDefinitionFileCommandAsync" priority="0x0100" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddNewSolutionLicenseHeaderDefinitionFileCommand" priority="0x0100" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="SolutionSubMenuGroup2" />
         <Icon guid="guidImages" id="bmpAddNewLicenseHeaderDefinitionFile" />
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -202,7 +202,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidOpenSolutionLicenseHeaderDefinitionFileCommandAsync" priority="0x0200" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidOpenSolutionLicenseHeaderDefinitionFileCommand" priority="0x0200" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="SolutionSubMenuGroup2" />
         <Icon guid="guidImages" id="bmpOpenLicenseHeaderDefinitionFile" />
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -211,7 +211,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidRemoveSolutionLicenseHeaderDefinitionFileCommandAsync" priority="0x0300" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidRemoveSolutionLicenseHeaderDefinitionFileCommand" priority="0x0300" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="SolutionSubMenuGroup2" />
         <Icon guid="guidImages" id="bmpRemoveLicenseHeaderDefinitionFile" />
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -220,7 +220,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddLicenseHeaderToAllFilesInProjectCommandAsync" priority="0x0100" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddLicenseHeaderToAllFilesInProjectCommand" priority="0x0100" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="ProjectSubMenuGroup1" />
         <Icon guid="guidImages" id="bmpAddLicenseHeadersToAllFiles" />
         <Strings>
@@ -228,7 +228,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidRemoveLicenseHeaderFromAllFilesInProjectCommandAsync" priority="0x0200" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidRemoveLicenseHeaderFromAllFilesInProjectCommand" priority="0x0200" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="ProjectSubMenuGroup1" />
         <Icon guid="guidImages" id="bmpRemoveLicenseHeadersFromAllFiles" />
         <Strings>
@@ -236,7 +236,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddNewLicenseHeaderDefinitionFileToProjectAsync" priority="0x0100" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddNewLicenseHeaderDefinitionFileToProject" priority="0x0100" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="ProjectSubMenuGroup2" />
         <Icon guid="guidImages" id="bmpAddNewLicenseHeaderDefinitionFile" />
         <Strings>
@@ -244,7 +244,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddExistingLicenseHeaderDefinitionFileToProjectAsync" priority="0x0200" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddExistingLicenseHeaderDefinitionFileToProject" priority="0x0200" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="ProjectSubMenuGroup2" />
         <Icon guid="guidImages" id="bmpAddExistingLicenseHeaderDefinitionFile" />
         <Strings>
@@ -259,7 +259,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddLicenseHeaderToAllFilesInFolderCommandAsync" priority="0x0100" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddLicenseHeaderToAllFilesInFolderCommand" priority="0x0100" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="FolderSubMenuGroup1" />
         <Icon guid="guidImages" id="bmpAddLicenseHeadersToAllFiles" />
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -269,7 +269,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidRemoveLicenseHeaderFromAllFilesInFolderCommandAsync" priority="0x0200" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidRemoveLicenseHeaderFromAllFilesInFolderCommand" priority="0x0200" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="FolderSubMenuGroup1" />
         <Icon guid="guidImages" id="bmpRemoveLicenseHeadersFromAllFiles" />
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -279,7 +279,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddNewLicenseHeaderDefinitionFileToFolderCommandAsync" priority="0x0100" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddNewLicenseHeaderDefinitionFileToFolderCommand" priority="0x0100" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="FolderSubMenuGroup2" />
         <Icon guid="guidImages" id="bmpAddNewLicenseHeaderDefinitionFile" />
         <Strings>
@@ -287,7 +287,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddExistingLicenseHeaderDefinitionFileToFolderCommandAsync" priority="0x0200" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddExistingLicenseHeaderDefinitionFileToFolderCommand" priority="0x0200" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="FolderSubMenuGroup2" />
         <Icon guid="guidImages" id="bmpAddExistingLicenseHeaderDefinitionFile" />
         <Strings>
@@ -295,7 +295,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddLicenseHeaderEditorAdvancedMenuCommandAsync" priority="0x0100" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidAddLicenseHeaderEditorAdvancedMenuCommand" priority="0x0100" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="EditMenuGroup" />
         <Icon guid="guidImages" id="bmpAddLicenseHeader" />
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -305,7 +305,7 @@
         </Strings>
       </Button>
 
-      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidRemoveLicenseHeaderEditorAdvancedMenuCommandAsync" priority="0x0200" type="Button">
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidRemoveLicenseHeaderEditorAdvancedMenuCommand" priority="0x0200" type="Button">
         <Parent guid="guidLicenseHeadersCmdSet" id="EditMenuGroup" />
         <Icon guid="guidImages" id="bmpRemoveLicenseHeader" />
         <CommandFlag>DynamicVisibility</CommandFlag>
@@ -389,24 +389,24 @@
   
     <GuidSymbol value="{1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0}" name="guidLicenseHeadersPackageCmdSet">
       <IDSymbol value="4128" name="MyMenuGroup" />
-      <IDSymbol value="256" name="cmdidAddHeaderToProjectItemCommandAsync" />
-      <IDSymbol value="4129" name="cmdidRemoveHeaderFromProjectItemCommandAsync" />
-      <IDSymbol value="4130" name="cmdidAddLicenceHeaderToAllFilesInSolutionCommandAsync" />
-      <IDSymbol value="4131" name="cmdidRemoveLicenseHeaderFromAllFilesInSolutionCommandAsync" />
-      <IDSymbol value="4132" name="cmdidAddNewSolutionLicenseHeaderDefinitionFileCommandAsync" />
-      <IDSymbol value="4133" name="cmdidOpenSolutionLicenseHeaderDefinitionFileCommandAsync" />
-      <IDSymbol value="4134" name="cmdidRemoveSolutionLicenseHeaderDefinitionFileCommandAsync" />
-      <IDSymbol value="4135" name="cmdidAddLicenseHeaderToAllFilesInProjectCommandAsync" />
-      <IDSymbol value="4136" name="cmdidAddNewLicenseHeaderDefinitionFileToProjectAsync" />
-      <IDSymbol value="4137" name="cmdidAddExistingLicenseHeaderDefinitionFileToProjectAsync" />
+      <IDSymbol value="256" name="cmdidAddHeaderToProjectItemCommand" />
+      <IDSymbol value="4129" name="cmdidRemoveHeaderFromProjectItemCommand" />
+      <IDSymbol value="4130" name="cmdidAddLicenseHeaderToAllFilesInSolutionCommand" />
+      <IDSymbol value="4131" name="cmdidRemoveLicenseHeaderFromAllFilesInSolutionCommand" />
+      <IDSymbol value="4132" name="cmdidAddNewSolutionLicenseHeaderDefinitionFileCommand" />
+      <IDSymbol value="4133" name="cmdidOpenSolutionLicenseHeaderDefinitionFileCommand" />
+      <IDSymbol value="4134" name="cmdidRemoveSolutionLicenseHeaderDefinitionFileCommand" />
+      <IDSymbol value="4135" name="cmdidAddLicenseHeaderToAllFilesInProjectCommand" />
+      <IDSymbol value="4136" name="cmdidAddNewLicenseHeaderDefinitionFileToProject" />
+      <IDSymbol value="4137" name="cmdidAddExistingLicenseHeaderDefinitionFileToProject" />
       <IDSymbol value="4138" name="cmdidLicenseHeaderOptions" />
-      <IDSymbol value="4139" name="cmdidRemoveLicenseHeaderFromAllFilesInProjectCommandAsync" />
-      <IDSymbol value="4140" name="cmdidAddLicenseHeaderToAllFilesInFolderCommandAsync" />
-      <IDSymbol value="4141" name="cmdidRemoveLicenseHeaderFromAllFilesInFolderCommandAsync" />
-      <IDSymbol value="4142" name="cmdidAddExistingLicenseHeaderDefinitionFileToFolderCommandAsync" />
-      <IDSymbol value="4143" name="cmdidAddNewLicenseHeaderDefinitionFileToFolderCommandAsync" />
-      <IDSymbol value="4144" name="cmdidAddLicenseHeaderEditorAdvancedMenuCommandAsync" />
-      <IDSymbol value="4145" name="cmdidRemoveLicenseHeaderEditorAdvancedMenuCommandAsync" />
+      <IDSymbol value="4139" name="cmdidRemoveLicenseHeaderFromAllFilesInProjectCommand" />
+      <IDSymbol value="4140" name="cmdidAddLicenseHeaderToAllFilesInFolderCommand" />
+      <IDSymbol value="4141" name="cmdidRemoveLicenseHeaderFromAllFilesInFolderCommand" />
+      <IDSymbol value="4142" name="cmdidAddExistingLicenseHeaderDefinitionFileToFolderCommand" />
+      <IDSymbol value="4143" name="cmdidAddNewLicenseHeaderDefinitionFileToFolderCommand" />
+      <IDSymbol value="4144" name="cmdidAddLicenseHeaderEditorAdvancedMenuCommand" />
+      <IDSymbol value="4145" name="cmdidRemoveLicenseHeaderEditorAdvancedMenuCommand" />
     </GuidSymbol>
   </Symbols>
   

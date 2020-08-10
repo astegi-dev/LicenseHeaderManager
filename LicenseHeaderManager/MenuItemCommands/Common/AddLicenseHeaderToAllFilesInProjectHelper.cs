@@ -19,7 +19,7 @@ using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.ResultObjects;
 using LicenseHeaderManager.Utils;
 
-namespace LicenseHeaderManager.CommandsAsync.Common
+namespace LicenseHeaderManager.MenuItemCommands.Common
 {
   internal class AddLicenseHeaderToAllFilesInProjectHelper
   {

@@ -1,49 +1,65 @@
-﻿using EnvDTE;
+﻿using System;
+using System.ComponentModel.Design;
+using EnvDTE;
+using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using System;
-using System.ComponentModel.Design;
-using LicenseHeaderManager.CommandsAsync.Common;
 using Task = System.Threading.Tasks.Task;
 
-namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
+namespace LicenseHeaderManager.MenuItemCommands.FolderMenu
 {
   /// <summary>
   /// Command handler
   /// </summary>
-  internal sealed class RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync
+  internal sealed class AddLicenseHeaderToAllFilesInFolderCommand
   {
     /// <summary>
     /// Command ID.
     /// </summary>
-    public const int CommandId = 4131;
+    public const int CommandId = 4140;
 
     /// <summary>
     /// Command menu group (command set GUID).
     /// </summary>
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
+    private readonly OleMenuCommand _menuItem;
+
     /// <summary>
-    /// Initializes a new instance of the <see cref="RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync"/> class.
+    /// Initializes a new instance of the <see cref="AddLicenseHeaderToAllFilesInFolderCommand"/> class.
     /// Adds our command handlers for menu (commands must exist in the command table file)
     /// </summary>
     /// <param name="package">Owner package, not null.</param>
     /// <param name="commandService">Command service to add command to, not null.</param>
-    private RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
+    private AddLicenseHeaderToAllFilesInFolderCommand (AsyncPackage package, OleMenuCommandService commandService)
     {
       ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      var menuItem = new OleMenuCommand (this.Execute, menuCommandID);
-      commandService.AddCommand (menuItem);
+      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
+      _menuItem.BeforeQueryStatus += OnQueryAllFilesCommandStatus;
+      commandService.AddCommand (_menuItem);
+    }
+
+    // TODO maybe whole method redundant (we know the command comes from a right click on folder - why check visibility?)
+    private void OnQueryAllFilesCommandStatus (object sender, EventArgs e)
+    {
+      bool visible;
+
+      var obj = ServiceProvider.GetSolutionExplorerItem();
+      if (obj is ProjectItem item)
+        visible = ProjectItemInspection.IsFolder (item) || ServiceProvider.ShouldBeVisible (item);
+      else
+        visible = obj is Project;
+
+      _menuItem.Visible = visible;
     }
 
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync Instance { get; private set; }
+    public static AddLicenseHeaderToAllFilesInFolderCommand Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
@@ -56,12 +72,12 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     /// <param name="package">Owner package, not null.</param>
     public static async Task InitializeAsync (AsyncPackage package)
     {
-      // Switch to the main thread - the call to AddCommand in RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync's constructor requires
+      // Switch to the main thread - the call to AddCommand in AddLicenseHeaderToAllFilesInFolderCommand's constructor requires
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
       var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
-      Instance = new RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync (package, commandService);
+      Instance = new AddLicenseHeaderToAllFilesInFolderCommand (package, commandService);
     }
 
     /// <summary>
@@ -75,32 +91,7 @@ namespace LicenseHeaderManager.CommandsAsync.SolutionMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      ExecuteInternalAsync().FireAndForget();
-    }
-
-    private async Task ExecuteInternalAsync ()
-    {
-      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-      var solution = ServiceProvider._dte.Solution;
-      var statusBar = (IVsStatusbar) await ServiceProvider.GetServiceAsync (typeof (SVsStatusbar));
-      var removeLicenseHeaderFromAllProjects = new RemoveLicenseHeaderFromAllFilesInSolutionHelper (statusBar, ServiceProvider._licenseReplacer);
-      var resharperSuspended = CommandUtility.ExecuteCommandIfExists ("ReSharper_Suspend", ServiceProvider._dte);
-
-      try
-      {
-        removeLicenseHeaderFromAllProjects.Execute (solution);
-      }
-      catch (Exception exception)
-      {
-        MessageBoxHelper.Information (
-            $"The command '{removeLicenseHeaderFromAllProjects.GetCommandName()}' failed with the exception '{exception.Message}'. See Visual Studio Output Window for Details.");
-        OutputWindowHandler.WriteMessage (exception.ToString());
-      }
-
-      if (resharperSuspended)
-      {
-        CommandUtility.ExecuteCommand ("ReSharper_Resume", ServiceProvider._dte);
-      }
+      new FolderProjectMenuHelper().AddLicenseHeaderToAllFilesAsync (ServiceProvider).FireAndForget();
     }
   }
 }

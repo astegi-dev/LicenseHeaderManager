@@ -5,10 +5,6 @@
 // second line copyright456
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Options;
@@ -16,10 +12,9 @@ using LicenseHeaderManager.Utils;
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Threading;
 using Task = System.Threading.Tasks.Task;
 
-namespace LicenseHeaderManager.CommandsAsync.Common
+namespace LicenseHeaderManager.MenuItemCommands.Common
 {
   internal class FolderProjectMenuHelper
   {

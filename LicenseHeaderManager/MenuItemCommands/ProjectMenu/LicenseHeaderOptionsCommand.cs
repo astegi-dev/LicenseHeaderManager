@@ -1,64 +1,46 @@
-﻿using EnvDTE;
-using LicenseHeaderManager.CommandsAsync.Common;
-using LicenseHeaderManager.Utils;
-using Microsoft.VisualStudio.Shell;
-using System;
+﻿using System;
 using System.ComponentModel.Design;
+using LicenseHeaderManager.Options;
+using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
-namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
+namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
 {
   /// <summary>
   /// Command handler
   /// </summary>
-  internal sealed class RemoveLicenseHeaderFromAllFilesInProjectCommandAsync
+  internal sealed class LicenseHeaderOptionsCommand
   {
     /// <summary>
     /// Command ID.
     /// </summary>
-    public const int CommandId = 4139;
+    public const int CommandId = 4138;
 
     /// <summary>
     /// Command menu group (command set GUID).
     /// </summary>
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
-    private readonly OleMenuCommand _menuItem;
-
     /// <summary>
-    /// Initializes a new instance of the <see cref="RemoveLicenseHeaderFromAllFilesInProjectCommandAsync"/> class.
+    /// Initializes a new instance of the <see cref="LicenseHeaderOptionsCommand"/> class.
     /// Adds our command handlers for menu (commands must exist in the command table file)
     /// </summary>
     /// <param name="package">Owner package, not null.</param>
     /// <param name="commandService">Command service to add command to, not null.</param>
-    private RemoveLicenseHeaderFromAllFilesInProjectCommandAsync (AsyncPackage package, OleMenuCommandService commandService)
+    private LicenseHeaderOptionsCommand (AsyncPackage package, OleMenuCommandService commandService)
     {
       ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
-      _menuItem.BeforeQueryStatus += OnQueryAllFilesCommandStatus;
-      commandService.AddCommand (_menuItem);
-    }
-
-    private void OnQueryAllFilesCommandStatus (object sender, EventArgs e)
-    {
-      bool visible;
-
-      var obj = ServiceProvider.GetSolutionExplorerItem();
-      if (obj is ProjectItem item)
-        visible = ServiceProvider.ShouldBeVisible (item);
-      else
-        visible = obj is Project;
-
-      _menuItem.Visible = visible;
+      var menuItem = new OleMenuCommand (this.Execute, menuCommandID);
+      commandService.AddCommand (menuItem);
     }
 
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static RemoveLicenseHeaderFromAllFilesInProjectCommandAsync Instance { get; private set; }
+    public static LicenseHeaderOptionsCommand Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
@@ -71,12 +53,12 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     /// <param name="package">Owner package, not null.</param>
     public static async Task InitializeAsync (AsyncPackage package)
     {
-      // Switch to the main thread - the call to AddCommand in RemoveLicenseHeaderFromAllFilesInProjectCommandAsync's constructor requires
+      // Switch to the main thread - the call to AddCommand in LicenseHeaderOptions's constructor requires
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
       var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
-      Instance = new RemoveLicenseHeaderFromAllFilesInProjectCommandAsync (package, commandService);
+      Instance = new LicenseHeaderOptionsCommand (package, commandService);
     }
 
     /// <summary>
@@ -90,7 +72,7 @@ namespace LicenseHeaderManager.CommandsAsync.ProjectMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      new FolderProjectMenuHelper().RemoveLicenseHeadersFromAllFilesAsync (ServiceProvider).FireAndForget();
+      ServiceProvider.ShowOptionPage (typeof (OptionsPage));
     }
   }
 }

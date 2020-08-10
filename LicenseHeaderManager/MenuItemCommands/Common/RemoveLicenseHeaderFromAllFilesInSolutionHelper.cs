@@ -15,36 +15,49 @@
 using System;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
+using LicenseHeaderManager.Interfaces;
+using LicenseHeaderManager.Utils;
+using Microsoft.VisualStudio.Shell.Interop;
 
-namespace LicenseHeaderManager.CommandsAsync.Common
+namespace LicenseHeaderManager.MenuItemCommands.Common
 {
-  public class RemoveLicenseHeaderFromAllFilesInProjectHelper
+  public class RemoveLicenseHeaderFromAllFilesInSolutionHelper : ISolutionLevelCommand
   {
+    private const string c_commandName = "Remove LicenseHeader from all Projects";
+
+    private readonly IVsStatusbar _statusBar;
     private readonly LicenseHeaderReplacer _licenseReplacer;
 
-    public RemoveLicenseHeaderFromAllFilesInProjectHelper (LicenseHeaderReplacer licenseReplacer)
+    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (IVsStatusbar statusBar, LicenseHeaderReplacer licenseReplacer)
     {
+      _statusBar = statusBar;
       _licenseReplacer = licenseReplacer;
     }
 
-    public void Execute (object projectOrProjectItem)
+    public string GetCommandName ()
     {
-      var project = projectOrProjectItem as Project;
-      var item = projectOrProjectItem as ProjectItem;
-      if (project == null && item == null)
-        return;
+      return c_commandName;
+    }
 
-      _licenseReplacer.ResetExtensionsWithInvalidHeaders();
-      if (project != null)
+    public void Execute (Solution solution)
+    {
+      if (solution == null) return;
+
+      var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
+      var projectsInSolution = allSolutionProjectsSearcher.GetAllProjects (solution);
+
+      var progressCount = 1;
+      var projectCount = projectsInSolution.Count;
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseReplacer);
+
+      foreach (var project in projectsInSolution)
       {
-        foreach (ProjectItem i in project.ProjectItems)
-          _licenseReplacer.RemoveOrReplaceHeaderRecursive (i, null, false);
+        _statusBar.SetText (string.Format (Resources.UpdateSolution, progressCount, projectCount));
+        removeAllLicenseHeadersCommand.Execute (project);
+        progressCount++;
       }
-      else
-      {
-        foreach (ProjectItem i in item.ProjectItems)
-          _licenseReplacer.RemoveOrReplaceHeaderRecursive (i, null, false);
-      }
+
+      _statusBar.SetText (string.Empty);
     }
   }
 }

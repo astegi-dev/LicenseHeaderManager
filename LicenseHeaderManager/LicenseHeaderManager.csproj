@@ -205,25 +205,25 @@
     <Compile Include="ButtonHandler\ButtonHandlerFactory.cs" />
     <Compile Include="ButtonHandler\AddLicenseHeaderToAllProjectsDelegate.cs" />
     <Compile Include="ButtonHandler\SolutionLevelButtonThreadWorker.cs" />
-    <Compile Include="CommandsAsync\Common\FolderProjectMenuHelper.cs" />
-    <Compile Include="CommandsAsync\FolderMenu\AddExistingLicenseHeaderDefinitionFileToFolderCommandAsync.cs" />
-    <Compile Include="CommandsAsync\ProjectMenu\AddExistingLicenseHeaderDefinitionFileToProjectCommandAsync.cs" />
-    <Compile Include="CommandsAsync\ProjectItemMenu\AddHeaderToProjectItemCommandAsync.cs" />
-    <Compile Include="CommandsAsync\EditorMenu\AddLicenseHeaderEditorAdvancedMenuCommandAsync.cs" />
-    <Compile Include="CommandsAsync\FolderMenu\AddLicenseHeaderToAllFilesInFolderCommandAsync.cs" />
-    <Compile Include="CommandsAsync\ProjectMenu\AddLicenseHeaderToAllFilesInProjectCommandAsync.cs" />
-    <Compile Include="CommandsAsync\SolutionMenu\AddLicenseHeaderToAllFilesInSolutionCommandAsync.cs" />
-    <Compile Include="CommandsAsync\FolderMenu\AddNewLicenseHeaderDefinitionFileToFolderCommandAsync.cs" />
-    <Compile Include="CommandsAsync\ProjectMenu\AddNewLicenseHeaderDefinitionFileToProjectCommandAsync.cs" />
-    <Compile Include="CommandsAsync\SolutionMenu\AddNewSolutionLicenseHeaderDefinitionFileCommandAsync.cs" />
-    <Compile Include="CommandsAsync\ProjectMenu\LicenseHeaderOptionsCommandAsync.cs" />
-    <Compile Include="CommandsAsync\SolutionMenu\OpenSolutionLicenseHeaderDefinitionFileCommandAsync.cs" />
-    <Compile Include="CommandsAsync\ProjectItemMenu\RemoveHeaderFromProjectItemCommandAsync.cs" />
-    <Compile Include="CommandsAsync\EditorMenu\RemoveLicenseHeaderEditorAdvancedMenuCommandAsync.cs" />
-    <Compile Include="CommandsAsync\FolderMenu\RemoveLicenseHeaderFromAllFilesInFolderCommandAsync.cs" />
-    <Compile Include="CommandsAsync\ProjectMenu\RemoveLicenseHeaderFromAllFilesInProjectCommandAsync.cs" />
-    <Compile Include="CommandsAsync\SolutionMenu\RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync.cs" />
-    <Compile Include="CommandsAsync\SolutionMenu\RemoveSolutionLicenseHeaderDefinitionFileCommandAsync.cs" />
+    <Compile Include="MenuItemCommands\Common\FolderProjectMenuHelper.cs" />
+    <Compile Include="MenuItemCommands\FolderMenu\AddExistingLicenseHeaderDefinitionFileToFolderCommand.cs" />
+    <Compile Include="MenuItemCommands\ProjectMenu\AddExistingLicenseHeaderDefinitionFileToProjectCommand.cs" />
+    <Compile Include="MenuItemCommands\ProjectItemMenu\AddHeaderToProjectItemCommand.cs" />
+    <Compile Include="MenuItemCommands\EditorMenu\AddLicenseHeaderEditorAdvancedMenuCommand.cs" />
+    <Compile Include="MenuItemCommands\FolderMenu\AddLicenseHeaderToAllFilesInFolderCommand.cs" />
+    <Compile Include="MenuItemCommands\ProjectMenu\AddLicenseHeaderToAllFilesInProjectCommand.cs" />
+    <Compile Include="MenuItemCommands\SolutionMenu\AddLicenseHeaderToAllFilesInSolutionCommand.cs" />
+    <Compile Include="MenuItemCommands\FolderMenu\AddNewLicenseHeaderDefinitionFileToFolderCommand.cs" />
+    <Compile Include="MenuItemCommands\ProjectMenu\AddNewLicenseHeaderDefinitionFileToProjectCommand.cs" />
+    <Compile Include="MenuItemCommands\SolutionMenu\AddNewSolutionLicenseHeaderDefinitionFileCommand.cs" />
+    <Compile Include="MenuItemCommands\ProjectMenu\LicenseHeaderOptionsCommand.cs" />
+    <Compile Include="MenuItemCommands\SolutionMenu\OpenSolutionLicenseHeaderDefinitionFileCommand.cs" />
+    <Compile Include="MenuItemCommands\ProjectItemMenu\RemoveHeaderFromProjectItemCommand.cs" />
+    <Compile Include="MenuItemCommands\EditorMenu\RemoveLicenseHeaderEditorAdvancedMenuCommand.cs" />
+    <Compile Include="MenuItemCommands\FolderMenu\RemoveLicenseHeaderFromAllFilesInFolderCommand.cs" />
+    <Compile Include="MenuItemCommands\ProjectMenu\RemoveLicenseHeaderFromAllFilesInProjectCommand.cs" />
+    <Compile Include="MenuItemCommands\SolutionMenu\RemoveLicenseHeaderFromAllFilesInSolutionCommand.cs" />
+    <Compile Include="MenuItemCommands\SolutionMenu\RemoveSolutionLicenseHeaderDefinitionFileCommand.cs" />
     <Compile Include="Headers\CommentParser.cs" />
     <Compile Include="Headers\CreateDocumentResult.cs" />
     <Compile Include="Headers\Document.cs" />
@@ -233,8 +233,8 @@
     <Compile Include="Headers\NewLineConst.cs" />
     <Compile Include="Interfaces\ICommentParser.cs" />
     <Compile Include="OutputWindowHandler.cs" />
-    <Compile Include="CommandsAsync\Common\AddLicenseHeaderToAllFilesInProjectHelper.cs" />
-    <Compile Include="CommandsAsync\Common\AddLicenseHeaderToAllFilesInSolutionHelper.cs" />
+    <Compile Include="MenuItemCommands\Common\AddLicenseHeaderToAllFilesInProjectHelper.cs" />
+    <Compile Include="MenuItemCommands\Common\AddLicenseHeaderToAllFilesInSolutionHelper.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="Headers\DocumentHeader.cs" />
     <Compile Include="Headers\DocumentHeaderProperties.cs" />
@@ -282,8 +282,8 @@
     <Compile Include="Options\WpfLanguages.xaml.cs">
       <DependentUpon>WpfLanguages.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CommandsAsync\Common\RemoveLicenseHeaderFromAllFilesInProjectHelper.cs" />
-    <Compile Include="CommandsAsync\Common\RemoveLicenseHeaderFromAllFilesInSolutionHelper.cs" />
+    <Compile Include="MenuItemCommands\Common\RemoveLicenseHeaderFromAllFilesInProjectHelper.cs" />
+    <Compile Include="MenuItemCommands\Common\RemoveLicenseHeaderFromAllFilesInSolutionHelper.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

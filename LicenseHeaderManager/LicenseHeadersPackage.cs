@@ -17,12 +17,6 @@
 using EnvDTE;
 using EnvDTE80;
 using LicenseHeaderManager.ButtonHandler;
-using LicenseHeaderManager.CommandsAsync.Common;
-using LicenseHeaderManager.CommandsAsync.EditorMenu;
-using LicenseHeaderManager.CommandsAsync.FolderMenu;
-using LicenseHeaderManager.CommandsAsync.ProjectItemMenu;
-using LicenseHeaderManager.CommandsAsync.ProjectMenu;
-using LicenseHeaderManager.CommandsAsync.SolutionMenu;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.Options;
@@ -41,6 +35,12 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using LicenseHeaderManager.MenuItemCommands.Common;
+using LicenseHeaderManager.MenuItemCommands.EditorMenu;
+using LicenseHeaderManager.MenuItemCommands.FolderMenu;
+using LicenseHeaderManager.MenuItemCommands.ProjectItemMenu;
+using LicenseHeaderManager.MenuItemCommands.ProjectMenu;
+using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
 using Document = LicenseHeaderManager.Headers.Document;
 using Task = System.Threading.Tasks.Task;
 
@@ -121,27 +121,27 @@ namespace LicenseHeaderManager
       var buttonHandlerFactory = new ButtonHandlerFactory (this, _licenseReplacer);
       _addLicenseHeaderToAllProjectsDelegate = buttonHandlerFactory.CreateAddLicenseHeaderToAllProjectsButtonHandler();
 
-      await AddHeaderToProjectItemCommandAsync.InitializeAsync (this);
-      await RemoveHeaderFromProjectItemCommandAsync.InitializeAsync (this);
-      await AddLicenseHeaderToAllFilesInSolutionCommandAsync.InitializeAsync (this);
-      await RemoveLicenseHeaderFromAllFilesInSolutionCommandAsync.InitializeAsync (this);
-      await AddNewSolutionLicenseHeaderDefinitionFileCommandAsync.InitializeAsync (
+      await AddHeaderToProjectItemCommand.InitializeAsync (this);
+      await RemoveHeaderFromProjectItemCommand.InitializeAsync (this);
+      await AddLicenseHeaderToAllFilesInSolutionCommand.InitializeAsync (this);
+      await RemoveLicenseHeaderFromAllFilesInSolutionCommand.InitializeAsync (this);
+      await AddNewSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (
           this,
           _dte?.Solution,
           () => ((DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage))).LicenseHeaderFileText);
-      await OpenSolutionLicenseHeaderDefinitionFileCommandAsync.InitializeAsync (this);
-      await RemoveSolutionLicenseHeaderDefinitionFileCommandAsync.InitializeAsync (this);
-      await AddLicenseHeaderToAllFilesInProjectCommandAsync.InitializeAsync (this);
-      await RemoveLicenseHeaderFromAllFilesInProjectCommandAsync.InitializeAsync (this);
-      await AddNewLicenseHeaderDefinitionFileToProjectCommandAsync.InitializeAsync (this);
-      await AddExistingLicenseHeaderDefinitionFileToProjectCommandAsync.InitializeAsync (this);
-      await LicenseHeaderOptionsCommandAsync.InitializeAsync (this);
-      await AddLicenseHeaderToAllFilesInFolderCommandAsync.InitializeAsync (this);
-      await RemoveLicenseHeaderFromAllFilesInFolderCommandAsync.InitializeAsync (this);
-      await AddExistingLicenseHeaderDefinitionFileToFolderCommandAsync.InitializeAsync (this);
-      await AddNewLicenseHeaderDefinitionFileToFolderCommandAsync.InitializeAsync (this);
-      await AddLicenseHeaderEditorAdvancedMenuCommandAsync.InitializeAsync (this);
-      await RemoveLicenseHeaderEditorAdvancedMenuCommandAsync.InitializeAsync (this);
+      await OpenSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this);
+      await RemoveSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this);
+      await AddLicenseHeaderToAllFilesInProjectCommand.InitializeAsync (this);
+      await RemoveLicenseHeaderFromAllFilesInProjectCommand.InitializeAsync (this);
+      await AddNewLicenseHeaderDefinitionFileToProjectCommand.InitializeAsync (this);
+      await AddExistingLicenseHeaderDefinitionFileToProjectCommand.InitializeAsync (this);
+      await LicenseHeaderOptionsCommand.InitializeAsync (this);
+      await AddLicenseHeaderToAllFilesInFolderCommand.InitializeAsync (this);
+      await RemoveLicenseHeaderFromAllFilesInFolderCommand.InitializeAsync (this);
+      await AddExistingLicenseHeaderDefinitionFileToFolderCommand.InitializeAsync (this);
+      await AddNewLicenseHeaderDefinitionFileToFolderCommand.InitializeAsync (this);
+      await AddLicenseHeaderEditorAdvancedMenuCommand.InitializeAsync (this);
+      await RemoveLicenseHeaderEditorAdvancedMenuCommand.InitializeAsync (this);
 
 
       //register ItemAdded event handler
@@ -283,7 +283,7 @@ namespace LicenseHeaderManager
     private void InvokeAddLicenseHeaderCommandFromLinkedCmd ()
     {
       _isCalledByLinkedCommand = true;
-      AddLicenseHeaderEditorAdvancedMenuCommandAsync.Instance.Invoke();
+      AddLicenseHeaderEditorAdvancedMenuCommand.Instance.Invoke();
       _isCalledByLinkedCommand = false;
     }
 
@@ -482,7 +482,7 @@ namespace LicenseHeaderManager
 
     private void AddNewSolutionLicenseHeaderDefinitionFileCallback (object sender, EventArgs e)
     {
-      AddNewSolutionLicenseHeaderDefinitionFileCommandAsync.Instance.Invoke (_dte.Solution);
+      AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (_dte.Solution);
     }
 
     #endregion
