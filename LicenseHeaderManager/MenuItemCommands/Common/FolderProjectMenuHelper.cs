@@ -16,9 +16,9 @@ using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
-  internal class FolderProjectMenuHelper
+  internal static class FolderProjectMenuHelper
   {
-    public void AddExistingLicenseHeaderDefinitionFile (LicenseHeadersPackage serviceProvider)
+    public static void AddExistingLicenseHeaderDefinitionFile (LicenseHeadersPackage serviceProvider)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -42,7 +42,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (fileName, projectItems);
     }
 
-    public async System.Threading.Tasks.Task AddLicenseHeaderToAllFilesAsync (LicenseHeadersPackage serviceProvider)
+    public static async Task AddLicenseHeaderToAllFilesAsync (LicenseHeadersPackage serviceProvider)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var obj = serviceProvider.GetSolutionExplorerItem();
@@ -59,7 +59,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       serviceProvider.HandleAddLicenseHeaderToAllFilesInProjectReturn (obj, addLicenseHeaderToAllFilesReturn);
     }
 
-    public void AddNewLicenseHeaderDefinitionFile (LicenseHeadersPackage serviceProvider)
+    public static void AddNewLicenseHeaderDefinitionFile (LicenseHeadersPackage serviceProvider)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -79,7 +79,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       licenseHeaderDefinitionFile.Open (EnvDTE.Constants.vsViewKindCode).Activate();
     }
 
-    public async Task RemoveLicenseHeadersFromAllFilesAsync(LicenseHeadersPackage serviceProvider)
+    public static async Task RemoveLicenseHeadersFromAllFilesAsync(LicenseHeadersPackage serviceProvider)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 

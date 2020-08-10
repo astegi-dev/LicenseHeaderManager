@@ -97,7 +97,7 @@ namespace LicenseHeaderManager.MenuItemCommands.FolderMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      new FolderProjectMenuHelper().RemoveLicenseHeadersFromAllFilesAsync(ServiceProvider).FireAndForget();
+      FolderProjectMenuHelper.RemoveLicenseHeadersFromAllFilesAsync(ServiceProvider).FireAndForget();
     }
   }
 }

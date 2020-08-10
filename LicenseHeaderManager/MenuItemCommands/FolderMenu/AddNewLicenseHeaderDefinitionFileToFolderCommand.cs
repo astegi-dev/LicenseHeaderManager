@@ -72,7 +72,7 @@ namespace LicenseHeaderManager.MenuItemCommands.FolderMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      new FolderProjectMenuHelper().AddNewLicenseHeaderDefinitionFile (ServiceProvider);
+      FolderProjectMenuHelper.AddNewLicenseHeaderDefinitionFile (ServiceProvider);
     }
   }
 }
