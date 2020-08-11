@@ -16,7 +16,6 @@
 
 using System;
 using System.Threading.Tasks;
-using System.Windows;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Utils;
@@ -45,14 +44,14 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         {
           var replacerInput = CoreHelpers.GetFilesToProcess (i, null, out _, false);
           var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput);
-          CoreHelpers.HandleResult(result);
+          CoreHelpers.HandleResult (result);
         }
       else
         foreach (ProjectItem i in item.ProjectItems)
         {
           var replacerInput = CoreHelpers.GetFilesToProcess (i, null, out _, false);
           var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput);
-          CoreHelpers.HandleResult(result);
+          CoreHelpers.HandleResult (result);
         }
     }
   }

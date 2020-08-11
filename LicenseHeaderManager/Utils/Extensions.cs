@@ -21,6 +21,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using Core;
 using EnvDTE;
+using LicenseHeaderManager.Headers;
+using LicenseHeaderManager.Interfaces;
+using Microsoft.VisualStudio.Shell;
+using LicenseHeader = LicenseHeaderManager.Headers.LicenseHeader;
+using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.Utils
 {
@@ -46,6 +51,26 @@ namespace LicenseHeaderManager.Utils
                          item.FileCodeModel.CodeElements.Cast<CodeElement>()
                              .First (ce => ce.Kind == vsCMElement.vsCMElementNamespace).Name)
              };
+    }
+
+    public static async Task<ReplacerResult<ReplacerError>> AddLicenseHeaderToItemAsync (this ProjectItem item, ILicenseHeaderExtension extension, bool calledByUser)
+    {
+      if (item == null || ProjectItemInspection.IsLicenseHeader (item))
+        return new ReplacerResult<ReplacerError>();
+
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+      var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
+      if (headers != null)
+        return await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
+            new LicenseHeaderInput (item.Document.FullName, headers, item.GetAdditionalProperties()),
+            calledByUser,
+            CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
+            message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, extension));
+
+      if (calledByUser && LicenseHeader.ShowQuestionForAddingLicenseHeaderFile (item.ContainingProject, extension.DefaultLicenseHeaderPage))
+        return await AddLicenseHeaderToItemAsync (item, extension, true);
+
+      return new ReplacerResult<ReplacerError>();
     }
 
     public static void FireAndForget (this Task task)

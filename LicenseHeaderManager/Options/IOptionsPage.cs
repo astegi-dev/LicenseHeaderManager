@@ -15,12 +15,21 @@
 #endregion
 
 using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace LicenseHeaderManager.Options
 {
   public interface IOptionsPage
   {
     bool UseRequiredKeywords { get; }
+
     string RequiredKeywords { get; }
+
+    ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
+
+    bool InsertInNewFiles { get; set; }
+
+    event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
   }
 }

@@ -21,36 +21,27 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
 using Core;
 using EnvDTE;
 using EnvDTE80;
-using LicenseHeaderManager.ButtonHandler;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
-using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.MenuItemCommands.EditorMenu;
 using LicenseHeaderManager.MenuItemCommands.FolderMenu;
 using LicenseHeaderManager.MenuItemCommands.ProjectItemMenu;
 using LicenseHeaderManager.MenuItemCommands.ProjectMenu;
 using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
 using LicenseHeaderManager.Options;
-using LicenseHeaderManager.ResultObjects;
 using LicenseHeaderManager.Utils;
 using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using CreateDocumentResult = Core.CreateDocumentResult;
-using Language = LicenseHeaderManager.Options.Language;
 using LicenseHeader = LicenseHeaderManager.Headers.LicenseHeader;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager
 {
-  #region package infrastructure
-
   /// <summary>
   ///   This is the class that implements the package exposed by this assembly.
   ///   The minimum requirement for a class to be considered a valid package for Visual Studio
@@ -79,6 +70,23 @@ namespace LicenseHeaderManager
   [ProvideMenuResource ("Menus.ctmenu", 1)]
   public sealed class LicenseHeadersPackage : AsyncPackage, ILicenseHeaderExtension
   {
+    public const string Version = "3.0.3";
+
+    private const string c_licenseHeaders = "License Header Manager";
+    private const string c_general = "General";
+    private const string c_languages = "Languages";
+    private const string c_defaultLicenseHeader = "Default Header";
+
+    private Stack<ProjectItem> _addedItems;
+    private CommandEvents _commandEvents;
+    private CommandEvents _currentCommandEvents;
+
+    private string _currentCommandGuid;
+    private int _currentCommandId;
+
+    private ProjectItemsEvents _projectItemEvents;
+    private ProjectItemsEvents _websiteItemEvents;
+
     /// <summary>
     ///   Default constructor of the package.
     ///   Inside this method you can place any initialization code that does not require
@@ -88,47 +96,55 @@ namespace LicenseHeaderManager
     /// </summary>
     public LicenseHeadersPackage ()
     {
+      _addedItems = new Stack<ProjectItem>();
     }
 
-    public const string Version = "3.0.3";
+    public LicenseHeaderReplacer LicenseHeaderReplacer
+    {
+      get
+      {
+        var keywords = OptionsPage.UseRequiredKeywords
+            ? OptionsPage.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
+            : null;
+        return new LicenseHeaderReplacer (LanguagesPage.Languages, keywords);
+      }
+    }
 
-    private const string c_licenseHeaders = "License Header Manager";
-    private const string c_general = "General";
-    private const string c_languages = "Languages";
-    private const string c_defaultLicenseHeader = "Default Header";
+    public void ShowLanguagesPage ()
+    {
+      ShowOptionPage (typeof (LanguagesPage));
+    }
 
-    private ProjectItemsEvents _projectItemEvents;
-    private ProjectItemsEvents _websiteItemEvents;
-    private CommandEvents _commandEvents;
+    public IDefaultLicenseHeaderPage DefaultLicenseHeaderPage => (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));
 
-    // TODO make private again and temporarily inject in command initialization until core lib is finished
-    public DTE2 _dte;
-    public AddLicenseHeaderToAllProjectsDelegate _addLicenseHeaderToAllProjectsDelegate;
+    public ILanguagesPage LanguagesPage => (LanguagesPage) GetDialogPage (typeof (LanguagesPage));
+
+    public IOptionsPage OptionsPage => (OptionsPage) GetDialogPage (typeof (OptionsPage));
+
+    public DTE2 Dte2 { get; private set; }
+
+    public bool IsCalledByLinkedCommand { get; private set; }
 
     /// <summary>
     ///   Initialization of the package; this method is called right after the package is sited, so this is the
-    ///   place where you can put all the initilaization code that rely on services provided by VisualStudio.
+    ///   place where you can put all the initialization code that rely on services provided by VisualStudio.
     /// </summary>
     protected override async Task InitializeAsync (CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
       await base.InitializeAsync (cancellationToken, progress);
       await JoinableTaskFactory.SwitchToMainThreadAsync (cancellationToken);
+      OutputWindowHandler.Initialize (await GetServiceAsync (typeof (SVsOutputWindow)) as IVsOutputWindow);
 
-      OutputWindowHandler.Initialize (GetGlobalService (typeof (SVsOutputWindow)) as IVsOutputWindow);
-      _dte = await GetServiceAsync (typeof (DTE)) as DTE2;
-      Assumes.Present (_dte);
+      Dte2 = await GetServiceAsync (typeof (DTE)) as DTE2;
+      Assumes.Present (Dte2);
+
       _addedItems = new Stack<ProjectItem>();
-      var buttonHandlerFactory = new ButtonHandlerFactory (this, LicenseHeaderReplacer);
-      _addLicenseHeaderToAllProjectsDelegate = buttonHandlerFactory.CreateAddLicenseHeaderToAllProjectsButtonHandler();
 
       await AddHeaderToProjectItemCommand.InitializeAsync (this);
       await RemoveHeaderFromProjectItemCommand.InitializeAsync (this);
       await AddLicenseHeaderToAllFilesInSolutionCommand.InitializeAsync (this);
       await RemoveLicenseHeaderFromAllFilesInSolutionCommand.InitializeAsync (this);
-      await AddNewSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (
-          this,
-          _dte?.Solution,
-          () => ((DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage))).LicenseHeaderFileText);
+      await AddNewSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this, Dte2?.Solution, () => DefaultLicenseHeaderPage.LicenseHeaderFileText);
       await OpenSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this);
       await RemoveSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this);
       await AddLicenseHeaderToAllFilesInProjectCommand.InitializeAsync (this);
@@ -145,8 +161,7 @@ namespace LicenseHeaderManager
 
 
       //register ItemAdded event handler
-      var events = _dte.Events as Events2;
-      if (events != null)
+      if (Dte2.Events is Events2 events)
       {
         _projectItemEvents = events.ProjectItemsEvents; //we need to keep a reference, otherwise the object is garbage collected and the event won't be fired
         _projectItemEvents.ItemAdded += ItemAdded;
@@ -170,12 +185,12 @@ namespace LicenseHeaderManager
       }
 
       //register event handlers for linked commands
-      var page = (OptionsPage) GetDialogPage (typeof (OptionsPage));
+      var page = OptionsPage;
       if (page != null)
       {
         foreach (var command in page.LinkedCommands)
         {
-          command.Events = _dte.Events.CommandEvents[command.Guid, command.Id];
+          command.Events = Dte2.Events.CommandEvents[command.Guid, command.Id];
 
           switch (command.ExecutionTime)
           {
@@ -191,14 +206,14 @@ namespace LicenseHeaderManager
         page.LinkedCommandsChanged += CommandsChanged;
 
         //register global event handler for ItemAdded
-        _commandEvents = _dte.Events.CommandEvents;
+        _commandEvents = Dte2.Events.CommandEvents;
         _commandEvents.BeforeExecute += BeforeAnyCommandExecuted;
       }
     }
 
     public bool SolutionHeaderDefinitionExists ()
     {
-      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (_dte.Solution);
+      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (Dte2.Solution);
       return File.Exists (solutionHeaderDefinitionFilePath);
     }
 
@@ -216,7 +231,7 @@ namespace LicenseHeaderManager
     {
       try
       {
-        var activeDocument = _dte.ActiveDocument;
+        var activeDocument = Dte2.ActiveDocument;
         if (activeDocument == null)
           return null;
         return activeDocument.ProjectItem;
@@ -227,69 +242,17 @@ namespace LicenseHeaderManager
       }
     }
 
-    public bool _isCalledByLinkedCommand;
-
     public object GetSolutionExplorerItem ()
     {
-      IntPtr hierarchyPtr, selectionContainerPtr;
-      uint projectItemId;
-
-      IVsMultiItemSelect mis;
       var monitorSelection = (IVsMonitorSelection) GetGlobalService (typeof (SVsShellMonitorSelection));
+      monitorSelection.GetCurrentSelection (out var hierarchyPtr, out var projectItemId, out _, out _);
 
-      monitorSelection.GetCurrentSelection (out hierarchyPtr, out projectItemId, out mis, out selectionContainerPtr);
-      var hierarchy = Marshal.GetTypedObjectForIUnknown (hierarchyPtr, typeof (IVsHierarchy)) as IVsHierarchy;
+      if (!(Marshal.GetTypedObjectForIUnknown (hierarchyPtr, typeof (IVsHierarchy)) is IVsHierarchy hierarchy))
+        return null;
 
-      if (hierarchy != null)
-      {
-        object item;
-        hierarchy.GetProperty (projectItemId, (int) __VSHPROPID.VSHPROPID_ExtObject, out item);
-        return item;
-      }
-
-      return null;
+      hierarchy.GetProperty (projectItemId, (int) __VSHPROPID.VSHPROPID_ExtObject, out var item);
+      return item;
     }
-
-    /// <summary>
-    ///   Executes a command asynchronously.
-    /// </summary>
-    private void PostExecCommand (Guid guid, uint id, object argument)
-    {
-      var shell = (IVsUIShell) GetService (typeof (SVsUIShell));
-      shell.PostExecCommand (
-          ref guid,
-          id,
-          (uint) vsCommandExecOption.vsCommandExecOptionDoDefault,
-          ref argument);
-    }
-
-    #endregion
-
-    public LicenseHeaderReplacer LicenseHeaderReplacer
-    {
-      get
-      {
-        var keywords = OptionsPage.UseRequiredKeywords
-            ? OptionsPage.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
-            : null;
-        return new LicenseHeaderReplacer (LanguagesPage.Languages.Select (Language.ToCoreLanguage), keywords);
-      }
-    }
-
-    public void ShowLanguagesPage ()
-    {
-      ShowOptionPage (typeof (LanguagesPage));
-    }
-
-    public IDefaultLicenseHeaderPage DefaultLicenseHeaderPage => (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));
-
-    public ILanguagesPage LanguagesPage => (LanguagesPage) GetDialogPage (typeof (LanguagesPage));
-
-    public IOptionsPage OptionsPage => (OptionsPage) GetDialogPage (typeof (OptionsPage));
-
-    public DTE2 Dte2 => _dte;
-
-    #region event handlers
 
     private void BeforeLinkedCommandExecuted (string guid, int id, object customIn, object customOut, ref bool cancelDefault)
     {
@@ -303,9 +266,9 @@ namespace LicenseHeaderManager
 
     private void InvokeAddLicenseHeaderCommandFromLinkedCmd ()
     {
-      _isCalledByLinkedCommand = true;
+      IsCalledByLinkedCommand = true;
       AddLicenseHeaderEditorAdvancedMenuCommand.Instance.Invoke();
-      _isCalledByLinkedCommand = false;
+      IsCalledByLinkedCommand = false;
     }
 
     private void CommandsChanged (object sender, NotifyCollectionChangedEventArgs e)
@@ -328,7 +291,7 @@ namespace LicenseHeaderManager
       if (e.NewItems != null)
         foreach (LinkedCommand command in e.NewItems)
         {
-          command.Events = _dte.Events.CommandEvents[command.Guid, command.Id];
+          command.Events = Dte2.Events.CommandEvents[command.Guid, command.Id];
 
           switch (command.ExecutionTime)
           {
@@ -342,13 +305,6 @@ namespace LicenseHeaderManager
         }
     }
 
-    #region insert headers in new files
-
-    private string _currentCommandGuid;
-    private int _currentCommandId;
-    private CommandEvents _currentCommandEvents;
-    private Stack<ProjectItem> _addedItems;
-
     private void BeforeAnyCommandExecuted (string guid, int id, object customIn, object customOut, ref bool cancelDefault)
     {
       //Save the current command in case it adds a new item to the project.
@@ -359,124 +315,41 @@ namespace LicenseHeaderManager
     private void ItemAdded (ProjectItem item)
     {
       //An item was added. Check if we should insert a header automatically.
-      var page = (OptionsPage) GetDialogPage (typeof (OptionsPage));
+      var page = OptionsPage;
       if (page != null && page.InsertInNewFiles && item != null)
       {
         //Normally the header should be inserted here, but that might interfere with the command
         //currently being executed, so we wait until it is finished.
-        _currentCommandEvents = _dte.Events.CommandEvents[_currentCommandGuid, _currentCommandId];
+        _currentCommandEvents = Dte2.Events.CommandEvents[_currentCommandGuid, _currentCommandId];
         _currentCommandEvents.AfterExecute += FinishedAddingItem;
         _addedItems.Push (item);
       }
     }
 
-    private async void FinishedAddingItem (string guid, int id, object customIn, object customOut)
+    private void FinishedAddingItem (string guid, int id, object customIn, object customOut)
+    {
+      FinishedAddingItemAsync().FireAndForget();
+    }
+
+    private async Task FinishedAddingItemAsync ()
     {
       //Now we can finally insert the header into the new item.
-
       while (_addedItems.Count > 0)
       {
         var item = _addedItems.Pop();
         var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
-        if (headers != null)
-        {
-          var result = await LicenseHeaderReplacer.RemoveOrReplaceHeader (
-              new LicenseHeaderInput (item.Document.FullName, headers, item.GetAdditionalProperties()),
-              false,
-              CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
-              message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, this));
-          CoreHelpers.HandleResult(result);
-        }
+        if (headers == null)
+          continue;
+
+        var result = await LicenseHeaderReplacer.RemoveOrReplaceHeader (
+            new LicenseHeaderInput (item.Document.FullName, headers, item.GetAdditionalProperties()),
+            false,
+            CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
+            message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, this));
+        CoreHelpers.HandleResult (result);
       }
 
       _currentCommandEvents.AfterExecute -= FinishedAddingItem;
     }
-
-    #endregion
-
-    #endregion
-
-    #region command handlers
-
-    public async Task<ReplacerResult<ReplacerError>> AddLicenseHeaderToItemAsync (ProjectItem item, bool calledByUser)
-    {
-      if (item == null || ProjectItemInspection.IsLicenseHeader (item))
-        return new ReplacerResult<ReplacerError>();
-
-      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-      var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
-      if (headers != null)
-        return await LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new LicenseHeaderInput (item.Document.FullName, headers, item.GetAdditionalProperties()),
-            calledByUser,
-            CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
-            message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, this));
-
-      var page = (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));
-      if (calledByUser && LicenseHeader.ShowQuestionForAddingLicenseHeaderFile (item.ContainingProject, page))
-        return await AddLicenseHeaderToItemAsync (item, true);
-
-      return new ReplacerResult<ReplacerError>();
-    }
-
-    public async Task HandleAddLicenseHeaderToAllFilesInProjectReturnAsync (
-        object obj,
-        AddLicenseHeaderToAllFilesResult addLicenseHeaderToAllFilesResult)
-    {
-      var project = obj as Project;
-      var projectItem = obj as ProjectItem;
-      if (project == null && projectItem == null)
-        return;
-      var currentProject = project;
-
-      if (projectItem != null)
-        currentProject = projectItem.ContainingProject;
-
-      if (addLicenseHeaderToAllFilesResult.NoHeaderFound)
-      {
-        // No license header found...
-        var solutionSearcher = new AllSolutionProjectsSearcher();
-        var projects = solutionSearcher.GetAllProjects (_dte.Solution);
-
-        if (projects.Any (projectInSolution => LicenseHeaderFinder.GetHeaderDefinitionForProjectWithoutFallback (projectInSolution) != null))
-        {
-          // If another projet has a license header, offer to add a link to the existing one.
-          if (MessageBoxHelper.DoYouWant (Resources.Question_AddExistingDefinitionFileToProject))
-          {
-            ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (currentProject.FileName, currentProject.ProjectItems);
-            await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync (this);
-          }
-        }
-        else
-        {
-          // If no project has a license header, offer to add one for the solution.
-          if (MessageBoxHelper.DoYouWant (Resources.Question_AddNewLicenseHeaderDefinitionForSolution))
-            AddNewSolutionLicenseHeaderDefinitionFileCallback (this, new EventArgs());
-        }
-      }
-    }
-
-    public async Task HandleLinkedFilesAndShowMessageBox (List<ProjectItem> linkedItems)
-    {
-      var linkedFileFilter = new LinkedFileFilter (_dte.Solution);
-      linkedFileFilter.Filter (linkedItems);
-
-      var linkedFileHandler = new LinkedFileHandler (this);
-      await linkedFileHandler.HandleAsync (linkedFileFilter);
-
-      if (linkedFileHandler.Message != string.Empty)
-        MessageBox.Show (
-            linkedFileHandler.Message,
-            Resources.NameOfThisExtension,
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
-    }
-
-    private void AddNewSolutionLicenseHeaderDefinitionFileCallback (object sender, EventArgs e)
-    {
-      AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (_dte.Solution);
-    }
-
-    #endregion
   }
 }

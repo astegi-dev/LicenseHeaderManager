@@ -26,9 +26,15 @@ namespace LicenseHeaderManager.Interfaces
     LicenseHeaderReplacer LicenseHeaderReplacer { get; }
 
     IDefaultLicenseHeaderPage DefaultLicenseHeaderPage { get; }
+
     ILanguagesPage LanguagesPage { get; }
+
     IOptionsPage OptionsPage { get; }
+
+    bool IsCalledByLinkedCommand { get; }
+
     DTE2 Dte2 { get; }
+
     void ShowLanguagesPage ();
   }
 }

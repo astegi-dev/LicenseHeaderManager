@@ -17,7 +17,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using Core;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
@@ -46,7 +45,7 @@ namespace LicenseHeaderManager.Utils
             true,
             CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
             message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, _licenseHeaderExtension));
-        CoreHelpers.HandleResult(result);
+        CoreHelpers.HandleResult (result);
       }
 
       if (linkedFileFilter.NoLicenseHeaderFile.Any() || linkedFileFilter.NotInSolution.Any())

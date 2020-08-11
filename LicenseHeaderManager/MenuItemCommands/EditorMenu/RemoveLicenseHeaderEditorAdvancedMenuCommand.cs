@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.Design;
-using System.Windows;
 using Core;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
@@ -102,7 +101,7 @@ namespace LicenseHeaderManager.MenuItemCommands.EditorMenu
           true,
           CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
           message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, ServiceProvider));
-      CoreHelpers.HandleResult(result);
+      CoreHelpers.HandleResult (result);
     }
   }
 }

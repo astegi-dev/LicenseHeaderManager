@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Design;
+using LicenseHeaderManager.ButtonHandler;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
@@ -20,6 +21,8 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     /// </summary>
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
+    private readonly ButtonHandlerFactory _buttonHandlerFactory;
+
     /// <summary>
     ///   Initializes a new instance of the <see cref="AddLicenseHeaderToAllFilesInSolutionCommand" /> class.
     ///   Adds our command handlers for menu (commands must exist in the command table file)
@@ -30,6 +33,8 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     {
       ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
+
+      _buttonHandlerFactory = new ButtonHandlerFactory (ServiceProvider);
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
       var menuItem = new OleMenuCommand (Execute, menuCommandID);
@@ -71,8 +76,7 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      // TODO examine simplification of SolutionLevelButtonThreadWorker, AddLicenseHeaderToAllProjectsDelegate and ButtonHandlerFactory, afterwards encapsulate corresponding logic within this class
-      ServiceProvider._addLicenseHeaderToAllProjectsDelegate.HandleButton (sender, e);
+      _buttonHandlerFactory.CreateAddLicenseHeaderToSolutionHandler().HandleButton (sender, e);
     }
   }
 }

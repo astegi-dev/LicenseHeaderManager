@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.Design;
-using System.Windows;
 using EnvDTE;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
@@ -103,8 +102,8 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
       if (item == null || !ProjectItemInspection.IsPhysicalFile (item) || ProjectItemInspection.IsLicenseHeader (item))
         return;
 
-      var result = await ServiceProvider.AddLicenseHeaderToItemAsync (item, !ServiceProvider._isCalledByLinkedCommand);
-      CoreHelpers.HandleResult(result);
+      var result = await item.AddLicenseHeaderToItemAsync (ServiceProvider, !ServiceProvider.IsCalledByLinkedCommand);
+      CoreHelpers.HandleResult (result);
     }
   }
 }

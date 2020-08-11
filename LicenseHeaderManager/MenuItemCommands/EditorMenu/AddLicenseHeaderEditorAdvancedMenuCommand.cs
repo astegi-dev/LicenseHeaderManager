@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.Design;
-using System.Windows;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
@@ -98,8 +97,8 @@ namespace LicenseHeaderManager.MenuItemCommands.EditorMenu
     private async Task ExecuteInternalAsync ()
     {
       var item = ServiceProvider.GetActiveProjectItem();
-      var result = await ServiceProvider.AddLicenseHeaderToItemAsync (item, !ServiceProvider._isCalledByLinkedCommand);
-      CoreHelpers.HandleResult(result);
+      var result = await item.AddLicenseHeaderToItemAsync (ServiceProvider, !ServiceProvider.IsCalledByLinkedCommand);
+      CoreHelpers.HandleResult (result);
     }
   }
 }

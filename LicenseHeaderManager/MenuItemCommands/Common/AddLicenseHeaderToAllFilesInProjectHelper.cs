@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Windows;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
@@ -74,7 +73,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         }
 
       var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
-      CoreHelpers.HandleResult(result);
+      CoreHelpers.HandleResult (result);
 
       return new AddLicenseHeaderToAllFilesResult (countSubLicenseHeadersFound, headers == null, linkedItems);
     }

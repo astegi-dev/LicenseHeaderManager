@@ -15,25 +15,22 @@
 #endregion
 
 using System;
-using Core;
 using LicenseHeaderManager.Interfaces;
 
 namespace LicenseHeaderManager.ButtonHandler
 {
   internal class ButtonHandlerFactory
   {
-    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
     private readonly ILicenseHeaderExtension _licenseHeadersPackage;
 
-    public ButtonHandlerFactory (ILicenseHeaderExtension licenseHeadersPackage, LicenseHeaderReplacer licenseHeaderReplacer)
+    public ButtonHandlerFactory (ILicenseHeaderExtension licenseHeadersPackage)
     {
-      _licenseHeaderReplacer = licenseHeaderReplacer;
       _licenseHeadersPackage = licenseHeadersPackage;
     }
 
-    public AddLicenseHeaderToAllProjectsDelegate CreateAddLicenseHeaderToAllProjectsButtonHandler ()
+    public AddLicenseHeaderToSolutionHandler CreateAddLicenseHeaderToSolutionHandler ()
     {
-      return new AddLicenseHeaderToAllProjectsDelegate (_licenseHeaderReplacer, _licenseHeadersPackage.Dte2);
+      return new AddLicenseHeaderToSolutionHandler (_licenseHeadersPackage.LicenseHeaderReplacer, _licenseHeadersPackage.Dte2);
     }
   }
 }

@@ -26,7 +26,7 @@ using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.ButtonHandler
 {
-  public class AddLicenseHeaderToAllProjectsDelegate
+  public class AddLicenseHeaderToSolutionHandler
   {
     private readonly DTE2 _dte2;
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
@@ -34,7 +34,7 @@ namespace LicenseHeaderManager.ButtonHandler
 
     private Thread _solutionUpdateThread;
 
-    public AddLicenseHeaderToAllProjectsDelegate (LicenseHeaderReplacer licenseHeaderReplacer, DTE2 dte2)
+    public AddLicenseHeaderToSolutionHandler (LicenseHeaderReplacer licenseHeaderReplacer, DTE2 dte2)
     {
       _licenseHeaderReplacer = licenseHeaderReplacer;
       _dte2 = dte2;

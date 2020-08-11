@@ -82,10 +82,10 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (ServiceProvider._dte.Solution);
+      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (ServiceProvider.Dte2.Solution);
 
       if (File.Exists (solutionHeaderDefinitionFilePath))
-        ServiceProvider._dte.Solution.DTE.OpenFile (Constants.vsViewKindTextView, solutionHeaderDefinitionFilePath).Activate();
+        ServiceProvider.Dte2.Solution.DTE.OpenFile (Constants.vsViewKindTextView, solutionHeaderDefinitionFilePath).Activate();
     }
   }
 }

@@ -50,6 +50,25 @@ namespace LicenseHeaderManager.Options
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
     public Commands Commands => Dte.Commands;
 
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Visible)]
+    // ReSharper disable once UnusedMember.Global
+    public string LinkedCommandsSerialized
+    {
+      get => _linkedCommandConverter.ToXml (LinkedCommands);
+      set => LinkedCommands = new ObservableCollection<LinkedCommand> (_linkedCommandConverter.FromXml (value));
+    }
+
+    [Browsable (false)]
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    protected override IWin32Window Window
+    {
+      get
+      {
+        var host = new WpfHost (new WpfOptions (this));
+        return host;
+      }
+    }
+
     //serialized properties
     public bool InsertInNewFiles { get; set; }
 
@@ -73,25 +92,6 @@ namespace LicenseHeaderManager.Options
           _linkedCommands.CollectionChanged += OnLinkedCommandsChanged;
           LinkedCommandsChanged?.Invoke (value, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, _linkedCommands));
         }
-      }
-    }
-
-    [DesignerSerializationVisibility (DesignerSerializationVisibility.Visible)]
-    // ReSharper disable once UnusedMember.Global
-    public string LinkedCommandsSerialized
-    {
-      get => _linkedCommandConverter.ToXml (LinkedCommands);
-      set => LinkedCommands = new ObservableCollection<LinkedCommand> (_linkedCommandConverter.FromXml (value));
-    }
-
-    [Browsable (false)]
-    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-    protected override IWin32Window Window
-    {
-      get
-      {
-        var host = new WpfHost (new WpfOptions (this));
-        return host;
       }
     }
 

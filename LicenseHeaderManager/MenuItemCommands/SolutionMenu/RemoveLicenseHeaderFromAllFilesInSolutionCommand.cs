@@ -80,12 +80,12 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     private async Task ExecuteInternalAsync ()
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-      var solution = ServiceProvider._dte.Solution;
+      var solution = ServiceProvider.Dte2.Solution;
       var statusBar = (IVsStatusbar) await ServiceProvider.GetServiceAsync (typeof (SVsStatusbar));
       var removeLicenseHeaderFromAllProjects = new RemoveLicenseHeaderFromAllFilesInSolutionHelper (
           statusBar,
           ServiceProvider.LicenseHeaderReplacer);
-      var resharperSuspended = CommandUtility.ExecuteCommandIfExists ("ReSharper_Suspend", ServiceProvider._dte);
+      var resharperSuspended = CommandUtility.ExecuteCommandIfExists ("ReSharper_Suspend", ServiceProvider.Dte2);
 
       try
       {
@@ -99,7 +99,7 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
       }
 
       if (resharperSuspended)
-        CommandUtility.ExecuteCommand ("ReSharper_Resume", ServiceProvider._dte);
+        CommandUtility.ExecuteCommand ("ReSharper_Resume", ServiceProvider.Dte2);
     }
   }
 }

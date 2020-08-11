@@ -20,12 +20,12 @@ namespace LicenseHeaderManager.Options
 
     public void Save ()
     {
-      throw new System.NotImplementedException();
+      throw new NotImplementedException();
     }
 
     public void Load ()
     {
-      throw new System.NotImplementedException();
+      throw new NotImplementedException();
     }
   }
 }

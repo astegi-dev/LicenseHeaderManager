@@ -31,9 +31,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
   {
     private const string c_commandName = "Add LicenseHeader to all files in Solution";
     private const int MaxProjectsWithoutDefinitionFileShownInMessage = 5;
+    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
     private readonly SolutionUpdateViewModel _solutionUpdateViewModel;
-    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
     public AddLicenseHeaderToAllFilesInSolutionHelper (
         LicenseHeaderReplacer licenseHeaderReplacer,

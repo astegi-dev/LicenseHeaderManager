@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.IO;
+using EnvDTE;
 using LicenseHeaderManager.Headers;
 using Microsoft.VisualStudio.Shell;
-using Document = EnvDTE.Document;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
@@ -82,10 +82,10 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (ServiceProvider._dte.Solution);
+      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (ServiceProvider.Dte2.Solution);
 
       // Look for and close the document representing the license header definition file if it exists
-      foreach (Document document in ServiceProvider._dte.Solution.DTE.Documents)
+      foreach (Document document in ServiceProvider.Dte2.Solution.DTE.Documents)
       {
         if (!string.Equals (solutionHeaderDefinitionFilePath, document.FullName, StringComparison.OrdinalIgnoreCase))
           continue;
