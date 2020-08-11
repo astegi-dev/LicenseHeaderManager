@@ -14,29 +14,29 @@
 
 #endregion
 
-using EnvDTE;
-using Microsoft.VisualStudio.Shell;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Core;
+using EnvDTE;
 
 namespace LicenseHeaderManager.Utils
 {
   internal static class Extensions
   {
-    public static IEnumerable<Core.DocumentHeaderProperty> GetAdditionalProperties (this ProjectItem item)
+    public static IEnumerable<DocumentHeaderProperty> GetAdditionalProperties (this ProjectItem item)
     {
       //ThreadHelper.ThrowIfNotOnUIThread();
 
-      return new List<Core.DocumentHeaderProperty>
+      return new List<DocumentHeaderProperty>
              {
-                 new Core.DocumentHeaderProperty (
+                 new DocumentHeaderProperty (
                      "%Project%",
                      documentHeader => item.ContainingProject != null,
                      documentHeader => item.ContainingProject.Name),
-                 new Core.DocumentHeaderProperty (
+                 new DocumentHeaderProperty (
                      "%Namespace%",
                      documentHeader =>
                          item.FileCodeModel != null &&
@@ -48,21 +48,19 @@ namespace LicenseHeaderManager.Utils
              };
     }
 
-    public static void FireAndForget (this System.Threading.Tasks.Task task)
+    public static void FireAndForget (this Task task)
     {
       // note: this code is inspired by a tweet from Ben Adams: https://twitter.com/ben_a_adams/status/1045060828700037125
       // Only care about tasks that may fault (not completed) or are faulted,
       // so fast-path for SuccessfullyCompleted and Canceled tasks.
       if (!task.IsCompleted || task.IsFaulted)
-      {
-        // use "_" (Discard operation) to remove the warning IDE0058: Because this call is not awaited, execution of the current method continues before the call is completed
-        // https://docs.microsoft.com/en-us/dotnet/csharp/discards#a-standalone-discard
+          // use "_" (Discard operation) to remove the warning IDE0058: Because this call is not awaited, execution of the current method continues before the call is completed
+          // https://docs.microsoft.com/en-us/dotnet/csharp/discards#a-standalone-discard
         _ = ForgetAwaited (task);
-      }
 
       // Allocate the async/await state machine only when needed for performance reason.
       // More info about the state machine: https://blogs.msdn.microsoft.com/seteplia/2017/11/30/dissecting-the-async-methods-in-c/
-      static async System.Threading.Tasks.Task ForgetAwaited (System.Threading.Tasks.Task task)
+      static async Task ForgetAwaited (Task task)
       {
         try
         {

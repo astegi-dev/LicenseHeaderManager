@@ -14,16 +14,18 @@
 
 #endregion
 
+using System;
+using Core;
 using LicenseHeaderManager.Interfaces;
 
 namespace LicenseHeaderManager.ButtonHandler
 {
   internal class ButtonHandlerFactory
   {
+    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
     private readonly ILicenseHeaderExtension _licenseHeadersPackage;
-    private readonly Core.LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public ButtonHandlerFactory (ILicenseHeaderExtension licenseHeadersPackage, Core.LicenseHeaderReplacer licenseHeaderReplacer)
+    public ButtonHandlerFactory (ILicenseHeaderExtension licenseHeadersPackage, LicenseHeaderReplacer licenseHeaderReplacer)
     {
       _licenseHeaderReplacer = licenseHeaderReplacer;
       _licenseHeadersPackage = licenseHeadersPackage;

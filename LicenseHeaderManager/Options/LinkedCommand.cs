@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,10 +11,12 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
-using EnvDTE;
+using System;
 using System.ComponentModel;
+using EnvDTE;
 
 namespace LicenseHeaderManager.Options
 {
@@ -25,15 +28,16 @@ namespace LicenseHeaderManager.Options
 
   public class LinkedCommand : INotifyPropertyChanged
   {
+    private ExecutionTime _executionTime;
+
+    private string _name;
     public string Guid { get; set; }
     public int Id { get; set; }
     public CommandEvents Events { get; set; }
 
-    private string _name;
-
     public string Name
     {
-      get { return _name; }
+      get => _name;
       set
       {
         if (value != _name)
@@ -44,11 +48,9 @@ namespace LicenseHeaderManager.Options
       }
     }
 
-    private ExecutionTime _executionTime;
-
     public ExecutionTime ExecutionTime
     {
-      get { return _executionTime; }
+      get => _executionTime;
       set
       {
         if (value != _executionTime)

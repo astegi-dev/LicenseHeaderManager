@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -22,12 +24,12 @@ using LicenseHeaderManager.Utils;
 namespace LicenseHeaderManager.Headers
 {
   /// <summary>
-  /// Class for finding the nearest license header file for a ProjectItem or a Project
+  ///   Class for finding the nearest license header file for a ProjectItem or a Project
   /// </summary>
   public class LicenseHeaderFinder
   {
     /// <summary>
-    /// Gets the license header file definition to use on the given project item.
+    ///   Gets the license header file definition to use on the given project item.
     /// </summary>
     /// <param name="projectItem"></param>
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
@@ -36,16 +38,14 @@ namespace LicenseHeaderManager.Headers
       // First search for the definition within the project
       var headerDefinition = SearchWithinProjectGetHeaderDefinitionForItem (projectItem);
       if (headerDefinition != null)
-      {
         return headerDefinition;
-      }
 
       // Next look for the solution-level definition
       return GetHeaderDefinitionForSolution (projectItem.DTE.Solution);
     }
 
     /// <summary>
-    /// Lookup the license header file within the given projectItems.
+    ///   Lookup the license header file within the given projectItems.
     /// </summary>
     /// <param name="projectItems"></param>
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
@@ -59,7 +59,7 @@ namespace LicenseHeaderManager.Headers
     }
 
     /// <summary>
-    /// Returns the License header file for the specified project, or the solution header file if it can't be found.
+    ///   Returns the License header file for the specified project, or the solution header file if it can't be found.
     /// </summary>
     /// <param name="project">The project which is scanned for the License header file</param>
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
@@ -69,16 +69,14 @@ namespace LicenseHeaderManager.Headers
       var definition = GetHeaderDefinitionForProjectWithoutFallback (project);
 
       if (definition != null)
-      {
         return definition;
-      }
 
       // Next look for the solution-level definition
       return GetHeaderDefinitionForSolution (project.DTE.Solution);
     }
 
     /// <summary>
-    /// Returns the License header file for the specified project. Does not fall back to the solution header file.
+    ///   Returns the License header file for the specified project. Does not fall back to the solution header file.
     /// </summary>
     /// <param name="project">The project which is scanned for the License header file</param>
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
@@ -89,7 +87,7 @@ namespace LicenseHeaderManager.Headers
     }
 
     /// <summary>
-    /// Returns the License header definition file for the specified solution.
+    ///   Returns the License header definition file for the specified solution.
     /// </summary>
     /// <param name="solution">The solution to look in.</param>
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
@@ -100,16 +98,15 @@ namespace LicenseHeaderManager.Headers
 
       var solutionHeaderFilePath = Path.Combine (solutionDirectory, solutionFileName + LicenseHeader.Extension);
       if (File.Exists (solutionHeaderFilePath))
-      {
         return LoadHeaderDefinition (solutionHeaderFilePath);
-      }
 
       return null;
     }
 
     #region Helper Methods
+
     /// <summary>
-    /// Returns the License header file that is directly attached to the project.
+    ///   Returns the License header file that is directly attached to the project.
     /// </summary>
     /// <param name="project">The project which is scanned for the License header file</param>
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
@@ -121,7 +118,7 @@ namespace LicenseHeaderManager.Headers
     }
 
     /// <summary>
-    /// Lookup the license header file within a project , if there is none on this level, moving up to next level.
+    ///   Lookup the license header file within a project , if there is none on this level, moving up to next level.
     /// </summary>
     /// <param name="projectItem"></param>
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
@@ -139,7 +136,8 @@ namespace LicenseHeaderManager.Headers
     }
 
     /// <summary>
-    /// Lookup the license header file within a project or a projectitem, if there is none on this level, moving up to next level.
+    ///   Lookup the license header file within a project or a projectitem, if there is none on this level, moving up to next
+    ///   level.
     /// </summary>
     /// <param name="projectOrItem">An oject which is either is a project or a projectitem</param>
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
@@ -185,18 +183,19 @@ namespace LicenseHeaderManager.Headers
               foreach (var extension in extensions)
                 headers[extension] = array;
             }
+
             extensions = line.Substring (LicenseHeader.Keyword.Length).Split (new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select (LicenseHeader.AddDot);
             header.Clear();
           }
           else
+          {
             header.Add (line);
+          }
         }
 
         if (wholeFile.EndsWith (NewLineConst.CR) || wholeFile.EndsWith (NewLineConst.LF))
-        {
           header.Add (string.Empty);
-        }
       }
 
       if (extensions != null)
@@ -213,7 +212,6 @@ namespace LicenseHeaderManager.Headers
         return null;
 
       foreach (ProjectItem item in projectItems)
-      {
         if (item.FileCount == 1)
         {
           string fileName = null;
@@ -229,10 +227,10 @@ namespace LicenseHeaderManager.Headers
           if (fileName != null && Path.GetExtension (fileName).ToLowerInvariant() == LicenseHeader.Extension)
             return fileName;
         }
-      }
 
       return string.Empty;
     }
+
     #endregion
   }
 }

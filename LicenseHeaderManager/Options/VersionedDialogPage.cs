@@ -1,4 +1,5 @@
 #region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -26,11 +28,11 @@ namespace LicenseHeaderManager.Options
 {
   public class VersionedDialogPage : DialogPage
   {
+    private static bool s_firstDialogPageLoaded = true;
+
     //Serialized properties
     //Is managed by VisualStudio and placed persistently in the Registry
     public string Version { get; set; }
-
-    private static bool s_firstDialogPageLoaded = true;
 
     public override void LoadSettingsFromStorage ()
     {
@@ -112,7 +114,6 @@ namespace LicenseHeaderManager.Options
           var registryValue = GetRegistryValue (key, property.Name);
 
           if (registryValue != null)
-          {
             try
             {
               property.SetValue (
@@ -123,7 +124,6 @@ namespace LicenseHeaderManager.Options
             {
               OutputWindowHandler.WriteMessage ($"Could not restore registry value for {property.Name}");
             }
-          }
         }
       }
     }
@@ -144,14 +144,10 @@ namespace LicenseHeaderManager.Options
     private TypeConverter GetPropertyConverterOrDefault (PropertyDescriptor propertyDescriptor)
     {
       if (propertyDescriptor.Name == nameof(LanguagesPage.Languages))
-      {
         return new LanguageConverter();
-      }
 
       if (propertyDescriptor.Name == nameof(OptionsPage.LinkedCommands))
-      {
         return new LinkedCommandConverter();
-      }
 
       return propertyDescriptor.Converter;
     }
@@ -169,14 +165,10 @@ namespace LicenseHeaderManager.Options
     protected T ThreeWaySelectionForMigration<T> (T currentValue, T migratedValue, T defaultValue)
     {
       if (defaultValue is ICollection)
-      {
         throw new InvalidOperationException ("ThreeWaySelectionForMigration does currently not support ICollections.");
-      }
 
       if (currentValue.Equals (defaultValue))
-      {
         return migratedValue;
-      }
 
       return currentValue;
     }

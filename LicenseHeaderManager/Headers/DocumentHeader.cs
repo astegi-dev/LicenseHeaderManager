@@ -3,19 +3,18 @@
 
 // first line
 // second line copyright456
+
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using EnvDTE;
-using System.IO;
 
 namespace LicenseHeaderManager.Headers
 {
   internal class DocumentHeader
   {
     private readonly TextDocument _document;
-    private readonly string _text;
-    private readonly FileInfo _fileInfo;
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 
     public DocumentHeader (TextDocument document, string text, IEnumerable<DocumentHeaderProperty> properties)
@@ -26,55 +25,40 @@ namespace LicenseHeaderManager.Headers
       _document = document;
       _properties = properties;
 
-      _fileInfo = CreateFileInfo();
-      _text = CreateText (text);
+      FileInfo = CreateFileInfo();
+      Text = CreateText (text);
     }
+
+    public bool IsEmpty => Text == null;
+
+    public FileInfo FileInfo { get; }
+
+    public string Text { get; }
 
     private FileInfo CreateFileInfo ()
     {
       var pathToDocument = _document.Parent.FullName;
 
       if (File.Exists (pathToDocument))
-      {
         return new FileInfo (pathToDocument);
-      }
       return null;
     }
 
     private string CreateText (string inputText)
     {
       if (inputText == null)
-      {
         return null;
-      }
 
       var finalText = inputText;
 
       foreach (var property in _properties)
-      {
         if (property.CanCreateValue (this))
         {
           var regex = new Regex (property.Token, RegexOptions.IgnoreCase);
           finalText = regex.Replace (finalText, property.CreateValue (this));
         }
-      }
 
       return finalText;
-    }
-
-    public bool IsEmpty
-    {
-      get { return _text == null; }
-    }
-
-    public FileInfo FileInfo
-    {
-      get { return _fileInfo; }
-    }
-
-    public string Text
-    {
-      get { return _text; }
     }
   }
 }

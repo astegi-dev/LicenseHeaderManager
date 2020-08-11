@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -30,46 +32,86 @@ namespace LicenseHeaderManager.Options
   public class LanguagesPage : VersionedDialogPage, ILanguagesPage
   {
     private readonly ObservableCollection<Language> _defaultLanguages = new ObservableCollection<Language>
-    {
-      new Language { Extensions = new[] { ".cs" }, LineComment = "//", BeginComment = "/*", EndComment = "*/", BeginRegion = "#region", EndRegion = "#endregion" },
-      new Language { Extensions = new[] { ".c", ".cpp", ".cxx", ".h", ".hpp" }, LineComment = "//", BeginComment = "/*", EndComment = "*/" },
-      new Language { Extensions = new[] { ".vb" }, LineComment = "'", BeginRegion = "#Region", EndRegion = "#End Region" },
-      new Language { Extensions = new[] { ".aspx", ".ascx", }, BeginComment = "<%--", EndComment = "--%>" },
-      new Language { Extensions = new[] { ".htm", ".html", ".xhtml", ".xml", ".xaml", ".resx", ".config", ".xsd" }, BeginComment = "<!--", EndComment = "-->", SkipExpression = @"(<\?xml(.|\s)*?\?>)?(\s*<!DOCTYPE(.|\s)*?>)?( |\t)*(\n|\r\n|\r)?" },
-      new Language { Extensions = new[] { ".css" }, BeginComment = "/*", EndComment = "*/" },
-      new Language { Extensions = new[] { ".js", ".ts" }, LineComment = "//", BeginComment = "/*", EndComment = "*/", SkipExpression = @"(/// *<reference.*/>( |\t)*(\n|\r\n|\r)?)*" },
-      new Language { Extensions = new[] { ".sql" }, BeginComment = "/*", EndComment = "*/", LineComment = "--" },
-      new Language { Extensions = new[] { ".php" }, BeginComment = "/*", EndComment = "*/", LineComment = "//" },
-      new Language { Extensions = new[] { ".wxs", ".wxl", ".wxi" }, BeginComment = "<!--", EndComment = "-->" },
-      new Language { Extensions = new[] { ".py" }, BeginComment = "\"\"\"", EndComment = "\"\"\"" },
-      new Language { Extensions = new[] { ".fs" }, BeginComment = "(*", EndComment = "*)", LineComment = "//" },
-      new Language { Extensions = new[] { ".cshtml", ".vbhtml" }, BeginComment = "@*", EndComment = "*@" },
-    };
+                                                                        {
+                                                                            new Language
+                                                                            {
+                                                                                Extensions = new[] { ".cs" }, LineComment = "//", BeginComment = "/*",
+                                                                                EndComment = "*/", BeginRegion = "#region", EndRegion = "#endregion"
+                                                                            },
+                                                                            new Language
+                                                                            {
+                                                                                Extensions = new[] { ".c", ".cpp", ".cxx", ".h", ".hpp" },
+                                                                                LineComment = "//", BeginComment = "/*", EndComment = "*/"
+                                                                            },
+                                                                            new Language
+                                                                            {
+                                                                                Extensions = new[] { ".vb" }, LineComment = "'", BeginRegion = "#Region",
+                                                                                EndRegion = "#End Region"
+                                                                            },
+                                                                            new Language
+                                                                            {
+                                                                                Extensions = new[] { ".aspx", ".ascx" }, BeginComment = "<%--",
+                                                                                EndComment = "--%>"
+                                                                            },
+                                                                            new Language
+                                                                            {
+                                                                                Extensions = new[]
+                                                                                             {
+                                                                                                 ".htm", ".html", ".xhtml", ".xml", ".xaml", ".resx",
+                                                                                                 ".config", ".xsd"
+                                                                                             },
+                                                                                BeginComment = "<!--", EndComment = "-->",
+                                                                                SkipExpression =
+                                                                                    @"(<\?xml(.|\s)*?\?>)?(\s*<!DOCTYPE(.|\s)*?>)?( |\t)*(\n|\r\n|\r)?"
+                                                                            },
+                                                                            new Language { Extensions = new[] { ".css" }, BeginComment = "/*", EndComment = "*/" },
+                                                                            new Language
+                                                                            {
+                                                                                Extensions = new[] { ".js", ".ts" }, LineComment = "//", BeginComment = "/*",
+                                                                                EndComment = "*/",
+                                                                                SkipExpression = @"(/// *<reference.*/>( |\t)*(\n|\r\n|\r)?)*"
+                                                                            },
+                                                                            new Language
+                                                                            {
+                                                                                Extensions = new[] { ".sql" }, BeginComment = "/*", EndComment = "*/",
+                                                                                LineComment = "--"
+                                                                            },
+                                                                            new Language
+                                                                            {
+                                                                                Extensions = new[] { ".php" }, BeginComment = "/*", EndComment = "*/",
+                                                                                LineComment = "//"
+                                                                            },
+                                                                            new Language
+                                                                            {
+                                                                                Extensions = new[] { ".wxs", ".wxl", ".wxi" }, BeginComment = "<!--",
+                                                                                EndComment = "-->"
+                                                                            },
+                                                                            new Language { Extensions = new[] { ".py" }, BeginComment = "\"\"\"", EndComment = "\"\"\"" },
+                                                                            new Language
+                                                                            {
+                                                                                Extensions = new[] { ".fs" }, BeginComment = "(*", EndComment = "*)",
+                                                                                LineComment = "//"
+                                                                            },
+                                                                            new Language
+                                                                            {
+                                                                                Extensions = new[] { ".cshtml", ".vbhtml" }, BeginComment = "@*",
+                                                                                EndComment = "*@"
+                                                                            }
+                                                                        };
 
     private readonly LanguageConverter _languageConverter = new LanguageConverter();
-
-    //serialized properties
-
-    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-    public ObservableCollection<Language> Languages { get; set; }
-
-    [DesignerSerializationVisibility (DesignerSerializationVisibility.Visible)]
-    // ReSharper disable once UnusedMember.Global
-    public string LanguagesSerialized
-    {
-      get { return _languageConverter.ToXml (Languages); }
-      set { Languages = new ObservableCollection<Language> (_languageConverter.FromXml (value)); }
-    }
 
     public LanguagesPage ()
     {
       ResetSettings();
     }
 
-    public override sealed void ResetSettings ()
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Visible)]
+    // ReSharper disable once UnusedMember.Global
+    public string LanguagesSerialized
     {
-      Languages = _defaultLanguages;
-      base.ResetSettings ();
+      get => _languageConverter.ToXml (Languages);
+      set => Languages = new ObservableCollection<Language> (_languageConverter.FromXml (value));
     }
 
     [Browsable (false)]
@@ -81,6 +123,17 @@ namespace LicenseHeaderManager.Options
         var host = new WpfHost (new WpfLanguages (this));
         return host;
       }
+    }
+
+    //serialized properties
+
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public ObservableCollection<Language> Languages { get; set; }
+
+    public sealed override void ResetSettings ()
+    {
+      Languages = _defaultLanguages;
+      base.ResetSettings();
     }
 
     #region version updates
@@ -176,7 +229,6 @@ namespace LicenseHeaderManager.Options
         MessageBox.Show (Resources.Update_SkipExpressions_1_2_2.Replace (@"\n", "\n"), "Update");
     }
 
-
     private void AddXmlXsd_1_3_2 ()
     {
       //Add a default rule for config/xsd
@@ -214,7 +266,6 @@ namespace LicenseHeaderManager.Options
       added |= AddLanguageIfNotExistent (".sql", new Language { Extensions = new[] { ".sql" }, BeginComment = "/*", EndComment = "*/", LineComment = "--" });
 
       if (added)
-      {
         MessageBox.Show (
             "License Header Manager has automatically updated its configuration to add Language settings for multiple file extensions."
             + Environment.NewLine +
@@ -228,7 +279,6 @@ namespace LicenseHeaderManager.Options
             ".py" + Environment.NewLine +
             ".sql",
             "License Header Manager Update");
-      }
     }
 
     private void MigrateStorageLocation_3_0_1 ()
@@ -254,7 +304,6 @@ namespace LicenseHeaderManager.Options
           new Language { Extensions = new[] { ".cshtml", ".vbhtml" }, BeginComment = "@*", EndComment = "*@" });
 
       if (added)
-      {
         MessageBox.Show (
             "License Header Manager has automatically updated its configuration to add Language settings for multiple file extensions."
             + Environment.NewLine +
@@ -263,24 +312,19 @@ namespace LicenseHeaderManager.Options
             "Added file extension settings:" + Environment.NewLine +
             ".cshtml & .vbhtml",
             "License Header Manager Update");
-      }
     }
 
     private bool AddLanguageIfNotExistsOrAddExtensionsIfExists (Language language)
     {
       if (language.Extensions.All (ExtensionExists))
-      {
         return false;
-      }
 
       if (language.Extensions.Any (ExtensionExists))
       {
         var extensionsToAdd = language.Extensions.Where (e => !ExtensionExists (e));
         var existingExtension = language.Extensions.First (ExtensionExists);
         foreach (var extension in extensionsToAdd)
-        {
           AddExtensionToExistingExtension (existingExtension, extension);
-        }
         return true;
       }
 

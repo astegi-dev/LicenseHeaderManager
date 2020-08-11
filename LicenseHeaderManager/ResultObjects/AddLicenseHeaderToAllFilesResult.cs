@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -20,10 +22,6 @@ namespace LicenseHeaderManager.ResultObjects
 {
   public class AddLicenseHeaderToAllFilesResult
   {
-    public int CountSubLicenseHeadersFound { get; set; }
-    public bool BaseHeaderFound { get; set; }
-    public List<ProjectItem> LinkedItems { get; set; }
-
     public AddLicenseHeaderToAllFilesResult (int countSubLicenseHeadersFound, bool baseHeaderFound, List<ProjectItem> linkedItems)
     {
       CountSubLicenseHeadersFound = countSubLicenseHeadersFound;
@@ -31,9 +29,10 @@ namespace LicenseHeaderManager.ResultObjects
       LinkedItems = linkedItems;
     }
 
-    public bool NoHeaderFound
-    {
-      get { return BaseHeaderFound && CountSubLicenseHeadersFound == 0; }
-    }
+    public int CountSubLicenseHeadersFound { get; set; }
+    public bool BaseHeaderFound { get; set; }
+    public List<ProjectItem> LinkedItems { get; set; }
+
+    public bool NoHeaderFound => BaseHeaderFound && CountSubLicenseHeadersFound == 0;
   }
 }

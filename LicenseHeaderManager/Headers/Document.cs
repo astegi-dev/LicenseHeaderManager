@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,24 +11,26 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using EnvDTE;
-using Language = LicenseHeaderManager.Options.Language;
 using System.Text.RegularExpressions;
+using EnvDTE;
 using LicenseHeaderManager.Utils;
+using Language = LicenseHeaderManager.Options.Language;
 
 namespace LicenseHeaderManager.Headers
 {
   public class Document
   {
-    internal readonly DocumentHeader _header;
-    internal readonly Language _language;
-    internal readonly IEnumerable<string> _keywords;
-    internal readonly TextDocument _document;
     internal readonly CommentParser _commentParser;
+    internal readonly TextDocument _document;
+    internal readonly DocumentHeader _header;
+    internal readonly IEnumerable<string> _keywords;
+    internal readonly Language _language;
     internal readonly string _lineEndingInDocument;
     private string _documentTextCache;
 
@@ -62,16 +65,13 @@ namespace LicenseHeaderManager.Headers
     {
       if (_header.IsEmpty)
         return true;
-      else
-        return LicenseHeader.Validate (_header.Text, _commentParser);
+      return LicenseHeader.Validate (_header.Text, _commentParser);
     }
 
     private string GetText ()
     {
       if (string.IsNullOrEmpty (_documentTextCache))
-      {
         RefreshText();
-      }
 
       return _documentTextCache;
     }
@@ -92,8 +92,7 @@ namespace LicenseHeaderManager.Headers
 
       if (_keywords == null || _keywords.Any (k => header.ToLower().Contains (k.ToLower())))
         return header;
-      else
-        return string.Empty;
+      return string.Empty;
     }
 
     public void ReplaceHeaderIfNecessary ()
@@ -110,7 +109,9 @@ namespace LicenseHeaderManager.Headers
           ReplaceHeader (existingHeader, _header.Text);
       }
       else
+      {
         RemoveHeader (existingHeader);
+      }
 
       if (!string.IsNullOrEmpty (skippedText))
         AddHeader (skippedText);
@@ -123,8 +124,7 @@ namespace LicenseHeaderManager.Headers
       var match = Regex.Match (GetText(), _language.SkipExpression, RegexOptions.IgnoreCase);
       if (match.Success && match.Index == 0)
         return match.Value;
-      else
-        return null;
+      return null;
     }
 
     private void ReplaceHeader (string existingHeader, string newHeader)

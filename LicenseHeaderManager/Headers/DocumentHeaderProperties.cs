@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,18 +11,19 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using EnvDTE;
 using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.Headers
 {
-  class DocumentHeaderProperties : IEnumerable<DocumentHeaderProperty>
+  internal class DocumentHeaderProperties : IEnumerable<DocumentHeaderProperty>
   {
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 
@@ -35,7 +37,7 @@ namespace LicenseHeaderManager.Headers
       return _properties.GetEnumerator();
     }
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+    IEnumerator IEnumerable.GetEnumerator ()
     {
       return GetEnumerator();
     }
@@ -45,7 +47,7 @@ namespace LicenseHeaderManager.Headers
       if (projectItem == null)
         throw new ArgumentNullException ("projectItem");
 
-      var properties = new List<DocumentHeaderProperty>()
+      var properties = new List<DocumentHeaderProperty>
                        {
                            new DocumentHeaderProperty (
                                "%FullFileName%",

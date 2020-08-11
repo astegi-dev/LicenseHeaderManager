@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -29,7 +31,6 @@ namespace LicenseHeaderManager.Options
   [Guid ("EB6F9B18-D203-43E3-8033-35AD9BEFC70D")]
   public class OptionsPage : VersionedDialogPage, IOptionsPage
   {
-
     private const bool c_defaultInsertInNewFiles = false;
     private const bool c_defaultUseRequiredKeywords = true;
     private const string c_defaultRequiredKeywords = "license, copyright, (c), ©";
@@ -37,30 +38,25 @@ namespace LicenseHeaderManager.Options
 
     private readonly LinkedCommandConverter _linkedCommandConverter = new LinkedCommandConverter();
 
-    public event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
+    private ObservableCollection<LinkedCommand> _linkedCommands;
 
-    private DTE2 Dte
+    public OptionsPage ()
     {
-      get { return GetService (typeof(DTE)) as DTE2; }
+      ResetSettings();
     }
 
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Commands Commands
-    {
-      get { return Dte.Commands; }
-    }
+    private DTE2 Dte => GetService (typeof (DTE)) as DTE2;
+
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public Commands Commands => Dte.Commands;
 
     //serialized properties
     public bool InsertInNewFiles { get; set; }
-    public bool UseRequiredKeywords { get; set; }
-    public string RequiredKeywords { get; set; }
-
-    private ObservableCollection<LinkedCommand> _linkedCommands;
 
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
     public ObservableCollection<LinkedCommand> LinkedCommands
     {
-      get { return _linkedCommands; }
+      get => _linkedCommands;
       set
       {
         if (_linkedCommands != null)
@@ -70,6 +66,7 @@ namespace LicenseHeaderManager.Options
               _linkedCommands,
               new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, _linkedCommands));
         }
+
         _linkedCommands = value;
         if (_linkedCommands != null)
         {
@@ -83,27 +80,8 @@ namespace LicenseHeaderManager.Options
     // ReSharper disable once UnusedMember.Global
     public string LinkedCommandsSerialized
     {
-      get { return _linkedCommandConverter.ToXml (LinkedCommands); }
-      set { LinkedCommands = new ObservableCollection<LinkedCommand> (_linkedCommandConverter.FromXml (value)); }
-    }
-
-    private void OnLinkedCommandsChanged (object sender, NotifyCollectionChangedEventArgs e)
-    {
-      LinkedCommandsChanged?.Invoke (sender, e);
-    }
-
-    public OptionsPage ()
-    {
-      ResetSettings();
-    }
-
-    public override sealed void ResetSettings ()
-    {
-      InsertInNewFiles = c_defaultInsertInNewFiles;
-      UseRequiredKeywords = c_defaultUseRequiredKeywords;
-      RequiredKeywords = c_defaultRequiredKeywords;
-      LinkedCommands = _defaultLinkedCommands;
-      base.ResetSettings();
+      get => _linkedCommandConverter.ToXml (LinkedCommands);
+      set => LinkedCommands = new ObservableCollection<LinkedCommand> (_linkedCommandConverter.FromXml (value));
     }
 
     [Browsable (false)]
@@ -115,6 +93,25 @@ namespace LicenseHeaderManager.Options
         var host = new WpfHost (new WpfOptions (this));
         return host;
       }
+    }
+
+    public bool UseRequiredKeywords { get; set; }
+    public string RequiredKeywords { get; set; }
+
+    public event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
+
+    private void OnLinkedCommandsChanged (object sender, NotifyCollectionChangedEventArgs e)
+    {
+      LinkedCommandsChanged?.Invoke (sender, e);
+    }
+
+    public sealed override void ResetSettings ()
+    {
+      InsertInNewFiles = c_defaultInsertInNewFiles;
+      UseRequiredKeywords = c_defaultUseRequiredKeywords;
+      RequiredKeywords = c_defaultRequiredKeywords;
+      LinkedCommands = _defaultLinkedCommands;
+      base.ResetSettings();
     }
 
     #region version updates

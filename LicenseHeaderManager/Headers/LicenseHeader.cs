@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -32,9 +34,7 @@ namespace LicenseHeaderManager.Headers
       //This is just to check if activeProject.FullName contains the FullName as expected. 
       //If an Project Type uses this Property incorrectly, we try generating the .licenseheader filename with the .FileName Property
       if (string.IsNullOrEmpty (Path.GetDirectoryName (project.FullName)))
-      {
         return GetNewFullName (project.FileName);
-      }
 
       return GetNewFullName (project.FullName);
     }
@@ -81,9 +81,8 @@ namespace LicenseHeaderManager.Headers
       return true;
     }
 
-
     /// <summary>
-    /// Adds a new License Header Definition file to the active project.
+    ///   Adds a new License Header Definition file to the active project.
     /// </summary>
     public static ProjectItem AddHeaderDefinitionFile (Project activeProject, IDefaultLicenseHeaderPage page)
     {
@@ -106,12 +105,12 @@ namespace LicenseHeaderManager.Headers
     private static bool IsValidProject (Project activeProject)
     {
       return activeProject == null ||
-      (string.IsNullOrEmpty (activeProject.FullName)
-          && string.IsNullOrEmpty (activeProject.FileName)); //It is possible that we receive a Project which is missing the Path property entirely.
+             string.IsNullOrEmpty (activeProject.FullName)
+             && string.IsNullOrEmpty (activeProject.FileName); //It is possible that we receive a Project which is missing the Path property entirely.
     }
 
     /// <summary>
-    /// Adds a new License Header Definition file to a folder
+    ///   Adds a new License Header Definition file to a folder
     /// </summary>
     public static ProjectItem AddLicenseHeaderDefinitionFile (ProjectItem folder, IDefaultLicenseHeaderPage page)
     {
@@ -136,6 +135,7 @@ namespace LicenseHeaderManager.Headers
         window.Activate();
         return true;
       }
+
       var message = string.Format (Resources.Error_CreatingFile).Replace (@"\n", "\n");
       MessageBox.Show (message, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error);
       return false;
@@ -145,8 +145,7 @@ namespace LicenseHeaderManager.Headers
     {
       if (extension.StartsWith ("."))
         return extension;
-      else
-        return "." + extension;
+      return "." + extension;
     }
 
     public static bool Validate (string header, CommentParser commentParser)

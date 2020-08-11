@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -21,18 +23,18 @@ namespace LicenseHeaderManager.Utils
 {
   public static class ProjectItemInspection
   {
-    public static bool IsPhysicalFile(ProjectItem projectItem)
+    public static bool IsPhysicalFile (ProjectItem projectItem)
     {
-      return (projectItem.Kind == Constants.vsProjectItemKindPhysicalFile ||
-          projectItem.Kind == "{" + GuidList.guidItemTypePhysicalFile + "}");
+      return projectItem.Kind == Constants.vsProjectItemKindPhysicalFile ||
+             projectItem.Kind == "{" + GuidList.guidItemTypePhysicalFile + "}";
     }
 
-    public static bool IsLicenseHeader(ProjectItem projectItem)
+    public static bool IsLicenseHeader (ProjectItem projectItem)
     {
-      return projectItem.Name.Contains(LicenseHeader.Extension);
+      return projectItem.Name.Contains (LicenseHeader.Extension);
     }
 
-    public static bool IsLink(ProjectItem projectItem)
+    public static bool IsLink (ProjectItem projectItem)
     {
       if (projectItem.Properties == null)
         return false;
@@ -41,20 +43,20 @@ namespace LicenseHeaderManager.Utils
 
       try
       {
-        isLinkProperty = projectItem.Properties.Cast<Property>().FirstOrDefault(property => property.Name == "IsLink");
+        isLinkProperty = projectItem.Properties.Cast<Property>().FirstOrDefault (property => property.Name == "IsLink");
       }
       catch (ArgumentException)
       {
         return false;
       }
 
-      return isLinkProperty != null && (bool)isLinkProperty.Value;
+      return isLinkProperty != null && (bool) isLinkProperty.Value;
     }
 
-    public static bool IsFolder(ProjectItem projectItem)
+    public static bool IsFolder (ProjectItem projectItem)
     {
-      return string.Equals(projectItem.Kind, Constants.vsProjectItemKindPhysicalFolder, StringComparison.InvariantCultureIgnoreCase) ||
-             string.Equals(projectItem.Kind, Constants.vsProjectItemKindVirtualFolder, StringComparison.InvariantCultureIgnoreCase);
+      return string.Equals (projectItem.Kind, Constants.vsProjectItemKindPhysicalFolder, StringComparison.InvariantCultureIgnoreCase) ||
+             string.Equals (projectItem.Kind, Constants.vsProjectItemKindVirtualFolder, StringComparison.InvariantCultureIgnoreCase);
     }
   }
 }

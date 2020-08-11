@@ -8,10 +8,10 @@ using System;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Options;
-using LicenseHeaderManager.Utils;
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Constants = EnvDTE.Constants;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
@@ -67,32 +67,30 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       var solutionItem = serviceProvider.GetSolutionExplorerItem();
       var project = solutionItem as Project;
       if (project == null)
-      {
         if (solutionItem is ProjectItem projectItem)
           LicenseHeader.AddLicenseHeaderDefinitionFile (projectItem, page);
-      }
 
       if (project == null)
         return;
 
       var licenseHeaderDefinitionFile = LicenseHeader.AddHeaderDefinitionFile (project, page);
-      licenseHeaderDefinitionFile.Open (EnvDTE.Constants.vsViewKindCode).Activate();
+      licenseHeaderDefinitionFile.Open (Constants.vsViewKindCode).Activate();
     }
 
-    public static async Task RemoveLicenseHeadersFromAllFilesAsync(LicenseHeadersPackage serviceProvider)
+    public static async Task RemoveLicenseHeadersFromAllFilesAsync (LicenseHeadersPackage serviceProvider)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
       var obj = serviceProvider.GetSolutionExplorerItem();
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper(serviceProvider.LicenseHeaderReplacer);
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (serviceProvider.LicenseHeaderReplacer);
 
-      var statusBar = (IVsStatusbar)await serviceProvider.GetServiceAsync(typeof(SVsStatusbar));
-      Assumes.Present(statusBar);
-      statusBar.SetText(Resources.UpdatingFiles);
+      var statusBar = (IVsStatusbar) await serviceProvider.GetServiceAsync (typeof (SVsStatusbar));
+      Assumes.Present (statusBar);
+      statusBar.SetText (Resources.UpdatingFiles);
 
-      await removeAllLicenseHeadersCommand.ExecuteAsync(obj);
+      await removeAllLicenseHeadersCommand.ExecuteAsync (obj);
 
-      statusBar.SetText(string.Empty);
+      statusBar.SetText (string.Empty);
     }
   }
 }

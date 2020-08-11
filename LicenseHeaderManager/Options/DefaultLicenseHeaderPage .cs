@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,15 +11,16 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Reflection;
-using System.IO;
 using System.ComponentModel;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 
 namespace LicenseHeaderManager.Options
@@ -32,15 +34,6 @@ namespace LicenseHeaderManager.Options
       ResetSettings();
     }
 
-    public string LicenseHeaderFileText { get; set; }
-
-    public override void ResetSettings ()
-    {
-      InitializeFromResource();
-
-      base.ResetSettings();
-    }
-
     [Browsable (false)]
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
     protected override IWin32Window Window
@@ -50,6 +43,15 @@ namespace LicenseHeaderManager.Options
         var host = new WpfHost (new WpfDefaultLicenseHeader (this));
         return host;
       }
+    }
+
+    public string LicenseHeaderFileText { get; set; }
+
+    public override void ResetSettings ()
+    {
+      InitializeFromResource();
+
+      base.ResetSettings();
     }
 
     private void InitializeFromResource ()

@@ -1,4 +1,5 @@
 #region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -41,7 +43,7 @@ namespace LicenseHeaderManager.Utils
       var parentProjectItemPath = GetPath (projectItemParent);
 
       //If both paths are empty it is impossible to say if we are in an endless recursion
-      if (String.IsNullOrEmpty (projectItemPath) && String.IsNullOrEmpty (parentProjectItemPath))
+      if (string.IsNullOrEmpty (projectItemPath) && string.IsNullOrEmpty (parentProjectItemPath))
         return false;
 
       //If the Paths are the same, we are in an endless recursion (projectItem.Parent == projectItem)
@@ -113,13 +115,12 @@ namespace LicenseHeaderManager.Utils
     private static string GetPath (ProjectItem projectItem)
     {
       if (projectItem.Properties == null)
-        return String.Empty;
+        return string.Empty;
 
       var fullPathProperty = projectItem.Properties.Cast<Property>().FirstOrDefault (property => property.Name == "FullPath");
       if (fullPathProperty != null && fullPathProperty.Value != null)
         return fullPathProperty.Value.ToString();
-      else
-        return String.Empty;
+      return string.Empty;
     }
 
     private static object GetParent (ProjectItem projectItem)

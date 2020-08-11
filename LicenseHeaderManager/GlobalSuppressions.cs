@@ -3,4 +3,8 @@
 
 // first line
 // second line copyright456
-[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage ("Microsoft.Design", "CA1017:MarkAssembliesWithComVisible")]
+
+using System;
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage ("Microsoft.Design", "CA1017:MarkAssembliesWithComVisible")]

@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -21,34 +23,13 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Forms;
 using EnvDTE;
+using Window = System.Windows.Window;
 
 namespace LicenseHeaderManager.Options
 {
-  public partial class WpfCommandDialog : System.Windows.Window
+  public partial class WpfCommandDialog : Window
   {
-    private Timer _timer;
-
-    private ICollectionView View
-    {
-      get { return commands.ItemsSource as ICollectionView; }
-      set
-      {
-        commands.ItemsSource = value;
-        value.Filter = Filter;
-      }
-    }
-
-    public IEnumerable Commands
-    {
-      get { return View.SourceCollection; }
-      set { View = CollectionViewSource.GetDefaultView (value); }
-    }
-
-    public LinkedCommand Command
-    {
-      get { return DataContext as LinkedCommand; }
-      set { DataContext = value; }
-    }
+    private readonly Timer _timer;
 
     public WpfCommandDialog (LinkedCommand command, Commands allCommands)
     {
@@ -60,7 +41,7 @@ namespace LicenseHeaderManager.Options
 
       Command = command;
       Commands = from Command c in allCommands
-          where !String.IsNullOrEmpty (c.Name)
+          where !string.IsNullOrEmpty (c.Name)
           orderby c.Name
           select c;
 
@@ -93,6 +74,28 @@ namespace LicenseHeaderManager.Options
         {
         }
       };
+    }
+
+    private ICollectionView View
+    {
+      get => commands.ItemsSource as ICollectionView;
+      set
+      {
+        commands.ItemsSource = value;
+        value.Filter = Filter;
+      }
+    }
+
+    public IEnumerable Commands
+    {
+      get => View.SourceCollection;
+      set => View = CollectionViewSource.GetDefaultView (value);
+    }
+
+    public LinkedCommand Command
+    {
+      get => DataContext as LinkedCommand;
+      set => DataContext = value;
     }
 
     private void OkButton_Click (object sender, RoutedEventArgs e)
@@ -133,6 +136,7 @@ namespace LicenseHeaderManager.Options
         var queries = search.Text.Split (chars, StringSplitOptions.RemoveEmptyEntries);
         return queries.All (q => parts.Any (p => p.ToLower().Contains (q.ToLower())));
       }
+
       return false;
     }
 

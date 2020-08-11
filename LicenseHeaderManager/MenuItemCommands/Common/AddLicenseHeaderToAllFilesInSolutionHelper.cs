@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
@@ -32,10 +33,11 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     private const int MaxProjectsWithoutDefinitionFileShownInMessage = 5;
 
     private readonly SolutionUpdateViewModel _solutionUpdateViewModel;
-    private Core.LicenseHeaderReplacer _licenseHeaderReplacer;
+    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public AddLicenseHeaderToAllFilesInSolutionHelper (Core.LicenseHeaderReplacer licenseHeaderReplacer,
-      SolutionUpdateViewModel solutionUpdateViewModel)
+    public AddLicenseHeaderToAllFilesInSolutionHelper (
+        LicenseHeaderReplacer licenseHeaderReplacer,
+        SolutionUpdateViewModel solutionUpdateViewModel)
     {
       _licenseHeaderReplacer = licenseHeaderReplacer;
       _solutionUpdateViewModel = solutionUpdateViewModel;
@@ -89,10 +91,8 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
             AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (solution);
 
             if (!MessageBoxHelper.DoYouWant (Resources.Question_StopForConfiguringDefinitionFilesSingleFile))
-            {
-              // They want to go ahead and apply without editing.
+                // They want to go ahead and apply without editing.
               AddLicenseHeaderToProjects (projectsInSolution);
-            }
           }
         }
       }

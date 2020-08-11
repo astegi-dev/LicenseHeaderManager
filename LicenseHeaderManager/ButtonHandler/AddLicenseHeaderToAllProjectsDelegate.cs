@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,11 +11,14 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
 using System.ComponentModel;
+using System.Threading;
 using System.Windows.Threading;
+using Core;
 using EnvDTE80;
 using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.SolutionUpdateViewModels;
@@ -25,16 +29,16 @@ namespace LicenseHeaderManager.ButtonHandler
   public class AddLicenseHeaderToAllProjectsDelegate
   {
     private readonly DTE2 _dte2;
+    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
+    private bool _resharperSuspended;
 
-    public AddLicenseHeaderToAllProjectsDelegate (Core.LicenseHeaderReplacer licenseHeaderReplacer, DTE2 dte2)
+    private Thread _solutionUpdateThread;
+
+    public AddLicenseHeaderToAllProjectsDelegate (LicenseHeaderReplacer licenseHeaderReplacer, DTE2 dte2)
     {
       _licenseHeaderReplacer = licenseHeaderReplacer;
       _dte2 = dte2;
     }
-
-    private System.Threading.Thread _solutionUpdateThread;
-    private bool _resharperSuspended;
-    private Core.LicenseHeaderReplacer _licenseHeaderReplacer;
 
     public void HandleButton (object sender, EventArgs e)
     {
@@ -54,9 +58,9 @@ namespace LicenseHeaderManager.ButtonHandler
         ResumeResharper();
       };
 
-      _solutionUpdateThread = new System.Threading.Thread (buttonThreadWorker.Run)
-                                  { IsBackground = true };
-      _solutionUpdateThread.SetApartmentState (System.Threading.ApartmentState.STA);
+      _solutionUpdateThread = new Thread (buttonThreadWorker.Run)
+                              { IsBackground = true };
+      _solutionUpdateThread.SetApartmentState (ApartmentState.STA);
       _solutionUpdateThread.Start (_dte2.Solution);
 
       dialog.ShowModal();
@@ -72,9 +76,7 @@ namespace LicenseHeaderManager.ButtonHandler
     private void ResumeResharper ()
     {
       if (_resharperSuspended)
-      {
         CommandUtility.ExecuteCommand ("ReSharper_Resume", _dte2);
-      }
     }
   }
 }

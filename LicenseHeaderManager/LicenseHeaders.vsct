@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
   <!--  This is the file that defines the actual layout and type of the commands.
@@ -24,8 +25,6 @@
   <!--<Extern href="msobtnid.h" xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" />-->
 
 
-
-
   <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
   <Commands package="guidLicenseHeadersPkg">
@@ -37,7 +36,7 @@
     group; your package should define its own command set in order to avoid collisions  
     with command ids defined by other packages. -->
 
-    
+
     <!-- In this section you can define new menu groups. A menu group is a container for 
          other menus or buttons (commands); from a visual point of view you can see the 
          group as the part of a menu contained between two lines. The parent of a group 
@@ -62,7 +61,7 @@
       <Group guid="guidLicenseHeadersCmdSet" id="ProjectSubMenuGroup1" priority="0x0100">
         <Parent guid="guidLicenseHeadersCmdSet" id="ProjectSubMenu" />
       </Group>
-      
+
       <Group guid="guidLicenseHeadersCmdSet" id="ProjectSubMenuGroup2" priority="0x0200">
         <Parent guid="guidLicenseHeadersCmdSet" id="ProjectSubMenu" />
       </Group>
@@ -102,11 +101,11 @@
       <Group guid="guidLicenseHeadersCmdSet" id="SolutionSubMenuGroup1" priority="0x0100">
         <Parent guid="guidLicenseHeadersCmdSet" id="SolutionSubMenu" />
       </Group>
-      
+
       <Group guid="guidLicenseHeadersCmdSet" id="SolutionSubMenuGroup2" priority="0x0200">
         <Parent guid="guidLicenseHeadersCmdSet" id="SolutionSubMenu" />
       </Group>
-      
+
       <Group guid="guidLicenseHeadersPackageCmdSet" id="MyMenuGroup" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
       </Group>
@@ -120,7 +119,7 @@
           <CommandName>License Headers</CommandName>
         </Strings>
       </Menu>
-      
+
       <Menu guid="guidLicenseHeadersCmdSet" id="ProjectItemSubMenu" priority="0x0100">
         <Parent guid="guidLicenseHeadersCmdSet" id="ProjectItemMenuGroup" />
         <Strings>
@@ -145,7 +144,7 @@
         </Strings>
       </Menu>
     </Menus>
-    
+
     <!--Buttons section. -->
     <!--This section defines the elements the user can interact with, like a menu command or a button 
         or combo box in a toolbar. -->
@@ -315,7 +314,7 @@
         </Strings>
       </Button>
     </Buttons>
-   
+
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
       <!--  The bitmap id is defined in a way that is a little bit different from the others: 
@@ -323,9 +322,10 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
             inside a button definition. An important aspect of this declaration is that the element id 
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\Images.bmp" usedList="bmpAddLicenseHeader, bmpRemoveLicenseHeader, bmpAddLicenseHeadersToAllFiles, bmpRemoveLicenseHeadersFromAllFiles, bmpAddExistingLicenseHeaderDefinitionFile, bmpAddNewLicenseHeaderDefinitionFile, bmpOpenLicenseHeaderDefinitionFile, bmpRemoveLicenseHeaderDefinitionFile" />
+      <Bitmap guid="guidImages" href="Resources\Images.bmp"
+              usedList="bmpAddLicenseHeader, bmpRemoveLicenseHeader, bmpAddLicenseHeadersToAllFiles, bmpRemoveLicenseHeadersFromAllFiles, bmpAddExistingLicenseHeaderDefinitionFile, bmpAddNewLicenseHeaderDefinitionFile, bmpOpenLicenseHeaderDefinitionFile, bmpRemoveLicenseHeaderDefinitionFile" />
     </Bitmaps>
- 
+
   </Commands>
 
   <KeyBindings>
@@ -357,7 +357,7 @@
       <IDSymbol name="ProjectItemSubMenu" value="0x2002" />
       <IDSymbol name="FolderSubMenu" value="0x2003" />
       <IDSymbol name="SolutionSubMenu" value="0x2004" />
-      
+
       <IDSymbol name="LicenseHeaderOptions" value="0x0001" />
       <IDSymbol name="AddLicenseHeader" value="0x0002" />
       <IDSymbol name="RemoveLicenseHeader" value="0x0003" />
@@ -373,7 +373,7 @@
       <IDSymbol name="OpenSolutionLicenseHeaderDefinitionFile" value="0x0013" />
       <IDSymbol name="RemoveSolutionLicenseHeaderDefinitionFile" value="0x0014" />
     </GuidSymbol>
-      
+
     <GuidSymbol name="guidImages" value="{d52c5a04-6352-4a9c-8d55-990945d89fe8}">
       <IDSymbol name="bmpAddLicenseHeader" value="1" />
       <IDSymbol name="bmpRemoveLicenseHeader" value="2" />
@@ -385,8 +385,7 @@
       <IDSymbol name="bmpRemoveLicenseHeaderDefinitionFile" value="8" />
     </GuidSymbol>
 
-    
-  
+
     <GuidSymbol value="{1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0}" name="guidLicenseHeadersPackageCmdSet">
       <IDSymbol value="4128" name="MyMenuGroup" />
       <IDSymbol value="256" name="cmdidAddHeaderToProjectItemCommand" />
@@ -409,5 +408,5 @@
       <IDSymbol value="4145" name="cmdidRemoveLicenseHeaderEditorAdvancedMenuCommand" />
     </GuidSymbol>
   </Symbols>
-  
+
 </CommandTable>

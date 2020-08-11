@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using Core;
 using EnvDTE;
-using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
@@ -42,7 +41,6 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
       _licenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
       if (project != null)
-      {
         foreach (ProjectItem i in project.ProjectItems)
         {
           var replacerInput = CoreHelpers.GetFilesToProcess (i, null, out _, false);
@@ -50,9 +48,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           if (errors.Count > 0)
             MessageBox.Show ($"Encountered {errors.Count} errors.", "Error(s)", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-      }
       else
-      {
         foreach (ProjectItem i in item.ProjectItems)
         {
           var replacerInput = CoreHelpers.GetFilesToProcess (i, null, out _, false);
@@ -60,7 +56,6 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           if (errors.Count > 0)
             MessageBox.Show ($"Encountered {errors.Count} errors.", "Error(s)", MessageBoxButton.OK, MessageBoxImage.Error);
         }
-      }
     }
   }
 }

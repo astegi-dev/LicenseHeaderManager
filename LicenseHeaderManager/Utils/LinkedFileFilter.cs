@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,8 +11,10 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
+using System;
 using System.Collections.Generic;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
@@ -21,11 +24,7 @@ namespace LicenseHeaderManager.Utils
 {
   public class LinkedFileFilter : ILinkedFileFilter
   {
-    private Solution solution;
-
-    public List<ProjectItem> ToBeProgressed { get; private set; }
-    public List<ProjectItem> NoLicenseHeaderFile { get; private set; }
-    public List<ProjectItem> NotInSolution { get; private set; }
+    private readonly Solution solution;
 
     public LinkedFileFilter (Solution solution)
     {
@@ -36,6 +35,9 @@ namespace LicenseHeaderManager.Utils
       NotInSolution = new List<ProjectItem>();
     }
 
+    public List<ProjectItem> ToBeProgressed { get; }
+    public List<ProjectItem> NoLicenseHeaderFile { get; }
+    public List<ProjectItem> NotInSolution { get; }
 
     public void Filter (List<ProjectItem> projectItems)
     {

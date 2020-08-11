@@ -14,10 +14,10 @@
 
 #endregion
 
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
-using EnvDTE;
+using Core;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 
@@ -27,13 +27,13 @@ namespace LicenseHeaderManager.Utils
   {
     private readonly ILicenseHeaderExtension _licenseHeaderExtension;
 
-    public string Message { get; private set; }
-
     public LinkedFileHandler (ILicenseHeaderExtension licenseHeaderExtension)
     {
       _licenseHeaderExtension = licenseHeaderExtension;
       Message = string.Empty;
     }
+
+    public string Message { get; private set; }
 
     public async Task HandleAsync (ILinkedFileFilter linkedFileFilter)
     {
@@ -43,7 +43,7 @@ namespace LicenseHeaderManager.Utils
         var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (projectItem);
         //licenseHeaderReplacer.RemoveOrReplaceHeader (projectItem, headers, true);
         var result = await _licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new Core.LicenseHeaderInput (projectItem.Document.FullName, headers, projectItem.GetAdditionalProperties()),
+            new LicenseHeaderInput (projectItem.Document.FullName, headers, projectItem.GetAdditionalProperties()),
             true,
             CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
             message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, _licenseHeaderExtension));

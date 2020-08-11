@@ -18,8 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
@@ -30,7 +28,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 {
   internal class AddLicenseHeaderToAllFilesInProjectHelper
   {
-    private LicenseHeaderReplacer _licenseHeaderReplacer;
+    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
     public AddLicenseHeaderToAllFilesInProjectHelper (LicenseHeaderReplacer licenseHeaderReplacer)
     {
@@ -65,7 +63,6 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       }
 
       foreach (ProjectItem item in projectItems)
-      {
         if (ProjectItemInspection.IsPhysicalFile (item) && ProjectItemInspection.IsLink (item))
         {
           linkedItems.Add (item);
@@ -75,7 +72,6 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           replacerInput.AddRange (CoreHelpers.GetFilesToProcess (item, headers, out var subLicenseHeaders));
           countSubLicenseHeadersFound = subLicenseHeaders;
         }
-      }
 
       var errors = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
       if (errors.Count > 0)

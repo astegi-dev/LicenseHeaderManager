@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,24 +11,26 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
+using System;
 using System.Windows;
 
 namespace LicenseHeaderManager.Options
 {
   public partial class WpfLanguageDialog : Window
   {
-    public new Language Language
-    {
-      get { return DataContext as Language; }
-      set { DataContext = value; }
-    }
-
     public WpfLanguageDialog ()
     {
       InitializeComponent();
       skipExpression.ToolTip = LicenseHeaderManager.Resources.SkipExpressionHelp.Replace (@"\n", "\n");
+    }
+
+    public new Language Language
+    {
+      get => DataContext as Language;
+      set => DataContext = value;
     }
 
     private void OkButton_Click (object sender, RoutedEventArgs e)
@@ -41,11 +44,13 @@ namespace LicenseHeaderManager.Options
           Close();
         }
         else
+        {
           MessageBox.Show (
               LicenseHeaderManager.Resources.Error_LanguageInvalid,
               LicenseHeaderManager.Resources.Error,
               MessageBoxButton.OK,
               MessageBoxImage.Warning);
+        }
       }
     }
   }

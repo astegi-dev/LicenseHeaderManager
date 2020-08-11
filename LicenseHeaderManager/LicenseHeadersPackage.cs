@@ -14,6 +14,15 @@
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using Core;
 using EnvDTE;
 using EnvDTE80;
@@ -33,15 +42,8 @@ using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
+using CreateDocumentResult = Core.CreateDocumentResult;
+using Language = LicenseHeaderManager.Options.Language;
 using LicenseHeader = LicenseHeaderManager.Headers.LicenseHeader;
 using Task = System.Threading.Tasks.Task;
 
@@ -50,14 +52,13 @@ namespace LicenseHeaderManager
   #region package infrastructure
 
   /// <summary>
-  /// This is the class that implements the package exposed by this assembly.
-  ///
-  /// The minimum requirement for a class to be considered a valid package for Visual Studio
-  /// is to implement the IVsPackage interface and register itself with the shell.
-  /// This package uses the helper classes defined inside the Managed Package Framework (MPF)
-  /// to do it: it derives from the Package class that provides the implementation of the 
-  /// IVsPackage interface and uses the registration attributes defined in the framework to 
-  /// register itself and its components with the shell.
+  ///   This is the class that implements the package exposed by this assembly.
+  ///   The minimum requirement for a class to be considered a valid package for Visual Studio
+  ///   is to implement the IVsPackage interface and register itself with the shell.
+  ///   This package uses the helper classes defined inside the Managed Package Framework (MPF)
+  ///   to do it: it derives from the Package class that provides the implementation of the
+  ///   IVsPackage interface and uses the registration attributes defined in the framework to
+  ///   register itself and its components with the shell.
   /// </summary>
   // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
   // a package.
@@ -79,11 +80,11 @@ namespace LicenseHeaderManager
   public sealed class LicenseHeadersPackage : AsyncPackage, ILicenseHeaderExtension
   {
     /// <summary>
-    /// Default constructor of the package.
-    /// Inside this method you can place any initialization code that does not require 
-    /// any Visual Studio service because at this point the package object is created but 
-    /// not sited yet inside Visual Studio environment. The place to do all the other 
-    /// initialization is the Initialize method.
+    ///   Default constructor of the package.
+    ///   Inside this method you can place any initialization code that does not require
+    ///   any Visual Studio service because at this point the package object is created but
+    ///   not sited yet inside Visual Studio environment. The place to do all the other
+    ///   initialization is the Initialize method.
     /// </summary>
     public LicenseHeadersPackage ()
     {
@@ -105,8 +106,8 @@ namespace LicenseHeaderManager
     public AddLicenseHeaderToAllProjectsDelegate _addLicenseHeaderToAllProjectsDelegate;
 
     /// <summary>
-    /// Initialization of the package; this method is called right after the package is sited, so this is the 
-    /// place where you can put all the initilaization code that rely on services provided by VisualStudio.
+    ///   Initialization of the package; this method is called right after the package is sited, so this is the
+    ///   place where you can put all the initilaization code that rely on services provided by VisualStudio.
     /// </summary>
     protected override async Task InitializeAsync (CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
@@ -165,9 +166,7 @@ namespace LicenseHeaderManager
         }
 
         if (_websiteItemEvents != null)
-        {
           _websiteItemEvents.ItemAdded += ItemAdded;
-        }
       }
 
       //register event handlers for linked commands
@@ -208,7 +207,7 @@ namespace LicenseHeaderManager
       var visible = false;
 
       if (ProjectItemInspection.IsPhysicalFile (item))
-        visible = LicenseHeaderReplacer.TryCreateDocument (item.FileNames[1], out _) == Core.CreateDocumentResult.DocumentCreated;
+        visible = LicenseHeaderReplacer.TryCreateDocument (item.FileNames[1], out _) == CreateDocumentResult.DocumentCreated;
 
       return visible;
     }
@@ -220,8 +219,7 @@ namespace LicenseHeaderManager
         var activeDocument = _dte.ActiveDocument;
         if (activeDocument == null)
           return null;
-        else
-          return activeDocument.ProjectItem;
+        return activeDocument.ProjectItem;
       }
       catch (ArgumentException)
       {
@@ -253,7 +251,7 @@ namespace LicenseHeaderManager
     }
 
     /// <summary>
-    /// Executes a command asynchronously.
+    ///   Executes a command asynchronously.
     /// </summary>
     private void PostExecCommand (Guid guid, uint id, object argument)
     {
@@ -266,6 +264,30 @@ namespace LicenseHeaderManager
     }
 
     #endregion
+
+    public LicenseHeaderReplacer LicenseHeaderReplacer
+    {
+      get
+      {
+        var keywords = OptionsPage.UseRequiredKeywords
+            ? OptionsPage.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
+            : null;
+        return new LicenseHeaderReplacer (LanguagesPage.Languages.Select (Language.ToCoreLanguage), keywords);
+      }
+    }
+
+    public void ShowLanguagesPage ()
+    {
+      ShowOptionPage (typeof (LanguagesPage));
+    }
+
+    public IDefaultLicenseHeaderPage DefaultLicenseHeaderPage => (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));
+
+    public ILanguagesPage LanguagesPage => (LanguagesPage) GetDialogPage (typeof (LanguagesPage));
+
+    public IOptionsPage OptionsPage => (OptionsPage) GetDialogPage (typeof (OptionsPage));
+
+    public DTE2 Dte2 => _dte;
 
     #region event handlers
 
@@ -292,9 +314,7 @@ namespace LicenseHeaderManager
         return;
 
       if (e.OldItems != null)
-      {
         foreach (LinkedCommand command in e.OldItems)
-        {
           switch (command.ExecutionTime)
           {
             case ExecutionTime.Before:
@@ -304,11 +324,8 @@ namespace LicenseHeaderManager
               command.Events.AfterExecute -= AfterLinkedCommandExecuted;
               break;
           }
-        }
-      }
 
       if (e.NewItems != null)
-      {
         foreach (LinkedCommand command in e.NewItems)
         {
           command.Events = _dte.Events.CommandEvents[command.Guid, command.Id];
@@ -323,7 +340,6 @@ namespace LicenseHeaderManager
               break;
           }
         }
-      }
     }
 
     #region insert headers in new files
@@ -391,13 +407,11 @@ namespace LicenseHeaderManager
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
       if (headers != null)
-      {
         return await LicenseHeaderReplacer.RemoveOrReplaceHeader (
             new LicenseHeaderInput (item.Document.FullName, headers, item.GetAdditionalProperties()),
             calledByUser,
             CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
             message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, this));
-      }
 
       var page = (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));
       if (calledByUser && LicenseHeader.ShowQuestionForAddingLicenseHeaderFile (item.ContainingProject, page))
@@ -417,9 +431,7 @@ namespace LicenseHeaderManager
       var currentProject = project;
 
       if (projectItem != null)
-      {
         currentProject = projectItem.ContainingProject;
-      }
 
       if (addLicenseHeaderToAllFilesResult.NoHeaderFound)
       {
@@ -440,9 +452,7 @@ namespace LicenseHeaderManager
         {
           // If no project has a license header, offer to add one for the solution.
           if (MessageBoxHelper.DoYouWant (Resources.Question_AddNewLicenseHeaderDefinitionForSolution))
-          {
             AddNewSolutionLicenseHeaderDefinitionFileCallback (this, new EventArgs());
-          }
         }
       }
     }
@@ -456,13 +466,11 @@ namespace LicenseHeaderManager
       await linkedFileHandler.HandleAsync (linkedFileFilter);
 
       if (linkedFileHandler.Message != string.Empty)
-      {
         MessageBox.Show (
             linkedFileHandler.Message,
             Resources.NameOfThisExtension,
             MessageBoxButton.OK,
             MessageBoxImage.Information);
-      }
     }
 
     private void AddNewSolutionLicenseHeaderDefinitionFileCallback (object sender, EventArgs e)
@@ -471,29 +479,5 @@ namespace LicenseHeaderManager
     }
 
     #endregion
-
-    public LicenseHeaderReplacer LicenseHeaderReplacer
-    {
-      get
-      {
-        var keywords = OptionsPage.UseRequiredKeywords
-            ? OptionsPage.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
-            : null;
-        return new LicenseHeaderReplacer (LanguagesPage.Languages.Select (Options.Language.ToCoreLanguage), keywords);
-      }
-    }
-
-    public void ShowLanguagesPage ()
-    {
-      ShowOptionPage (typeof (LanguagesPage));
-    }
-
-    public IDefaultLicenseHeaderPage DefaultLicenseHeaderPage => (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));
-
-    public ILanguagesPage LanguagesPage => (LanguagesPage) GetDialogPage (typeof (LanguagesPage));
-
-    public IOptionsPage OptionsPage => (OptionsPage) GetDialogPage (typeof (OptionsPage));
-
-    public DTE2 Dte2 => _dte;
   }
 }

@@ -42,8 +42,8 @@ namespace LicenseHeaderManager.Options
           return false;
 
         if (string.IsNullOrEmpty (LineComment))
-          return (!string.IsNullOrEmpty (BeginComment) &&
-                  !string.IsNullOrEmpty (EndComment));
+          return !string.IsNullOrEmpty (BeginComment) &&
+                 !string.IsNullOrEmpty (EndComment);
 
         return string.IsNullOrEmpty (BeginComment) == string.IsNullOrEmpty (EndComment);
       }
@@ -51,7 +51,7 @@ namespace LicenseHeaderManager.Options
 
     public object Clone ()
     {
-      return new Language()
+      return new Language
              {
                  Extensions = Extensions.ToList(),
                  LineComment = LineComment,

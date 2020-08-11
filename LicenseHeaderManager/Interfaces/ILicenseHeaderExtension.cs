@@ -14,6 +14,8 @@
 
 #endregion
 
+using System;
+using Core;
 using EnvDTE80;
 using LicenseHeaderManager.Options;
 
@@ -21,13 +23,12 @@ namespace LicenseHeaderManager.Interfaces
 {
   public interface ILicenseHeaderExtension
   {
-    void ShowLanguagesPage ();
-
-    Core.LicenseHeaderReplacer LicenseHeaderReplacer { get; }
+    LicenseHeaderReplacer LicenseHeaderReplacer { get; }
 
     IDefaultLicenseHeaderPage DefaultLicenseHeaderPage { get; }
     ILanguagesPage LanguagesPage { get; }
     IOptionsPage OptionsPage { get; }
     DTE2 Dte2 { get; }
+    void ShowLanguagesPage ();
   }
 }

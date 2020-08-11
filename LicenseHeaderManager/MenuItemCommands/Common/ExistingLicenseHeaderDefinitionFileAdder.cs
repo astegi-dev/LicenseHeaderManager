@@ -50,13 +50,11 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
       var fileCountAfter = projectItems.Count;
       if (fileCountBefore == fileCountAfter)
-      {
         MessageBox.Show (
             Resources.Warning_CantLinkItemInSameProject,
             Resources.NameOfThisExtension,
             MessageBoxButton.OK,
             MessageBoxImage.Information);
-      }
 
       return newProjectItem;
     }

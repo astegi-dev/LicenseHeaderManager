@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 // Guids.cs
@@ -18,7 +20,7 @@ using System;
 
 namespace LicenseHeaderManager
 {
-  static class GuidList
+  internal static class GuidList
   {
     public const string guidLicenseHeadersPkgString = "4c570677-8476-4d33-bd0c-da36c89287c8";
     public const string guidLicenseHeadersCmdSetString = "88ce72ac-651d-4441-be9c-dc74c2dc44b6";
@@ -26,5 +28,5 @@ namespace LicenseHeaderManager
     public const string guidVisualStudioOutputWindow = "0F44E2D1-F5FA-4d2d-AB30-22BE8ECD9789";
 
     public static readonly Guid guidLicenseHeadersCmdSet = new Guid (guidLicenseHeadersCmdSetString);
-  };
+  }
 }

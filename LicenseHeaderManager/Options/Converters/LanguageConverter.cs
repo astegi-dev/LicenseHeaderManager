@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -20,7 +22,7 @@ using System.Xml.Linq;
 
 namespace LicenseHeaderManager.Options.Converters
 {
-  class LanguageConverter : XmlTypeConverter<IEnumerable<Language>>
+  internal class LanguageConverter : XmlTypeConverter<IEnumerable<Language>>
   {
     private const string c_language = "Language";
     private const string c_languages = "Languages";
@@ -64,17 +66,17 @@ namespace LicenseHeaderManager.Options.Converters
       try
       {
         var languages = from l in XElement.Parse (xml).Descendants (c_language)
-            select new Language()
+            select new Language
                    {
-                     Extensions =
-                         from e in l.Descendants (c_extension)
-                         select e.Value,
-                     LineComment = GetAttributeValue (l, c_linecomment),
-                     BeginComment = GetAttributeValue (l, c_beginComment),
-                     EndComment = GetAttributeValue (l, c_endComment),
-                     BeginRegion = GetAttributeValue (l, c_beginRegion),
-                     EndRegion = GetAttributeValue (l, c_endRegion),
-                     SkipExpression = GetAttributeValue (l, c_skipExpression)
+                       Extensions =
+                           from e in l.Descendants (c_extension)
+                           select e.Value,
+                       LineComment = GetAttributeValue (l, c_linecomment),
+                       BeginComment = GetAttributeValue (l, c_beginComment),
+                       EndComment = GetAttributeValue (l, c_endComment),
+                       BeginRegion = GetAttributeValue (l, c_beginRegion),
+                       EndRegion = GetAttributeValue (l, c_endRegion),
+                       SkipExpression = GetAttributeValue (l, c_skipExpression)
                    };
         return new ObservableCollection<Language> (languages);
       }

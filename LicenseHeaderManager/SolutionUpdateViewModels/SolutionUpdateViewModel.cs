@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -25,7 +27,7 @@ namespace LicenseHeaderManager.SolutionUpdateViewModels
 
     public string ProgressText
     {
-      get { return _progressText; }
+      get => _progressText;
       set
       {
         _progressText = value;
@@ -40,7 +42,7 @@ namespace LicenseHeaderManager.SolutionUpdateViewModels
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    private void NotifyPropertyChanged (String propertyName = "")
+    private void NotifyPropertyChanged (string propertyName = "")
     {
       PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (propertyName));
     }
