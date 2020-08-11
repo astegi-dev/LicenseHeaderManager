@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Core;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Core;
 
 namespace LicenseHeaderManager.Options
 {
@@ -79,9 +79,19 @@ namespace LicenseHeaderManager.Options
                                                                             }
                                                                         };
 
+    /// <summary>
+    /// Gets or sets the currently up-to-date configuration of the License Header Manager Extension.
+    /// </summary>
+    public static OptionsStore CurrentConfig { get; set; }
+
+    static OptionsStore ()
+    {
+      CurrentConfig = new OptionsStore();
+      CurrentConfig.SetDefaults();
+    }
+
     public OptionsStore ()
     {
-      SetDefaults();
     }
 
     public bool InsertHeaderIntoNewFiles { get; set; }
@@ -96,14 +106,36 @@ namespace LicenseHeaderManager.Options
 
     public IEnumerable<Language> Languages { get; set; }
 
-    public void Save (string filePath)
+    /// <summary>
+    ///   Serializes an <see cref="IOptionsStore" /> instance to a file in the file system.
+    /// </summary>
+    /// <param name="options">The <see cref="IOptionsStore" /> instance to serialize.</param>
+    /// <param name="filePath">The path to which an options file should be persisted.</param>
+    public static void Save (OptionsStore options, string filePath)
     {
-      throw new NotImplementedException();
+      var serializer = new JsonSerializer
+                       {
+                           Formatting = Formatting.Indented,
+                           NullValueHandling = NullValueHandling.Include
+                       };
+      using var sw = new StreamWriter (filePath);
+      using JsonWriter writer = new JsonTextWriter (sw);
+      serializer.Serialize (writer, options);
     }
 
-    public IOptionsStore Load (string filePath)
+    /// <summary>
+    ///   Deserializes an <see cref="IOptionsStore" /> instance from a file in the file system.
+    /// </summary>
+    /// <param name="filePath">The path to an options file from which a corresponding <see cref="IOptionsStore"/> instance should be constructed.</param>
+    /// <returns>An <see cref="IOptionsStore"/> instance that represents to configuration contained in the file specified by <paramref name="filePath"/>.</returns>
+    public static OptionsStore Load (string filePath)
     {
-      throw new NotImplementedException();
+      using var file = File.OpenText (filePath);
+      var serializer = new JsonSerializer
+                       {
+                           NullValueHandling = NullValueHandling.Include
+                       };
+      return (OptionsStore) serializer.Deserialize (file, typeof (OptionsStore));
     }
 
     public IOptionsStore Clone ()
@@ -121,6 +153,10 @@ namespace LicenseHeaderManager.Options
       return clonedObject;
     }
 
+    /// <summary>
+    /// Sets all public members of this <see cref="IOptionsStore"/> instance to their default values.
+    /// </summary>
+    /// <remarks>The default values are implementation-dependent.</remarks>
     public void SetDefaults ()
     {
       InsertHeaderIntoNewFiles = false;

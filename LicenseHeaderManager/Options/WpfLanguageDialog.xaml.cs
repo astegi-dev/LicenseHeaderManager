@@ -38,7 +38,7 @@ namespace LicenseHeaderManager.Options
     {
       if (Language != null)
       {
-        if (Language.IsValid)
+        if (Language.IsValid())
         {
           Language.NormalizeExtensions();
           DialogResult = true;

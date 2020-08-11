@@ -30,22 +30,19 @@ namespace Core
     public string EndRegion { get; set; }
     public string SkipExpression { get; set; }
 
-    public bool IsValid
+    public bool IsValid ()
     {
-      get
-      {
-        if (Extensions == null || !Extensions.Any())
-          return false;
+      if (Extensions == null || !Extensions.Any())
+        return false;
 
-        if (string.IsNullOrEmpty (BeginRegion) != string.IsNullOrEmpty (EndRegion))
-          return false;
+      if (string.IsNullOrEmpty (BeginRegion) != string.IsNullOrEmpty (EndRegion))
+        return false;
 
-        if (string.IsNullOrEmpty (LineComment))
-          return !string.IsNullOrEmpty (BeginComment) &&
-                 !string.IsNullOrEmpty (EndComment);
+      if (string.IsNullOrEmpty (LineComment))
+        return !string.IsNullOrEmpty (BeginComment) &&
+               !string.IsNullOrEmpty (EndComment);
 
-        return string.IsNullOrEmpty (BeginComment) == string.IsNullOrEmpty (EndComment);
-      }
+      return string.IsNullOrEmpty (BeginComment) == string.IsNullOrEmpty (EndComment);
     }
 
     public Language Clone ()

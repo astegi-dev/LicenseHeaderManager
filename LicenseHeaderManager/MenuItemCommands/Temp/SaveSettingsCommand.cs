@@ -87,8 +87,8 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
       if (dlg.ShowDialog() != true)
         return;
 
-      IOptionsStore options = new OptionsStore();
-      options.Save (dlg.FileName);
+      var options = new OptionsStore();
+      OptionsStore.Save (options, dlg.FileName);
     }
   }
 }

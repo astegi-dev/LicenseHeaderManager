@@ -26,6 +26,7 @@ namespace LicenseHeaderManager.Options
     After
   }
 
+  // todo examine how to serialize and deserialize (due to CommandEvents property)
   public class LinkedCommand : INotifyPropertyChanged
   {
     private ExecutionTime _executionTime;
