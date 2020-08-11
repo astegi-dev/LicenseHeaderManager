@@ -73,9 +73,8 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           countSubLicenseHeadersFound = subLicenseHeaders;
         }
 
-      var errors = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
-      if (errors.Count > 0)
-        MessageBox.Show ($"Encountered {errors.Count} errors.", "Error(s)", MessageBoxButton.OK, MessageBoxImage.Error);
+      var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
+      CoreHelpers.HandleResult(result);
 
       return new AddLicenseHeaderToAllFilesResult (countSubLicenseHeadersFound, headers == null, linkedItems);
     }

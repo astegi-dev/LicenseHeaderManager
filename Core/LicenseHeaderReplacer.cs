@@ -63,13 +63,13 @@ namespace Core
     ///   Is executed if there there is no license header definition configured for the language of a specific file.
     ///   If null, no action is executed in this case.
     /// </param>
-    public Task<string> RemoveOrReplaceHeader (
+    public Task<ReplacerResult<ReplacerError>> RemoveOrReplaceHeader (
         LicenseHeaderInput licenseHeaderInput,
         bool calledByUser,
         Func<string, bool> nonCommentTextInquiry = null,
         Action<string> commentDefinitionNotFoundAction = null)
     {
-      var message = "";
+      var returnObject = new ReplacerResult<ReplacerError>();
       try
       {
         var result = TryCreateDocument (licenseHeaderInput.DocumentPath, out var document, licenseHeaderInput.AdditionalProperties, licenseHeaderInput.Headers);
@@ -79,15 +79,13 @@ namespace Core
           case CreateDocumentResult.DocumentCreated:
             if (!document.ValidateHeader())
             {
-              message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).Replace (@"\n", "\n");
+              var message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).Replace (@"\n", "\n");
               var addDespiteNonCommentText = nonCommentTextInquiry?.Invoke (message) ?? true;
-              if (addDespiteNonCommentText)
-              {
-                message = "";
-              }
-              else
+              if (!addDespiteNonCommentText)
               {
                 message = $"Execution of {nameof(RemoveOrReplaceHeader)} was cancelled by caller";
+                returnObject = new ReplacerResult<ReplacerError>(new ReplacerError(licenseHeaderInput.DocumentPath,
+                  ErrorType.NonCommentText, message));
                 break;
               }
             }
@@ -98,20 +96,20 @@ namespace Core
             }
             catch (ParseException)
             {
-              message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).Replace (@"\n", "\n");
+              var message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).Replace (@"\n", "\n");
+              returnObject = new ReplacerResult<ReplacerError>(new ReplacerError(licenseHeaderInput.DocumentPath, ErrorType.ParsingError, message));
             }
 
             break;
           case CreateDocumentResult.LanguageNotFound:
             if (calledByUser)
             {
-              message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).Replace (@"\n", "\n");
+              var message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).Replace (@"\n", "\n");
 
               if (commentDefinitionNotFoundAction != null)
-              {
                 commentDefinitionNotFoundAction (message);
-                message = "";
-              }
+              else
+                returnObject = new ReplacerResult<ReplacerError>(new ReplacerError(licenseHeaderInput.DocumentPath, ErrorType.LanguageNotFound, message));
             }
 
             break;
@@ -119,22 +117,26 @@ namespace Core
             break;
           case CreateDocumentResult.NoHeaderFound:
             if (calledByUser)
-              message = string.Format (Resources.Error_NoHeaderFound).Replace (@"\n", "\n");
+            {
+              var message = string.Format(Resources.Error_NoHeaderFound).Replace(@"\n", "\n");
+              returnObject = new ReplacerResult<ReplacerError>(new ReplacerError(licenseHeaderInput.DocumentPath, ErrorType.NoHeaderFound, message));
+            }
 
             break;
         }
       }
       catch (ArgumentException ex)
       {
-        message = $"{ex.Message} {licenseHeaderInput.DocumentPath}";
+        var message = $"{ex.Message} {licenseHeaderInput.DocumentPath}";
+        returnObject = new ReplacerResult<ReplacerError>(new ReplacerError(licenseHeaderInput.DocumentPath, ErrorType.Miscellaneous, message));
       }
 
-      return Task.FromResult (message);
+      return Task.FromResult (returnObject);
     }
 
-    public Task<Dictionary<string, string>> RemoveOrReplaceHeader (IEnumerable<LicenseHeaderInput> licenseHeaders, Func<string, bool> nonCommentTextInquiry = null)
+    public Task<ReplacerResult<IEnumerable<ReplacerError>>> RemoveOrReplaceHeader (IEnumerable<LicenseHeaderInput> licenseHeaders, Func<string, bool> nonCommentTextInquiry = null)
     {
-      var errors = new Dictionary<string, string>();
+      var errorList = new List<ReplacerError>();
 
       foreach (var header in licenseHeaders)
       {
@@ -165,11 +167,11 @@ namespace Core
         catch (ParseException)
         {
           message = string.Format (Resources.Error_InvalidLicenseHeader, header.DocumentPath).Replace (@"\n", "\n");
-          errors.Add (header.DocumentPath, message);
+          errorList.Add(new ReplacerError(header.DocumentPath, ErrorType.ParsingError, message));
         }
       }
 
-      return Task.FromResult (errors);
+      return Task.FromResult (errorList.Count == 0 ? new ReplacerResult<IEnumerable<ReplacerError>>() : new ReplacerResult<IEnumerable<ReplacerError>>(errorList));
     }
 
     public static bool IsLicenseHeader (string documentPath)

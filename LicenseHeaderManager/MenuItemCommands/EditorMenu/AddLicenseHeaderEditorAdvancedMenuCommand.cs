@@ -99,8 +99,7 @@ namespace LicenseHeaderManager.MenuItemCommands.EditorMenu
     {
       var item = ServiceProvider.GetActiveProjectItem();
       var result = await ServiceProvider.AddLicenseHeaderToItemAsync (item, !ServiceProvider._isCalledByLinkedCommand);
-      if (!string.IsNullOrEmpty (result))
-        MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+      CoreHelpers.HandleResult(result);
     }
   }
 }

@@ -46,8 +46,7 @@ namespace LicenseHeaderManager.Utils
             true,
             CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
             message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, _licenseHeaderExtension));
-        if (!string.IsNullOrEmpty (result))
-          MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        CoreHelpers.HandleResult(result);
       }
 
       if (linkedFileFilter.NoLicenseHeaderFile.Any() || linkedFileFilter.NotInSolution.Any())

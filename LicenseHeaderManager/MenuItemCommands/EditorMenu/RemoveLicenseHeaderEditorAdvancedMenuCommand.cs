@@ -102,8 +102,7 @@ namespace LicenseHeaderManager.MenuItemCommands.EditorMenu
           true,
           CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
           message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, ServiceProvider));
-      if (!string.IsNullOrEmpty (result))
-        MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+      CoreHelpers.HandleResult(result);
     }
   }
 }

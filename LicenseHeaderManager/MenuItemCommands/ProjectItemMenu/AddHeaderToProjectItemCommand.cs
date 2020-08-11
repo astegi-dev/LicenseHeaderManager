@@ -104,8 +104,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
         return;
 
       var result = await ServiceProvider.AddLicenseHeaderToItemAsync (item, !ServiceProvider._isCalledByLinkedCommand);
-      if (!string.IsNullOrEmpty (result))
-        MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+      CoreHelpers.HandleResult(result);
     }
   }
 }

@@ -44,17 +44,15 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         foreach (ProjectItem i in project.ProjectItems)
         {
           var replacerInput = CoreHelpers.GetFilesToProcess (i, null, out _, false);
-          var errors = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput);
-          if (errors.Count > 0)
-            MessageBox.Show ($"Encountered {errors.Count} errors.", "Error(s)", MessageBoxButton.OK, MessageBoxImage.Error);
+          var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput);
+          CoreHelpers.HandleResult(result);
         }
       else
         foreach (ProjectItem i in item.ProjectItems)
         {
           var replacerInput = CoreHelpers.GetFilesToProcess (i, null, out _, false);
-          var errors = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput);
-          if (errors.Count > 0)
-            MessageBox.Show ($"Encountered {errors.Count} errors.", "Error(s)", MessageBoxButton.OK, MessageBoxImage.Error);
+          var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput);
+          CoreHelpers.HandleResult(result);
         }
     }
   }

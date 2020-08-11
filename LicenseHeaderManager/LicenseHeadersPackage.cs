@@ -385,8 +385,7 @@ namespace LicenseHeaderManager
               false,
               CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
               message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, this));
-          if (!string.IsNullOrEmpty (result))
-            MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+          CoreHelpers.HandleResult(result);
         }
       }
 
@@ -399,10 +398,10 @@ namespace LicenseHeaderManager
 
     #region command handlers
 
-    public async Task<string> AddLicenseHeaderToItemAsync (ProjectItem item, bool calledByUser)
+    public async Task<ReplacerResult<ReplacerError>> AddLicenseHeaderToItemAsync (ProjectItem item, bool calledByUser)
     {
       if (item == null || ProjectItemInspection.IsLicenseHeader (item))
-        return string.Empty;
+        return new ReplacerResult<ReplacerError>();
 
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
@@ -417,7 +416,7 @@ namespace LicenseHeaderManager
       if (calledByUser && LicenseHeader.ShowQuestionForAddingLicenseHeaderFile (item.ContainingProject, page))
         return await AddLicenseHeaderToItemAsync (item, true);
 
-      return string.Empty;
+      return new ReplacerResult<ReplacerError>();
     }
 
     public async Task HandleAddLicenseHeaderToAllFilesInProjectReturnAsync (

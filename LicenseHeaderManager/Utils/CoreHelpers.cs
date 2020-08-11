@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using Core;
 using EnvDTE;
@@ -73,6 +74,18 @@ namespace LicenseHeaderManager.Utils
       }
 
       return files;
+    }
+
+    public static void HandleResult(ReplacerResult<ReplacerError> result)
+    {
+      if (!result.IsSuccess)
+        MessageBox.Show($"Error: {result.Error.Description}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+
+    public static void HandleResult(ReplacerResult<IEnumerable<ReplacerError>> result)
+    {
+      if (!result.IsSuccess)
+        MessageBox.Show($"Encountered errors in {result.Error.Count()} files", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
     }
   }
 }

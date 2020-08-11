@@ -18,6 +18,11 @@
     ParsingError,
 
     /// <summary>
+    /// Specifies that the file's language currently has no header defined in the license header definition file.
+    /// </summary>
+    NoHeaderFound,
+
+    /// <summary>
     /// An unspecified error occured.
     /// </summary>
     Miscellaneous
