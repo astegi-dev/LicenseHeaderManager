@@ -55,8 +55,8 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       var addLicenseHeaderToAllFilesReturn = await addLicenseHeaderToAllFilesCommand.ExecuteAsync (obj);
       statusBar.SetText (string.Empty);
 
-      serviceProvider.HandleLinkedFilesAndShowMessageBox (addLicenseHeaderToAllFilesReturn.LinkedItems);
-      serviceProvider.HandleAddLicenseHeaderToAllFilesInProjectReturnAsync (obj, addLicenseHeaderToAllFilesReturn).FireAndForget();
+      await serviceProvider.HandleLinkedFilesAndShowMessageBox (addLicenseHeaderToAllFilesReturn.LinkedItems);
+      await serviceProvider.HandleAddLicenseHeaderToAllFilesInProjectReturnAsync (obj, addLicenseHeaderToAllFilesReturn);
     }
 
     public static void AddNewLicenseHeaderDefinitionFile (LicenseHeadersPackage serviceProvider)
@@ -84,13 +84,13 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
       var obj = serviceProvider.GetSolutionExplorerItem();
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper(serviceProvider._licenseReplacer);
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper(serviceProvider._licenseReplacer, serviceProvider.GetLicenseHeaderReplacer());
 
       var statusBar = (IVsStatusbar)await serviceProvider.GetServiceAsync(typeof(SVsStatusbar));
       Assumes.Present(statusBar);
       statusBar.SetText(Resources.UpdatingFiles);
 
-      removeAllLicenseHeadersCommand.Execute(obj);
+      await removeAllLicenseHeadersCommand.Execute(obj);
 
       statusBar.SetText(string.Empty);
     }

@@ -359,7 +359,7 @@ namespace LicenseHeaderManager
       }
     }
 
-    private void FinishedAddingItem (string guid, int id, object customIn, object customOut)
+    private async void FinishedAddingItem (string guid, int id, object customIn, object customOut)
     {
       //Now we can finally insert the header into the new item.
 
@@ -368,7 +368,15 @@ namespace LicenseHeaderManager
         var item = _addedItems.Pop();
         var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
         if (headers != null)
-          _licenseReplacer.RemoveOrReplaceHeader (item, headers, false);
+        {
+          var result = await GetLicenseHeaderReplacer().RemoveOrReplaceHeader (
+              new LicenseHeaderInput (item.Document.FullName, headers, item.GetAdditionalProperties()),
+              false,
+              CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
+              message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, this));
+          if (!string.IsNullOrEmpty (result))
+            MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
       }
 
       _currentCommandEvents.AfterExecute -= FinishedAddingItem;
@@ -411,23 +419,6 @@ namespace LicenseHeaderManager
       return new Core.LicenseHeaderReplacer (LanguagesPage.Languages.Select (Options.Language.ToCoreLanguage), keywords);
     }
 
-    private async Task AddLicenseHeadersToAllFilesInProjectCallbackAsync (object sender, EventArgs e)
-    {
-      var obj = GetSolutionExplorerItem();
-      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (GetLicenseHeaderReplacer());
-
-      var statusBar = (IVsStatusbar) GetService (typeof (SVsStatusbar));
-      statusBar.SetText (Resources.UpdatingFiles);
-
-      var addLicenseHeaderToAllFilesReturn = await addLicenseHeaderToAllFilesCommand.ExecuteAsync (obj);
-
-      statusBar.SetText (String.Empty);
-
-      HandleLinkedFilesAndShowMessageBox (addLicenseHeaderToAllFilesReturn.LinkedItems);
-
-      await HandleAddLicenseHeaderToAllFilesInProjectReturnAsync (obj, addLicenseHeaderToAllFilesReturn);
-    }
-
     public async Task HandleAddLicenseHeaderToAllFilesInProjectReturnAsync (
         object obj,
         AddLicenseHeaderToAllFilesResult addLicenseHeaderToAllFilesResult)
@@ -456,7 +447,7 @@ namespace LicenseHeaderManager
           {
             ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (currentProject.FileName, currentProject.ProjectItems);
 
-            await AddLicenseHeadersToAllFilesInProjectCallbackAsync ((object) project ?? projectItem, null);
+            await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync(this);
           }
         }
         else
@@ -470,13 +461,13 @@ namespace LicenseHeaderManager
       }
     }
 
-    public void HandleLinkedFilesAndShowMessageBox (List<ProjectItem> linkedItems)
+    public async Task HandleLinkedFilesAndShowMessageBox (List<ProjectItem> linkedItems)
     {
       var linkedFileFilter = new LinkedFileFilter (_dte.Solution);
       linkedFileFilter.Filter (linkedItems);
 
-      var linkedFileHandler = new LinkedFileHandler();
-      linkedFileHandler.Handle (_licenseReplacer, linkedFileFilter);
+      var linkedFileHandler = new LinkedFileHandler (this);
+      await linkedFileHandler.HandleAsync (linkedFileFilter);
 
       if (linkedFileHandler.Message != string.Empty)
       {

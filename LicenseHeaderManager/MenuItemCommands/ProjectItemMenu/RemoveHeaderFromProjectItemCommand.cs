@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using System.IO;
+using System.Threading.Tasks;
 using Core;
 using EnvDTE;
+using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
@@ -33,41 +35,34 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
     /// <param name="commandService">Command service to add command to, not null.</param>
     private RemoveHeaderFromProjectItemCommand (AsyncPackage package, OleMenuCommandService commandService)
     {
-      ServiceProvider = (LicenseHeadersPackage)package ?? throw new ArgumentNullException(nameof(package));
-      commandService = commandService ?? throw new ArgumentNullException (nameof (commandService));
+      ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
+      commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      _menuItem = new OleMenuCommand(this.Execute, menuCommandID);
+      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
       _menuItem.BeforeQueryStatus += OnQueryProjectItemCommandStatus;
       commandService.AddCommand (_menuItem);
     }
 
-    private void OnQueryProjectItemCommandStatus(object sender, EventArgs e)
+    private void OnQueryProjectItemCommandStatus (object sender, EventArgs e)
     {
       var visible = false;
 
       if (ServiceProvider.GetSolutionExplorerItem() is ProjectItem item)
-        visible = ServiceProvider.ShouldBeVisible(item);
-      
+        visible = ServiceProvider.ShouldBeVisible (item);
+
       _menuItem.Visible = visible;
     }
 
     /// <summary>
     /// Gets the instance of the command.
     /// </summary>
-    public static RemoveHeaderFromProjectItemCommand Instance
-    {
-      get;
-      private set;
-    }
+    public static RemoveHeaderFromProjectItemCommand Instance { get; private set; }
 
     /// <summary>
     /// Gets the service provider from the owner package.
     /// </summary>
-    private LicenseHeadersPackage ServiceProvider
-    {
-      get;
-    }
+    private LicenseHeadersPackage ServiceProvider { get; }
 
     /// <summary>
     /// Initializes the singleton instance of the command.
@@ -92,14 +87,20 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
     /// <param name="e">Event args.</param>
     private void Execute (object sender, EventArgs e)
     {
-      ThreadHelper.ThrowIfNotOnUIThread ();
+      ThreadHelper.ThrowIfNotOnUIThread();
 
       if (!(e is OleMenuCmdEventArgs args))
         return;
 
       var item = args.InValue as ProjectItem ?? ServiceProvider.GetSolutionExplorerItem() as ProjectItem;
-      if (item != null && Path.GetExtension(item.Name) != LicenseHeader.Extension)
-        ServiceProvider._licenseReplacer.RemoveOrReplaceHeaderRecursive(item, null, false);
+      if (item != null && Path.GetExtension (item.Name) != LicenseHeader.Extension)
+        ExecuteInternalAsync (item).FireAndForget();
+    }
+
+    private async Task ExecuteInternalAsync (ProjectItem item)
+    {
+      var replacerInput = CoreHelpers.GetFilesToProcess (item, null, out _, false);
+      await ServiceProvider.GetLicenseHeaderReplacer().RemoveOrReplaceHeader (replacerInput, CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
     }
   }
 }

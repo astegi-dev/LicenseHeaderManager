@@ -27,11 +27,13 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     private readonly IVsStatusbar _statusBar;
     private readonly LicenseHeaderReplacer _licenseReplacer;
+    private readonly Core.LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (IVsStatusbar statusBar, LicenseHeaderReplacer licenseReplacer)
+    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (IVsStatusbar statusBar, LicenseHeaderReplacer licenseReplacer, Core.LicenseHeaderReplacer licenseHeaderReplacer)
     {
       _statusBar = statusBar;
       _licenseReplacer = licenseReplacer;
+      _licenseHeaderReplacer = licenseHeaderReplacer;
     }
 
     public string GetCommandName ()
@@ -39,7 +41,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return c_commandName;
     }
 
-    public void Execute (Solution solution)
+    public async void Execute (Solution solution)
     {
       if (solution == null) return;
 
@@ -48,12 +50,12 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
       var progressCount = 1;
       var projectCount = projectsInSolution.Count;
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseReplacer);
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseReplacer, _licenseHeaderReplacer);
 
       foreach (var project in projectsInSolution)
       {
         _statusBar.SetText (string.Format (Resources.UpdateSolution, progressCount, projectCount));
-        removeAllLicenseHeadersCommand.Execute (project);
+        await removeAllLicenseHeadersCommand.Execute (project);
         progressCount++;
       }
 

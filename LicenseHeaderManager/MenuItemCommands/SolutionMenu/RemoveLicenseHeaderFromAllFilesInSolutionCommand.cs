@@ -82,7 +82,7 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var solution = ServiceProvider._dte.Solution;
       var statusBar = (IVsStatusbar) await ServiceProvider.GetServiceAsync (typeof (SVsStatusbar));
-      var removeLicenseHeaderFromAllProjects = new RemoveLicenseHeaderFromAllFilesInSolutionHelper (statusBar, ServiceProvider._licenseReplacer);
+      var removeLicenseHeaderFromAllProjects = new RemoveLicenseHeaderFromAllFilesInSolutionHelper (statusBar, ServiceProvider._licenseReplacer, ServiceProvider.GetLicenseHeaderReplacer());
       var resharperSuspended = CommandUtility.ExecuteCommandIfExists ("ReSharper_Suspend", ServiceProvider._dte);
 
       try
