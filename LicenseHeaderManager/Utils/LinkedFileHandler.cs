@@ -17,6 +17,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using Core;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
@@ -39,14 +40,14 @@ namespace LicenseHeaderManager.Utils
     {
       foreach (var projectItem in linkedFileFilter.ToBeProgressed)
       {
-        // todo replace
         var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (projectItem);
-        //licenseHeaderReplacer.RemoveOrReplaceHeader (projectItem, headers, true);
         var result = await _licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new LicenseHeaderInput (projectItem.Document.FullName, headers, projectItem.GetAdditionalProperties()),
+            new LicenseHeaderInput (projectItem.FileNames[1], headers, projectItem.GetAdditionalProperties()),
             true,
             CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
             message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, _licenseHeaderExtension));
+        if (!string.IsNullOrEmpty (result))
+          MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
       }
 
       if (linkedFileFilter.NoLicenseHeaderFile.Any() || linkedFileFilter.NotInSolution.Any())
