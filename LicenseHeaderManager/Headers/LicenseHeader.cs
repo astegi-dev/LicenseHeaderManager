@@ -67,7 +67,7 @@ namespace LicenseHeaderManager.Headers
     {
       var solutionDirectory = Path.GetDirectoryName (solution.FullName);
       var solutionFileName = Path.GetFileName (solution.FullName);
-      return Path.Combine (solutionDirectory, solutionFileName + LicenseHeader.Extension);
+      return Path.Combine (solutionDirectory, solutionFileName + Extension);
     }
 
     public static bool ShowQuestionForAddingLicenseHeaderFile (Project activeProject, IDefaultLicenseHeaderPage page)

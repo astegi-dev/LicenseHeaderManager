@@ -39,7 +39,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
+      _menuItem = new OleMenuCommand (Execute, menuCommandID);
       _menuItem.BeforeQueryStatus += OnQueryProjectItemCommandStatus;
       commandService.AddCommand (_menuItem);
     }
@@ -100,7 +100,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
     private async Task ExecuteInternalAsync (ProjectItem item)
     {
       var replacerInput = CoreHelpers.GetFilesToProcess (item, null, out _, false);
-      await ServiceProvider.GetLicenseHeaderReplacer().RemoveOrReplaceHeader (replacerInput, CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
+      await ServiceProvider.LicenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
     }
   }
 }

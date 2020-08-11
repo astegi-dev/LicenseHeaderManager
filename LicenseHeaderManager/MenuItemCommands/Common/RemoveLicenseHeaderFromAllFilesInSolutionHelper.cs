@@ -12,9 +12,8 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 #endregion
 
-using System;
+using Core;
 using EnvDTE;
-using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -26,13 +25,11 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     private const string c_commandName = "Remove LicenseHeader from all Projects";
 
     private readonly IVsStatusbar _statusBar;
-    private readonly LicenseHeaderReplacer _licenseReplacer;
-    private readonly Core.LicenseHeaderReplacer _licenseHeaderReplacer;
+    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (IVsStatusbar statusBar, LicenseHeaderReplacer licenseReplacer, Core.LicenseHeaderReplacer licenseHeaderReplacer)
+    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (IVsStatusbar statusBar, LicenseHeaderReplacer licenseHeaderReplacer)
     {
       _statusBar = statusBar;
-      _licenseReplacer = licenseReplacer;
       _licenseHeaderReplacer = licenseHeaderReplacer;
     }
 
@@ -50,12 +47,12 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
       var progressCount = 1;
       var projectCount = projectsInSolution.Count;
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseReplacer, _licenseHeaderReplacer);
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseHeaderReplacer);
 
       foreach (var project in projectsInSolution)
       {
         _statusBar.SetText (string.Format (Resources.UpdateSolution, progressCount, projectCount));
-        await removeAllLicenseHeadersCommand.Execute (project);
+        await removeAllLicenseHeadersCommand.ExecuteAsync (project);
         progressCount++;
       }
 

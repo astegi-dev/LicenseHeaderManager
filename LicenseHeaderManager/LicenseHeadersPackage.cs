@@ -14,11 +14,18 @@
 
 #endregion
 
+using Core;
 using EnvDTE;
 using EnvDTE80;
 using LicenseHeaderManager.ButtonHandler;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
+using LicenseHeaderManager.MenuItemCommands.Common;
+using LicenseHeaderManager.MenuItemCommands.EditorMenu;
+using LicenseHeaderManager.MenuItemCommands.FolderMenu;
+using LicenseHeaderManager.MenuItemCommands.ProjectItemMenu;
+using LicenseHeaderManager.MenuItemCommands.ProjectMenu;
+using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
 using LicenseHeaderManager.Options;
 using LicenseHeaderManager.ResultObjects;
 using LicenseHeaderManager.Utils;
@@ -35,17 +42,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using Core;
-using LicenseHeaderManager.MenuItemCommands.Common;
-using LicenseHeaderManager.MenuItemCommands.EditorMenu;
-using LicenseHeaderManager.MenuItemCommands.FolderMenu;
-using LicenseHeaderManager.MenuItemCommands.ProjectItemMenu;
-using LicenseHeaderManager.MenuItemCommands.ProjectMenu;
-using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
-using CreateDocumentResult = LicenseHeaderManager.Headers.CreateDocumentResult;
-using Document = LicenseHeaderManager.Headers.Document;
 using LicenseHeader = LicenseHeaderManager.Headers.LicenseHeader;
-using LicenseHeaderReplacer = LicenseHeaderManager.Headers.LicenseHeaderReplacer;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager
@@ -105,7 +102,6 @@ namespace LicenseHeaderManager
 
     // TODO make private again and temporarily inject in command initialization until core lib is finished
     public DTE2 _dte;
-    public LicenseHeaderReplacer _licenseReplacer;
     public AddLicenseHeaderToAllProjectsDelegate _addLicenseHeaderToAllProjectsDelegate;
 
     /// <summary>
@@ -118,11 +114,10 @@ namespace LicenseHeaderManager
       await JoinableTaskFactory.SwitchToMainThreadAsync (cancellationToken);
 
       OutputWindowHandler.Initialize (GetGlobalService (typeof (SVsOutputWindow)) as IVsOutputWindow);
-      _licenseReplacer = new LicenseHeaderReplacer (this);
       _dte = await GetServiceAsync (typeof (DTE)) as DTE2;
       Assumes.Present (_dte);
       _addedItems = new Stack<ProjectItem>();
-      var buttonHandlerFactory = new ButtonHandlerFactory (this, GetLicenseHeaderReplacer());
+      var buttonHandlerFactory = new ButtonHandlerFactory (this, LicenseHeaderReplacer);
       _addLicenseHeaderToAllProjectsDelegate = buttonHandlerFactory.CreateAddLicenseHeaderToAllProjectsButtonHandler();
 
       await AddHeaderToProjectItemCommand.InitializeAsync (this);
@@ -213,7 +208,7 @@ namespace LicenseHeaderManager
       var visible = false;
 
       if (ProjectItemInspection.IsPhysicalFile (item))
-        visible = GetLicenseHeaderReplacer().TryCreateDocument (item.FileNames[1], out _) == Core.CreateDocumentResult.DocumentCreated;
+        visible = LicenseHeaderReplacer.TryCreateDocument (item.FileNames[1], out _) == Core.CreateDocumentResult.DocumentCreated;
 
       return visible;
     }
@@ -369,7 +364,7 @@ namespace LicenseHeaderManager
         var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
         if (headers != null)
         {
-          var result = await GetLicenseHeaderReplacer().RemoveOrReplaceHeader (
+          var result = await LicenseHeaderReplacer.RemoveOrReplaceHeader (
               new LicenseHeaderInput (item.Document.FullName, headers, item.GetAdditionalProperties()),
               false,
               CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
@@ -397,7 +392,7 @@ namespace LicenseHeaderManager
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
       if (headers != null)
       {
-        return await GetLicenseHeaderReplacer().RemoveOrReplaceHeader (
+        return await LicenseHeaderReplacer.RemoveOrReplaceHeader (
             new LicenseHeaderInput (item.Document.FullName, headers, item.GetAdditionalProperties()),
             calledByUser,
             CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
@@ -409,14 +404,6 @@ namespace LicenseHeaderManager
         return await AddLicenseHeaderToItemAsync (item, true);
 
       return string.Empty;
-    }
-
-    public Core.LicenseHeaderReplacer GetLicenseHeaderReplacer ()
-    {
-      var keywords = OptionsPage.UseRequiredKeywords
-          ? OptionsPage.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
-          : null;
-      return new Core.LicenseHeaderReplacer (LanguagesPage.Languages.Select (Options.Language.ToCoreLanguage), keywords);
     }
 
     public async Task HandleAddLicenseHeaderToAllFilesInProjectReturnAsync (
@@ -484,6 +471,17 @@ namespace LicenseHeaderManager
     }
 
     #endregion
+
+    public LicenseHeaderReplacer LicenseHeaderReplacer
+    {
+      get
+      {
+        var keywords = OptionsPage.UseRequiredKeywords
+            ? OptionsPage.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
+            : null;
+        return new LicenseHeaderReplacer (LanguagesPage.Languages.Select (Options.Language.ToCoreLanguage), keywords);
+      }
+    }
 
     public void ShowLanguagesPage ()
     {

@@ -18,7 +18,7 @@ namespace LicenseHeaderManager.Test
       ILicenseHeaderExtension extension = MockRepository.GenerateStub<ILicenseHeaderExtension>();
       
       LinkedFileFilter linkedFileFilter = MockRepository.GenerateStrictMock<LinkedFileFilter> (solution);
-      LicenseHeaderReplacer licenseHeaderReplacer = MockRepository.GenerateStrictMock<LicenseHeaderReplacer> (extension);
+      //LicenseHeaderReplacer licenseHeaderReplacer = MockRepository.GenerateStrictMock<LicenseHeaderReplacer> (extension);
       
       //LinkedFileHandler linkedFileHandler = new LinkedFileHandler(null);
       //linkedFileHandler.HandleAsync(licenseHeaderReplacer, linkedFileFilter);
@@ -34,7 +34,7 @@ namespace LicenseHeaderManager.Test
       projectItem.Expect (x => x.Name).Return ("projectItem.cs");
 
       ILinkedFileFilter linkedFileFilter = MockRepository.GenerateMock<ILinkedFileFilter>();
-      LicenseHeaderReplacer licenseHeaderReplacer = MockRepository.GenerateStrictMock<LicenseHeaderReplacer> (extension);
+      //LicenseHeaderReplacer licenseHeaderReplacer = MockRepository.GenerateStrictMock<LicenseHeaderReplacer> (extension);
 
       linkedFileFilter.Expect (x => x.NoLicenseHeaderFile).Return (new List<ProjectItem> { projectItem });
       linkedFileFilter.Expect (x => x.ToBeProgressed).Return (new List<ProjectItem>());

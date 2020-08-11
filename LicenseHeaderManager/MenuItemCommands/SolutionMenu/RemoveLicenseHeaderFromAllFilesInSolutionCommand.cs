@@ -35,7 +35,7 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      var menuItem = new OleMenuCommand (this.Execute, menuCommandID);
+      var menuItem = new OleMenuCommand (Execute, menuCommandID);
       commandService.AddCommand (menuItem);
     }
 
@@ -82,7 +82,9 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var solution = ServiceProvider._dte.Solution;
       var statusBar = (IVsStatusbar) await ServiceProvider.GetServiceAsync (typeof (SVsStatusbar));
-      var removeLicenseHeaderFromAllProjects = new RemoveLicenseHeaderFromAllFilesInSolutionHelper (statusBar, ServiceProvider._licenseReplacer, ServiceProvider.GetLicenseHeaderReplacer());
+      var removeLicenseHeaderFromAllProjects = new RemoveLicenseHeaderFromAllFilesInSolutionHelper (
+          statusBar,
+          ServiceProvider.LicenseHeaderReplacer);
       var resharperSuspended = CommandUtility.ExecuteCommandIfExists ("ReSharper_Suspend", ServiceProvider._dte);
 
       try

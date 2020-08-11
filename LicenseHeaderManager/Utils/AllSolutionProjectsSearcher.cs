@@ -42,13 +42,13 @@ namespace LicenseHeaderManager.Utils
 
     private bool IsValid (Project project)
     {
-      if (string.Equals (project.Kind, EnvDTE.Constants.vsProjectKindUnmodeled, StringComparison.OrdinalIgnoreCase))
+      if (string.Equals (project.Kind, Constants.vsProjectKindUnmodeled, StringComparison.OrdinalIgnoreCase))
       {
         // If project is not loaded, it doesn't count.
         return false;
       }
 
-      if (string.Equals (project.Kind, EnvDTE.Constants.vsProjectKindMisc, StringComparison.OrdinalIgnoreCase))
+      if (string.Equals (project.Kind, Constants.vsProjectKindMisc, StringComparison.OrdinalIgnoreCase))
       {
         // If project is "miscellaneous items", it doesn't count.
         return false;

@@ -50,7 +50,7 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
       _defaultHeaderDefinitionFunc = defaultHeaderDefinitionFunc;
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
+      _menuItem = new OleMenuCommand (Execute, menuCommandID);
       _menuItem.BeforeQueryStatus += OnQuerySolutionCommandStatus;
       commandService.AddCommand (_menuItem);
     }
@@ -114,7 +114,7 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
       // Add file
       var defaultLicenseHeaderFileText = _defaultHeaderDefinitionFunc();
       File.WriteAllText (solutionHeaderDefinitionFilePath, defaultLicenseHeaderFileText, Encoding.UTF8);
-      solution.DTE.OpenFile (EnvDTE.Constants.vsViewKindTextView, solutionHeaderDefinitionFilePath).Activate();
+      solution.DTE.OpenFile (Constants.vsViewKindTextView, solutionHeaderDefinitionFilePath).Activate();
     }
   }
 }

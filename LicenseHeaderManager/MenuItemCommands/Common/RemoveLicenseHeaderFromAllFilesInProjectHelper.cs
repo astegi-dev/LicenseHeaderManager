@@ -17,6 +17,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Windows;
+using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Utils;
@@ -25,23 +26,21 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 {
   public class RemoveLicenseHeaderFromAllFilesInProjectHelper
   {
-    private readonly LicenseHeaderReplacer _licenseReplacer;
-    private readonly Core.LicenseHeaderReplacer _licenseHeaderReplacer;
+    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public RemoveLicenseHeaderFromAllFilesInProjectHelper (LicenseHeaderReplacer licenseReplacer, Core.LicenseHeaderReplacer licenseHeaderReplacer)
+    public RemoveLicenseHeaderFromAllFilesInProjectHelper (LicenseHeaderReplacer licenseHeaderReplacer)
     {
-      _licenseReplacer = licenseReplacer;
       _licenseHeaderReplacer = licenseHeaderReplacer;
     }
 
-    public async Task Execute (object projectOrProjectItem)
+    public async Task ExecuteAsync (object projectOrProjectItem)
     {
       var project = projectOrProjectItem as Project;
       var item = projectOrProjectItem as ProjectItem;
       if (project == null && item == null)
         return;
 
-      _licenseReplacer.ResetExtensionsWithInvalidHeaders();
+      _licenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
       if (project != null)
       {
         foreach (ProjectItem i in project.ProjectItems)

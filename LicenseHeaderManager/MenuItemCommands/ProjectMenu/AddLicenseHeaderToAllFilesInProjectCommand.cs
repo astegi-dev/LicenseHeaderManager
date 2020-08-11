@@ -37,7 +37,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
-      _menuItem = new OleMenuCommand (this.Execute, menuCommandID);
+      _menuItem = new OleMenuCommand (Execute, menuCommandID);
       _menuItem.BeforeQueryStatus += OnQueryAllFilesCommandStatus;
       commandService.AddCommand (_menuItem);
     }

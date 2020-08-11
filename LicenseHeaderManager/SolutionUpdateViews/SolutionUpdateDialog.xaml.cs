@@ -25,7 +25,7 @@ namespace LicenseHeaderManager
     public SolutionUpdateDialog (SolutionUpdateViewModel solutionUpdateViewModel)
     {
       InitializeComponent();
-      this.DataContext = solutionUpdateViewModel;
+      DataContext = solutionUpdateViewModel;
     }
   }
 }

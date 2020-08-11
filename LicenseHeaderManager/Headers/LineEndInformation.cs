@@ -29,8 +29,8 @@ namespace LicenseHeaderManager.Headers
 
     public LineEndInformation (int index, string lineEnd)
     {
-      this.Index = index;
-      this.LineEnd = lineEnd;
+      Index = index;
+      LineEnd = lineEnd;
     }
   }
 }

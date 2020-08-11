@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,26 +11,27 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using LicenseHeaderManager.Interfaces;
 
 namespace LicenseHeaderManager.ButtonHandler
 {
-  class ButtonHandlerFactory
+  internal class ButtonHandlerFactory
   {
     private readonly ILicenseHeaderExtension _licenseHeadersPackage;
-    private Core.LicenseHeaderReplacer _licenseHeaderReplacerCore;
+    private readonly Core.LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public ButtonHandlerFactory (ILicenseHeaderExtension licenseHeadersPackage, Core.LicenseHeaderReplacer licenseHeaderReplacerCore)
+    public ButtonHandlerFactory (ILicenseHeaderExtension licenseHeadersPackage, Core.LicenseHeaderReplacer licenseHeaderReplacer)
     {
-      _licenseHeaderReplacerCore = licenseHeaderReplacerCore;
+      _licenseHeaderReplacer = licenseHeaderReplacer;
       _licenseHeadersPackage = licenseHeadersPackage;
     }
 
     public AddLicenseHeaderToAllProjectsDelegate CreateAddLicenseHeaderToAllProjectsButtonHandler ()
     {
-      return new AddLicenseHeaderToAllProjectsDelegate (_licenseHeaderReplacerCore, _licenseHeadersPackage.Dte2);
+      return new AddLicenseHeaderToAllProjectsDelegate (_licenseHeaderReplacer, _licenseHeadersPackage.Dte2);
     }
   }
 }

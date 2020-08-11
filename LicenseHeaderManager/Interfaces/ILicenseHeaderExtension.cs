@@ -23,7 +23,7 @@ namespace LicenseHeaderManager.Interfaces
   {
     void ShowLanguagesPage ();
 
-    Core.LicenseHeaderReplacer GetLicenseHeaderReplacer ();
+    Core.LicenseHeaderReplacer LicenseHeaderReplacer { get; }
 
     IDefaultLicenseHeaderPage DefaultLicenseHeaderPage { get; }
     ILanguagesPage LanguagesPage { get; }

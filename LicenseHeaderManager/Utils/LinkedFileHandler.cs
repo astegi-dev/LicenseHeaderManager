@@ -42,7 +42,7 @@ namespace LicenseHeaderManager.Utils
         // todo replace
         var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (projectItem);
         //licenseHeaderReplacer.RemoveOrReplaceHeader (projectItem, headers, true);
-        var result = await _licenseHeaderExtension.GetLicenseHeaderReplacer().RemoveOrReplaceHeader (
+        var result = await _licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
             new Core.LicenseHeaderInput (projectItem.Document.FullName, headers, projectItem.GetAdditionalProperties()),
             true,
             CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,

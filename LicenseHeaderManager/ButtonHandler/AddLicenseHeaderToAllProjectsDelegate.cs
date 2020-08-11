@@ -28,7 +28,7 @@ namespace LicenseHeaderManager.ButtonHandler
 
     public AddLicenseHeaderToAllProjectsDelegate (Core.LicenseHeaderReplacer licenseHeaderReplacer, DTE2 dte2)
     {
-      this._licenseHeaderReplacer = licenseHeaderReplacer;
+      _licenseHeaderReplacer = licenseHeaderReplacer;
       _dte2 = dte2;
     }
 

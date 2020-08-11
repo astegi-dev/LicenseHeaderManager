@@ -30,9 +30,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 {
   internal class AddLicenseHeaderToAllFilesInProjectHelper
   {
-    private Core.LicenseHeaderReplacer _licenseHeaderReplacer;
+    private LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public AddLicenseHeaderToAllFilesInProjectHelper (Core.LicenseHeaderReplacer licenseHeaderReplacer)
+    public AddLicenseHeaderToAllFilesInProjectHelper (LicenseHeaderReplacer licenseHeaderReplacer)
     {
       _licenseHeaderReplacer = licenseHeaderReplacer;
     }

@@ -46,7 +46,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var obj = serviceProvider.GetSolutionExplorerItem();
-      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (serviceProvider.GetLicenseHeaderReplacer());
+      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (serviceProvider.LicenseHeaderReplacer);
 
       var statusBar = (IVsStatusbar) await serviceProvider.GetServiceAsync (typeof (SVsStatusbar));
       Assumes.Present (statusBar);
@@ -84,13 +84,13 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
       var obj = serviceProvider.GetSolutionExplorerItem();
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper(serviceProvider._licenseReplacer, serviceProvider.GetLicenseHeaderReplacer());
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper(serviceProvider.LicenseHeaderReplacer);
 
       var statusBar = (IVsStatusbar)await serviceProvider.GetServiceAsync(typeof(SVsStatusbar));
       Assumes.Present(statusBar);
       statusBar.SetText(Resources.UpdatingFiles);
 
-      await removeAllLicenseHeadersCommand.Execute(obj);
+      await removeAllLicenseHeadersCommand.ExecuteAsync(obj);
 
       statusBar.SetText(string.Empty);
     }
