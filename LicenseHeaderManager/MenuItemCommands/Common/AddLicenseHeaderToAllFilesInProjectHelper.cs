@@ -41,14 +41,14 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     {
       var project = projectOrProjectItem as Project;
       var projectItem = projectOrProjectItem as ProjectItem;
-      var files = new List<LicenseHeaderInput>();
+      var replacerInput = new List<LicenseHeaderInput>();
 
       var countSubLicenseHeadersFound = 0;
-      IDictionary<string, string[]> headers = null;
+      IDictionary<string, string[]> headers;
       var linkedItems = new List<ProjectItem>();
 
       if (project == null && projectItem == null)
-        return new AddLicenseHeaderToAllFilesResult (countSubLicenseHeadersFound, headers == null, linkedItems);
+        return new AddLicenseHeaderToAllFilesResult (countSubLicenseHeadersFound, true, linkedItems);
 
       _licenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
       ProjectItems projectItems;
@@ -72,51 +72,16 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         }
         else
         {
-          files.AddRange (GetFilesToProcess (item, headers, out var subLicenseHeaders));
+          replacerInput.AddRange (CoreHelpers.GetFilesToProcess (item, headers, out var subLicenseHeaders));
           countSubLicenseHeadersFound = subLicenseHeaders;
         }
       }
 
-      var errors = await _licenseHeaderReplacer.RemoveOrReplaceHeader (files);
+      var errors = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
       if (errors.Count > 0)
         MessageBox.Show ($"Encountered {errors.Count} errors.", "Error(s)", MessageBoxButton.OK, MessageBoxImage.Error);
 
       return new AddLicenseHeaderToAllFilesResult (countSubLicenseHeadersFound, headers == null, linkedItems);
-    }
-
-    private IEnumerable<LicenseHeaderInput> GetFilesToProcess (
-        ProjectItem item,
-        IDictionary<string, string[]> headers,
-        out int countSubLicenseHeaders,
-        bool searchForLicenseHeaders = true)
-    {
-      var files = new List<LicenseHeaderInput>();
-      countSubLicenseHeaders = 0;
-
-      if (item.ProjectItems == null)
-        return files;
-
-      if (item.FileCount == 1 && System.IO.File.Exists(item.FileNames[1]))
-        files.Add(new LicenseHeaderInput(item.FileNames[1], headers, item.GetAdditionalProperties()));
-
-      var childHeaders = headers;
-      if (searchForLicenseHeaders)
-      {
-        childHeaders = LicenseHeaderFinder.SearchItemsDirectlyGetHeaderDefinition (item.ProjectItems);
-        if (childHeaders != null)
-          countSubLicenseHeaders++;
-        else
-          childHeaders = headers;
-      }
-
-      foreach (ProjectItem child in item.ProjectItems)
-      {
-        var subFiles = GetFilesToProcess (child, childHeaders, out var subLicenseHeaders, searchForLicenseHeaders);
-        files.AddRange (subFiles);
-        countSubLicenseHeaders += subLicenseHeaders;
-      }
-
-      return files;
     }
   }
 }

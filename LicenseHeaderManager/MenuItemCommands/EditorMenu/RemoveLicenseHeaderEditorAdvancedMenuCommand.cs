@@ -99,7 +99,11 @@ namespace LicenseHeaderManager.MenuItemCommands.EditorMenu
 
     private async Task ExecuteInternalAsync (string path)
     {
-      var result = await ServiceProvider.GetLicenseHeaderReplacer().RemoveOrReplaceHeader (new LicenseHeaderInput(path, null));
+      var result = await ServiceProvider.GetLicenseHeaderReplacer().RemoveOrReplaceHeader (
+          new LicenseHeaderInput (path, null),
+          true,
+          CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
+          message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, ServiceProvider));
       if (!string.IsNullOrEmpty (result))
         MessageBox.Show ($"Error: {result}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
     }

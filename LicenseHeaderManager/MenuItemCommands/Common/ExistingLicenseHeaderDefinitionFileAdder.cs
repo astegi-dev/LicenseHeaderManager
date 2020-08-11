@@ -23,7 +23,7 @@ using EnvDTE;
 using LicenseHeaderManager.Headers;
 using Microsoft.Win32;
 
-namespace LicenseHeaderManager.Utils
+namespace LicenseHeaderManager.MenuItemCommands.Common
 {
   public static class ExistingLicenseHeaderDefinitionFileAdder
   {

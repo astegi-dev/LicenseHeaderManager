@@ -389,7 +389,11 @@ namespace LicenseHeaderManager
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
       if (headers != null)
       {
-        return await GetLicenseHeaderReplacer().RemoveOrReplaceHeader (new LicenseHeaderInput(item.Document.FullName, headers, item.GetAdditionalProperties()), calledByUser);
+        return await GetLicenseHeaderReplacer().RemoveOrReplaceHeader (
+            new LicenseHeaderInput (item.Document.FullName, headers, item.GetAdditionalProperties()),
+            calledByUser,
+            CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
+            message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, this));
       }
 
       var page = (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));

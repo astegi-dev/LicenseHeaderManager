@@ -227,9 +227,10 @@
     <Compile Include="Headers\CommentParser.cs" />
     <Compile Include="Headers\CreateDocumentResult.cs" />
     <Compile Include="Headers\Document.cs" />
+    <Compile Include="Utils\CoreHelpers.cs" />
     <Compile Include="Utils\ProjectItemParentFinder.cs" />
     <Compile Include="Interfaces\ISolutionLevelCommand.cs" />
-    <Compile Include="Utils\ExistingLicenseHeaderDefinitionFileAdder.cs" />
+    <Compile Include="MenuItemCommands\Common\ExistingLicenseHeaderDefinitionFileAdder.cs" />
     <Compile Include="Headers\NewLineConst.cs" />
     <Compile Include="Interfaces\ICommentParser.cs" />
     <Compile Include="OutputWindowHandler.cs" />
