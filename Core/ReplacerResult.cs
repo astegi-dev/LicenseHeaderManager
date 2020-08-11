@@ -1,11 +1,9 @@
-﻿namespace Core
+﻿using System;
+
+namespace Core
 {
   public class ReplacerResult<TError>
   {
-    public bool IsSuccess { get; }
-
-    public TError Error { get; }
-
     public ReplacerResult ()
     {
       IsSuccess = true;
@@ -17,5 +15,9 @@
       Error = error;
       IsSuccess = false;
     }
+
+    public bool IsSuccess { get; }
+
+    public TError Error { get; }
   }
 }
