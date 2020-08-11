@@ -213,7 +213,7 @@ namespace LicenseHeaderManager
       var visible = false;
 
       if (ProjectItemInspection.IsPhysicalFile (item))
-        visible = _licenseReplacer.TryCreateDocument (item, out _, out _) == CreateDocumentResult.DocumentCreated;
+        visible = GetLicenseHeaderReplacer().TryCreateDocument (item.FileNames[1], out _) == Core.CreateDocumentResult.DocumentCreated;
 
       return visible;
     }
@@ -446,8 +446,7 @@ namespace LicenseHeaderManager
           if (MessageBoxHelper.DoYouWant (Resources.Question_AddExistingDefinitionFileToProject))
           {
             ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (currentProject.FileName, currentProject.ProjectItems);
-
-            await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync(this);
+            await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync (this);
           }
         }
         else
