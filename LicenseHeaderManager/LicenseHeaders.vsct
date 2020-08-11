@@ -313,6 +313,18 @@
           <ButtonText>Remove License Header</ButtonText>
         </Strings>
       </Button>
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidSaveSettingsCommand" priority="0x0100" type="Button">
+        <Parent guid="guidLicenseHeadersPackageCmdSet" id="MyMenuGroup" />
+        <Strings>
+          <ButtonText>Save LHM Settings...</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidLicenseHeadersPackageCmdSet" id="cmdidLoadSettingsCommand" priority="0x0100" type="Button">
+        <Parent guid="guidLicenseHeadersPackageCmdSet" id="MyMenuGroup" />
+        <Strings>
+          <ButtonText>Load LHM Settings...</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
@@ -406,6 +418,8 @@
       <IDSymbol value="4143" name="cmdidAddNewLicenseHeaderDefinitionFileToFolderCommand" />
       <IDSymbol value="4144" name="cmdidAddLicenseHeaderEditorAdvancedMenuCommand" />
       <IDSymbol value="4145" name="cmdidRemoveLicenseHeaderEditorAdvancedMenuCommand" />
+      <IDSymbol value="4146" name="cmdidSaveSettingsCommand" />
+      <IDSymbol value="4147" name="cmdidLoadSettingsCommand" />
     </GuidSymbol>
   </Symbols>
 

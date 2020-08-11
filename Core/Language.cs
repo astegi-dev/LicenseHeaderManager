@@ -20,7 +20,7 @@ using System.Linq;
 
 namespace Core
 {
-  public class Language : ICloneable
+  public class Language
   {
     public IEnumerable<string> Extensions { get; set; }
     public string LineComment { get; set; }
@@ -48,7 +48,7 @@ namespace Core
       }
     }
 
-    public object Clone ()
+    public Language Clone ()
     {
       return new Language
              {

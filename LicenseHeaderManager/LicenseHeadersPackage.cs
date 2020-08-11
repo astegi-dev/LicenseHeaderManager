@@ -1,4 +1,4 @@
-#region copyright
+﻿#region copyright
 
 // Copyright (c) rubicon IT GmbH
 
@@ -67,6 +67,7 @@ namespace LicenseHeaderManager
   [ProvideProfile (typeof (DefaultLicenseHeaderPage), c_licenseHeaders, c_defaultLicenseHeader, 0, 0, true)]
   [ProvideAutoLoad (VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
   [Guid (GuidList.guidLicenseHeadersPkgString)]
+  [ProvideMenuResource ("Menus.ctmenu", 1)]
   [ProvideMenuResource ("Menus.ctmenu", 1)]
   public sealed class LicenseHeadersPackage : AsyncPackage, ILicenseHeaderExtension
   {
@@ -158,7 +159,8 @@ namespace LicenseHeaderManager
       await AddNewLicenseHeaderDefinitionFileToFolderCommand.InitializeAsync (this);
       await AddLicenseHeaderEditorAdvancedMenuCommand.InitializeAsync (this);
       await RemoveLicenseHeaderEditorAdvancedMenuCommand.InitializeAsync (this);
-
+      await MenuItemCommands.Temp.SaveSettingsCommand.InitializeAsync (this);
+      await MenuItemCommands.Temp.LoadSettingsCommand.InitializeAsync (this);
 
       //register ItemAdded event handler
       if (Dte2.Events is Events2 events)

@@ -75,7 +75,7 @@ namespace LicenseHeaderManager.Options
       if (language == null)
         return;
 
-      var copy = language.Clone() as Language;
+      var copy = language.Clone();
 
       var dialog = new WpfLanguageDialog();
       dialog.Language = copy;

@@ -41,13 +41,27 @@ namespace LicenseHeaderManager.Options
     IEnumerable<Language> Languages { get; set; }
 
     /// <summary>
-    ///   Saves the current <see cref="IOptionsStore" /> instance.
+    ///   Serializes the current <see cref="IOptionsStore" /> instance to a file in the file system.
     /// </summary>
-    void Save ();
+    /// <param name="filePath">The path to which an options file should be persisted.</param>
+    void Save (string filePath);
 
     /// <summary>
-    ///   Loads the current <see cref="IOptionsStore" /> instance.
+    ///   Deserializes an <see cref="IOptionsStore" /> instance from a file in the file system.
     /// </summary>
-    void Load ();
+    /// <param name="filePath">The path to an options file from which a corresponding <see cref="IOptionsStore"/> instance should be constructed.</param>
+    IOptionsStore Load (string filePath);
+
+    /// <summary>
+    /// Creates a deep copy of the current <see cref="IOptionsStore"/> instance.
+    /// </summary>
+    /// <returns></returns>
+    IOptionsStore Clone();
+
+    /// <summary>
+    /// Sets all public members of this <see cref="IOptionsStore"/> instance to their respective default values.
+    /// </summary>
+    /// <remarks>The default values are implementation-dependent.</remarks>
+    void SetDefaults ();
   }
 }

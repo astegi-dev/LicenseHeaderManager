@@ -227,6 +227,8 @@
     <Compile Include="MenuItemCommands\ProjectMenu\RemoveLicenseHeaderFromAllFilesInProjectCommand.cs" />
     <Compile Include="MenuItemCommands\SolutionMenu\RemoveLicenseHeaderFromAllFilesInSolutionCommand.cs" />
     <Compile Include="MenuItemCommands\SolutionMenu\RemoveSolutionLicenseHeaderDefinitionFileCommand.cs" />
+    <Compile Include="MenuItemCommands\Temp\LoadSettingsCommand.cs" />
+    <Compile Include="MenuItemCommands\Temp\SaveSettingsCommand.cs" />
     <Compile Include="Options\IOptionsStore.cs" />
     <Compile Include="Options\OptionsStore.cs" />
     <Compile Include="Utils\CoreHelpers.cs" />

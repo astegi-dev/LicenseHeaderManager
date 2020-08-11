@@ -67,5 +67,17 @@ namespace LicenseHeaderManager.Options
     {
       PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (propertyName));
     }
+
+    public LinkedCommand Clone ()
+    {
+      return new LinkedCommand
+             {
+                 Name = Name,
+                 ExecutionTime = ExecutionTime,
+                 Events = Events,
+                 Guid = Guid,
+                 Id = Id
+             };
+    }
   }
 }
