@@ -23,6 +23,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Core;
 using LicenseHeaderManager.Options.Converters;
 
 namespace LicenseHeaderManager.Options

@@ -36,12 +36,9 @@ namespace LicenseHeaderManager.Utils
         catch (COMException e)
         {
           if (command == "ReSharper_Suspend")
-            OutputWindowHandler.WriteMessage (
-                "Excecution of '" + command +
-                "' failed. Maybe ReSharper is already suspended? \n " + e);
+            OutputWindowHandler.WriteMessage ("Execution of '" + command + "' failed. Maybe ReSharper is already suspended? \n " + e);
           else
-              //Command may be found but cannot be executed
-            OutputWindowHandler.WriteMessage ("Excecution of '" + command + "' failed. \n " + e);
+            OutputWindowHandler.WriteMessage ("Execution of '" + command + "' failed. \n " + e); //Command may be found but cannot be executed
           return false;
         }
 

@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using Core;
 
 namespace LicenseHeaderManager.Options
 {

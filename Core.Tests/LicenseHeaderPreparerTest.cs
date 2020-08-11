@@ -1,6 +1,5 @@
 ﻿using System;
-using LicenseHeaderManager.Interfaces;
-using LicenseHeaderManager.Utils;
+using Core;
 using NUnit.Framework;
 using Rhino.Mocks;
 

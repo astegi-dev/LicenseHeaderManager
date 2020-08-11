@@ -227,9 +227,6 @@
     <Compile Include="MenuItemCommands\ProjectMenu\RemoveLicenseHeaderFromAllFilesInProjectCommand.cs" />
     <Compile Include="MenuItemCommands\SolutionMenu\RemoveLicenseHeaderFromAllFilesInSolutionCommand.cs" />
     <Compile Include="MenuItemCommands\SolutionMenu\RemoveSolutionLicenseHeaderDefinitionFileCommand.cs" />
-    <Compile Include="Headers\CommentParser.cs" />
-    <Compile Include="Headers\CreateDocumentResult.cs" />
-    <Compile Include="Headers\Document.cs" />
     <Compile Include="Options\IOptionsStore.cs" />
     <Compile Include="Options\OptionsStore.cs" />
     <Compile Include="Utils\CoreHelpers.cs" />
@@ -237,20 +234,12 @@
     <Compile Include="Interfaces\ISolutionLevelCommand.cs" />
     <Compile Include="MenuItemCommands\Common\ExistingLicenseHeaderDefinitionFileAdder.cs" />
     <Compile Include="Headers\NewLineConst.cs" />
-    <Compile Include="Interfaces\ICommentParser.cs" />
     <Compile Include="OutputWindowHandler.cs" />
     <Compile Include="MenuItemCommands\Common\AddLicenseHeaderToAllFilesInProjectHelper.cs" />
     <Compile Include="MenuItemCommands\Common\AddLicenseHeaderToAllFilesInSolutionHelper.cs" />
     <Compile Include="Guids.cs" />
-    <Compile Include="Headers\DocumentHeader.cs" />
-    <Compile Include="Headers\DocumentHeaderProperties.cs" />
-    <Compile Include="Headers\DocumentHeaderProperty.cs" />
     <Compile Include="Headers\LicenseHeaderFinder.cs" />
     <Compile Include="Headers\LicenseHeader.cs" />
-    <Compile Include="Headers\LineEndInformation.cs" />
-    <Compile Include="Headers\NewLineManager.cs" />
-    <Compile Include="Headers\ParseException.cs" />
-    <Compile Include="Headers\UserInfo.cs" />
     <Compile Include="Interfaces\ILicenseHeaderExtension.cs" />
     <Compile Include="Interfaces\ILinkedFileFilter.cs" />
     <Compile Include="Options\IDefaultLicenseHeaderPage.cs" />
@@ -259,7 +248,7 @@
     <Compile Include="Options\WpfEditDefaultLicenseHeaderDialog.xaml.cs">
       <DependentUpon>WpfEditDefaultLicenseHeaderDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Options\DefaultLicenseHeaderPage .cs">
+    <Compile Include="Options\DefaultLicenseHeaderPage.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\VersionedDialogPage.cs">
@@ -280,7 +269,6 @@
     <Compile Include="Options\OptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Options\Language.cs" />
     <Compile Include="Options\LanguagesPage.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -318,11 +306,9 @@
     <Compile Include="SolutionUpdateViewModels\SolutionUpdateViewModel.cs" />
     <Compile Include="Utils\AllSolutionProjectsSearcher.cs" />
     <Compile Include="Utils\CommandUtility.cs" />
-    <Compile Include="Utils\LicenseHeaderPreparer.cs" />
     <Compile Include="Utils\LinkedFileFilter.cs" />
     <Compile Include="Utils\LinkedFileHandler.cs" />
     <Compile Include="Utils\MessageBoxHelper.cs" />
-    <Compile Include="Utils\PathUtility.cs" />
     <Compile Include="Utils\ProjectItemInspection.cs" />
     <Compile Include="Utils\Extensions.cs" />
   </ItemGroup>

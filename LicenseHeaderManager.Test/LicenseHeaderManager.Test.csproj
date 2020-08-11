@@ -87,9 +87,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AllSolutionProjectsSearcherTest.cs" />
-    <Compile Include="LicenseHeaderPreparerTest.cs" />
-    <Compile Include="LineManagerTest.cs" />
-    <Compile Include="CommentParserTests.cs" />
     <Compile Include="LinkedFileFilterTest.cs" />
     <Compile Include="LinkedFileHandlerTest.cs" />
     <Compile Include="OptionsPageTest.cs" />

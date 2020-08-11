@@ -147,18 +147,5 @@ namespace LicenseHeaderManager.Headers
         return extension;
       return "." + extension;
     }
-
-    public static bool Validate (string header, CommentParser commentParser)
-    {
-      try
-      {
-        var result = commentParser.Parse (header);
-        return result == header;
-      }
-      catch (ParseException)
-      {
-        return false;
-      }
-    }
   }
 }

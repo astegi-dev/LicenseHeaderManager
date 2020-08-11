@@ -74,23 +74,5 @@ namespace LicenseHeaderManager.Utils
         }
       }
     }
-
-    internal static int CountOccurrence (this string inputString, string searchString)
-    {
-      if (inputString == null)
-        throw new ArgumentNullException ("inputString");
-      if (string.IsNullOrEmpty (searchString))
-        throw new ArgumentNullException ("searchString");
-
-      var idx = 0;
-      var count = 0;
-      while ((idx = inputString.IndexOf (searchString, idx)) != -1)
-      {
-        idx += searchString.Length;
-        count++;
-      }
-
-      return count;
-    }
   }
 }

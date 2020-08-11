@@ -16,6 +16,7 @@
 
 using System;
 using System.Windows;
+using Core;
 
 namespace LicenseHeaderManager.Options
 {

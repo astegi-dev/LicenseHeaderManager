@@ -30,7 +30,9 @@ namespace LicenseHeaderManager.ResultObjects
     }
 
     public int CountSubLicenseHeadersFound { get; set; }
+
     public bool BaseHeaderFound { get; set; }
+
     public List<ProjectItem> LinkedItems { get; set; }
 
     public bool NoHeaderFound => BaseHeaderFound && CountSubLicenseHeadersFound == 0;

@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Xml.Linq;
+using Core;
 
 namespace LicenseHeaderManager.Options.Converters
 {
