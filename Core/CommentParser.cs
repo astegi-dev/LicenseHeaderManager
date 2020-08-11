@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,29 +11,25 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 
 namespace Core
 {
   /// <summary>
-  /// Detects a comment block at the beginning of a text block and returns it (if any).
+  ///   Detects a comment block at the beginning of a text block and returns it (if any).
   /// </summary>
   public class CommentParser : ICommentParser
   {
-    private bool _started;
     private int _position;
     private Stack<int> _regionStarts;
+    private bool _started;
 
     private string _text;
-
-    public string LineComment { get; private set; }
-    public string BeginComment { get; private set; }
-    public string EndComment { get; private set; }
-    public string BeginRegion { get; private set; }
-    public string EndRegion { get; private set; }
 
     public CommentParser (string lineComment, string beginComment, string endComment, string beginRegion, string endRegion)
     {
@@ -47,6 +44,12 @@ namespace Core
       EndRegion = string.IsNullOrEmpty (endRegion) ? null : endRegion;
     }
 
+    public string LineComment { get; }
+    public string BeginComment { get; }
+    public string EndComment { get; }
+    public string BeginRegion { get; }
+    public string EndRegion { get; }
+
     public string Parse (string text)
     {
       Contract.Requires (text != null);
@@ -56,7 +59,7 @@ namespace Core
       _text = text;
       _regionStarts = new Stack<int>();
 
-      for (string token = GetToken(); HandleToken (token); token = GetToken())
+      for (var token = GetToken(); HandleToken (token); token = GetToken())
       {
       }
 
@@ -77,16 +80,17 @@ namespace Core
       if (SkipWhiteSpaces())
         return null;
 
-      int start = _position;
+      var start = _position;
       for (; _position < _text.Length && !char.IsWhiteSpace (_text, _position); _position++)
       {
       }
+
       return _text.Substring (start, _position - start);
     }
 
     private bool SkipWhiteSpaces ()
     {
-      int start = _position;
+      var start = _position;
 
       //move to next real character
       for (; _position < _text.Length && char.IsWhiteSpace (_text, _position); _position++)
@@ -103,8 +107,8 @@ namespace Core
         var firstNewLine = NewLineManager.NextLineEndPositionInformation (_text, start, _position - start);
         if (firstNewLine != null)
         {
-          int afterFirstNewLine = firstNewLine.Index + firstNewLine.LineEndLength;
-          int nextNewLine = NewLineManager.NextLineEndPosition (_text, afterFirstNewLine, _position - afterFirstNewLine);
+          var afterFirstNewLine = firstNewLine.Index + firstNewLine.LineEndLength;
+          var nextNewLine = NewLineManager.NextLineEndPosition (_text, afterFirstNewLine, _position - afterFirstNewLine);
           //more than one NewLine (= at least one empty line)
           if (nextNewLine > 0)
             return true;
@@ -131,20 +135,19 @@ namespace Core
         return true;
       }
 
-      else if (BeginComment != null && token.StartsWith (BeginComment))
+      if (BeginComment != null && token.StartsWith (BeginComment))
       {
         SetStarted();
 
         _position = _text.IndexOf (EndComment, _position - token.Length + BeginComment.Length);
         if (_position < 0)
           throw new ParseException();
-        else
-          _position += EndComment.Length;
+        _position += EndComment.Length;
 
         return true;
       }
 
-      else if (BeginRegion != null && token == BeginRegion)
+      if (BeginRegion != null && token == BeginRegion)
       {
         SetStarted();
 
@@ -158,7 +161,7 @@ namespace Core
         return true;
       }
 
-      else if (EndRegion != null && token == EndRegion)
+      if (EndRegion != null && token == EndRegion)
       {
         SetStarted();
 
@@ -174,14 +177,15 @@ namespace Core
 
         return true;
       }
-      else if (EndRegion != null && EndRegion.Contains (token))
+
+      if (EndRegion != null && EndRegion.Contains (token))
       {
         SetStarted();
 
-        string firstPart = token;
+        var firstPart = token;
         token = GetToken();
 
-        if ((firstPart + " " + token) == EndRegion)
+        if (firstPart + " " + token == EndRegion)
         {
           if (_regionStarts.Count == 0)
             throw new ParseException();
@@ -197,11 +201,8 @@ namespace Core
         return true;
       }
 
-      else
-      {
-        _position -= token.Length;
-        return false;
-      }
+      _position -= token.Length;
+      return false;
     }
 
     private void UpdatePositionIfEndOfFile ()

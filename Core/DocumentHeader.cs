@@ -36,6 +36,12 @@ namespace Core
       Text = CreateText (text);
     }
 
+    public bool IsEmpty => Text == null;
+
+    public FileInfo FileInfo { get; }
+
+    public string Text { get; }
+
     private FileInfo CreateFileInfo (string pathToDocument)
     {
       return File.Exists (pathToDocument) ? new FileInfo (pathToDocument) : null;
@@ -44,28 +50,18 @@ namespace Core
     private string CreateText (string inputText)
     {
       if (inputText == null)
-      {
         return null;
-      }
 
-      string finalText = inputText;
+      var finalText = inputText;
 
-      foreach (DocumentHeaderProperty property in _properties)
-      {
+      foreach (var property in _properties)
         if (property.CanCreateValue (this))
         {
           var regex = new Regex (property.Token, RegexOptions.IgnoreCase);
           finalText = regex.Replace (finalText, property.CreateValue (this));
         }
-      }
 
       return finalText;
     }
-
-    public bool IsEmpty => Text == null;
-
-    public FileInfo FileInfo { get; }
-
-    public string Text { get; }
   }
 }

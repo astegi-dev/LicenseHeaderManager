@@ -25,14 +25,14 @@ namespace Core
 {
   public class LicenseHeaderReplacer
   {
-    private readonly IEnumerable<Language> _languages;
-    private readonly IEnumerable<string> _keywords;
-
     /// <summary>
-    /// Used to keep track of the user selection when he is trying to insert invalid headers into all files,
-    /// so that the warning is only displayed once per file extension.
+    ///   Used to keep track of the user selection when he is trying to insert invalid headers into all files,
+    ///   so that the warning is only displayed once per file extension.
     /// </summary>
     private readonly IDictionary<string, bool> _extensionsWithInvalidHeaders = new Dictionary<string, bool>();
+
+    private readonly IEnumerable<string> _keywords;
+    private readonly IEnumerable<Language> _languages;
 
     public LicenseHeaderReplacer (IEnumerable<Language> languages, IEnumerable<string> keywords)
     {
@@ -46,14 +46,23 @@ namespace Core
     }
 
     /// <summary>
-    /// Removes or replaces the header of a given project item.
+    ///   Removes or replaces the header of a given project item.
     /// </summary>
     /// <param name="licenseHeaderInput">The licenseHeaderInput item.</param>
-    /// <param name="calledByUser">Specifies whether the command was called by the user (as opposed to automatically by a linked command or by ItemAdded)</param>
-    /// <param name="nonCommentTextInquiry">Determines whether license headers should be inserted even if they contain non-comment text for the respective language.
-    /// Is supplied with a <see cref="string"/> argument that represents a specific message describing the issue. If null, license headers are inserted.</param>
-    /// <param name="commentDefinitionNotFoundAction">Is executed if there there is no license header definition configured for the language of a specific file.
-    /// If null, no action is executed in this case.</param>
+    /// <param name="calledByUser">
+    ///   Specifies whether the command was called by the user (as opposed to automatically by a
+    ///   linked command or by ItemAdded)
+    /// </param>
+    /// <param name="nonCommentTextInquiry">
+    ///   Determines whether license headers should be inserted even if they contain non-comment text for the respective
+    ///   language.
+    ///   Is supplied with a <see cref="string" /> argument that represents a specific message describing the issue. If null,
+    ///   license headers are inserted.
+    /// </param>
+    /// <param name="commentDefinitionNotFoundAction">
+    ///   Is executed if there there is no license header definition configured for the language of a specific file.
+    ///   If null, no action is executed in this case.
+    /// </param>
     public Task<string> RemoveOrReplaceHeader (
         LicenseHeaderInput licenseHeaderInput,
         bool calledByUser,
@@ -110,9 +119,7 @@ namespace Core
             break;
           case CreateDocumentResult.NoHeaderFound:
             if (calledByUser)
-            {
               message = string.Format (Resources.Error_NoHeaderFound).Replace (@"\n", "\n");
-            }
 
             break;
         }
@@ -171,12 +178,15 @@ namespace Core
     }
 
     /// <summary>
-    /// Tries to open a given project item as a Document which can be used to add or remove headers.
+    ///   Tries to open a given project item as a Document which can be used to add or remove headers.
     /// </summary>
     /// <param name="documentPath">The project item.</param>
     /// <param name="document">The document which was created or null if an error occured (see return value).</param>
     /// <param name="additionalProperties"></param>
-    /// <param name="headers">A dictionary of headers using the file extension as key and the header as value or null if headers should only be removed.</param>
+    /// <param name="headers">
+    ///   A dictionary of headers using the file extension as key and the header as value or null if
+    ///   headers should only be removed.
+    /// </param>
     /// <returns>A value indicating the result of the operation. Document will be null unless DocumentCreated is returned.</returns>
     public CreateDocumentResult TryCreateDocument (
         string documentPath,
@@ -203,16 +213,12 @@ namespace Core
             .FirstOrDefault (x => documentPath.EndsWith (x, StringComparison.OrdinalIgnoreCase));
 
         if (extension == null)
-        {
           return CreateDocumentResult.NoHeaderFound;
-        }
 
         header = headers[extension];
 
         if (header.All (string.IsNullOrEmpty))
-        {
           return CreateDocumentResult.EmptyHeader;
-        }
       }
 
       document = new Document (documentPath, language, header, additionalProperties, _keywords);

@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,6 +11,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
 using System;
@@ -20,19 +22,20 @@ using Core.Properties;
 namespace Core
 {
   /// <summary>
-  /// Represents general information about the current user, e.g. login or display name.
-  /// Information about the current user is retrieved in static constructor.
+  ///   Represents general information about the current user, e.g. login or display name.
+  ///   Information about the current user is retrieved in static constructor.
   /// </summary>
   public static class UserInfo
   {
     #region Properties
+
     private static readonly object NameLock = new object();
     private static readonly object DisplayNameLock = new object();
 
     private static string _name;
 
     /// <summary>
-    /// Gets name (login) of the current user.
+    ///   Gets name (login) of the current user.
     /// </summary>
     public static string Name
     {
@@ -41,9 +44,7 @@ namespace Core
         lock (NameLock)
         {
           if (string.IsNullOrEmpty (_name))
-          {
             _name = Environment.UserName;
-          }
           return _name;
         }
       }
@@ -51,10 +52,10 @@ namespace Core
 
     private static string _displayName = "";
     private static DateTime _lastPropertyCall = DateTime.MinValue;
-    private static bool _lookupSuccessful = false;
+    private static bool _lookupSuccessful;
 
     /// <summary>
-    /// Gets display name of the current user, e.g. "John Smith".
+    ///   Gets display name of the current user, e.g. "John Smith".
     /// </summary>
     public static string DisplayName
     {
@@ -86,18 +87,17 @@ namespace Core
       }
       catch (Exception e)
       {
-        string OutputMessage = string.Format (Resources.UserInfo_LookupFailure_Information, e).Replace (@"\n", "\n");
+        var OutputMessage = string.Format (Resources.UserInfo_LookupFailure_Information, e).Replace (@"\n", "\n");
 
         if (e is FileNotFoundException)
-        {
           OutputMessage = string.Format (Resources.UserInfo_LookupFailure_FileNotFoundException_Information).Replace (@"\n", "\n");
-        }
 
         // OutputWindowHandler.WriteMessage(OutputMessage);
         _displayName = Resources.UserInfo_UnknownDisplayNameString;
         _lookupSuccessful = false;
       }
     }
+
     #endregion
   }
 }

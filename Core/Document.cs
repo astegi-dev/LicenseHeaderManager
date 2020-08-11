@@ -1,4 +1,5 @@
 ﻿#region copyright
+
 // Copyright (c) rubicon IT GmbH
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
@@ -10,8 +11,10 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,11 +25,11 @@ namespace Core
 {
   public class Document
   {
-    internal readonly DocumentHeader _header;
-    internal readonly Language _language;
-    internal readonly IEnumerable<string> _keywords;
-    internal readonly string _documentFilePath;
     internal readonly CommentParser _commentParser;
+    internal readonly string _documentFilePath;
+    internal readonly DocumentHeader _header;
+    internal readonly IEnumerable<string> _keywords;
+    internal readonly Language _language;
     internal readonly string _lineEndingInDocument;
     private string _documentTextCache;
 
@@ -42,7 +45,7 @@ namespace Core
       _lineEndingInDocument = NewLineManager.DetectMostFrequentLineEnd (GetText());
 
 
-      string headerText = CreateHeaderText (headerLines);
+      var headerText = CreateHeaderText (headerLines);
       _header = new DocumentHeader (documentFilePath, headerText, new DocumentHeaderProperties (additionalProperties));
       _keywords = keywords;
 
@@ -51,32 +54,33 @@ namespace Core
       _commentParser = new CommentParser (language.LineComment, language.BeginComment, language.EndComment, language.BeginRegion, language.EndRegion);
     }
 
-    public bool ValidateHeader()
+    public bool ValidateHeader ()
     {
       if (_header.IsEmpty)
         return true;
-      else
-        return LicenseHeader.Validate(_header.Text, _commentParser);
+      return LicenseHeader.Validate (_header.Text, _commentParser);
     }
 
-    public void ReplaceHeaderIfNecessary()
+    public void ReplaceHeaderIfNecessary ()
     {
       var skippedText = SkipText();
-      if (!string.IsNullOrEmpty(skippedText))
-        RemoveHeader(skippedText);
+      if (!string.IsNullOrEmpty (skippedText))
+        RemoveHeader (skippedText);
 
-      string existingHeader = GetExistingHeader();
+      var existingHeader = GetExistingHeader();
 
       if (!_header.IsEmpty)
       {
         if (existingHeader != _header.Text)
-          ReplaceHeader(existingHeader, _header.Text);
+          ReplaceHeader (existingHeader, _header.Text);
       }
       else
-        RemoveHeader(existingHeader);
+      {
+        RemoveHeader (existingHeader);
+      }
 
-      if (!string.IsNullOrEmpty(skippedText))
-        AddHeader(skippedText);
+      if (!string.IsNullOrEmpty (skippedText))
+        AddHeader (skippedText);
     }
 
     private string CreateHeaderText (string[] headerLines)
@@ -93,26 +97,23 @@ namespace Core
     private string GetText ()
     {
       if (string.IsNullOrEmpty (_documentTextCache))
-      {
         RefreshText();
-      }
 
       return _documentTextCache;
     }
 
     private void RefreshText ()
     {
-      _documentTextCache = File.ReadAllText(_documentFilePath);
+      _documentTextCache = File.ReadAllText (_documentFilePath);
     }
 
     private string GetExistingHeader ()
     {
-      string header = _commentParser.Parse (GetText());
+      var header = _commentParser.Parse (GetText());
 
       if (_keywords == null || _keywords.Any (k => header.ToLower().Contains (k.ToLower())))
         return header;
-      else
-        return string.Empty;
+      return string.Empty;
     }
 
     private string SkipText ()
@@ -122,8 +123,7 @@ namespace Core
       var match = Regex.Match (GetText(), _language.SkipExpression, RegexOptions.IgnoreCase);
       if (match.Success && match.Index == 0)
         return match.Value;
-      else
-        return null;
+      return null;
     }
 
     private void ReplaceHeader (string existingHeader, string newHeader)
@@ -137,8 +137,8 @@ namespace Core
       if (!string.IsNullOrEmpty (header))
       {
         var sb = new StringBuilder();
-        var newContent = sb.Append(header).Append(GetText()).ToString();
-        File.WriteAllText(_documentFilePath, newContent);
+        var newContent = sb.Append (header).Append (GetText()).ToString();
+        File.WriteAllText (_documentFilePath, newContent);
         RefreshText();
       }
     }
@@ -147,8 +147,8 @@ namespace Core
     {
       if (!string.IsNullOrEmpty (header))
       {
-        var newContent = GetText().Substring(header.Length);
-        File.WriteAllText(_documentFilePath, newContent);
+        var newContent = GetText().Substring (header.Length);
+        File.WriteAllText (_documentFilePath, newContent);
         RefreshText();
       }
     }

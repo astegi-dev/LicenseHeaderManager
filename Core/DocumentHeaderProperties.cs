@@ -15,19 +15,20 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace Core
 {
-  class DocumentHeaderProperties : IEnumerable<DocumentHeaderProperty>
+  internal class DocumentHeaderProperties : IEnumerable<DocumentHeaderProperty>
   {
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 
     public DocumentHeaderProperties (IEnumerable<DocumentHeaderProperty> additionalProperties = null)
     {
-      _properties = CreateProperties(additionalProperties);
+      _properties = CreateProperties (additionalProperties);
     }
 
     public IEnumerator<DocumentHeaderProperty> GetEnumerator ()
@@ -35,7 +36,7 @@ namespace Core
       return _properties.GetEnumerator();
     }
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator ()
+    IEnumerator IEnumerable.GetEnumerator ()
     {
       return GetEnumerator();
     }
