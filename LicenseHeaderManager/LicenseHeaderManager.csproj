@@ -232,6 +232,7 @@
     <Compile Include="Options\IOptionsStore.cs" />
     <Compile Include="Options\OptionsStore.cs" />
     <Compile Include="Utils\CoreHelpers.cs" />
+    <Compile Include="Utils\JsonBoolConverter.cs" />
     <Compile Include="Utils\ProjectItemParentFinder.cs" />
     <Compile Include="Interfaces\ISolutionLevelCommand.cs" />
     <Compile Include="MenuItemCommands\Common\ExistingLicenseHeaderDefinitionFileAdder.cs" />
