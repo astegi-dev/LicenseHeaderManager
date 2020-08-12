@@ -22,12 +22,31 @@ namespace LicenseHeaderManager.Test
       Assert.That (deserializeObject, Is.False);
     }
 
-    [TestCase("0")]
-    [TestCase("-0")]
-    [TestCase("1")]
-    [TestCase("5")]
-    [TestCase("-1")]
-    [TestCase("-13")]
+    [Test]
+    public void Test_Deserialize_Null_Throws ()
+    {
+      var ex = Assert.Throws<JsonReaderException> (() => JsonConvert.DeserializeObject<bool> ("null", new JsonBoolConverter()));
+      Assert.That (ex.Message, Contains.Substring (JsonBoolConverter.NullLiteral));
+    }
+
+    [TestCase("\"\"")]
+    [TestCase("\"True\"")]
+    [TestCase("\"tRuE\"")]
+    [TestCase("\"true\"")]
+    [TestCase("\"False\"")]
+    [TestCase("\"false\"")]
+    [TestCase("\"fALsE\"")]
+    public void Test_Deserialize_String_Throws(string stringLiteral)
+    {
+      Assert.Throws<JsonReaderException>(() => JsonConvert.DeserializeObject<bool>(stringLiteral, new JsonBoolConverter()));
+    }
+
+    [TestCase ("0")]
+    [TestCase ("-0")]
+    [TestCase ("1")]
+    [TestCase ("5")]
+    [TestCase ("-1")]
+    [TestCase ("-13")]
     public void Test_Deserialize_Number_Throws (string number)
     {
       Assert.Throws<JsonReaderException> (() => JsonConvert.DeserializeObject<bool> (number, new JsonBoolConverter()));

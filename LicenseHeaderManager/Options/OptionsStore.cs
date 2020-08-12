@@ -187,11 +187,12 @@ namespace LicenseHeaderManager.Options
     private static void OnSerializerError (ErrorEventArgs args, ICollection<string> errors)
     {
       // log errors only once
-      if (args.CurrentObject != args.ErrorContext.OriginalObject || errors.Contains (args.ErrorContext.Error.Message))
+      if (args.CurrentObject != args.ErrorContext.OriginalObject)
         return;
-
-      errors.Add (args.ErrorContext.Error.Message);
       args.ErrorContext.Handled = true;
+
+      if (!errors.Contains (args.ErrorContext.Error.Message))
+        errors.Add (args.ErrorContext.Error.Message);
     }
 
     public IOptionsStore Clone ()
