@@ -63,7 +63,7 @@ namespace Core
     ///   Is executed if there there is no license header definition configured for the language of a specific file.
     ///   If null, no action is executed in this case.
     /// </param>
-    public Task<ReplacerResult<ReplacerError>> RemoveOrReplaceHeader (
+    public async Task<ReplacerResult<ReplacerError>> RemoveOrReplaceHeader (
         LicenseHeaderInput licenseHeaderInput,
         bool calledByUser,
         Func<string, bool> nonCommentTextInquiry = null,
@@ -77,7 +77,7 @@ namespace Core
         switch (result)
         {
           case CreateDocumentResult.DocumentCreated:
-            if (!document.ValidateHeader())
+            if (!(await document.ValidateHeader()))
             {
               var message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).Replace (@"\n", "\n");
               var addDespiteNonCommentText = nonCommentTextInquiry?.Invoke (message) ?? true;
@@ -95,7 +95,7 @@ namespace Core
 
             try
             {
-              document.ReplaceHeaderIfNecessary();
+              await document.ReplaceHeaderIfNecessary();
             }
             catch (ParseException)
             {
@@ -134,10 +134,10 @@ namespace Core
         returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput.DocumentPath, ErrorType.Miscellaneous, message));
       }
 
-      return Task.FromResult (returnObject);
+      return returnObject;
     }
 
-    public Task<ReplacerResult<IEnumerable<ReplacerError>>> RemoveOrReplaceHeader (
+    public async Task<ReplacerResult<IEnumerable<ReplacerError>>> RemoveOrReplaceHeader (
         IEnumerable<LicenseHeaderInput> licenseHeaders,
         Func<string, bool> nonCommentTextInquiry = null)
     {
@@ -151,7 +151,7 @@ namespace Core
         string message;
         var replace = true;
 
-        if (!document.ValidateHeader())
+        if (!(await document.ValidateHeader()))
         {
           var extension = Path.GetExtension (header.DocumentPath);
           if (!_extensionsWithInvalidHeaders.TryGetValue (extension, out replace))
@@ -167,7 +167,7 @@ namespace Core
 
         try
         {
-          document.ReplaceHeaderIfNecessary();
+          await document.ReplaceHeaderIfNecessary();
         }
         catch (ParseException)
         {
@@ -176,7 +176,7 @@ namespace Core
         }
       }
 
-      return Task.FromResult (errorList.Count == 0 ? new ReplacerResult<IEnumerable<ReplacerError>>() : new ReplacerResult<IEnumerable<ReplacerError>> (errorList));
+      return errorList.Count == 0 ? new ReplacerResult<IEnumerable<ReplacerError>>() : new ReplacerResult<IEnumerable<ReplacerError>> (errorList);
     }
 
     public static bool IsLicenseHeader (string documentPath)

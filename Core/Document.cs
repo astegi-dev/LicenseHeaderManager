@@ -20,18 +20,21 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Core
 {
   public class Document
   {
-    internal readonly CommentParser _commentParser;
-    internal readonly string _documentFilePath;
-    internal readonly DocumentHeader _header;
-    internal readonly IEnumerable<string> _keywords;
-    internal readonly Language _language;
-    internal readonly string _lineEndingInDocument;
+    private readonly IEnumerable<DocumentHeaderProperty> _additionalProperties;
+    private readonly CommentParser _commentParser;
+    private readonly string _documentFilePath;
+    private readonly string[] _headerLines;
+    private readonly IEnumerable<string> _keywords;
+    private readonly Language _language;
     private string _documentTextCache;
+    private DocumentHeader _headerCache;
+    private string _lineEndingInDocumentCache;
 
     public Document (
         string documentFilePath,
@@ -41,115 +44,132 @@ namespace Core
         IEnumerable<string> keywords = null)
     {
       _documentFilePath = documentFilePath;
-
-      _lineEndingInDocument = NewLineManager.DetectMostFrequentLineEnd (GetText());
-
-
-      var headerText = CreateHeaderText (headerLines);
-      _header = new DocumentHeader (documentFilePath, headerText, new DocumentHeaderProperties (additionalProperties));
+      _additionalProperties = additionalProperties;
       _keywords = keywords;
-
       _language = language;
-
+      _headerLines = headerLines;
       _commentParser = new CommentParser (language.LineComment, language.BeginComment, language.EndComment, language.BeginRegion, language.EndRegion);
     }
 
-    public bool ValidateHeader ()
+    private async Task<DocumentHeader> GetHeader ()
     {
-      if (_header.IsEmpty)
-        return true;
-      return LicenseHeader.Validate (_header.Text, _commentParser);
+      if (_headerCache != default)
+        return _headerCache;
+
+      var headerText = await CreateHeaderText (_headerLines);
+      _headerCache = new DocumentHeader (_documentFilePath, headerText, new DocumentHeaderProperties (_additionalProperties));
+      return _headerCache;
     }
 
-    public void ReplaceHeaderIfNecessary ()
+    private async Task<string> GetLineEndingInDocument ()
     {
-      var skippedText = SkipText();
+      _lineEndingInDocumentCache ??= NewLineManager.DetectMostFrequentLineEnd (await GetText());
+      return _lineEndingInDocumentCache;
+    }
+
+    public async Task<bool> ValidateHeader ()
+    {
+      return (await GetHeader()).IsEmpty || LicenseHeader.Validate ((await GetHeader()).Text, _commentParser);
+    }
+
+    public async Task ReplaceHeaderIfNecessary ()
+    {
+      var skippedText = await SkipText();
       if (!string.IsNullOrEmpty (skippedText))
-        RemoveHeader (skippedText);
+        await RemoveHeader (skippedText);
 
-      var existingHeader = GetExistingHeader();
+      var existingHeader = await GetExistingHeader();
 
-      if (!_header.IsEmpty)
+      if (!(await GetHeader()).IsEmpty)
       {
-        if (existingHeader != _header.Text)
-          ReplaceHeader (existingHeader, _header.Text);
+        if (existingHeader != (await GetHeader()).Text)
+          await ReplaceHeader (existingHeader, (await GetHeader()).Text);
       }
       else
       {
-        RemoveHeader (existingHeader);
+        await RemoveHeader (existingHeader);
       }
 
       if (!string.IsNullOrEmpty (skippedText))
-        AddHeader (skippedText);
+        await AddHeader (skippedText);
     }
 
-    private string CreateHeaderText (string[] headerLines)
+    private async Task<string> CreateHeaderText (string[] headerLines)
     {
       if (headerLines == null)
         return null;
 
-      var inputText = string.Join (_lineEndingInDocument, headerLines);
-      inputText += _lineEndingInDocument;
+      var inputText = string.Join (await GetLineEndingInDocument(), headerLines);
+      inputText += await GetLineEndingInDocument();
 
       return inputText;
     }
 
-    private string GetText ()
+    private async Task<string> GetText ()
     {
       if (string.IsNullOrEmpty (_documentTextCache))
-        RefreshText();
+        await RefreshText();
 
       return _documentTextCache;
     }
 
-    private void RefreshText ()
+    private async Task RefreshText ()
     {
-      _documentTextCache = File.ReadAllText (_documentFilePath);
+      using var reader = new StreamReader (_documentFilePath, Encoding.UTF8);
+      _documentTextCache = await reader.ReadToEndAsync();
     }
 
-    private string GetExistingHeader ()
+    private async Task<string> GetExistingHeader ()
     {
-      var header = _commentParser.Parse (GetText());
+      var header = _commentParser.Parse (await GetText());
 
       if (_keywords == null || _keywords.Any (k => header.ToLower().Contains (k.ToLower())))
         return header;
       return string.Empty;
     }
 
-    private string SkipText ()
+    private async Task<string> SkipText ()
     {
       if (string.IsNullOrEmpty (_language.SkipExpression))
         return null;
-      var match = Regex.Match (GetText(), _language.SkipExpression, RegexOptions.IgnoreCase);
+      var match = Regex.Match (await GetText(), _language.SkipExpression, RegexOptions.IgnoreCase);
       if (match.Success && match.Index == 0)
         return match.Value;
       return null;
     }
 
-    private void ReplaceHeader (string existingHeader, string newHeader)
+    private async Task ReplaceHeader (string existingHeader, string newHeader)
     {
-      RemoveHeader (existingHeader);
-      AddHeader (LicenseHeaderPreparer.Prepare (newHeader, GetText(), _commentParser));
+      await RemoveHeader (existingHeader);
+      await AddHeader (LicenseHeaderPreparer.Prepare (newHeader, await GetText(), _commentParser));
     }
 
-    private void AddHeader (string header)
+    private async Task AddHeader (string header)
     {
       if (!string.IsNullOrEmpty (header))
       {
         var sb = new StringBuilder();
-        var newContent = sb.Append (header).Append (GetText()).ToString();
-        File.WriteAllText (_documentFilePath, newContent);
-        RefreshText();
+        var newContent = sb.Append (header).Append (await GetText()).ToString();
+        using (var writer = new StreamWriter (_documentFilePath, false, Encoding.UTF8))
+        {
+          await writer.WriteAsync (newContent);
+        }
+
+        await RefreshText();
       }
     }
 
-    private void RemoveHeader (string header)
+    private async Task RemoveHeader (string header)
     {
       if (!string.IsNullOrEmpty (header))
       {
-        var newContent = GetText().Substring (header.Length);
-        File.WriteAllText (_documentFilePath, newContent);
-        RefreshText();
+        var newContent = (await GetText()).Substring (header.Length);
+        using (var writer = new StreamWriter (_documentFilePath, false, Encoding.UTF8))
+        {
+          await writer.WriteAsync (newContent);
+        }
+
+        await RefreshText();
       }
     }
   }
