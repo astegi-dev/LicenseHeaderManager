@@ -2,19 +2,33 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
+using LicenseHeaderManager.SolutionUpdateViewModels;
+using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.Utils
 {
   internal static class CoreHelpers
   {
-    public static void OnProgressReported (ReplacerProgressReport obj)
+    public static void OnProgressReported (ReplacerProgressReport progress)
     {
-      OutputWindowHandler.WriteMessage($"Processed {obj.ProcessedFileCount} of {obj.TotalFileCount} files.");
+      OutputWindowHandler.WriteMessage($"Processed {progress.ProcessedFileCount} of {progress.TotalFileCount} files.");
+    }
+
+    public static async System.Threading.Tasks.Task OnProgressReported(ReplacerProgressReport progress, SolutionUpdateViewModel solutionUpdateViewModel)
+    {
+      // OutputWindowHandler.WriteMessage($"Processed {progress.ProcessedFileCount} of {progress.TotalFileCount} files.");
+      if (solutionUpdateViewModel == null)
+        return;
+
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+      solutionUpdateViewModel.FileCountCurrentProject = progress.TotalFileCount;
+      solutionUpdateViewModel.ProcessedFilesCountCurrentProject = progress.ProcessedFileCount;
     }
 
     /// <summary>

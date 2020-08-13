@@ -23,15 +23,66 @@ namespace LicenseHeaderManager.SolutionUpdateViewModels
 {
   public class SolutionUpdateViewModel : INotifyPropertyChanged
   {
-    private string _progressText = "Preparing update...";
+    private string _currentProject = "Preparing update...";
+    private int _processedFilesCountCurrentProject;
+    private int _fileCountCurrentProject;
+    private int _projectCount;
+    private int _processedProjectCount;
 
-    public string ProgressText
+    public SolutionUpdateViewModel ()
     {
-      get => _progressText;
+      // set progressbar maximum values to something other than 0 in order to prevent progressbar from being "full" at dialog startup
+      ProjectCount = 1;
+      FileCountCurrentProject = 1;
+    }
+
+    public string CurrentProject
+    {
+      get => _currentProject;
       set
       {
-        _progressText = value;
-        NotifyPropertyChanged ("ProgressText");
+        _currentProject = value;
+        NotifyPropertyChanged (nameof(CurrentProject));
+      }
+    }
+
+    public int ProjectCount
+    {
+      get => _projectCount;
+      set
+      {
+        _projectCount = value;
+        NotifyPropertyChanged(nameof(ProjectCount));
+      }
+    }
+
+    public int ProcessedProjectCount
+    {
+      get => _processedProjectCount;
+      set
+      {
+        _processedProjectCount = value;
+        NotifyPropertyChanged(nameof(ProcessedProjectCount));
+      }
+    }
+
+    public int FileCountCurrentProject
+    {
+      get => _fileCountCurrentProject;
+      set
+      {
+        _fileCountCurrentProject = value;
+        NotifyPropertyChanged (nameof(FileCountCurrentProject));
+      }
+    }
+
+    public int ProcessedFilesCountCurrentProject
+    {
+      get => _processedFilesCountCurrentProject;
+      set
+      {
+        _processedFilesCountCurrentProject = value;
+        NotifyPropertyChanged (nameof(ProcessedFilesCountCurrentProject));
       }
     }
 

@@ -207,7 +207,6 @@
   <ItemGroup>
     <Compile Include="ButtonHandler\ButtonHandlerFactory.cs" />
     <Compile Include="ButtonHandler\AddLicenseHeaderToSolutionHandler.cs" />
-    <Compile Include="ButtonHandler\SolutionLevelButtonThreadWorker.cs" />
     <Compile Include="MenuItemCommands\Common\FolderProjectMenuHelper.cs" />
     <Compile Include="MenuItemCommands\FolderMenu\AddExistingLicenseHeaderDefinitionFileToFolderCommand.cs" />
     <Compile Include="MenuItemCommands\ProjectMenu\AddExistingLicenseHeaderDefinitionFileToProjectCommand.cs" />

@@ -26,6 +26,7 @@ using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
 using LicenseHeaderManager.SolutionUpdateViewModels;
 using LicenseHeaderManager.Utils;
+using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
@@ -50,7 +51,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return c_commandName;
     }
 
-    public async Task ExecuteAsync (Solution solution)
+    public async System.Threading.Tasks.Task ExecuteAsync (Solution solution)
     {
       if (solution == null) return;
 
@@ -133,17 +134,25 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return MessageBoxHelper.DoYouWant (message);
     }
 
-    private async Task AddLicenseHeaderToProjectsAsync (List<Project> projectsInSolution)
+    private async System.Threading.Tasks.Task AddLicenseHeaderToProjectsAsync (ICollection<Project> projectsInSolution)
     {
-      var progressCount = 1;
-      var projectCount = projectsInSolution.Count;
-
+      _solutionUpdateViewModel.ProcessedProjectCount = 0;
+      _solutionUpdateViewModel.ProjectCount = projectsInSolution.Count;
+     
       foreach (var project in projectsInSolution)
       {
-        _solutionUpdateViewModel.ProgressText = $"Currently updating '{project.Name}'. Updating {progressCount}/{projectCount} Projects.";
-        await new AddLicenseHeaderToAllFilesInProjectHelper (_licenseHeaderReplacer).ExecuteAsync (project);
-        progressCount++;
+        //await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+        _solutionUpdateViewModel.CurrentProject = await GetProjectNameAsync (project).ConfigureAwait (true);
+
+        await new AddLicenseHeaderToAllFilesInProjectHelper (_licenseHeaderReplacer, _solutionUpdateViewModel).ExecuteAsync (project);
+        _solutionUpdateViewModel.ProcessedProjectCount++;
       }
+    }
+
+    private async Task<string> GetProjectNameAsync(Project project)
+    {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+      return project.Name;
     }
   }
 }
