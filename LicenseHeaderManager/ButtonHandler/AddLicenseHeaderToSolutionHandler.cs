@@ -17,6 +17,7 @@
 using System;
 using System.ComponentModel;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 using Core;
 using EnvDTE80;
@@ -40,7 +41,7 @@ namespace LicenseHeaderManager.ButtonHandler
       _dte2 = dte2;
     }
 
-    public void HandleButton (object sender, EventArgs e)
+    public void HandleButtonAsync (object sender, EventArgs e)
     {
       var solutionUpdateViewModel = new SolutionUpdateViewModel();
       var addHeaderToAllProjectsCommand = new AddLicenseHeaderToAllFilesInSolutionHelper (_licenseHeaderReplacer, solutionUpdateViewModel);
@@ -58,17 +59,14 @@ namespace LicenseHeaderManager.ButtonHandler
         ResumeResharper();
       };
 
-      _solutionUpdateThread = new Thread (buttonThreadWorker.Run)
-                              { IsBackground = true };
-      _solutionUpdateThread.SetApartmentState (ApartmentState.STA);
-      _solutionUpdateThread.Start (_dte2.Solution);
+      buttonThreadWorker.RunAsync(_dte2.Solution).FireAndForget();
 
       dialog.ShowModal();
     }
 
     private void DialogOnClosing (object sender, CancelEventArgs cancelEventArgs)
     {
-      _solutionUpdateThread.Abort();
+      // TODO how to cancel Core operation?
 
       ResumeResharper();
     }

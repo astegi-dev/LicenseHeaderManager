@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using EnvDTE;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.Utils;
@@ -32,14 +33,14 @@ namespace LicenseHeaderManager.ButtonHandler
 
     public event EventHandler ThreadDone;
 
-    public void Run (object solutionObject)
+    public async Task RunAsync (object solutionObject)
     {
-      var solution = solutionObject as Solution;
-      if (solution == null) return;
+      if (!(solutionObject is Solution solution))
+        return;
 
       try
       {
-        _solutionLevelCommand.Execute (solution);
+        await _solutionLevelCommand.ExecuteAsync (solution);
       }
       catch (Exception exception)
       {

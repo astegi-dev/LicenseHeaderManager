@@ -19,6 +19,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.Properties;
 
@@ -138,27 +139,52 @@ namespace Core
       return returnObject;
     }
 
-    private async Task RemoveOrReplaceHeaderForOneFile(LicenseHeaderInput header, Func<string, bool> nonCommentTextInquiry, ConcurrentQueue<ReplacerError> errors)
+    private int _processedFileCount;
+    private int _totalFileCount;
+
+    private void ResetProgress (int totalFileCount)
     {
-      if (TryCreateDocument(header.DocumentPath, out var document, header.AdditionalProperties, header.Headers) != CreateDocumentResult.DocumentCreated)
+      _processedFileCount = 0;
+      _totalFileCount = totalFileCount;
+    }
+
+    private void ReportProgress (IProgress<ReplacerProgressReport> progress)
+    {
+      Interlocked.Increment (ref _processedFileCount);
+      progress.Report (new ReplacerProgressReport (_totalFileCount, _processedFileCount));
+    }
+
+    private async Task RemoveOrReplaceHeaderForOneFile (
+        LicenseHeaderInput header,
+        Func<string, bool> nonCommentTextInquiry,
+        IProgress<ReplacerProgressReport> progress,
+        ConcurrentQueue<ReplacerError> errors)
+    {
+      if (TryCreateDocument (header.DocumentPath, out var document, header.AdditionalProperties, header.Headers) != CreateDocumentResult.DocumentCreated)
+      {
+        ReportProgress (progress);
         return;
+      }
 
       string message;
       var replace = true;
 
       if (!(await document.ValidateHeader()))
       {
-        var extension = Path.GetExtension(header.DocumentPath);
-        if (!_extensionsWithInvalidHeaders.TryGetValue(extension, out replace))
+        var extension = Path.GetExtension (header.DocumentPath);
+        if (!_extensionsWithInvalidHeaders.TryGetValue (extension, out replace))
         {
-          message = string.Format(Resources.Warning_InvalidLicenseHeader, extension).Replace(@"\n", "\n");
-          replace = nonCommentTextInquiry?.Invoke(message) ?? true;
+          message = string.Format (Resources.Warning_InvalidLicenseHeader, extension).Replace (@"\n", "\n");
+          replace = nonCommentTextInquiry?.Invoke (message) ?? true;
           _extensionsWithInvalidHeaders[extension] = replace;
         }
       }
 
       if (!replace)
+      {
+        ReportProgress (progress);
         return;
+      }
 
       try
       {
@@ -166,18 +192,22 @@ namespace Core
       }
       catch (ParseException)
       {
-        message = string.Format(Resources.Error_InvalidLicenseHeader, header.DocumentPath).Replace(@"\n", "\n");
-        errors.Enqueue(new ReplacerError(header.DocumentPath, ErrorType.ParsingError, message));
+        message = string.Format (Resources.Error_InvalidLicenseHeader, header.DocumentPath).Replace (@"\n", "\n");
+        errors.Enqueue (new ReplacerError (header.DocumentPath, ErrorType.ParsingError, message));
       }
+
+      ReportProgress (progress);
     }
 
     public async Task<ReplacerResult<IEnumerable<ReplacerError>>> RemoveOrReplaceHeader (
-        IEnumerable<LicenseHeaderInput> licenseHeaders,
+        ICollection<LicenseHeaderInput> licenseHeaders,
+        IProgress<ReplacerProgressReport> progress,
         Func<string, bool> nonCommentTextInquiry = null)
     {
       var errorList = new ConcurrentQueue<ReplacerError>();
+      ResetProgress (licenseHeaders.Count);
 
-      var tasks = licenseHeaders.Select (x => RemoveOrReplaceHeaderForOneFile (x, nonCommentTextInquiry, errorList));
+      var tasks = licenseHeaders.Select (x => RemoveOrReplaceHeaderForOneFile (x, nonCommentTextInquiry, progress, errorList));
       await Task.WhenAll (tasks);
 
       return errorList.Count == 0 ? new ReplacerResult<IEnumerable<ReplacerError>>() : new ReplacerResult<IEnumerable<ReplacerError>> (errorList);

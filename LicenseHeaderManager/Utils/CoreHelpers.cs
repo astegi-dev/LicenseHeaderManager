@@ -12,6 +12,11 @@ namespace LicenseHeaderManager.Utils
 {
   internal static class CoreHelpers
   {
+    public static void OnProgressReported (ReplacerProgressReport obj)
+    {
+      OutputWindowHandler.WriteMessage($"Processed {obj.ProcessedFileCount} of {obj.TotalFileCount} files.");
+    }
+
     /// <summary>
     ///   Is executed when the Core reports that the license header definition file to be used on a specific file contains
     ///   content that is not recognized as comments for the respective language.
@@ -41,7 +46,7 @@ namespace LicenseHeaderManager.Utils
         licenseHeaderExtension.ShowLanguagesPage();
     }
 
-    public static IEnumerable<LicenseHeaderInput> GetFilesToProcess (
+    public static ICollection<LicenseHeaderInput> GetFilesToProcess (
         ProjectItem item,
         IDictionary<string, string[]> headers,
         out int countSubLicenseHeaders,

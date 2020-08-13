@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Interfaces;
@@ -41,7 +42,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return c_commandName;
     }
 
-    public async void Execute (Solution solution)
+    public async Task ExecuteAsync (Solution solution)
     {
       if (solution == null) return;
 

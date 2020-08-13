@@ -15,7 +15,9 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Utils;
@@ -33,26 +35,34 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     public async Task ExecuteAsync (object projectOrProjectItem)
     {
-      var project = projectOrProjectItem as Project;
-      var item = projectOrProjectItem as ProjectItem;
-      if (project == null && item == null)
-        return;
+      switch (projectOrProjectItem)
+      {
+        case Project project:
+        {
+          _licenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
 
-      _licenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
-      if (project != null)
-        foreach (ProjectItem i in project.ProjectItems)
-        {
-          var replacerInput = CoreHelpers.GetFilesToProcess (i, null, out _, false);
-          var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput);
-          CoreHelpers.HandleResult (result);
+          var replacerInput = new List<LicenseHeaderInput>();
+          foreach (ProjectItem item in project.ProjectItems)
+            replacerInput.AddRange (CoreHelpers.GetFilesToProcess (item, null, out _, false));
+
+          await RemoveOrReplaceHeaderAndHandleResultAsync (replacerInput);
+
+          break;
         }
-      else
-        foreach (ProjectItem i in item.ProjectItems)
+        case ProjectItem item:
         {
-          var replacerInput = CoreHelpers.GetFilesToProcess (i, null, out _, false);
-          var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput);
-          CoreHelpers.HandleResult (result);
+          _licenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
+          await RemoveOrReplaceHeaderAndHandleResultAsync (CoreHelpers.GetFilesToProcess (item, null, out _, false));
+
+          break;
         }
+      }
+    }
+
+    private async Task RemoveOrReplaceHeaderAndHandleResultAsync (ICollection<LicenseHeaderInput> replacerInput)
+    {
+      var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, new Progress<ReplacerProgressReport> (CoreHelpers.OnProgressReported));
+      CoreHelpers.HandleResult (result);
     }
   }
 }

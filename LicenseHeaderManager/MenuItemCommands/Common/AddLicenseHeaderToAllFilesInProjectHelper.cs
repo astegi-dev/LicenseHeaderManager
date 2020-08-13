@@ -72,7 +72,10 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           countSubLicenseHeadersFound = subLicenseHeaders;
         }
 
-      var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
+      var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (
+          replacerInput,
+          new Progress<ReplacerProgressReport> (CoreHelpers.OnProgressReported),
+          CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
       CoreHelpers.HandleResult (result);
 
       return new AddLicenseHeaderToAllFilesResult (countSubLicenseHeadersFound, headers == null, linkedItems);

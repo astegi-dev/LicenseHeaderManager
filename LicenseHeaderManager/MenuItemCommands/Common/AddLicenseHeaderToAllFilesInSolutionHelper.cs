@@ -17,6 +17,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
@@ -48,7 +50,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return c_commandName;
     }
 
-    public void Execute (Solution solution)
+    public async Task ExecuteAsync (Solution solution)
     {
       if (solution == null) return;
 
@@ -68,7 +70,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       if (solutionHeaderDefinitions != null || !projectsWithoutLicenseHeaderFile.Any())
       {
         // Every project is covered either by a solution or project level license header defintion, go ahead and add them.
-        AddLicenseHeaderToProjects (projectsInSolution);
+        await AddLicenseHeaderToProjectsAsync (projectsInSolution);
       }
       else
       {
@@ -81,7 +83,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           if (DefinitionFilesShouldBeAdded (projectsWithoutLicenseHeaderFile))
             ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToMultipleProjects (projectsWithoutLicenseHeaderFile);
 
-          AddLicenseHeaderToProjects (projectsInSolution);
+          await AddLicenseHeaderToProjectsAsync (projectsInSolution);
         }
         else
         {
@@ -90,9 +92,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           {
             AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (solution);
 
+            // They want to go ahead and apply without editing.
             if (!MessageBoxHelper.DoYouWant (Resources.Question_StopForConfiguringDefinitionFilesSingleFile))
-                // They want to go ahead and apply without editing.
-              AddLicenseHeaderToProjects (projectsInSolution);
+              await AddLicenseHeaderToProjectsAsync (projectsInSolution);
           }
         }
       }
@@ -131,18 +133,14 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return MessageBoxHelper.DoYouWant (message);
     }
 
-    private async void AddLicenseHeaderToProjects (List<Project> projectsInSolution)
+    private async Task AddLicenseHeaderToProjectsAsync (List<Project> projectsInSolution)
     {
       var progressCount = 1;
       var projectCount = projectsInSolution.Count;
 
       foreach (var project in projectsInSolution)
       {
-        _solutionUpdateViewModel.ProgressText = string.Format (
-            "Currently updating '{0}'. Updating {1}/{2} Projects.",
-            project.Name,
-            progressCount,
-            projectCount);
+        _solutionUpdateViewModel.ProgressText = $"Currently updating '{project.Name}'. Updating {progressCount}/{projectCount} Projects.";
         await new AddLicenseHeaderToAllFilesInProjectHelper (_licenseHeaderReplacer).ExecuteAsync (project);
         progressCount++;
       }

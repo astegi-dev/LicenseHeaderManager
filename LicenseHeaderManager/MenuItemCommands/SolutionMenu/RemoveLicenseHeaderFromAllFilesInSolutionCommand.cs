@@ -89,7 +89,7 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
 
       try
       {
-        removeLicenseHeaderFromAllProjects.Execute (solution);
+        await removeLicenseHeaderFromAllProjects.ExecuteAsync (solution);
       }
       catch (Exception exception)
       {

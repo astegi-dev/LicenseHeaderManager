@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using LicenseHeaderManager.ButtonHandler;
+using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
@@ -76,7 +77,7 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      _buttonHandlerFactory.CreateAddLicenseHeaderToSolutionHandler().HandleButton (sender, e);
+      _buttonHandlerFactory.CreateAddLicenseHeaderToSolutionHandler().HandleButtonAsync (sender, e);
     }
   }
 }

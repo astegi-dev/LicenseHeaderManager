@@ -99,7 +99,10 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
     private async Task ExecuteInternalAsync (ProjectItem item)
     {
       var replacerInput = CoreHelpers.GetFilesToProcess (item, null, out _, false);
-      await ServiceProvider.LicenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
+      await ServiceProvider.LicenseHeaderReplacer.RemoveOrReplaceHeader (
+          replacerInput,
+          new Progress<ReplacerProgressReport> (CoreHelpers.OnProgressReported),
+          CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
     }
   }
 }

@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using EnvDTE;
 
 namespace LicenseHeaderManager.Interfaces
@@ -22,6 +23,7 @@ namespace LicenseHeaderManager.Interfaces
   public interface ISolutionLevelCommand
   {
     string GetCommandName ();
-    void Execute (Solution solutionObject);
+
+    Task ExecuteAsync (Solution solutionObject);
   }
 }
