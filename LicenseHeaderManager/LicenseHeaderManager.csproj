@@ -230,6 +230,7 @@
     <Compile Include="MenuItemCommands\Temp\SaveSettingsCommand.cs" />
     <Compile Include="Options\IOptionsStore.cs" />
     <Compile Include="Options\OptionsStore.cs" />
+    <Compile Include="SolutionUpdateViews\IntToMaximumConverter.cs" />
     <Compile Include="Utils\CoreHelpers.cs" />
     <Compile Include="Utils\JsonBoolConverter.cs" />
     <Compile Include="Utils\ProjectItemParentFinder.cs" />

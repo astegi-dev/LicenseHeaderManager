@@ -77,7 +77,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
       var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (
           replacerInput,
-          new Progress<ReplacerProgressReport> (report => CoreHelpers.OnProgressReported (report, _solutionUpdateViewModel).FireAndForget()),
+          new Progress<ReplacerProgressReport> (report => CoreHelpers.OnProgressReportedAsync (report, _solutionUpdateViewModel).FireAndForget()),
           CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
       CoreHelpers.HandleResult (result);
 

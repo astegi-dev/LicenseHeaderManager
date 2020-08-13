@@ -20,9 +20,8 @@ namespace LicenseHeaderManager.Utils
       OutputWindowHandler.WriteMessage($"Processed {progress.ProcessedFileCount} of {progress.TotalFileCount} files.");
     }
 
-    public static async System.Threading.Tasks.Task OnProgressReported(ReplacerProgressReport progress, SolutionUpdateViewModel solutionUpdateViewModel)
+    public static async System.Threading.Tasks.Task OnProgressReportedAsync(ReplacerProgressReport progress, SolutionUpdateViewModel solutionUpdateViewModel)
     {
-      // OutputWindowHandler.WriteMessage($"Processed {progress.ProcessedFileCount} of {progress.TotalFileCount} files.");
       if (solutionUpdateViewModel == null)
         return;
 

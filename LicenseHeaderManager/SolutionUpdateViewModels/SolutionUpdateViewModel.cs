@@ -31,9 +31,6 @@ namespace LicenseHeaderManager.SolutionUpdateViewModels
 
     public SolutionUpdateViewModel ()
     {
-      // set progressbar maximum values to something other than 0 in order to prevent progressbar from being "full" at dialog startup
-      ProjectCount = 1;
-      FileCountCurrentProject = 1;
     }
 
     public string CurrentProject
