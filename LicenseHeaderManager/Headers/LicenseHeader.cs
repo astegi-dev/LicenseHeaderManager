@@ -42,7 +42,7 @@ namespace LicenseHeaderManager.Headers
 
       if (string.IsNullOrEmpty (directory))
       {
-        MessageBoxHelper.ShowInformation (
+        MessageBoxHelper.ShowMessage (
             "We could not determine a path and name for the new .licenseheader file." +
             "As a workaround you could create a .licenseheader file manually." +
             "If possible, please report this issue to us." +
@@ -70,8 +70,7 @@ namespace LicenseHeaderManager.Headers
     public static bool ShowQuestionForAddingLicenseHeaderFile (Project activeProject, IDefaultLicenseHeaderPage page)
     {
       var message = string.Format (Resources.Error_NoHeaderDefinition, activeProject.Name).Replace (@"\n", "\n");
-      var messageBoxResult = MessageBox.Show (message, Resources.Error, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No);
-      if (messageBoxResult != MessageBoxResult.Yes)
+      if (!MessageBoxHelper.AskYesNo(message, Resources.Error))
         return false;
       var licenseHeaderDefinitionFile = AddHeaderDefinitionFile (activeProject, page);
       licenseHeaderDefinitionFile.Open (Constants.vsViewKindCode).Activate();
@@ -93,7 +92,7 @@ namespace LicenseHeaderManager.Headers
       if (newProjectItem == null)
       {
         var message = string.Format (Resources.Error_CreatingFile).Replace (@"\n", "\n");
-        MessageBox.Show (message, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+        MessageBoxHelper.ShowError(message);
       }
 
       return newProjectItem;
@@ -134,7 +133,7 @@ namespace LicenseHeaderManager.Headers
       }
 
       var message = string.Format (Resources.Error_CreatingFile).Replace (@"\n", "\n");
-      MessageBox.Show (message, Resources.Error, MessageBoxButton.OK, MessageBoxImage.Error);
+      MessageBoxHelper.ShowError (message);
       return false;
     }
 

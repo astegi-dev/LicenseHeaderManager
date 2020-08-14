@@ -54,7 +54,7 @@ namespace LicenseHeaderManager.Utils
     /// <returns>True if the license header should still be inserted, otherwise false.</returns>
     public static bool NonCommentLicenseHeaderDefinitionInquiry (string message)
     {
-      return MessageBox.Show (message, Resources.Warning, MessageBoxButton.YesNo, MessageBoxImage.Warning, MessageBoxResult.No) == MessageBoxResult.Yes;
+      return MessageBoxHelper.AskYesNo (message, Resources.Warning, true);
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ namespace LicenseHeaderManager.Utils
     /// </param>
     public static void NoLicenseHeaderDefinitionFound (string message, ILicenseHeaderExtension licenseHeaderExtension)
     {
-      if (MessageBox.Show (message, Resources.Error, MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
+      if (MessageBoxHelper.AskYesNo(message, Resources.Error))
         licenseHeaderExtension.ShowLanguagesPage();
     }
 
@@ -113,13 +113,13 @@ namespace LicenseHeaderManager.Utils
     public static void HandleResult (ReplacerResult<ReplacerError> result)
     {
       if (!result.IsSuccess)
-        MessageBox.Show ($"Error: {result.Error.Description}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        MessageBoxHelper.ShowError ($"Error: {result.Error.Description}");
     }
 
     public static void HandleResult (ReplacerResult<IEnumerable<ReplacerError>> result)
     {
       if (!result.IsSuccess)
-        MessageBox.Show ($"Encountered errors in {result.Error.Count()} files", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        MessageBoxHelper.ShowError($"Encountered errors in {result.Error.Count()} files");
     }
   }
 }

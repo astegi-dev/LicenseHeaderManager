@@ -116,9 +116,8 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
         if (projects.Any (projectInSolution => LicenseHeaderFinder.GetHeaderDefinitionForProjectWithoutFallback (projectInSolution) != null))
         {
-          //TODO owner window as parameter
           // If another project has a license header, offer to add a link to the existing one.
-          if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddExistingDefinitionFileToProject, null).ConfigureAwait (true))
+          if (MessageBoxHelper.AskYesNo (Resources.Question_AddExistingDefinitionFileToProject))
           {
             ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (currentProject.FileName, currentProject.ProjectItems);
             await AddLicenseHeaderToAllFilesAsync (serviceProvider, baseUpdateViewModel);
@@ -127,7 +126,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         else
         {
           // If no project has a license header, offer to add one for the solution.
-          if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddNewLicenseHeaderDefinitionForSolution, null).ConfigureAwait (true))
+          if (MessageBoxHelper.AskYesNo (Resources.Question_AddNewLicenseHeaderDefinitionForSolution))
             AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (serviceProvider.Dte2.Solution);
         }
       }
@@ -142,7 +141,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       await linkedFileHandler.HandleAsync (linkedFileFilter);
 
       if (linkedFileHandler.Message != string.Empty)
-        MessageBox.Show (linkedFileHandler.Message, Resources.NameOfThisExtension, MessageBoxButton.OK, MessageBoxImage.Information);
+        MessageBoxHelper.ShowMessage (linkedFileHandler.Message);
     }
   }
 }

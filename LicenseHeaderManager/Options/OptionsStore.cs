@@ -176,11 +176,9 @@ namespace LicenseHeaderManager.Options
       if (errors.Count == 0)
         return;
 
-      MessageBox.Show (
-          $"{errors.Count} errors were encountered while deserializing:\n*) {string.Join ("\n*) ", errors)}",
-          "Deserialization failed",
-          MessageBoxButton.OK,
-          MessageBoxImage.Error);
+      MessageBoxHelper.ShowError (
+          $"{errors.Count} errors were encountered while serialization:\n*) {string.Join ("\n*) ", errors)}",
+          Resources.SerializationFailed);
     }
 
     /// <summary>
@@ -210,11 +208,9 @@ namespace LicenseHeaderManager.Options
       if (errors.Count == 0)
         return deserializedObject;
 
-      MessageBox.Show (
+      MessageBoxHelper.ShowError (
           $"{errors.Count} errors were encountered while deserializing:\n*) {string.Join ("\n*) ", errors)}",
-          "Deserialization failed",
-          MessageBoxButton.OK,
-          MessageBoxImage.Error);
+          Resources.DeserializationFailed);
       return null;
     }
 

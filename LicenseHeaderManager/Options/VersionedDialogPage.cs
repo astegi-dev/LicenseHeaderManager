@@ -41,7 +41,7 @@ namespace LicenseHeaderManager.Options
       {
         if (s_firstDialogPageLoaded)
         {
-          MessageBoxHelper.ShowInformation (
+          MessageBoxHelper.ShowMessage (
               "We detected that you are downgrading LicenseHeaderManager from a higher version." + Environment.NewLine +
               "As we dont know what you did to get to that state, it is possible that you missed an update for the Language Settings."
               + Environment.NewLine +

@@ -68,7 +68,6 @@ namespace LicenseHeaderManager.MenuItemCommands.FolderMenu
     /// </summary>
     private LicenseHeadersPackage ServiceProvider { get; }
 
-    // TODO maybe whole method redundant (we know the command comes from a right click on folder - why check visibility?)
     private void OnQueryAllFilesCommandStatus (object sender, EventArgs e)
     {
       bool visible;

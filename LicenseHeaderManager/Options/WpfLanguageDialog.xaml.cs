@@ -14,6 +14,7 @@
 using System;
 using System.Windows;
 using Core;
+using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.Options
 {
@@ -33,22 +34,18 @@ namespace LicenseHeaderManager.Options
 
     private void OkButton_Click (object sender, RoutedEventArgs e)
     {
-      if (Language != null)
+      if (Language == null)
+        return;
+      
+      if (Language.IsValid())
       {
-        if (Language.IsValid())
-        {
-          Language.NormalizeExtensions();
-          DialogResult = true;
-          Close();
-        }
-        else
-        {
-          MessageBox.Show (
-              LicenseHeaderManager.Resources.Error_LanguageInvalid,
-              LicenseHeaderManager.Resources.Error,
-              MessageBoxButton.OK,
-              MessageBoxImage.Warning);
-        }
+        Language.NormalizeExtensions();
+        DialogResult = true;
+        Close();
+      }
+      else
+      {
+        MessageBoxHelper.ShowMessage (LicenseHeaderManager.Resources.Error_LanguageInvalid, LicenseHeaderManager.Resources.Error, true);
       }
     }
   }

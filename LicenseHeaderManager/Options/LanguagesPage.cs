@@ -22,6 +22,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Core;
 using LicenseHeaderManager.Options.Converters;
+using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.Options
 {
@@ -162,7 +163,7 @@ namespace LicenseHeaderManager.Options
           l => updated |= UpdateIfNullOrEmpty (l, lang => lang.SkipExpression, "/// *<reference.*/>"));
 
       if (updated)
-        MessageBox.Show (Resources.Update_1_1_3.Replace (@"\n", "\n"), "Update");
+        MessageBoxHelper.Show (Resources.Update_1_1_3.Replace (@"\n", "\n"), Resources.Update);
     }
 
     private void AddDefaultRegionSettings_1_2_1 ()
@@ -193,7 +194,7 @@ namespace LicenseHeaderManager.Options
           });
 
       if (updated)
-        MessageBox.Show (Resources.Update_RegionSettings_1_2_1.Replace (@"\n", "\n"), "Update");
+        MessageBoxHelper.Show (Resources.Update_RegionSettings_1_2_1.Replace (@"\n", "\n"), Resources.Update);
     }
 
     private void AdjustDefaultXmlSkipExpression_1_2_2 ()
@@ -224,7 +225,7 @@ namespace LicenseHeaderManager.Options
           });
 
       if (updated)
-        MessageBox.Show (Resources.Update_SkipExpressions_1_2_2.Replace (@"\n", "\n"), "Update");
+        MessageBoxHelper.Show (Resources.Update_SkipExpressions_1_2_2.Replace (@"\n", "\n"), Resources.Update);
     }
 
     private void AddXmlXsd_1_3_2 ()
@@ -236,7 +237,7 @@ namespace LicenseHeaderManager.Options
       added |= AddExtensionToExistingExtension (".xml", ".xsd");
 
       if (added)
-        MessageBox.Show (Resources.Update_1_3_1.Replace (@"\n", "\n"), "Update");
+        MessageBoxHelper.Show (Resources.Update_1_3_1.Replace (@"\n", "\n"), Resources.Update);
     }
 
     private void ReduceToBaseExtensions_1_3_6 ()
@@ -264,7 +265,7 @@ namespace LicenseHeaderManager.Options
       added |= AddLanguageIfNotExistent (".sql", new Language { Extensions = new[] { ".sql" }, BeginComment = "/*", EndComment = "*/", LineComment = "--" });
 
       if (added)
-        MessageBox.Show (
+        MessageBoxHelper.Show (
             "License Header Manager has automatically updated its configuration to add Language settings for multiple file extensions."
             + Environment.NewLine +
             "You can see all Language Settings at 'Options -> License Header Manager -> Languages'." + Environment.NewLine +
@@ -276,7 +277,7 @@ namespace LicenseHeaderManager.Options
             ".php" + Environment.NewLine +
             ".py" + Environment.NewLine +
             ".sql",
-            "License Header Manager Update");
+            Resources.Update);
     }
 
     private void MigrateStorageLocation_3_0_1 ()
@@ -302,14 +303,14 @@ namespace LicenseHeaderManager.Options
           new Language { Extensions = new[] { ".cshtml", ".vbhtml" }, BeginComment = "@*", EndComment = "*@" });
 
       if (added)
-        MessageBox.Show (
+        MessageBoxHelper.Show (
             "License Header Manager has automatically updated its configuration to add Language settings for multiple file extensions."
             + Environment.NewLine +
             "You can see all Language Settings at 'Options -> License Header Manager -> Languages'." + Environment.NewLine +
             Environment.NewLine +
             "Added file extension settings:" + Environment.NewLine +
             ".cshtml & .vbhtml",
-            "License Header Manager Update");
+            Resources.Update);
     }
 
     private bool AddLanguageIfNotExistsOrAddExtensionsIfExists (Language language)

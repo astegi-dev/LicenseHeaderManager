@@ -225,9 +225,6 @@
   <data name="LinkedFileUpdateInformation" xml:space="preserve">
     <value>We could not update following linked files, because there is no license header definition file in their original project, or the original project is not part of this solution.\n\n{0}</value>
   </data>
-  <data name="NameOfThisExtension" xml:space="preserve">
-    <value>License Header Manager</value>
-  </data>
   <data name="Ok" xml:space="preserve">
     <value>OK</value>
   </data>
@@ -310,5 +307,23 @@
   </data>
   <data name="Question_AddExistingDefinitionFileToProject" xml:space="preserve">
     <value>No License Header Definition File found in the Project. Do you want to add an existing License Header Definition File to the project?</value>
+  </data>
+  <data name="Message" xml:space="preserve">
+    <value>Message</value>
+  </data>
+  <data name="Question" xml:space="preserve">
+    <value>Question</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
+  <data name="DeserializationFailed" xml:space="preserve">
+    <value>Deserialization failed</value>
+  </data>
+  <data name="SerializationFailed" xml:space="preserve">
+    <value>Serialization failed</value>
+  </data>
+  <data name="TaskFailed" xml:space="preserve">
+    <value>Execution of asynchronous Task failed</value>
   </data>
 </root>

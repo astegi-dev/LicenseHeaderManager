@@ -87,12 +87,12 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         else
         {
           // No projects have definition. Ask the user if they want to add a solution level header definition.
-          if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddNewLicenseHeaderDefinitionForSolution, window).ConfigureAwait (true))
+          if (await MessageBoxHelper.AskYesNoAsync (window, Resources.Question_AddNewLicenseHeaderDefinitionForSolution).ConfigureAwait (true))
           {
             AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (solution);
 
             // They want to go ahead and apply without editing.
-            if (!await MessageBoxHelper.AskYesNoAsync (Resources.Question_StopForConfiguringDefinitionFilesSingleFile, window).ConfigureAwait (true))
+            if (!await MessageBoxHelper.AskYesNoAsync (window, Resources.Question_StopForConfiguringDefinitionFilesSingleFile).ConfigureAwait (true))
               await AddLicenseHeaderToProjectsAsync (projectsInSolution);
           }
         }
@@ -129,7 +129,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       var message = string.Format (errorResourceString, projects).Replace (@"\n", "\n");
 
 
-      return await MessageBoxHelper.AskYesNoAsync (message, window).ConfigureAwait (true);
+      return await MessageBoxHelper.AskYesNoAsync (window, message).ConfigureAwait (true);
     }
 
     private async Task AddLicenseHeaderToProjectsAsync (ICollection<Project> projectsInSolution)

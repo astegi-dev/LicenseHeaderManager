@@ -77,7 +77,7 @@ namespace LicenseHeaderManager.ButtonHandler
       }
       catch (Exception exception)
       {
-        MessageBoxHelper.ShowInformation (
+        MessageBoxHelper.ShowMessage (
             $"The command '{command.GetCommandName()}' failed with the exception '{exception.Message}'. See Visual Studio Output Window for Details.");
         OutputWindowHandler.WriteMessage (exception.ToString());
       }

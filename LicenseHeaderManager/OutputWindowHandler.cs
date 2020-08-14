@@ -34,8 +34,7 @@ namespace LicenseHeaderManager
 
       if (customPane == null)
       {
-        var customTitle = Resources.NameOfThisExtension;
-        _outputWindow.CreatePane (ref _customGuid, customTitle, 1, 1);
+        _outputWindow.CreatePane (ref _customGuid, Resources.LicenseHeaderManagerName, 1, 1);
         customPane = GetOutputWindow();
       }
 

@@ -92,7 +92,7 @@ namespace LicenseHeaderManager.Utils
         catch (Exception ex)
         {
           // TODO logging (in general) + log exception stack trace
-          MessageBox.Show ($"Task failed: {ex.Message}", "Task failed", MessageBoxButton.OK, MessageBoxImage.Error);
+          MessageBoxHelper.ShowError ($"Task failed: {ex.Message}", Resources.TaskFailed);
         }
       }
     }

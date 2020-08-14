@@ -175,7 +175,7 @@ namespace LicenseHeaderManager
         }
         catch (Exception)
         {
-          //TODO: Add log statement as soon as we have added logging.
+          //TODO Add log statement as soon as we have added logging.
           //This probably only throws an exception if no WebSite component is installed on the machine.
           //If no WebSite component is installed, they are probably not using a WebSite Project and therefore dont need that feature.
         }

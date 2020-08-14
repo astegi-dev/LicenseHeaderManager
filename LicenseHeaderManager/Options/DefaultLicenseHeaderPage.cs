@@ -19,6 +19,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.Options
 {
@@ -81,7 +82,7 @@ namespace LicenseHeaderManager.Options
       if (string.IsNullOrEmpty (LicenseHeaderFileText))
       {
         InitializeFromResource();
-        MessageBox.Show (Resources.Update_DefaultLicenseHeader_1_2_1.Replace (@"\n", "\n"), "Update");
+        MessageBoxHelper.Show (Resources.Update_DefaultLicenseHeader_1_2_1.Replace (@"\n", "\n"), Resources.Update);
       }
     }
 
