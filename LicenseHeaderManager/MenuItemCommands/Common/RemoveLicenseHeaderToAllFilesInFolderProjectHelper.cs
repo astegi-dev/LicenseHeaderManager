@@ -26,10 +26,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return c_commandName;
     }
 
-    public Task ExecuteAsync (Solution solutionObject, Window window)
+    public async Task ExecuteAsync (Solution solutionObject, Window window)
     {
-      FolderProjectMenuHelper.RemoveLicenseHeaderFromAllFilesAsync((LicenseHeadersPackage)_licenseHeaderExtension, _folderProjectUpdateViewModel).FireAndForget();
-      return Task.CompletedTask;
+      await FolderProjectMenuHelper.RemoveLicenseHeaderFromAllFilesAsync((LicenseHeadersPackage)_licenseHeaderExtension, _folderProjectUpdateViewModel);
     }
   }
 }

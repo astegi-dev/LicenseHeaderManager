@@ -27,10 +27,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return c_commandName;
     }
 
-    public Task ExecuteAsync(Solution solutionObject, Window window)
+    public async Task ExecuteAsync(Solution solutionObject, Window window)
     {
-      FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync((LicenseHeadersPackage)_licenseHeaderExtension, _folderProjectUpdateViewModel).FireAndForget();
-      return Task.CompletedTask;
+      await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync((LicenseHeadersPackage)_licenseHeaderExtension, _folderProjectUpdateViewModel);
     }
   }
 }
