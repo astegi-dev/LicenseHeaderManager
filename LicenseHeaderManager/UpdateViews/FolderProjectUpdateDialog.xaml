@@ -22,32 +22,32 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
                          mc:Ignorable="d"
                          ShowInTaskbar="False"
                          ResizeMode="NoResize"
-                         Title="LicenseHeaderManager" Height="178.853" Width="400.333"
+                         Title="LicenseHeaderManager" Height="164.308" Width="410.569"
                          d:DataContext="{d:DesignInstance updateViewModels:FolderProjectUpdateViewModel}">
 
-    <platformUi:DialogWindow.Resources>
-        <local:IntToMaximumConverter x:Key="IntToMaximumConverter" />
-    </platformUi:DialogWindow.Resources>
+  <platformUi:DialogWindow.Resources>
+    <local:IntToMaximumConverter x:Key="IntToMaximumConverter" />
+  </platformUi:DialogWindow.Resources>
 
-    <Grid Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" RenderTransformOrigin="0.5,0.5">
-        <TextBlock Margin="10,0,0,60.6" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="363">
-            <TextBlock.Text>
-                <MultiBinding StringFormat="{}{0}/{1} files in project done" UpdateSourceTrigger="PropertyChanged">
-                    <Binding Path="ProcessedFilesCountCurrentProject" />
-                    <Binding Path="FileCountCurrentProject" />
-                </MultiBinding>
-            </TextBlock.Text>
-        </TextBlock>
-        <ProgressBar HorizontalAlignment="Left" Height="17" Margin="10,0,0,41.6" VerticalAlignment="Bottom" Width="363" Minimum="0"
+  <Grid Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" RenderTransformOrigin="0.5,0.5">
+    <TextBlock Margin="10,0,0,61" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="374">
+      <TextBlock.Text>
+        <MultiBinding StringFormat="{}{0}/{1} files in project done" UpdateSourceTrigger="PropertyChanged">
+          <Binding Path="ProcessedFilesCountCurrentProject" />
+          <Binding Path="FileCountCurrentProject" />
+        </MultiBinding>
+      </TextBlock.Text>
+    </TextBlock>
+    <ProgressBar HorizontalAlignment="Left" Height="17" Margin="10,0,0,42" VerticalAlignment="Bottom" Width="374" Minimum="0"
                      Maximum="{Binding FileCountCurrentProject, Converter={StaticResource IntToMaximumConverter}}"
                      Value="{Binding ProcessedFilesCountCurrentProject}" RenderTransformOrigin="0.504,0.4" />
 
-        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="363">
+    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="374">
             Updating license headers.
             If you have selected a big folder or project, this may take some time. Closing of the Window stops the process.
-        </TextBlock>
-        <Button Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75"
+    </TextBlock>
+    <Button Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75"
                 Command="{Binding CloseCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type platformUi:DialogWindow}}}" />
-    </Grid>
+  </Grid>
 </platformUi:DialogWindow>

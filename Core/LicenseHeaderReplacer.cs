@@ -111,6 +111,7 @@ namespace Core
             {
               var message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).Replace (@"\n", "\n");
 
+              // todo test with project with .snk file (z.B. DependDB.Util)
               if (commentDefinitionNotFoundAction != null)
                 commentDefinitionNotFoundAction (message);
               else

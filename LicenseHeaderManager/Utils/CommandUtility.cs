@@ -21,7 +21,7 @@ namespace LicenseHeaderManager.Utils
 {
   public static class CommandUtility
   {
-    public static bool ExecuteCommandIfExists (string command, DTE2 dte)
+    public static bool TryExecuteCommand (string command, DTE2 dte)
     {
       if (dte.Commands.Cast<Command>().Any (dtecommand => dtecommand.Name == command))
       {
@@ -33,9 +33,9 @@ namespace LicenseHeaderManager.Utils
         catch (COMException e)
         {
           if (command == "ReSharper_Suspend")
-            OutputWindowHandler.WriteMessage ("Execution of '" + command + "' failed. Maybe ReSharper is already suspended? \n " + e);
+            OutputWindowHandler.WriteMessage ($"Command '{command} failed. Maybe ReSharper is already suspended? \n " + e);
           else
-            OutputWindowHandler.WriteMessage ("Execution of '" + command + "' failed. \n " + e); //Command may be found but cannot be executed
+            OutputWindowHandler.WriteMessage ($"Command '{command}' failed. \n " + e); //Command may be found but cannot be executed
           return false;
         }
 
@@ -55,9 +55,9 @@ namespace LicenseHeaderManager.Utils
       catch (COMException e)
       {
         if (command == "ReSharper_Resume")
-          OutputWindowHandler.WriteMessage ("Execution of '" + command + "' failed. Maybe ReSharper is was not suspended at all? \n " + e);
+          OutputWindowHandler.WriteMessage ($"Command '{command}' failed. Maybe ReSharper is not suspended at all? \n " + e);
         else
-          OutputWindowHandler.WriteMessage ("Execution of '" + command + "' failed. \n " + e); //Command may be found but cannot be executed
+          OutputWindowHandler.WriteMessage ($"Command '{command}' failed. \n " + e); //Command may be found but cannot be executed
       }
     }
   }

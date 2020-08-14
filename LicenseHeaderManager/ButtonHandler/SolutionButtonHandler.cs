@@ -36,7 +36,7 @@ namespace LicenseHeaderManager.ButtonHandler
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
     private SolutionUpdateDialog _dialog;
-    private bool _resharperSuspended;
+    private bool _reSharperSuspended;
 
     public SolutionButtonHandler (LicenseHeaderReplacer licenseHeaderReplacer, DTE2 dte2, ButtonOperation operation)
     {
@@ -63,7 +63,7 @@ namespace LicenseHeaderManager.ButtonHandler
 
       _dialog = new SolutionUpdateDialog(solutionUpdateViewModel);
       _dialog.Closing += DialogOnClosing;
-      _resharperSuspended = CommandUtility.ExecuteCommandIfExists("ReSharper_Suspend", _dte2);
+      _reSharperSuspended = CommandUtility.TryExecuteCommand("ReSharper_Suspend", _dte2);
 
       Task.Run(() => HandleButtonInternalAsync(_dte2.Solution, command)).FireAndForget();
       _dialog.ShowModal();
@@ -87,8 +87,6 @@ namespace LicenseHeaderManager.ButtonHandler
 
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       _dialog.Close();
-
-      ResumeReSharper();
     }
 
     private void DialogOnClosing(object sender, CancelEventArgs e)
@@ -100,7 +98,7 @@ namespace LicenseHeaderManager.ButtonHandler
 
     private void ResumeReSharper()
     {
-      if (_resharperSuspended)
+      if (_reSharperSuspended)
         CommandUtility.ExecuteCommand("ReSharper_Resume", _dte2);
     }
   }
