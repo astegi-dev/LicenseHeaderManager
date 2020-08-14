@@ -342,8 +342,10 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\default.licenseheader" />
+    <None Include="..\LicenseHeaderManager.sln.licenseheader">
+      <Link>LicenseHeaderManager.sln.licenseheader</Link>
+    </None>
     <None Include="app.config" />
-    <None Include="LicenseHeaderManager.licenseheader" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>

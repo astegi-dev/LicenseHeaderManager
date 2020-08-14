@@ -1,18 +1,15 @@
-﻿#region copyright
-
-// Copyright (c) rubicon IT GmbH
-
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
-// and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-// WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
-
-#endregion
+﻿/* Copyright (c) rubicon IT GmbH
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+ * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+ */
 
 using System;
 using System.Linq;
@@ -31,7 +28,7 @@ namespace LicenseHeaderManager.Utils
         try
         {
           dte.ExecuteCommand (command);
-          OutputWindowHandler.WriteMessage ("Command executed");
+          OutputWindowHandler.WriteMessage ($"Command {command} successfully executed");
         }
         catch (COMException e)
         {
@@ -50,7 +47,18 @@ namespace LicenseHeaderManager.Utils
 
     public static void ExecuteCommand (string command, DTE2 dte)
     {
-     // dte.ExecuteCommand (command);
+      try
+      {
+        dte.ExecuteCommand (command);
+        OutputWindowHandler.WriteMessage ($"Command {command} successfully executed");
+      }
+      catch (COMException e)
+      {
+        if (command == "ReSharper_Resume")
+          OutputWindowHandler.WriteMessage ("Execution of '" + command + "' failed. Maybe ReSharper is was not suspended at all? \n " + e);
+        else
+          OutputWindowHandler.WriteMessage ("Execution of '" + command + "' failed. \n " + e); //Command may be found but cannot be executed
+      }
     }
   }
 }

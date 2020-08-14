@@ -87,6 +87,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\LicenseHeaderManager.sln.licenseheader">
+      <Link>LicenseHeaderManager.sln.licenseheader</Link>
+    </None>
     <None Include="Key.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
