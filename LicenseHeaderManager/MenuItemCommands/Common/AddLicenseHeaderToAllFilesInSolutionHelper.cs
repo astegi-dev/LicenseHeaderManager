@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
@@ -26,6 +27,7 @@ using LicenseHeaderManager.SolutionUpdateViewModels;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
+using Window = System.Windows.Window;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
@@ -50,7 +52,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return c_commandName;
     }
 
-    public async Task ExecuteAsync (Solution solution)
+    public async Task ExecuteAsync (Solution solution, Window window)
     {
       if (solution == null) return;
 
@@ -80,7 +82,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         if (someProjectsHaveDefinition)
         {
           // Some projects have a header. Ask the user if they want to add an existing header to the uncovered projects.
-          if (DefinitionFilesShouldBeAdded (projectsWithoutLicenseHeaderFile))
+          if (await DefinitionFilesShouldBeAddedAsync (projectsWithoutLicenseHeaderFile, window))
             ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToMultipleProjects (projectsWithoutLicenseHeaderFile);
 
           await AddLicenseHeaderToProjectsAsync (projectsInSolution);
@@ -88,19 +90,19 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         else
         {
           // No projects have definition. Ask the user if they want to add a solution level header definition.
-          if (MessageBoxHelper.DoYouWant (Resources.Question_AddNewLicenseHeaderDefinitionForSolution))
+          if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddNewLicenseHeaderDefinitionForSolution, window).ConfigureAwait(true))
           {
             AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (solution);
 
             // They want to go ahead and apply without editing.
-            if (!MessageBoxHelper.DoYouWant (Resources.Question_StopForConfiguringDefinitionFilesSingleFile))
+            if (!await MessageBoxHelper.AskYesNoAsync (Resources.Question_StopForConfiguringDefinitionFilesSingleFile, window).ConfigureAwait(true))
               await AddLicenseHeaderToProjectsAsync (projectsInSolution);
           }
         }
       }
     }
 
-    private bool DefinitionFilesShouldBeAdded (List<Project> projectsWithoutLicenseHeaderFile)
+    private async Task<bool> DefinitionFilesShouldBeAddedAsync (List<Project> projectsWithoutLicenseHeaderFile, System.Windows.Window window)
     {
       if (!projectsWithoutLicenseHeaderFile.Any()) return false;
 
@@ -130,7 +132,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       var message = string.Format (errorResourceString, projects).Replace (@"\n", "\n");
 
 
-      return MessageBoxHelper.DoYouWant (message);
+      return await MessageBoxHelper.AskYesNoAsync (message, window).ConfigureAwait(true);
     }
 
     private async Task AddLicenseHeaderToProjectsAsync (ICollection<Project> projectsInSolution)

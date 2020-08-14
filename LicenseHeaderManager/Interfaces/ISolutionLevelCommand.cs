@@ -17,6 +17,7 @@
 using System;
 using System.Threading.Tasks;
 using EnvDTE;
+using Window = System.Windows.Window;
 
 namespace LicenseHeaderManager.Interfaces
 {
@@ -24,6 +25,6 @@ namespace LicenseHeaderManager.Interfaces
   {
     string GetCommandName ();
 
-    Task ExecuteAsync (Solution solutionObject);
+    Task ExecuteAsync (Solution solutionObject, Window window);
   }
 }

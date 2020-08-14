@@ -46,11 +46,11 @@ namespace LicenseHeaderManager.ButtonHandler
 
       try
       {
-        await command.ExecuteAsync (solution);
+        await command.ExecuteAsync (solution, _dialog);
       }
       catch (Exception exception)
       {
-        MessageBoxHelper.Information (
+        MessageBoxHelper.ShowInformation (
             $"The command '{command.GetCommandName()}' failed with the exception '{exception.Message}'. See Visual Studio Output Window for Details.");
         OutputWindowHandler.WriteMessage (exception.ToString());
       }

@@ -15,29 +15,45 @@
 #endregion
 
 using System;
+using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.Utils
 {
   public static class MessageBoxHelper
   {
-    public static void Information (string message)
+    public static void ShowInformation(string message)
     {
-      MessageBox.Show (
+      MessageBox.Show(
           message,
           Resources.LicenseHeaderManagerName,
           MessageBoxButton.OK,
           MessageBoxImage.Information);
     }
 
-    public static bool DoYouWant (string message)
+    public static async Task<bool> AskYesNoAsync(string message, Window owner)
     {
-      return MessageBox.Show (
-          message,
-          Resources.LicenseHeaderManagerName,
-          MessageBoxButton.YesNo,
-          MessageBoxImage.Information,
-          MessageBoxResult.No) == MessageBoxResult.Yes;
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+      if (owner != null)
+      {
+        return MessageBox.Show(
+            owner,
+            message,
+            Resources.LicenseHeaderManagerName,
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Information,
+            MessageBoxResult.No) == MessageBoxResult.Yes;
+      }
+
+      return MessageBox.Show(
+                 message,
+                 Resources.LicenseHeaderManagerName,
+                 MessageBoxButton.YesNo,
+                 MessageBoxImage.Information,
+                 MessageBoxResult.No) == MessageBoxResult.Yes;
+
     }
   }
 }

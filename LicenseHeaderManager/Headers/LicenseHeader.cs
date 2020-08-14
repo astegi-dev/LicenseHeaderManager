@@ -45,7 +45,7 @@ namespace LicenseHeaderManager.Headers
 
       if (string.IsNullOrEmpty (directory))
       {
-        MessageBoxHelper.Information (
+        MessageBoxHelper.ShowInformation (
             "We could not determine a path and name for the new .licenseheader file." +
             "As a workaround you could create a .licenseheader file manually." +
             "If possible, please report this issue to us." +

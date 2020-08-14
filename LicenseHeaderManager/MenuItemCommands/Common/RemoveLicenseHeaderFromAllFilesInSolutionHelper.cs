@@ -22,6 +22,7 @@ using LicenseHeaderManager.SolutionUpdateViewModels;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
+using Window = System.Windows.Window;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
@@ -43,7 +44,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return c_commandName;
     }
 
-    public async Task ExecuteAsync (Solution solution)
+    public async Task ExecuteAsync (Solution solution, Window window)
     {
       if (solution == null)
         return;

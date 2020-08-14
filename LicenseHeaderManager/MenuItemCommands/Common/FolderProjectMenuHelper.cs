@@ -121,8 +121,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
         if (projects.Any (projectInSolution => LicenseHeaderFinder.GetHeaderDefinitionForProjectWithoutFallback (projectInSolution) != null))
         {
+          //TODO owner window as parameter
           // If another project has a license header, offer to add a link to the existing one.
-          if (MessageBoxHelper.DoYouWant (Resources.Question_AddExistingDefinitionFileToProject))
+          if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddExistingDefinitionFileToProject, null).ConfigureAwait(true))
           {
             ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (currentProject.FileName, currentProject.ProjectItems);
             await AddLicenseHeaderToAllFilesAsync (serviceProvider);
@@ -131,7 +132,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         else
         {
           // If no project has a license header, offer to add one for the solution.
-          if (MessageBoxHelper.DoYouWant (Resources.Question_AddNewLicenseHeaderDefinitionForSolution))
+          if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddNewLicenseHeaderDefinitionForSolution, null).ConfigureAwait(true))
             AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (serviceProvider.Dte2.Solution);
         }
       }
