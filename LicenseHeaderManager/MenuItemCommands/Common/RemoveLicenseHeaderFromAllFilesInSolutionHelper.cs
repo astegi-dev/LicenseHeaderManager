@@ -33,7 +33,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     private readonly SolutionUpdateViewModel _viewModel;
 
-    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (SolutionUpdateViewModel viewModel, LicenseHeaderReplacer licenseHeaderReplacer)
+    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (LicenseHeaderReplacer licenseHeaderReplacer, SolutionUpdateViewModel viewModel)
     {
       _viewModel = viewModel;
       _licenseHeaderReplacer = licenseHeaderReplacer;

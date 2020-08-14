@@ -28,14 +28,14 @@ namespace LicenseHeaderManager.ButtonHandler
       _licenseHeadersPackage = licenseHeadersPackage;
     }
 
-    public AddLicenseHeaderToSolutionHandler CreateAddLicenseHeaderToSolutionHandler ()
+    public SolutionButtonHandler CreateAddLicenseHeaderToSolutionHandler (ButtonOperation operation)
     {
-      return new AddLicenseHeaderToSolutionHandler (_licenseHeadersPackage.LicenseHeaderReplacer, _licenseHeadersPackage.Dte2);
+      return new SolutionButtonHandler (_licenseHeadersPackage.LicenseHeaderReplacer, _licenseHeadersPackage.Dte2, operation);
     }
 
-    public RemoveLicenseHeaderFromSolutionHandler CreateRemoveLicenseHeaderFromSolutionHandler ()
+    public SolutionButtonHandler CreateRemoveLicenseHeaderFromSolutionHandler (ButtonOperation operation)
     {
-      return new RemoveLicenseHeaderFromSolutionHandler (_licenseHeadersPackage.LicenseHeaderReplacer, _licenseHeadersPackage.Dte2);
+      return new SolutionButtonHandler(_licenseHeadersPackage.LicenseHeaderReplacer, _licenseHeadersPackage.Dte2, operation);
     }
   }
 }

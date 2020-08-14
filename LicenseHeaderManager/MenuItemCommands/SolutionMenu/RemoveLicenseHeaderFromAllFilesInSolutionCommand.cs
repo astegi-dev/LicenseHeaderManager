@@ -76,33 +76,7 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      //ExecuteInternalAsync().FireAndForget();
-      _buttonHandlerFactory.CreateRemoveLicenseHeaderFromSolutionHandler().HandleButton (sender, e);
+      _buttonHandlerFactory.CreateRemoveLicenseHeaderFromSolutionHandler(ButtonOperation.Remove).HandleButton (sender, e);
     }
-
-    /*private async Task ExecuteInternalAsync ()
-    {
-      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-      var solution = ServiceProvider.Dte2.Solution;
-      var statusBar = (IVsStatusbar) await ServiceProvider.GetServiceAsync (typeof (SVsStatusbar));
-      var removeLicenseHeaderFromAllProjects = new RemoveLicenseHeaderFromAllFilesInSolutionHelper (
-          statusBar,
-          ServiceProvider.LicenseHeaderReplacer);
-      var resharperSuspended = CommandUtility.ExecuteCommandIfExists ("ReSharper_Suspend", ServiceProvider.Dte2);
-
-      try
-      {
-        await removeLicenseHeaderFromAllProjects.ExecuteAsync (solution);
-      }
-      catch (Exception exception)
-      {
-        MessageBoxHelper.Information (
-            $"The command '{removeLicenseHeaderFromAllProjects.GetCommandName()}' failed with the exception '{exception.Message}'. See Visual Studio Output Window for Details.");
-        OutputWindowHandler.WriteMessage (exception.ToString());
-      }
-
-      if (resharperSuspended)
-        CommandUtility.ExecuteCommand ("ReSharper_Resume", ServiceProvider.Dte2);
-    }*/
   }
 }
