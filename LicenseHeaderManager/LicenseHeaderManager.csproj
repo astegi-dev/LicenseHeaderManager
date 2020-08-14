@@ -231,7 +231,12 @@
     <Compile Include="MenuItemCommands\Temp\SaveSettingsCommand.cs" />
     <Compile Include="Options\IOptionsStore.cs" />
     <Compile Include="Options\OptionsStore.cs" />
-    <Compile Include="SolutionUpdateViews\IntToMaximumConverter.cs" />
+    <Compile Include="UpdateViewModels\BaseUpdateViewModel.cs" />
+    <Compile Include="UpdateViewModels\FolderProjectUpdateViewModel.cs" />
+    <Compile Include="UpdateViews\FolderProjectUpdateDialog.xaml.cs">
+      <DependentUpon>FolderProjectUpdateDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UpdateViews\IntToMaximumConverter.cs" />
     <Compile Include="Utils\CoreHelpers.cs" />
     <Compile Include="Utils\JsonBoolConverter.cs" />
     <Compile Include="Utils\ProjectItemParentFinder.cs" />
@@ -303,11 +308,11 @@
       <DependentUpon>WpfCommandDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="ResultObjects\AddLicenseHeaderToAllFilesResult.cs" />
-    <Compile Include="SolutionUpdateViewModels\RelayCommand.cs" />
-    <Compile Include="SolutionUpdateViews\SolutionUpdateDialog.xaml.cs">
+    <Compile Include="UpdateViewModels\RelayCommand.cs" />
+    <Compile Include="UpdateViews\SolutionUpdateDialog.xaml.cs">
       <DependentUpon>SolutionUpdateDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SolutionUpdateViewModels\SolutionUpdateViewModel.cs" />
+    <Compile Include="UpdateViewModels\SolutionUpdateViewModel.cs" />
     <Compile Include="Utils\AllSolutionProjectsSearcher.cs" />
     <Compile Include="Utils\CommandUtility.cs" />
     <Compile Include="Utils\LinkedFileFilter.cs" />
@@ -378,7 +383,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SolutionUpdateViews\SolutionUpdateDialog.xaml">
+    <Page Include="UpdateViews\FolderProjectUpdateDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UpdateViews\SolutionUpdateDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

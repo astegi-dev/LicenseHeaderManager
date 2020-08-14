@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace LicenseHeaderManager.SolutionUpdateViews
+namespace LicenseHeaderManager.UpdateViews
 {
   internal class IntToMaximumConverter : IValueConverter
   {

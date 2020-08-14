@@ -14,19 +14,12 @@
 
 #endregion
 
-using System;
-using System.ComponentModel;
-using System.Windows.Input;
-using Microsoft.VisualStudio.PlatformUI;
 
-namespace LicenseHeaderManager.SolutionUpdateViewModels
+namespace LicenseHeaderManager.UpdateViewModels
 {
-  public class SolutionUpdateViewModel : INotifyPropertyChanged
+  public class SolutionUpdateViewModel : BaseUpdateViewModel
   {
     private string _currentProject = "Preparing update...";
-    private int _fileCountCurrentProject;
-    private int _processedFilesCountCurrentProject;
-    private int _processedProjectCount;
     private int _projectCount;
 
     public SolutionUpdateViewModel ()
@@ -51,48 +44,6 @@ namespace LicenseHeaderManager.SolutionUpdateViewModels
         _projectCount = value;
         NotifyPropertyChanged (nameof(ProjectCount));
       }
-    }
-
-    public int ProcessedProjectCount
-    {
-      get => _processedProjectCount;
-      set
-      {
-        _processedProjectCount = value;
-        NotifyPropertyChanged (nameof(ProcessedProjectCount));
-      }
-    }
-
-    public int FileCountCurrentProject
-    {
-      get => _fileCountCurrentProject;
-      set
-      {
-        _fileCountCurrentProject = value;
-        NotifyPropertyChanged (nameof(FileCountCurrentProject));
-      }
-    }
-
-    public int ProcessedFilesCountCurrentProject
-    {
-      get => _processedFilesCountCurrentProject;
-      set
-      {
-        _processedFilesCountCurrentProject = value;
-        NotifyPropertyChanged (nameof(ProcessedFilesCountCurrentProject));
-      }
-    }
-
-    public ICommand CloseCommand
-    {
-      get { return new RelayCommand (o => ((DialogWindow) o).Close()); }
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private void NotifyPropertyChanged (string propertyName = "")
-    {
-      PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (propertyName));
     }
   }
 }

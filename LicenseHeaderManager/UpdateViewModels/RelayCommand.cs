@@ -18,7 +18,7 @@ using System;
 using System.Diagnostics;
 using System.Windows.Input;
 
-namespace LicenseHeaderManager.SolutionUpdateViewModels
+namespace LicenseHeaderManager.UpdateViewModels
 {
   public class RelayCommand : ICommand
   {

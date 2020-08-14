@@ -21,7 +21,7 @@ using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.ResultObjects;
-using LicenseHeaderManager.SolutionUpdateViewModels;
+using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common

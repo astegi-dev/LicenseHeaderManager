@@ -7,7 +7,7 @@ using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
-using LicenseHeaderManager.SolutionUpdateViewModels;
+using LicenseHeaderManager.UpdateViewModels;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 

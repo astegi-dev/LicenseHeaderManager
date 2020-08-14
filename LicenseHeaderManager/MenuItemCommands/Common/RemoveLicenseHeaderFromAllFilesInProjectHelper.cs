@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
 using EnvDTE;
-using LicenseHeaderManager.SolutionUpdateViewModels;
+using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common

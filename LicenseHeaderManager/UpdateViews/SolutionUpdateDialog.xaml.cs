@@ -14,17 +14,16 @@
 
 #endregion
 
-using System;
-using System.ComponentModel;
-using System.Windows.Controls;
-using System.Windows.Data;
-using LicenseHeaderManager.SolutionUpdateViewModels;
+using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
+using System.ComponentModel;
+using System.Windows.Controls;
+using System.Windows.Data;
 using Task = System.Threading.Tasks.Task;
 
-namespace LicenseHeaderManager
+namespace LicenseHeaderManager.UpdateViews
 {
   /// <summary>
   ///   Interaction logic for TestDialog.xaml
@@ -35,15 +34,15 @@ namespace LicenseHeaderManager
     {
       InitializeComponent();
       DataContext = solutionUpdateViewModel;
-      ((SolutionUpdateViewModel) DataContext).PropertyChanged += OnPropertyChanged1;
+      ((SolutionUpdateViewModel) DataContext).PropertyChanged += OnViewModelUpdated;
     }
 
-    private void OnPropertyChanged1 (object sender, PropertyChangedEventArgs e)
+    private void OnViewModelUpdated (object sender, PropertyChangedEventArgs e)
     {
-      UpdateTextBlockAsync (e).FireAndForget();
+      UpdateControlsAsync (e).FireAndForget();
     }
 
-    private async Task UpdateTextBlockAsync(PropertyChangedEventArgs args)
+    private async Task UpdateControlsAsync(PropertyChangedEventArgs args)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 

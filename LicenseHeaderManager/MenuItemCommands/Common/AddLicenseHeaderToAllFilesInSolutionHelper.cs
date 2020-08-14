@@ -23,7 +23,7 @@ using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
-using LicenseHeaderManager.SolutionUpdateViewModels;
+using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
