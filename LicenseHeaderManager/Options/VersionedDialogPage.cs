@@ -89,8 +89,7 @@ namespace LicenseHeaderManager.Options
 
     private Version GetParsedRegistryVersion ()
     {
-      Version result;
-      System.Version.TryParse (Version, out result);
+      System.Version.TryParse (Version, out var result);
       return result;
     }
 
@@ -103,25 +102,23 @@ namespace LicenseHeaderManager.Options
 
     protected void LoadRegistryValuesBefore_3_0_0 (DialogPage dialogPage = null)
     {
-      using (var key = GetOldRegistryKey())
+      using var key = GetOldRegistryKey();
+      foreach (var property in GetVisibleProperties())
       {
-        foreach (var property in GetVisibleProperties())
-        {
-          var converter = GetPropertyConverterOrDefault (property);
-          var registryValue = GetRegistryValue (key, property.Name);
+        var converter = GetPropertyConverterOrDefault (property);
+        var registryValue = GetRegistryValue (key, property.Name);
 
-          if (registryValue != null)
-            try
-            {
-              property.SetValue (
-                  dialogPage ?? AutomationObject,
-                  DeserializeValue (converter, registryValue));
-            }
-            catch (Exception)
-            {
-              OutputWindowHandler.WriteMessage ($"Could not restore registry value for {property.Name}");
-            }
-        }
+        if (registryValue != null)
+          try
+          {
+            property.SetValue (
+                dialogPage ?? AutomationObject,
+                DeserializeValue (converter, registryValue));
+          }
+          catch (Exception)
+          {
+            OutputWindowHandler.WriteMessage ($"Could not restore registry value for {property.Name}");
+          }
       }
     }
 

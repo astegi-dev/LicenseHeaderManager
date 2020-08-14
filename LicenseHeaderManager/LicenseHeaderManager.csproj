@@ -205,7 +205,9 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interfaces\IMenuItemButtonNewHandler.cs" />
     <Compile Include="MenuItemButtonHandler\MenuItemButtonHandlerFactory.cs" />
+    <Compile Include="MenuItemButtonHandler\MenuItemButtonLevel.cs" />
     <Compile Include="MenuItemButtonHandler\MenuItemButtonOperation.cs" />
     <Compile Include="MenuItemButtonHandler\FolderProjectMenuItemButtonHandler.cs" />
     <Compile Include="MenuItemButtonHandler\SolutionMenuItemButtonHandler.cs" />

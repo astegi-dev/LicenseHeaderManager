@@ -59,14 +59,9 @@ namespace LicenseHeaderManager.Options
 
     private string GetDefaultLicenseHeader ()
     {
-      using (var resource = Assembly.GetExecutingAssembly()
-          .GetManifestResourceStream (typeof (LicenseHeadersPackage), "Resources.default.licenseheader"))
-      {
-        using (var streamreader = new StreamReader (resource, Encoding.UTF8))
-        {
-          return streamreader.ReadToEnd();
-        }
-      }
+      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream (typeof (LicenseHeadersPackage), "Resources.default.licenseheader");
+      using var streamReader = new StreamReader (resource, Encoding.UTF8);
+      return streamReader.ReadToEnd();
     }
 
     #region version updates

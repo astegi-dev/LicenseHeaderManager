@@ -26,11 +26,10 @@ using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.ButtonHandler
 {
-  internal class SolutionMenuItemButtonHandler
+  internal class SolutionMenuItemButtonHandler : IMenuItemButtonNewHandler
   {
     private readonly DTE2 _dte2;
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
-    private readonly MenuItemButtonOperation _mode;
 
     private SolutionUpdateDialog _dialog;
     private bool _reSharperSuspended;
@@ -39,14 +38,18 @@ namespace LicenseHeaderManager.ButtonHandler
     {
       _licenseHeaderReplacer = licenseHeaderReplacer;
       _dte2 = dte2;
-      _mode = mode;
+      Mode = mode;
     }
+
+    public MenuItemButtonLevel Level => MenuItemButtonLevel.Solution;
+
+    public MenuItemButtonOperation Mode { get; }
 
     public void HandleButton (object sender, EventArgs e)
     {
       var solutionUpdateViewModel = new SolutionUpdateViewModel();
       IMenuItemButtonHandler handler;
-      switch (_mode)
+      switch (Mode)
       {
         case MenuItemButtonOperation.Add:
           handler = new AddLicenseHeaderToAllFilesInSolutionHelper (_licenseHeaderReplacer, solutionUpdateViewModel);
@@ -55,7 +58,7 @@ namespace LicenseHeaderManager.ButtonHandler
           handler = new RemoveLicenseHeaderFromAllFilesInSolutionHelper (_licenseHeaderReplacer, solutionUpdateViewModel);
           break;
         default:
-          throw new ArgumentOutOfRangeException (nameof(_mode), _mode, null);
+          throw new ArgumentOutOfRangeException (nameof(Mode), Mode, null);
       }
 
       _dialog = new SolutionUpdateDialog (solutionUpdateViewModel);

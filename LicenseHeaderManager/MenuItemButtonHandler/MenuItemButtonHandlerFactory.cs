@@ -18,24 +18,33 @@ namespace LicenseHeaderManager.ButtonHandler
 {
   internal static class MenuItemButtonHandlerFactory
   {
-    public static SolutionMenuItemButtonHandler CreateAddLicenseHeaderToSolutionHandler (ILicenseHeaderExtension licenseHeadersPackage, MenuItemButtonOperation mode)
+    public static IMenuItemButtonNewHandler CreateHandler (
+        MenuItemButtonLevel level,
+        MenuItemButtonOperation mode,
+        ILicenseHeaderExtension licenseHeadersPackage)
+    {
+      return level switch
+      {
+          MenuItemButtonLevel.Solution => CreateSolutionHandler (licenseHeadersPackage, mode),
+          MenuItemButtonLevel.Folder => CreateFolderHandler (licenseHeadersPackage, mode),
+          MenuItemButtonLevel.Project => CreateProjectHandler (licenseHeadersPackage, mode),
+          _ => throw new ArgumentOutOfRangeException (nameof(level), level, null)
+      };
+    }
+
+    private static SolutionMenuItemButtonHandler CreateSolutionHandler (ILicenseHeaderExtension licenseHeadersPackage, MenuItemButtonOperation mode)
     {
       return new SolutionMenuItemButtonHandler (licenseHeadersPackage.LicenseHeaderReplacer, licenseHeadersPackage.Dte2, mode);
     }
 
-    public static SolutionMenuItemButtonHandler CreateRemoveLicenseHeaderFromSolutionHandler (ILicenseHeaderExtension licenseHeadersPackage, MenuItemButtonOperation mode)
+    private static FolderProjectMenuItemButtonHandler CreateFolderHandler (ILicenseHeaderExtension licenseHeadersPackage, MenuItemButtonOperation mode)
     {
-      return new SolutionMenuItemButtonHandler (licenseHeadersPackage.LicenseHeaderReplacer, licenseHeadersPackage.Dte2, mode);
+      return new FolderProjectMenuItemButtonHandler (licenseHeadersPackage, mode, MenuItemButtonLevel.Folder);
     }
 
-    public static FolderProjectMenuItemButtonHandler CreateAddLicenseHeaderToFolderProjectHandler (ILicenseHeaderExtension licenseHeadersPackage, MenuItemButtonOperation mode)
+    private static FolderProjectMenuItemButtonHandler CreateProjectHandler (ILicenseHeaderExtension licenseHeadersPackage, MenuItemButtonOperation mode)
     {
-      return new FolderProjectMenuItemButtonHandler (licenseHeadersPackage, mode);
-    }
-
-    public static FolderProjectMenuItemButtonHandler CreateRemoveLicenseHeaderFromFolderProjectHandler (ILicenseHeaderExtension licenseHeadersPackage, MenuItemButtonOperation mode)
-    {
-      return new FolderProjectMenuItemButtonHandler (licenseHeadersPackage, mode);
+      return new FolderProjectMenuItemButtonHandler (licenseHeadersPackage, mode, MenuItemButtonLevel.Project);
     }
   }
 }

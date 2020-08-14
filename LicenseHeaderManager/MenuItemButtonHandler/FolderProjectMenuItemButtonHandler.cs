@@ -23,24 +23,27 @@ using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.ButtonHandler
 {
-  internal class FolderProjectMenuItemButtonHandler
+  internal class FolderProjectMenuItemButtonHandler : IMenuItemButtonNewHandler
   {
     private readonly ILicenseHeaderExtension _licenseHeaderExtension;
-    private readonly MenuItemButtonOperation _mode;
-
     private FolderProjectUpdateDialog _dialog;
 
-    public FolderProjectMenuItemButtonHandler (ILicenseHeaderExtension licenseHeaderExtension, MenuItemButtonOperation mode)
+    public FolderProjectMenuItemButtonHandler (ILicenseHeaderExtension licenseHeaderExtension, MenuItemButtonOperation mode, MenuItemButtonLevel level)
     {
       _licenseHeaderExtension = licenseHeaderExtension;
-      _mode = mode;
+      Mode = mode;
+      Level = level;
     }
+
+    public MenuItemButtonLevel Level { get; }
+
+    public MenuItemButtonOperation Mode { get; }
 
     public void HandleButton (object sender, EventArgs e)
     {
       var folderProjectUpdateViewModel = new FolderProjectUpdateViewModel();
       IMenuItemButtonHandler handler;
-      switch (_mode)
+      switch (Mode)
       {
         case MenuItemButtonOperation.Add:
           handler = new AddLicenseHeaderToAllFilesInFolderProjectHelper (_licenseHeaderExtension, folderProjectUpdateViewModel);
@@ -49,7 +52,7 @@ namespace LicenseHeaderManager.ButtonHandler
           handler = new RemoveLicenseHeaderToAllFilesInFolderProjectHelper (_licenseHeaderExtension, folderProjectUpdateViewModel);
           break;
         default:
-          throw new ArgumentOutOfRangeException (nameof(_mode), _mode, null);
+          throw new ArgumentOutOfRangeException (nameof(Mode), Mode, null);
       }
 
       _dialog = new FolderProjectUpdateDialog (folderProjectUpdateViewModel);
