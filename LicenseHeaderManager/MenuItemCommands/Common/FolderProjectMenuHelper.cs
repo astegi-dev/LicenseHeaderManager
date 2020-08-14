@@ -11,6 +11,9 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
@@ -19,8 +22,6 @@ using LicenseHeaderManager.ResultObjects;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
-using System.Collections.Generic;
-using System.Linq;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
@@ -104,8 +105,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
         if (projects.Any (projectInSolution => LicenseHeaderFinder.GetHeaderDefinitionForProjectWithoutFallback (projectInSolution) != null))
         {
+          baseUpdateViewModel.ProcessedFilesCountCurrentProject = 0;
           // If another project has a license header, offer to add a link to the existing one.
-          if (MessageBoxHelper.AskYesNo (Resources.Question_AddExistingDefinitionFileToProject))
+          if (MessageBoxHelper.AskYesNo (Resources.Question_AddExistingDefinitionFileToProject.ReplaceNewLines()))
           {
             ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (currentProject.FileName, currentProject.ProjectItems);
             await AddLicenseHeaderToAllFilesAsync (serviceProvider, baseUpdateViewModel);

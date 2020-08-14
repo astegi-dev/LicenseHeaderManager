@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Windows;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Utils;
@@ -52,7 +51,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       var fileCountAfter = projectItems.Count;
       if (fileCountBefore == fileCountAfter)
         MessageBoxHelper.ShowMessage (Resources.Warning_CantLinkItemInSameProject);
-      
+
 
       return newProjectItem;
     }

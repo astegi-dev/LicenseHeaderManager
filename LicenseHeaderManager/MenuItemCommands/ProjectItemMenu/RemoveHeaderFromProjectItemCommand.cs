@@ -114,7 +114,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
       var replacerInput = CoreHelpers.GetFilesToProcess (item, null, out _, false);
       await ServiceProvider.LicenseHeaderReplacer.RemoveOrReplaceHeader (
           replacerInput,
-          new Progress<ReplacerProgressReport> (CoreHelpers.OnProgressReported),
+          new Progress<ReplacerProgressReport>(),
           CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
     }
   }

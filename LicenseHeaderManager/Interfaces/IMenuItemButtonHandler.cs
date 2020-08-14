@@ -18,27 +18,30 @@ using Microsoft.VisualStudio.Shell;
 namespace LicenseHeaderManager.Interfaces
 {
   /// <summary>
-  /// Provides a common type for classes which encapsulate logic handling the execution of a menu item command
-  /// that is more sophisticated than in the most common use cases.
+  ///   Provides a common type for classes which encapsulate logic handling the execution of a menu item command
+  ///   that is more sophisticated than in the most common use cases.
   /// </summary>
   public interface IMenuItemButtonHandler
   {
     /// <summary>
-    /// Handles a click on a menu item.
-    /// </summary>
-    /// <param name="sender">The clicked menu item.</param>
-    /// <param name="e">A corresponding <see cref="EventArgs"/> instance. In most cases, an instance of the
-    /// <see cref="OleMenuCmdEventArgs"/> class.</param>
-    void HandleButton (object sender, EventArgs e);
-
-    /// <summary>
-    /// Gets the scope of menu item command this <see cref="IMenuItemButtonHandler"/> corresponds to.
+    ///   Gets the scope of menu item command this <see cref="IMenuItemButtonHandler" /> corresponds to.
     /// </summary>
     MenuItemButtonLevel Level { get; }
 
     /// <summary>
-    /// Gets the type of operation an invocation of the command this <see cref="IMenuItemButtonHandler"/> corresponds to entails.
+    ///   Gets the type of operation an invocation of the command this <see cref="IMenuItemButtonHandler" /> corresponds to
+    ///   entails.
     /// </summary>
     MenuItemButtonOperation Mode { get; }
+
+    /// <summary>
+    ///   Handles a click on a menu item.
+    /// </summary>
+    /// <param name="sender">The clicked menu item.</param>
+    /// <param name="e">
+    ///   A corresponding <see cref="EventArgs" /> instance. In most cases, an instance of the
+    ///   <see cref="OleMenuCmdEventArgs" /> class.
+    /// </param>
+    void HandleButton (object sender, EventArgs e);
   }
 }

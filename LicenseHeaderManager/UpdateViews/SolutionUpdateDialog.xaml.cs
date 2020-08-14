@@ -44,6 +44,7 @@ namespace LicenseHeaderManager.UpdateViews
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
+      // for unknown reasons, changes in below DependencyProperties' data source are not reflected in the UI => trigger update manually
       var context = (SolutionUpdateViewModel) DataContext;
       switch (args.PropertyName)
       {

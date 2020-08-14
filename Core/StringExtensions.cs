@@ -18,9 +18,9 @@ namespace Core
   internal static class StringExtensions
   {
     /// <summary>
-    /// Replaces occurrences of "\n" in a string by new line characters.
+    ///   Replaces occurrences of "\n" in a string by new line characters.
     /// </summary>
-    /// <returns>A <see cref="string"/> where all occurrences of "\n" have been replaced by new line characters</returns>
+    /// <returns>A <see cref="string" /> where all occurrences of "\n" have been replaced by new line characters</returns>
     public static string ReplaceNewLines (this string input)
     {
       return input.Replace (@"\n", "\n");

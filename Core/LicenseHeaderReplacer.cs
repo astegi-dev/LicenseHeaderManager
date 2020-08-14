@@ -34,10 +34,12 @@ namespace Core
     private readonly IEnumerable<Language> _languages;
 
     private int _processedFileCount;
+    private readonly SemaphoreSlim _semaphore;
     private int _totalFileCount;
 
     public LicenseHeaderReplacer (IEnumerable<Language> languages, IEnumerable<string> keywords)
     {
+      _semaphore = new SemaphoreSlim (1, 1);
       _languages = languages;
       _keywords = keywords;
     }
@@ -86,11 +88,7 @@ namespace Core
               if (!addDespiteNonCommentText)
               {
                 message = $"Execution of {nameof(RemoveOrReplaceHeader)} was cancelled by caller";
-                returnObject = new ReplacerResult<ReplacerError> (
-                    new ReplacerError (
-                        licenseHeaderInput.DocumentPath,
-                        ErrorType.NonCommentText,
-                        message));
+                returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput.DocumentPath, ErrorType.NonCommentText, message));
                 break;
               }
             }
@@ -111,7 +109,7 @@ namespace Core
             {
               var message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
 
-              // TODO test with project with .snk file (e.g. DependDB.Util)
+              // TODO test with project with .snk file (e.g. DependDB.Util): works, but window closes immediately after showing
               if (commentDefinitionNotFoundAction != null)
                 commentDefinitionNotFoundAction (message);
               else
@@ -146,10 +144,18 @@ namespace Core
       _totalFileCount = totalFileCount;
     }
 
-    private void ReportProgress (IProgress<ReplacerProgressReport> progress)
+    private async Task ReportProgress (IProgress<ReplacerProgressReport> progress)
     {
-      Interlocked.Increment (ref _processedFileCount);
-      progress.Report (new ReplacerProgressReport (_totalFileCount, _processedFileCount));
+      await _semaphore.WaitAsync();
+      try
+      {
+        Interlocked.Increment (ref _processedFileCount);
+        progress.Report (new ReplacerProgressReport (_totalFileCount, _processedFileCount));
+      }
+      finally
+      {
+        _semaphore.Release();
+      }
     }
 
     private async Task RemoveOrReplaceHeaderForOneFile (
@@ -160,7 +166,7 @@ namespace Core
     {
       if (TryCreateDocument (header.DocumentPath, out var document, header.AdditionalProperties, header.Headers) != CreateDocumentResult.DocumentCreated)
       {
-        ReportProgress (progress);
+        await ReportProgress (progress);
         return;
       }
 
@@ -180,7 +186,7 @@ namespace Core
 
       if (!replace)
       {
-        ReportProgress (progress);
+        await ReportProgress (progress);
         return;
       }
 
@@ -194,7 +200,7 @@ namespace Core
         errors.Enqueue (new ReplacerError (header.DocumentPath, ErrorType.ParsingError, message));
       }
 
-      ReportProgress (progress);
+      await ReportProgress (progress);
     }
 
     public async Task<ReplacerResult<IEnumerable<ReplacerError>>> RemoveOrReplaceHeader (
@@ -238,8 +244,7 @@ namespace Core
       if (IsLicenseHeader (documentPath))
         return CreateDocumentResult.LicenseHeaderDocument;
 
-      var language = _languages
-          .FirstOrDefault (x => x.Extensions.Any (y => documentPath.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
+      var language = _languages.FirstOrDefault (x => x.Extensions.Any (y => documentPath.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
 
       if (language == null)
         return CreateDocumentResult.LanguageNotFound;

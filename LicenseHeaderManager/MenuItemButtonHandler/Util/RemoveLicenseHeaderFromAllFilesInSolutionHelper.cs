@@ -25,7 +25,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 {
   public class RemoveLicenseHeaderFromAllFilesInSolutionHelper : MenuItemButtonHandlerHelper
   {
-    private const string c_commandName = "Remove LicenseHeader from all Projects";
+    private const string c_commandName = "Remove LicenseHeader from all files in Solution";
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
     public RemoveLicenseHeaderFromAllFilesInSolutionHelper (LicenseHeaderReplacer licenseHeaderReplacer)
@@ -46,7 +46,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
         return;
 
       if (!(viewModel is SolutionUpdateViewModel updateViewModel))
-        throw new ArgumentException($"Argument {nameof(viewModel)} must be of type {nameof(SolutionUpdateViewModel)}");
+        throw new ArgumentException ($"Argument {nameof(viewModel)} must be of type {nameof(SolutionUpdateViewModel)}");
 
       var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
       var projectsInSolution = allSolutionProjectsSearcher.GetAllProjects (solution);

@@ -14,7 +14,6 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Windows;
 using EnvDTE;
 using LicenseHeaderManager.Options;
 using LicenseHeaderManager.Utils;
@@ -70,7 +69,7 @@ namespace LicenseHeaderManager.Headers
     public static bool ShowQuestionForAddingLicenseHeaderFile (Project activeProject, IDefaultLicenseHeaderPage page)
     {
       var message = string.Format (Resources.Error_NoHeaderDefinition, activeProject.Name).ReplaceNewLines();
-      if (!MessageBoxHelper.AskYesNo(message, Resources.Error))
+      if (!MessageBoxHelper.AskYesNo (message, Resources.Error))
         return false;
       var licenseHeaderDefinitionFile = AddHeaderDefinitionFile (activeProject, page);
       licenseHeaderDefinitionFile.Open (Constants.vsViewKindCode).Activate();
@@ -92,7 +91,7 @@ namespace LicenseHeaderManager.Headers
       if (newProjectItem == null)
       {
         var message = string.Format (Resources.Error_CreatingFile).ReplaceNewLines();
-        MessageBoxHelper.ShowError(message);
+        MessageBoxHelper.ShowError (message);
       }
 
       return newProjectItem;

@@ -11,6 +11,10 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+using System;
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Input;
 using EnvDTE;
 using EnvDTE80;
 using LicenseHeaderManager.Interfaces;
@@ -18,9 +22,6 @@ using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.UpdateViews;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
-using System;
-using System.ComponentModel;
-using System.Windows.Input;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemButtonHandler
@@ -28,10 +29,10 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
   internal class SolutionMenuItemButtonHandler : IMenuItemButtonHandler
   {
     private readonly DTE2 _dte2;
+    private readonly MenuItemButtonHandlerHelper _handler;
 
     private SolutionUpdateDialog _dialog;
     private bool _reSharperSuspended;
-    private readonly MenuItemButtonHandlerHelper _handler;
 
     public SolutionMenuItemButtonHandler (DTE2 dte2, MenuItemButtonOperation mode, MenuItemButtonHandlerHelper handler)
     {
@@ -49,7 +50,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
       Mouse.OverrideCursor = Cursors.Wait;
       var solutionUpdateViewModel = new SolutionUpdateViewModel();
 
-      _dialog = new SolutionUpdateDialog (solutionUpdateViewModel);
+      _dialog = new SolutionUpdateDialog (solutionUpdateViewModel) { WindowStartupLocation = WindowStartupLocation.CenterOwner };
       _dialog.Closing += DialogOnClosing;
       _reSharperSuspended = CommandUtility.TryExecuteCommand ("ReSharper_Suspend", _dte2);
 

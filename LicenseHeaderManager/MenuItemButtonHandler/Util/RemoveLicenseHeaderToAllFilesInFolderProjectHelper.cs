@@ -24,7 +24,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 {
   internal class RemoveLicenseHeaderToAllFilesInFolderProjectHelper : MenuItemButtonHandlerHelper
   {
-    private const string c_commandName = "Add LicenseHeader to all files in folder or project";
+    private const string c_commandName = "Remove LicenseHeader from all files in folder or project";
     private readonly ILicenseHeaderExtension _licenseHeaderExtension;
 
     public RemoveLicenseHeaderToAllFilesInFolderProjectHelper (ILicenseHeaderExtension licenseHeaderExtension)

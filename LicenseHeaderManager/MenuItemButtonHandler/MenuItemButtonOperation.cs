@@ -15,19 +15,18 @@ using System;
 
 namespace LicenseHeaderManager.MenuItemButtonHandler
 {
- 
   /// <summary>
-  /// Specifies different types of operations the click of a menu item button may invoke
+  ///   Specifies different types of operations the click of a menu item button may invoke
   /// </summary>
   public enum MenuItemButtonOperation
   {
     /// <summary>
-    /// Inserts license headers into one or multiple files or replaces them.
+    ///   Inserts license headers into one or multiple files or replaces them.
     /// </summary>
     Add,
 
     /// <summary>
-    /// Removes license headers from one or multiple files.
+    ///   Removes license headers from one or multiple files.
     /// </summary>
     Remove
   }

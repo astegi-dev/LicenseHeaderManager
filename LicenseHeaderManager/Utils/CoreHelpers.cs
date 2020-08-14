@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
@@ -28,11 +27,6 @@ namespace LicenseHeaderManager.Utils
 {
   internal static class CoreHelpers
   {
-    public static void OnProgressReported (ReplacerProgressReport progress)
-    {
-      OutputWindowHandler.WriteMessage ($"Processed {progress.ProcessedFileCount} of {progress.TotalFileCount} files.");
-    }
-
     public static async Task OnProgressReportedAsync (ReplacerProgressReport progress, BaseUpdateViewModel baseUpdateViewModel, string projectName)
     {
       if (baseUpdateViewModel == null)
@@ -40,7 +34,13 @@ namespace LicenseHeaderManager.Utils
 
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       baseUpdateViewModel.FileCountCurrentProject = progress.TotalFileCount;
-      baseUpdateViewModel.ProcessedFilesCountCurrentProject = progress.ProcessedFileCount;
+
+      // IProgress relies on SynchronizationContext. Thus, in the current architecture, OnProgressReportAsync callbacks are not always guaranteed to be executed
+      // in the same order as they are reported from the Core (especially if reports happen at the same time). Countering that, the ProgressBar value is updated
+      // only if reported value is higher than last one (or on reset). The resulting drawback that some progress "steps" might be skipped is negligible and not
+      // detrimental to the user feedback (for instance, it happens if a few Core threads being responsible for small files finish at roughly the same time).
+      if (progress.ProcessedFileCount <= 1 || progress.ProcessedFileCount > baseUpdateViewModel.ProcessedFilesCountCurrentProject)
+        baseUpdateViewModel.ProcessedFilesCountCurrentProject = progress.ProcessedFileCount;
 
       if (baseUpdateViewModel is SolutionUpdateViewModel solutionUpdateViewModel)
         solutionUpdateViewModel.CurrentProject = projectName;
@@ -71,7 +71,7 @@ namespace LicenseHeaderManager.Utils
     /// </param>
     public static void NoLicenseHeaderDefinitionFound (string message, ILicenseHeaderExtension licenseHeaderExtension)
     {
-      if (MessageBoxHelper.AskYesNo(message, Resources.Error))
+      if (MessageBoxHelper.AskYesNo (message, Resources.Error))
         licenseHeaderExtension.ShowLanguagesPage();
     }
 
@@ -119,7 +119,7 @@ namespace LicenseHeaderManager.Utils
     public static void HandleResult (ReplacerResult<IEnumerable<ReplacerError>> result)
     {
       if (!result.IsSuccess)
-        MessageBoxHelper.ShowError($"Encountered errors in {result.Error.Count()} files");
+        MessageBoxHelper.ShowError ($"Encountered errors in {result.Error.Count()} files");
     }
   }
 }

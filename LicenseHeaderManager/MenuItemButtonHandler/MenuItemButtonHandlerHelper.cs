@@ -26,38 +26,59 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
         "An implementation has not been provided because the operation cannot be performed in a meaningful way. Use another overload.";
 
     /// <summary>
-    /// Gets a description of the current <see cref="MenuItemButtonHandlerHelper"/> instance that is presented to the user in case of errors.
+    ///   Gets a description of the current <see cref="MenuItemButtonHandlerHelper" /> instance that is presented to the user
+    ///   in case of errors.
     /// </summary>
     public abstract string Description { get; }
 
     /// <summary>
-    /// Carries out the work that the corresponding <see cref="IMenuItemButtonHandler"/> instance wants to delegate to this
-    /// <see cref="MenuItemButtonHandlerHelper"/> instance.
+    ///   Carries out the work that the corresponding <see cref="IMenuItemButtonHandler" /> instance wants to delegate to this
+    ///   <see cref="MenuItemButtonHandlerHelper" /> instance.
     /// </summary>
-    /// <param name="viewModel">The view model this helper needs to update in order to reflect process in the corresponding dialog window.</param>
-    /// <param name="solution">The <see cref="Solution"/> instance the work to be done is related with.</param>
-    /// <param name="window">The <see cref="System.Windows.Window"/> that is on top of the screen while the work to be done is being carried out.</param>
-    /// <remarks>If not both a Solution and a Window are strictly required for the desired work to be done (even though one or both of them might even be
-    /// present, i. e. could theoretically be supplied), use another overload, if possible. If this is not possible, a suitable
-    /// overload that does not expect the superfluous parameters is called by the actual implementation.</remarks>
+    /// <param name="viewModel">
+    ///   The view model this helper needs to update in order to reflect process in the corresponding
+    ///   dialog window.
+    /// </param>
+    /// <param name="solution">The <see cref="Solution" /> instance the work to be done is related with.</param>
+    /// <param name="window">
+    ///   The <see cref="System.Windows.Window" /> that is on top of the screen while the work to be done is
+    ///   being carried out.
+    /// </param>
+    /// <remarks>
+    ///   If not both a Solution and a Window are strictly required for the desired work to be done (even though one or both of
+    ///   them might even be
+    ///   present, i. e. could theoretically be supplied), use another overload, if possible. If this is not possible, a
+    ///   suitable
+    ///   overload that does not expect the superfluous parameters is called by the actual implementation.
+    /// </remarks>
     public abstract Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution, Window window);
 
     /// <summary>
-    /// Carries out the work that the corresponding <see cref="IMenuItemButtonHandler"/>  instance wants to delegate to this
-    /// <see cref="MenuItemButtonHandlerHelper"/> instance.
+    ///   Carries out the work that the corresponding <see cref="IMenuItemButtonHandler" />  instance wants to delegate to this
+    ///   <see cref="MenuItemButtonHandlerHelper" /> instance.
     /// </summary>
-    /// <param name="viewModel">The view model this helper needs to update in order to reflect process in the corresponding dialog window.</param>
-    /// <param name="solution">The <see cref="Solution"/> instance the work to be done is related with.</param>
-    /// <remarks>If no Solution is strictly required for the desired work to be done (even though one might be present, i. e. could theoretically be supplied),
-    /// use another overload, if possible. If this is not possible, a suitable overload that does not expect the superfluous parameters is called by
-    /// the actual implementation.</remarks>
+    /// <param name="viewModel">
+    ///   The view model this helper needs to update in order to reflect process in the corresponding
+    ///   dialog window.
+    /// </param>
+    /// <param name="solution">The <see cref="Solution" /> instance the work to be done is related with.</param>
+    /// <remarks>
+    ///   If no Solution is strictly required for the desired work to be done (even though one might be present, i. e. could
+    ///   theoretically be supplied),
+    ///   use another overload, if possible. If this is not possible, a suitable overload that does not expect the superfluous
+    ///   parameters is called by
+    ///   the actual implementation.
+    /// </remarks>
     public abstract Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution);
 
     /// <summary>
-    /// Carries out the work that the corresponding <see cref="IMenuItemButtonHandler"/>
-    /// instance wants to delegate to this <see cref="MenuItemButtonHandlerHelper"/> instance.
+    ///   Carries out the work that the corresponding <see cref="IMenuItemButtonHandler" />
+    ///   instance wants to delegate to this <see cref="MenuItemButtonHandlerHelper" /> instance.
     /// </summary>
-    /// <param name="viewModel">The view model this helper needs to update in order to reflect process in the corresponding dialog window.</param>
+    /// <param name="viewModel">
+    ///   The view model this helper needs to update in order to reflect process in the corresponding
+    ///   dialog window.
+    /// </param>
     public abstract Task DoWorkAsync (BaseUpdateViewModel viewModel);
   }
 }

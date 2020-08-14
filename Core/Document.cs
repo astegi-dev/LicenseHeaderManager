@@ -148,9 +148,7 @@ namespace Core
         var sb = new StringBuilder();
         var newContent = sb.Append (header).Append (await GetText()).ToString();
         using (var writer = new StreamWriter (_documentFilePath, false, Encoding.UTF8))
-        {
           await writer.WriteAsync (newContent);
-        }
 
         await RefreshText();
       }

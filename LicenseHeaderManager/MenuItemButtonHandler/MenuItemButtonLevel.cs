@@ -16,22 +16,22 @@ using System;
 namespace LicenseHeaderManager.MenuItemButtonHandler
 {
   /// <summary>
-  /// Provides different levels/scopes menu item buttons may reside in.
+  ///   Provides different levels/scopes menu item buttons may reside in.
   /// </summary>
   public enum MenuItemButtonLevel
   {
     /// <summary>
-    /// A menu item button that appears in the right click menu of a solution node.
+    ///   A menu item button that appears in the right click menu of a solution node.
     /// </summary>
     Solution,
 
     /// <summary>
-    /// A menu item button that appears in the right click menu of a project node.
+    ///   A menu item button that appears in the right click menu of a project node.
     /// </summary>
     Project,
 
     /// <summary>
-    /// A menu item button that appears in the right click menu of a folder node.
+    ///   A menu item button that appears in the right click menu of a folder node.
     /// </summary>
     Folder
   }

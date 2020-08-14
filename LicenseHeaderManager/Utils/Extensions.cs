@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
@@ -29,9 +28,9 @@ namespace LicenseHeaderManager.Utils
   internal static class Extensions
   {
     /// <summary>
-    /// Replaces occurrences of "\n" in a string by new line characters.
+    ///   Replaces occurrences of "\n" in a string by new line characters.
     /// </summary>
-    /// <returns>A <see cref="string"/> where all occurrences of "\n" have been replaced by new line characters</returns>
+    /// <returns>A <see cref="string" /> where all occurrences of "\n" have been replaced by new line characters</returns>
     public static string ReplaceNewLines (this string input)
     {
       return input.Replace (@"\n", "\n");

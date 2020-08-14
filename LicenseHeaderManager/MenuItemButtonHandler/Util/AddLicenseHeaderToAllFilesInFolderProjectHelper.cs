@@ -35,17 +35,17 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 
     public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution, Window window)
     {
-      return DoWorkAsync(viewModel);
+      return DoWorkAsync (viewModel);
     }
 
     public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution)
     {
-      return DoWorkAsync(viewModel);
+      return DoWorkAsync (viewModel);
     }
 
     public override async Task DoWorkAsync (BaseUpdateViewModel viewModel)
     {
-      await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync((LicenseHeadersPackage)_licenseHeaderExtension, viewModel);
+      await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync ((LicenseHeadersPackage) _licenseHeaderExtension, viewModel);
     }
   }
 }

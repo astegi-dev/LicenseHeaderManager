@@ -11,22 +11,22 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+using System;
+using System.ComponentModel;
+using System.Windows.Input;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.UpdateViews;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
-using System;
-using System.ComponentModel;
-using System.Windows.Input;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemButtonHandler
 {
   internal class FolderProjectMenuItemButtonHandler : IMenuItemButtonHandler
   {
-    private FolderProjectUpdateDialog _dialog;
     private readonly MenuItemButtonHandlerHelper _handler;
+    private FolderProjectUpdateDialog _dialog;
 
     public FolderProjectMenuItemButtonHandler (MenuItemButtonOperation mode, MenuItemButtonLevel level, MenuItemButtonHandlerHelper handler)
     {
@@ -44,7 +44,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
       Mouse.OverrideCursor = Cursors.Wait;
       var folderProjectUpdateViewModel = new FolderProjectUpdateViewModel();
 
-      _dialog = new FolderProjectUpdateDialog (folderProjectUpdateViewModel);
+      _dialog = new FolderProjectUpdateDialog (folderProjectUpdateViewModel) { WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner };
       _dialog.Closing += DialogOnClosing;
 
       Task.Run (() => HandleButtonInternalAsync (_handler, folderProjectUpdateViewModel)).FireAndForget();
