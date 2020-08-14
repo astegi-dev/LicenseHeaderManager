@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
@@ -27,30 +28,32 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 {
   public static class ExistingLicenseHeaderDefinitionFileAdder
   {
-    public static ProjectItem AddDefinitionFileToOneProject (string fileName, ProjectItems projectItems)
-    {
-      var licenseHeaderDefinitionFileName = OpenFileDialogForExistingFile (fileName);
 
-      return licenseHeaderDefinitionFileName == string.Empty ? null : AddFileToProject (projectItems, licenseHeaderDefinitionFileName);
+    public static ProjectItem AddDefinitionFileToOneProject(string fileName, ProjectItems projectItems)
+    {
+      var licenseHeaderDefinitionFileName = OpenFileDialogForExistingFile(fileName);
+
+      return licenseHeaderDefinitionFileName == string.Empty ? null : AddFileToProject(projectItems, licenseHeaderDefinitionFileName);
     }
 
-    public static void AddDefinitionFileToMultipleProjects (List<Project> projects)
+    public static void AddDefinitionFileToMultipleProjects(List<Project> projects)
     {
-      var licenseHeaderDefinitionFileName = OpenFileDialogForExistingFile (projects.First().DTE.Solution.FullName);
-      if (licenseHeaderDefinitionFileName == string.Empty) return;
+      var licenseHeaderDefinitionFileName = OpenFileDialogForExistingFile(projects.First().DTE.Solution.FullName);
+      if (licenseHeaderDefinitionFileName == string.Empty)
+        return;
 
       foreach (var project in projects)
-        AddFileToProject (project.ProjectItems, licenseHeaderDefinitionFileName);
+        AddFileToProject(project.ProjectItems, licenseHeaderDefinitionFileName);
     }
 
-    private static ProjectItem AddFileToProject (ProjectItems projectItems, string licenseHeaderDefinitionFileName)
+    private static ProjectItem AddFileToProject(ProjectItems projectItems, string licenseHeaderDefinitionFileName)
     {
       var fileCountBefore = projectItems.Count;
-      var newProjectItem = projectItems.AddFromFile (licenseHeaderDefinitionFileName);
+      var newProjectItem = projectItems.AddFromFile(licenseHeaderDefinitionFileName);
 
       var fileCountAfter = projectItems.Count;
       if (fileCountBefore == fileCountAfter)
-        MessageBox.Show (
+        MessageBox.Show(
             Resources.Warning_CantLinkItemInSameProject,
             Resources.NameOfThisExtension,
             MessageBoxButton.OK,
@@ -59,21 +62,42 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return newProjectItem;
     }
 
-    private static string OpenFileDialogForExistingFile (string fileName)
+    private static void OpenFileDialogForExistingFileInternal(string fileName, out string selectedFileName)
     {
-      FileDialog dialog = new OpenFileDialog();
-      dialog.CheckFileExists = true;
-      dialog.CheckPathExists = true;
-      dialog.DefaultExt = LicenseHeader.Extension;
-      dialog.DereferenceLinks = true;
-      dialog.Filter = "License Header Definitions|*" + LicenseHeader.Extension;
-      dialog.InitialDirectory = Path.GetDirectoryName (fileName);
+      FileDialog dialog = new OpenFileDialog
+      {
+          CheckFileExists = true,
+        CheckPathExists = true,
+        DefaultExt = LicenseHeader.Extension,
+        DereferenceLinks = true,
+        Filter = "License Header Definitions|*" + LicenseHeader.Extension,
+        InitialDirectory = Path.GetDirectoryName(fileName)
+      };
       var result = dialog.ShowDialog();
 
       if (result.HasValue && result.Value)
-        return dialog.FileName;
+      {
+        selectedFileName = dialog.FileName;
+        return;
+      }
 
-      return string.Empty;
+      selectedFileName = string.Empty;
+    }
+
+    private static string OpenFileDialogForExistingFile(string fileName)
+    {
+      var returnValue = string.Empty;
+
+      var staThread = new System.Threading.Thread(() =>
+      {
+        OpenFileDialogForExistingFileInternal(fileName, out var selectedFileName);
+        returnValue = selectedFileName;
+      });
+      staThread.SetApartmentState(ApartmentState.STA);
+      staThread.Start();
+      staThread.Join();
+
+      return returnValue;
     }
   }
 }

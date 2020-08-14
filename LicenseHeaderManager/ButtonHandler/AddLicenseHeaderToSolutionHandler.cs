@@ -25,6 +25,7 @@ using LicenseHeaderManager.SolutionUpdateViewModels;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
+using Thread = EnvDTE.Thread;
 
 namespace LicenseHeaderManager.ButtonHandler
 {

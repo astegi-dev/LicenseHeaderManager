@@ -36,7 +36,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
     private readonly SolutionUpdateViewModel _solutionUpdateViewModel;
-
+    
     public AddLicenseHeaderToAllFilesInSolutionHelper (
         LicenseHeaderReplacer licenseHeaderReplacer,
         SolutionUpdateViewModel solutionUpdateViewModel)
