@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using EnvDTE80;
@@ -9,37 +10,17 @@ using Rhino.Mocks;
 namespace LicenseHeaderManager.Test
 {
   [TestFixture]
-  class AllSolutionProjectsSearcherTest
+  internal class AllSolutionProjectsSearcherTest
   {
-    [Test]
-    public void TestGetAllProjects_ShouldReturnListOfProjects ()
-    {
-      Solution solution = MockRepository.GenerateStub<Solution>();
-
-      Project legitProject1 = MockRepository.GenerateStub<Project>();
-      Project legitProject2 = MockRepository.GenerateStub<Project>();
-
-      List<Project> projectList = new List<Project> { legitProject1, legitProject2 };
-
-      solution.Stub (x => x.GetEnumerator()).Return (projectList.GetEnumerator());
-
-
-      var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
-      List<Project> returnedProjects = allSolutionProjectsSearcher.GetAllProjects (solution);
-
-
-      Assert.AreEqual (2, returnedProjects.Count);
-    }
-
     [Test]
     public void TestGetAllProjects_DoesOnlyReturnProjects ()
     {
-      Solution solution = MockRepository.GenerateStub<Solution>();
+      var solution = MockRepository.GenerateStub<Solution>();
 
-      Project legitProject1 = MockRepository.GenerateStub<Project>();
-      Project solutionFolder = MockRepository.GenerateStub<Project>();
+      var legitProject1 = MockRepository.GenerateStub<Project>();
+      var solutionFolder = MockRepository.GenerateStub<Project>();
 
-      List<Project> projectList = new List<Project> { legitProject1, solutionFolder };
+      var projectList = new List<Project> { legitProject1, solutionFolder };
 
       solutionFolder.Stub (x => x.Kind).Return (ProjectKinds.vsProjectKindSolutionFolder);
       solutionFolder.Stub (x => x.ProjectItems.Count).Return (0);
@@ -48,7 +29,7 @@ namespace LicenseHeaderManager.Test
 
 
       var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
-      List<Project> returnedProjects = allSolutionProjectsSearcher.GetAllProjects (solution);
+      var returnedProjects = allSolutionProjectsSearcher.GetAllProjects (solution);
 
 
       Assert.AreEqual (legitProject1, returnedProjects.First());
@@ -57,13 +38,13 @@ namespace LicenseHeaderManager.Test
     [Test]
     public void TestGetAllProjects_FindsNestedProject ()
     {
-      Solution solution = MockRepository.GenerateStub<Solution>();
+      var solution = MockRepository.GenerateStub<Solution>();
 
-      Project legitProject1 = MockRepository.GenerateStub<Project>();
-      Project solutionFolder = MockRepository.GenerateStub<Project>();
-      Project projectInSolutionFolder = MockRepository.GenerateStub<Project>();
+      var legitProject1 = MockRepository.GenerateStub<Project>();
+      var solutionFolder = MockRepository.GenerateStub<Project>();
+      var projectInSolutionFolder = MockRepository.GenerateStub<Project>();
 
-      List<Project> projectList = new List<Project> { legitProject1, solutionFolder };
+      var projectList = new List<Project> { legitProject1, solutionFolder };
 
       solutionFolder.Stub (x => x.Kind).Return (ProjectKinds.vsProjectKindSolutionFolder);
       solutionFolder.Stub (x => x.ProjectItems.Count).Return (1);
@@ -73,10 +54,30 @@ namespace LicenseHeaderManager.Test
 
 
       var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
-      List<Project> returnedProjects = allSolutionProjectsSearcher.GetAllProjects (solution);
+      var returnedProjects = allSolutionProjectsSearcher.GetAllProjects (solution);
 
 
       Assert.Contains (projectInSolutionFolder, returnedProjects);
+    }
+
+    [Test]
+    public void TestGetAllProjects_ShouldReturnListOfProjects ()
+    {
+      var solution = MockRepository.GenerateStub<Solution>();
+
+      var legitProject1 = MockRepository.GenerateStub<Project>();
+      var legitProject2 = MockRepository.GenerateStub<Project>();
+
+      var projectList = new List<Project> { legitProject1, legitProject2 };
+
+      solution.Stub (x => x.GetEnumerator()).Return (projectList.GetEnumerator());
+
+
+      var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
+      var returnedProjects = allSolutionProjectsSearcher.GetAllProjects (solution);
+
+
+      Assert.AreEqual (2, returnedProjects.Count);
     }
   }
 }

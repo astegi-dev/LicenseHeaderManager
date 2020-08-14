@@ -25,43 +25,44 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
                          Title="LicenseHeaderManager" Height="228" Width="400.333"
                          d:DataContext="{d:DesignInstance solutionUpdateViewModels:SolutionUpdateViewModel}">
 
-  <platformUi:DialogWindow.Resources>
-    <solutionUpdateViews:IntToMaximumConverter x:Key="IntToMaximumConverter" />
-  </platformUi:DialogWindow.Resources>
+    <platformUi:DialogWindow.Resources>
+        <solutionUpdateViews:IntToMaximumConverter x:Key="IntToMaximumConverter" />
+    </platformUi:DialogWindow.Resources>
 
-  <Grid Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" RenderTransformOrigin="0.5,0.5">
-    <TextBlock Margin="10,0,0,120" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="363">
-      <TextBlock.Text>
-        <MultiBinding StringFormat="{}{0}/{1} files in project done">
-          <Binding Path="ProcessedFilesCountCurrentProject" />
-          <Binding Path="FileCountCurrentProject" />
-        </MultiBinding>
-      </TextBlock.Text>
-    </TextBlock>
-    <ProgressBar HorizontalAlignment="Left" Height="17" Margin="10,0,0,101" VerticalAlignment="Bottom" Width="363" Minimum="0"
-                 Maximum="{Binding FileCountCurrentProject, Converter={StaticResource IntToMaximumConverter}}"
-                 Value="{Binding ProcessedFilesCountCurrentProject}" RenderTransformOrigin="0.504,0.4" />
+    <Grid Background="{DynamicResource {x:Static SystemColors.ControlLightLightBrushKey}}" RenderTransformOrigin="0.5,0.5">
+        <TextBlock Margin="10,0,0,120" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="363">
+            <TextBlock.Text>
+                <MultiBinding StringFormat="{}{0}/{1} files in project done">
+                    <Binding Path="ProcessedFilesCountCurrentProject" />
+                    <Binding Path="FileCountCurrentProject" />
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+        <ProgressBar HorizontalAlignment="Left" Height="17" Margin="10,0,0,101" VerticalAlignment="Bottom" Width="363" Minimum="0"
+                     Maximum="{Binding FileCountCurrentProject, Converter={StaticResource IntToMaximumConverter}}"
+                     Value="{Binding ProcessedFilesCountCurrentProject}" RenderTransformOrigin="0.504,0.4" />
 
-    <TextBlock Margin="10,0,0,76" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="363">
-      <TextBlock.Text>
-        <MultiBinding StringFormat="{}{0}/{1} projects done">
-          <Binding Path="ProcessedProjectCount" />
-          <Binding Path="ProjectCount" />
-        </MultiBinding>
-      </TextBlock.Text>
-    </TextBlock>
-    <TextBlock Margin="10,0,0,61" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="363" TextTrimming="CharacterEllipsis"
-               Text="{Binding CurrentProject}" />
-    <ProgressBar HorizontalAlignment="Left" Height="17" Margin="10,0,0,42" VerticalAlignment="Bottom" Width="363" Minimum="0"
-                 Maximum="{Binding ProjectCount, Converter={StaticResource IntToMaximumConverter}}"
-                 Value="{Binding ProcessedProjectCount}" RenderTransformOrigin="0.504,0.4" />
+        <TextBlock Margin="10,0,0,76" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="363">
+            <TextBlock.Text>
+                <MultiBinding StringFormat="{}{0}/{1} projects done">
+                    <Binding Path="ProcessedProjectCount" />
+                    <Binding Path="ProjectCount" />
+                </MultiBinding>
+            </TextBlock.Text>
+        </TextBlock>
+        <TextBlock Margin="10,0,0,61" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="363" TextTrimming="CharacterEllipsis"
+                   Text="{Binding CurrentProject}" />
+        <ProgressBar HorizontalAlignment="Left" Height="17" Margin="10,0,0,42" VerticalAlignment="Bottom" Width="363" Minimum="0"
+                     Maximum="{Binding ProjectCount, Converter={StaticResource IntToMaximumConverter}}"
+                     Value="{Binding ProcessedProjectCount}" RenderTransformOrigin="0.504,0.4" />
 
 
-    <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="363">
-      Updating license header in the solution.
-      If you have a big solution, this may take some time. Closing of the Window stops the process.
-    </TextBlock>
-    <Button Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75" Command="{Binding CloseCommand}"
-            CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type platformUi:DialogWindow}}}" />
-  </Grid>
+        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="363">
+            Updating license header in the solution.
+            If you have a big solution, this may take some time. Closing of the Window stops the process.
+        </TextBlock>
+        <Button Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75"
+                Command="{Binding CloseCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type platformUi:DialogWindow}}}" />
+    </Grid>
 </platformUi:DialogWindow>

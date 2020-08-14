@@ -19,8 +19,8 @@ using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Interfaces;
+using LicenseHeaderManager.SolutionUpdateViewModels;
 using LicenseHeaderManager.Utils;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
@@ -29,11 +29,11 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     private const string c_commandName = "Remove LicenseHeader from all Projects";
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    private readonly IVsStatusbar _statusBar;
+    private readonly SolutionUpdateViewModel _viewModel;
 
-    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (IVsStatusbar statusBar, LicenseHeaderReplacer licenseHeaderReplacer)
+    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (SolutionUpdateViewModel viewModel, LicenseHeaderReplacer licenseHeaderReplacer)
     {
-      _statusBar = statusBar;
+      _viewModel = viewModel;
       _licenseHeaderReplacer = licenseHeaderReplacer;
     }
 
@@ -49,18 +49,15 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
       var projectsInSolution = allSolutionProjectsSearcher.GetAllProjects (solution);
 
-      var progressCount = 1;
-      var projectCount = projectsInSolution.Count;
+      _viewModel.ProjectCount = projectsInSolution.Count;
       var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseHeaderReplacer);
 
       foreach (var project in projectsInSolution)
       {
-        _statusBar.SetText (string.Format (Resources.UpdateSolution, progressCount, projectCount));
+        _viewModel.CurrentProject = project.Name;
         await removeAllLicenseHeadersCommand.ExecuteAsync (project);
-        progressCount++;
+        _viewModel.ProcessedProjectCount++;
       }
-
-      _statusBar.SetText (string.Empty);
     }
   }
 }

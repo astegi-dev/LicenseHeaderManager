@@ -1,15 +1,20 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace LicenseHeaderManager.Utils
 {
   /// <summary>
-  /// Converts boolean literals found in JSON files to a <see cref="bool"/> value and vice versa.
+  ///   Converts boolean literals found in JSON files to a <see cref="bool" /> value and vice versa.
   /// </summary>
-  /// <remarks>Newtonsoft.Json's default boolean converter is not very strict, i. e. it allows string literals like "TruE" or number literals
-  /// like 0, 3, 4 found in a file to be converted to a <see cref="bool"/> value. This might be convenient in some situations, but for this
-  /// project, a notion that is more oriented towards the JSON specification is pursued. Consequently, this this class only allows the
-  /// <see cref="bool"/> literals true and false, without surrounding quotes and case-sensitive.</remarks>
+  /// <remarks>
+  ///   Newtonsoft.Json's default boolean converter is not very strict, i. e. it allows string literals like "TruE" or number
+  ///   literals
+  ///   like 0, 3, 4 found in a file to be converted to a <see cref="bool" /> value. This might be convenient in some
+  ///   situations, but for this
+  ///   project, a notion that is more oriented towards the JSON specification is pursued. Consequently, this this class only
+  ///   allows the
+  ///   <see cref="bool" /> literals true and false, without surrounding quotes and case-sensitive.
+  /// </remarks>
   internal class JsonBoolConverter : JsonConverter
   {
     public const string NullLiteral = "{null}";
@@ -39,14 +44,12 @@ namespace LicenseHeaderManager.Utils
       const string exceptionMessage = exceptionShortMessage + " Path '{1}', line {2}, position {3}.";
 
       if (reader is IJsonLineInfo jsonLineInfo && jsonLineInfo.HasLineInfo())
-      {
         return new JsonReaderException (
             string.Format (exceptionMessage, literal, reader.Path, jsonLineInfo.LineNumber, jsonLineInfo.LinePosition),
             reader.Path,
             jsonLineInfo.LineNumber,
             jsonLineInfo.LinePosition,
             null);
-      }
 
       return new JsonReaderException (string.Format (exceptionShortMessage, literal));
     }

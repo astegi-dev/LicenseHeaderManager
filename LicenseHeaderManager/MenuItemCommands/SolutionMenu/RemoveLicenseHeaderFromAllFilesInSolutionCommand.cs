@@ -1,9 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Design;
-using LicenseHeaderManager.MenuItemCommands.Common;
-using LicenseHeaderManager.Utils;
+using LicenseHeaderManager.ButtonHandler;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
@@ -23,6 +21,8 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     /// </summary>
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
+    private readonly ButtonHandlerFactory _buttonHandlerFactory;
+
     /// <summary>
     ///   Initializes a new instance of the <see cref="RemoveLicenseHeaderFromAllFilesInSolutionCommand" /> class.
     ///   Adds our command handlers for menu (commands must exist in the command table file)
@@ -33,6 +33,8 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     {
       ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
+
+      _buttonHandlerFactory = new ButtonHandlerFactory (ServiceProvider);
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
       var menuItem = new OleMenuCommand (Execute, menuCommandID);
@@ -74,10 +76,11 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      ExecuteInternalAsync().FireAndForget();
+      //ExecuteInternalAsync().FireAndForget();
+      _buttonHandlerFactory.CreateRemoveLicenseHeaderFromSolutionHandler().HandleButton (sender, e);
     }
 
-    private async Task ExecuteInternalAsync ()
+    /*private async Task ExecuteInternalAsync ()
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var solution = ServiceProvider.Dte2.Solution;
@@ -100,6 +103,6 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
 
       if (resharperSuspended)
         CommandUtility.ExecuteCommand ("ReSharper_Resume", ServiceProvider.Dte2);
-    }
+    }*/
   }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using LicenseHeaderManager.ButtonHandler;
-using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 

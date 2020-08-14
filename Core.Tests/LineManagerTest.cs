@@ -1,4 +1,5 @@
-﻿using Core;
+﻿using System;
+using Core;
 using NUnit.Framework;
 
 namespace LicenseHeaderManager.Test
@@ -9,41 +10,41 @@ namespace LicenseHeaderManager.Test
     [Test]
     public void DetectLineEnd_CRLF ()
     {
-      string text = "test\r\ntest";
+      var text = "test\r\ntest";
       Assert.AreEqual ("\r\n", NewLineManager.DetectMostFrequentLineEnd (text));
-    }
-
-    [Test]
-    public void DetectLineEnd_OnlyLF ()
-    {
-      string text = "test\ntest";
-      Assert.AreEqual ("\n", NewLineManager.DetectMostFrequentLineEnd (text));
     }
 
     [Test]
     public void DetectLineEnd_OnlyCR ()
     {
-      string text = "test\rtest";
+      var text = "test\rtest";
       Assert.AreEqual ("\r", NewLineManager.DetectMostFrequentLineEnd (text));
     }
 
     [Test]
-    public void ReplaceAllLineEnds_ReplaceFullLineEnding ()
+    public void DetectLineEnd_OnlyLF ()
     {
-      string text1 = "test1";
-      string text2 = "test2";
-      string text3 = "test3";
-      string text4 = "test4";
-      string fulltext = text1 + "\r\n" + text2 + "\n" + text3 + "\r" + text4;
-      Assert.AreEqual (text1 + text2 + text3 + text4, NewLineManager.ReplaceAllLineEnds (fulltext, string.Empty));
+      var text = "test\ntest";
+      Assert.AreEqual ("\n", NewLineManager.DetectMostFrequentLineEnd (text));
     }
 
     [Test]
     public void DetectMostFrequentLineEnd_DetectFullLineEnding ()
     {
-      string text = "test\n\r\n\r\n test\r\n te\r restasd";
+      var text = "test\n\r\n\r\n test\r\n te\r restasd";
       var result = NewLineManager.DetectMostFrequentLineEnd (text);
       Assert.AreEqual ("\r\n", result);
+    }
+
+    [Test]
+    public void ReplaceAllLineEnds_ReplaceFullLineEnding ()
+    {
+      var text1 = "test1";
+      var text2 = "test2";
+      var text3 = "test3";
+      var text4 = "test4";
+      var fulltext = text1 + "\r\n" + text2 + "\n" + text3 + "\r" + text4;
+      Assert.AreEqual (text1 + text2 + text3 + text4, NewLineManager.ReplaceAllLineEnds (fulltext, string.Empty));
     }
   }
 }

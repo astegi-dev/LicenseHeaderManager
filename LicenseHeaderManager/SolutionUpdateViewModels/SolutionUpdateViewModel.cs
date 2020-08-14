@@ -24,10 +24,10 @@ namespace LicenseHeaderManager.SolutionUpdateViewModels
   public class SolutionUpdateViewModel : INotifyPropertyChanged
   {
     private string _currentProject = "Preparing update...";
-    private int _processedFilesCountCurrentProject;
     private int _fileCountCurrentProject;
-    private int _projectCount;
+    private int _processedFilesCountCurrentProject;
     private int _processedProjectCount;
+    private int _projectCount;
 
     public SolutionUpdateViewModel ()
     {
@@ -49,7 +49,7 @@ namespace LicenseHeaderManager.SolutionUpdateViewModels
       set
       {
         _projectCount = value;
-        NotifyPropertyChanged(nameof(ProjectCount));
+        NotifyPropertyChanged (nameof(ProjectCount));
       }
     }
 
@@ -59,7 +59,7 @@ namespace LicenseHeaderManager.SolutionUpdateViewModels
       set
       {
         _processedProjectCount = value;
-        NotifyPropertyChanged(nameof(ProcessedProjectCount));
+        NotifyPropertyChanged (nameof(ProcessedProjectCount));
       }
     }
 

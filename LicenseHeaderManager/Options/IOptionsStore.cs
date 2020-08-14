@@ -41,9 +41,9 @@ namespace LicenseHeaderManager.Options
     IEnumerable<Language> Languages { get; set; }
 
     /// <summary>
-    /// Creates a deep copy of the current <see cref="IOptionsStore"/> instance.
+    ///   Creates a deep copy of the current <see cref="IOptionsStore" /> instance.
     /// </summary>
     /// <returns></returns>
-    IOptionsStore Clone();
+    IOptionsStore Clone ();
   }
 }

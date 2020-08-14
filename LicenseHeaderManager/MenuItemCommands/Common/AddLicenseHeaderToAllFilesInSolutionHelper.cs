@@ -17,7 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
@@ -49,7 +49,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return c_commandName;
     }
 
-    public async System.Threading.Tasks.Task ExecuteAsync (Solution solution)
+    public async Task ExecuteAsync (Solution solution)
     {
       if (solution == null) return;
 
@@ -132,15 +132,16 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       return MessageBoxHelper.DoYouWant (message);
     }
 
-    private async System.Threading.Tasks.Task AddLicenseHeaderToProjectsAsync (ICollection<Project> projectsInSolution)
+    private async Task AddLicenseHeaderToProjectsAsync (ICollection<Project> projectsInSolution)
     {
       _solutionUpdateViewModel.ProcessedProjectCount = 0;
       _solutionUpdateViewModel.ProjectCount = projectsInSolution.Count;
+      var addAllLicenseHeadersCommand = new AddLicenseHeaderToAllFilesInProjectHelper (_licenseHeaderReplacer, _solutionUpdateViewModel);
 
       foreach (var project in projectsInSolution)
       {
         _solutionUpdateViewModel.CurrentProject = project.Name;
-        await new AddLicenseHeaderToAllFilesInProjectHelper (_licenseHeaderReplacer, _solutionUpdateViewModel).ExecuteAsync (project);
+        await addAllLicenseHeadersCommand.ExecuteAsync (project);
         _solutionUpdateViewModel.ProcessedProjectCount++;
       }
     }

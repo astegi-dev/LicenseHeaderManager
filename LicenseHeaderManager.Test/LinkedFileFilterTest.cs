@@ -10,13 +10,13 @@ using Rhino.Mocks;
 namespace LicenseHeaderManager.Test
 {
   [TestFixture]
-  class LinkedFileFilterTest
+  internal class LinkedFileFilterTest
   {
     [Test]
     public void TestEmptyList ()
     {
-      Solution solution = MockRepository.GenerateMock<Solution>();
-      LinkedFileFilter linkedFileFilter = new LinkedFileFilter (solution);
+      var solution = MockRepository.GenerateMock<Solution>();
+      var linkedFileFilter = new LinkedFileFilter (solution);
 
       linkedFileFilter.Filter (new List<ProjectItem>());
 
@@ -26,14 +26,30 @@ namespace LicenseHeaderManager.Test
     }
 
     [Test]
+    public void TestProjectItemNotInSolution ()
+    {
+      var solution = MockRepository.GenerateMock<Solution>();
+      var linkedFile = MockRepository.GenerateMock<ProjectItem>();
+      solution.Expect (x => x.FindProjectItem ("linkedFile.cs")).Return (null);
+      linkedFile.Expect (x => x.Name).Return ("linkedFile.cs");
+
+      var linkedFileFilter = new LinkedFileFilter (solution);
+      linkedFileFilter.Filter (new List<ProjectItem> { linkedFile });
+
+      Assert.IsEmpty (linkedFileFilter.ToBeProgressed);
+      Assert.IsEmpty (linkedFileFilter.NoLicenseHeaderFile);
+      Assert.IsNotEmpty (linkedFileFilter.NotInSolution);
+    }
+
+    [Test]
     public void TestProjectItemWithLicenseHeaderFile ()
     {
-      string licenseHeaderFileName = "test.licenseheader";
+      var licenseHeaderFileName = "test.licenseheader";
 
-      Solution solution = MockRepository.GenerateMock<Solution>();
-      ProjectItem linkedFile = MockRepository.GenerateMock<ProjectItem>();
+      var solution = MockRepository.GenerateMock<Solution>();
+      var linkedFile = MockRepository.GenerateMock<ProjectItem>();
 
-      ProjectItem licenseHeaderFile = MockRepository.GenerateStub<ProjectItem>();
+      var licenseHeaderFile = MockRepository.GenerateStub<ProjectItem>();
       licenseHeaderFile.Expect (x => x.FileCount).Return (1);
       licenseHeaderFile.Expect (x => x.FileNames[0]).Return (licenseHeaderFileName);
 
@@ -43,7 +59,7 @@ namespace LicenseHeaderManager.Test
         writer.WriteLine ("//test");
       }
 
-      ProjectItems projectItems = MockRepository.GenerateStub<ProjectItems>();
+      var projectItems = MockRepository.GenerateStub<ProjectItems>();
       projectItems.Stub (x => x.GetEnumerator())
           .Return (null)
           .WhenCalled (
@@ -56,7 +72,7 @@ namespace LicenseHeaderManager.Test
       solution.Expect (x => x.FindProjectItem ("linkedFile.cs")).Return (linkedFile);
 
 
-      LinkedFileFilter linkedFileFilter = new LinkedFileFilter (solution);
+      var linkedFileFilter = new LinkedFileFilter (solution);
       linkedFileFilter.Filter (new List<ProjectItem> { linkedFile });
 
       Assert.IsNotEmpty (linkedFileFilter.ToBeProgressed);
@@ -70,15 +86,15 @@ namespace LicenseHeaderManager.Test
     [Test]
     public void TestProjectItemWithoutLicenseHeaderFile ()
     {
-      Solution solution = MockRepository.GenerateMock<Solution>();
+      var solution = MockRepository.GenerateMock<Solution>();
       solution.Expect (x => x.FullName).Return (@"d:\projects\Stuff.sln");
 
-      DTE dte = MockRepository.GenerateMock<DTE>();
+      var dte = MockRepository.GenerateMock<DTE>();
       dte.Expect (x => x.Solution).Return (solution);
 
-      ProjectItems projectItems = MockRepository.GenerateMock<ProjectItems>();
+      var projectItems = MockRepository.GenerateMock<ProjectItems>();
 
-      ProjectItem linkedFile = MockRepository.GenerateMock<ProjectItem>();
+      var linkedFile = MockRepository.GenerateMock<ProjectItem>();
       linkedFile.Expect (x => x.DTE).Return (dte);
       projectItems.Expect (x => x.Parent).Return (new object());
       linkedFile.Expect (x => x.Collection).Return (projectItems);
@@ -90,28 +106,12 @@ namespace LicenseHeaderManager.Test
       linkedFile.Expect (x => x.Properties).Return (null);
 
 
-      LinkedFileFilter linkedFileFilter = new LinkedFileFilter (solution);
+      var linkedFileFilter = new LinkedFileFilter (solution);
       linkedFileFilter.Filter (new List<ProjectItem> { linkedFile });
 
       Assert.IsEmpty (linkedFileFilter.ToBeProgressed);
       Assert.IsNotEmpty (linkedFileFilter.NoLicenseHeaderFile);
       Assert.IsEmpty (linkedFileFilter.NotInSolution);
-    }
-
-    [Test]
-    public void TestProjectItemNotInSolution ()
-    {
-      Solution solution = MockRepository.GenerateMock<Solution>();
-      ProjectItem linkedFile = MockRepository.GenerateMock<ProjectItem>();
-      solution.Expect (x => x.FindProjectItem ("linkedFile.cs")).Return (null);
-      linkedFile.Expect (x => x.Name).Return ("linkedFile.cs");
-
-      LinkedFileFilter linkedFileFilter = new LinkedFileFilter (solution);
-      linkedFileFilter.Filter (new List<ProjectItem> { linkedFile });
-
-      Assert.IsEmpty (linkedFileFilter.ToBeProgressed);
-      Assert.IsEmpty (linkedFileFilter.NoLicenseHeaderFile);
-      Assert.IsNotEmpty (linkedFileFilter.NotInSolution);
     }
   }
 }

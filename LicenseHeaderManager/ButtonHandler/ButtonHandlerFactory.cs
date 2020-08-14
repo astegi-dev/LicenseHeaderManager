@@ -32,5 +32,10 @@ namespace LicenseHeaderManager.ButtonHandler
     {
       return new AddLicenseHeaderToSolutionHandler (_licenseHeadersPackage.LicenseHeaderReplacer, _licenseHeadersPackage.Dte2);
     }
+
+    public RemoveLicenseHeaderFromSolutionHandler CreateRemoveLicenseHeaderFromSolutionHandler ()
+    {
+      return new RemoveLicenseHeaderFromSolutionHandler (_licenseHeadersPackage.LicenseHeaderReplacer, _licenseHeadersPackage.Dte2);
+    }
   }
 }

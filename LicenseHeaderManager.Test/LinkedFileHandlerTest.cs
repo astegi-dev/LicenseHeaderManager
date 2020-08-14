@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using EnvDTE;
-using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.Utils;
 using NUnit.Framework;
@@ -9,31 +9,16 @@ using Rhino.Mocks;
 namespace LicenseHeaderManager.Test
 {
   [TestFixture]
-  class LinkedFileHandlerTest
+  internal class LinkedFileHandlerTest
   {
-    [Test]
-    public void TestNoProjectItems ()
-    {
-      Solution solution = MockRepository.GenerateStub<Solution>();
-      ILicenseHeaderExtension extension = MockRepository.GenerateStub<ILicenseHeaderExtension>();
-      
-      LinkedFileFilter linkedFileFilter = MockRepository.GenerateStrictMock<LinkedFileFilter> (solution);
-      //LicenseHeaderReplacer licenseHeaderReplacer = MockRepository.GenerateStrictMock<LicenseHeaderReplacer> (extension);
-      
-      //LinkedFileHandler linkedFileHandler = new LinkedFileHandler(null);
-      //linkedFileHandler.HandleAsync(licenseHeaderReplacer, linkedFileFilter);
-
-      //Assert.AreEqual(string.Empty, linkedFileHandler.Message);
-    }
-
     [Test]
     public void TestNoLicenseHeaderFile ()
     {
-      ILicenseHeaderExtension extension = MockRepository.GenerateStub<ILicenseHeaderExtension>();
-      ProjectItem projectItem = MockRepository.GenerateMock<ProjectItem>();
+      var extension = MockRepository.GenerateStub<ILicenseHeaderExtension>();
+      var projectItem = MockRepository.GenerateMock<ProjectItem>();
       projectItem.Expect (x => x.Name).Return ("projectItem.cs");
 
-      ILinkedFileFilter linkedFileFilter = MockRepository.GenerateMock<ILinkedFileFilter>();
+      var linkedFileFilter = MockRepository.GenerateMock<ILinkedFileFilter>();
       //LicenseHeaderReplacer licenseHeaderReplacer = MockRepository.GenerateStrictMock<LicenseHeaderReplacer> (extension);
 
       linkedFileFilter.Expect (x => x.NoLicenseHeaderFile).Return (new List<ProjectItem> { projectItem });
@@ -41,13 +26,28 @@ namespace LicenseHeaderManager.Test
       linkedFileFilter.Expect (x => x.NotInSolution).Return (new List<ProjectItem>());
 
 
-      LinkedFileHandler linkedFileHandler = new LinkedFileHandler(null);
+      var linkedFileHandler = new LinkedFileHandler (null);
       //linkedFileHandler.HandleAsync(licenseHeaderReplacer, linkedFileFilter);
 
       //string expectedMessage = string.Format(Resources.LinkedFileUpdateInformation, "projectItem.cs")
       //    .Replace(@"\n", "\n");
 
       //Assert.AreEqual(expectedMessage, linkedFileHandler.Message);
+    }
+
+    [Test]
+    public void TestNoProjectItems ()
+    {
+      var solution = MockRepository.GenerateStub<Solution>();
+      var extension = MockRepository.GenerateStub<ILicenseHeaderExtension>();
+
+      var linkedFileFilter = MockRepository.GenerateStrictMock<LinkedFileFilter> (solution);
+      //LicenseHeaderReplacer licenseHeaderReplacer = MockRepository.GenerateStrictMock<LicenseHeaderReplacer> (extension);
+
+      //LinkedFileHandler linkedFileHandler = new LinkedFileHandler(null);
+      //linkedFileHandler.HandleAsync(licenseHeaderReplacer, linkedFileFilter);
+
+      //Assert.AreEqual(string.Empty, linkedFileHandler.Message);
     }
   }
 }

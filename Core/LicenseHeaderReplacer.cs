@@ -36,6 +36,9 @@ namespace Core
     private readonly IEnumerable<string> _keywords;
     private readonly IEnumerable<Language> _languages;
 
+    private int _processedFileCount;
+    private int _totalFileCount;
+
     public LicenseHeaderReplacer (IEnumerable<Language> languages, IEnumerable<string> keywords)
     {
       _languages = languages;
@@ -79,7 +82,7 @@ namespace Core
         switch (result)
         {
           case CreateDocumentResult.DocumentCreated:
-            if (!(await document.ValidateHeader()))
+            if (!await document.ValidateHeader())
             {
               var message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).Replace (@"\n", "\n");
               var addDespiteNonCommentText = nonCommentTextInquiry?.Invoke (message) ?? true;
@@ -139,9 +142,6 @@ namespace Core
       return returnObject;
     }
 
-    private int _processedFileCount;
-    private int _totalFileCount;
-
     private void ResetProgress (int totalFileCount)
     {
       _processedFileCount = 0;
@@ -169,7 +169,7 @@ namespace Core
       string message;
       var replace = true;
 
-      if (!(await document.ValidateHeader()))
+      if (!await document.ValidateHeader())
       {
         var extension = Path.GetExtension (header.DocumentPath);
         if (!_extensionsWithInvalidHeaders.TryGetValue (extension, out replace))

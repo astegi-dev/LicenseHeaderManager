@@ -1,7 +1,4 @@
-﻿using Core;
-using LicenseHeaderManager.Utils;
-using Microsoft.VisualStudio.Shell.TableManager;
-using Newtonsoft.Json;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -9,6 +6,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Windows;
+using Core;
+using LicenseHeaderManager.Utils;
+using Newtonsoft.Json;
 using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace LicenseHeaderManager.Options
@@ -91,11 +91,6 @@ namespace LicenseHeaderManager.Options
                                                                             }
                                                                         };
 
-    /// <summary>
-    /// Gets or sets the currently up-to-date configuration of the License Header Manager Extension.
-    /// </summary>
-    public static OptionsStore CurrentConfig { get; set; }
-
     static OptionsStore ()
     {
       CurrentConfig = new OptionsStore (true);
@@ -113,6 +108,11 @@ namespace LicenseHeaderManager.Options
         SetDefaults();
     }
 
+    /// <summary>
+    ///   Gets or sets the currently up-to-date configuration of the License Header Manager Extension.
+    /// </summary>
+    public static OptionsStore CurrentConfig { get; set; }
+
     [JsonConverter (typeof (JsonBoolConverter))]
     public bool InsertHeaderIntoNewFiles { get; set; }
 
@@ -127,6 +127,21 @@ namespace LicenseHeaderManager.Options
 
     public IEnumerable<Language> Languages { get; set; }
 
+    public IOptionsStore Clone ()
+    {
+      var clonedObject = new OptionsStore
+                         {
+                             InsertHeaderIntoNewFiles = InsertHeaderIntoNewFiles,
+                             UseRequiredKeywords = UseRequiredKeywords,
+                             RequiredKeywords = RequiredKeywords,
+                             LinkedCommands = LinkedCommands.Select (x => x.Clone()),
+                             DefaultLicenseHeaderFileText = DefaultLicenseHeaderFileText,
+                             Languages = Languages.Select (x => x.Clone())
+                         };
+
+      return clonedObject;
+    }
+
     /// <summary>
     ///   Serializes an <see cref="IOptionsStore" /> instance to a file in the file system.
     /// </summary>
@@ -137,7 +152,7 @@ namespace LicenseHeaderManager.Options
       var errors = new List<string>();
       var serializer = new JsonSerializer
                        {
-                           Formatting = Formatting.Indented,
+                           Formatting = Formatting.Indented
                        };
       serializer.Error += (sender, args) => OnSerializerError (args, errors);
 
@@ -158,9 +173,15 @@ namespace LicenseHeaderManager.Options
     /// <summary>
     ///   Deserializes an <see cref="IOptionsStore" /> instance from a file in the file system.
     /// </summary>
-    /// <param name="filePath">The path to an options file from which a corresponding <see cref="IOptionsStore"/> instance should be constructed.</param>
-    /// <returns>An <see cref="IOptionsStore"/> instance that represents to configuration contained in the file specified by <paramref name="filePath"/>.
-    /// If there were errors upon deserialization, <see langword="null"/> is returned.</returns>
+    /// <param name="filePath">
+    ///   The path to an options file from which a corresponding <see cref="IOptionsStore" /> instance
+    ///   should be constructed.
+    /// </param>
+    /// <returns>
+    ///   An <see cref="IOptionsStore" /> instance that represents to configuration contained in the file specified by
+    ///   <paramref name="filePath" />.
+    ///   If there were errors upon deserialization, <see langword="null" /> is returned.
+    /// </returns>
     public static OptionsStore Load (string filePath)
     {
       var errors = new List<string>();
@@ -195,23 +216,8 @@ namespace LicenseHeaderManager.Options
         errors.Add (args.ErrorContext.Error.Message);
     }
 
-    public IOptionsStore Clone ()
-    {
-      var clonedObject = new OptionsStore
-                         {
-                             InsertHeaderIntoNewFiles = InsertHeaderIntoNewFiles,
-                             UseRequiredKeywords = UseRequiredKeywords,
-                             RequiredKeywords = RequiredKeywords,
-                             LinkedCommands = LinkedCommands.Select (x => x.Clone()),
-                             DefaultLicenseHeaderFileText = DefaultLicenseHeaderFileText,
-                             Languages = Languages.Select (x => x.Clone())
-                         };
-
-      return clonedObject;
-    }
-
     /// <summary>
-    /// Sets all public members of this <see cref="IOptionsStore"/> instance to their default values.
+    ///   Sets all public members of this <see cref="IOptionsStore" /> instance to their default values.
     /// </summary>
     /// <remarks>The default values are implementation-dependent.</remarks>
     public void SetDefaults ()

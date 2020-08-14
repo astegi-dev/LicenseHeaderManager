@@ -50,7 +50,7 @@ namespace LicenseHeaderManager.Utils
 
     public static void ExecuteCommand (string command, DTE2 dte)
     {
-      dte.ExecuteCommand (command);
+     // dte.ExecuteCommand (command);
     }
   }
 }

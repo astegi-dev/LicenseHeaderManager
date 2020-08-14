@@ -17,9 +17,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using Core;
 using EnvDTE;
+using LicenseHeaderManager.SolutionUpdateViewModels;
 using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
@@ -27,10 +27,12 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
   public class RemoveLicenseHeaderFromAllFilesInProjectHelper
   {
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
+    private readonly SolutionUpdateViewModel _solutionUpdateViewModel;
 
-    public RemoveLicenseHeaderFromAllFilesInProjectHelper (LicenseHeaderReplacer licenseHeaderReplacer)
+    public RemoveLicenseHeaderFromAllFilesInProjectHelper (LicenseHeaderReplacer licenseHeaderReplacer, SolutionUpdateViewModel solutionUpdateViewModel = null)
     {
       _licenseHeaderReplacer = licenseHeaderReplacer;
+      _solutionUpdateViewModel = solutionUpdateViewModel;
     }
 
     public async Task ExecuteAsync (object projectOrProjectItem)
@@ -61,7 +63,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     private async Task RemoveOrReplaceHeaderAndHandleResultAsync (ICollection<LicenseHeaderInput> replacerInput)
     {
-      var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, new Progress<ReplacerProgressReport> (CoreHelpers.OnProgressReported));
+      var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (
+          replacerInput,
+          new Progress<ReplacerProgressReport> (report => CoreHelpers.OnProgressReportedAsync (report, _solutionUpdateViewModel).FireAndForget()));
       CoreHelpers.HandleResult (result);
     }
   }

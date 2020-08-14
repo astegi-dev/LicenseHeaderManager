@@ -9,34 +9,6 @@ namespace LicenseHeaderManager.Test
   public class LicenseHeaderPreparerTest
   {
     [Test]
-    public void TestLicenseHeaderWithoutEndingNewLine ()
-    {
-      var currentHeaderText = "nothingRelevant";
-      var toBeInsertedHeaderText = "//Testtext";
-
-      var commentParserMock = MockRepository.GenerateMock<ICommentParser>();
-      commentParserMock.Expect (x => x.Parse (currentHeaderText)).Return (String.Empty);
-
-      string preparedHeader = LicenseHeaderPreparer.Prepare (toBeInsertedHeaderText, currentHeaderText, commentParserMock);
-
-      Assert.AreEqual (toBeInsertedHeaderText, preparedHeader);
-    }
-
-    [Test]
-    public void TestLicenseHeaderWithEndingNewLine ()
-    {
-      var currentHeaderText = "nothingRelevant";
-      var toBeInsertedHeaderText = "//Testtext" + Environment.NewLine;
-
-      var commentParserMock = MockRepository.GenerateMock<ICommentParser>();
-      commentParserMock.Expect (x => x.Parse (currentHeaderText)).Return (String.Empty);
-
-      string preparedHeader = LicenseHeaderPreparer.Prepare (toBeInsertedHeaderText, currentHeaderText, commentParserMock);
-
-      Assert.AreEqual (toBeInsertedHeaderText, preparedHeader);
-    }
-
-    [Test]
     public void TestLicenseHeaderWhereCurrentHeaderHasComment ()
     {
       var currentHeaderText = "//HighlyRelevantComment";
@@ -45,7 +17,7 @@ namespace LicenseHeaderManager.Test
       var commentParserMock = MockRepository.GenerateMock<ICommentParser>();
       commentParserMock.Expect (x => x.Parse (currentHeaderText)).Return ("OhOurCurrentHeaderTextHasAComment");
 
-      string preparedHeader = LicenseHeaderPreparer.Prepare (toBeInsertedHeaderText, currentHeaderText, commentParserMock);
+      var preparedHeader = LicenseHeaderPreparer.Prepare (toBeInsertedHeaderText, currentHeaderText, commentParserMock);
 
       Assert.AreEqual (toBeInsertedHeaderText + Environment.NewLine, preparedHeader);
     }
@@ -59,7 +31,35 @@ namespace LicenseHeaderManager.Test
       var commentParserMock = MockRepository.GenerateMock<ICommentParser>();
       commentParserMock.Expect (x => x.Parse (currentHeaderText)).Return ("OhOurCurrentHeaderTextHasAComment");
 
-      string preparedHeader = LicenseHeaderPreparer.Prepare (toBeInsertedHeaderText, currentHeaderText, commentParserMock);
+      var preparedHeader = LicenseHeaderPreparer.Prepare (toBeInsertedHeaderText, currentHeaderText, commentParserMock);
+
+      Assert.AreEqual (toBeInsertedHeaderText, preparedHeader);
+    }
+
+    [Test]
+    public void TestLicenseHeaderWithEndingNewLine ()
+    {
+      var currentHeaderText = "nothingRelevant";
+      var toBeInsertedHeaderText = "//Testtext" + Environment.NewLine;
+
+      var commentParserMock = MockRepository.GenerateMock<ICommentParser>();
+      commentParserMock.Expect (x => x.Parse (currentHeaderText)).Return (string.Empty);
+
+      var preparedHeader = LicenseHeaderPreparer.Prepare (toBeInsertedHeaderText, currentHeaderText, commentParserMock);
+
+      Assert.AreEqual (toBeInsertedHeaderText, preparedHeader);
+    }
+
+    [Test]
+    public void TestLicenseHeaderWithoutEndingNewLine ()
+    {
+      var currentHeaderText = "nothingRelevant";
+      var toBeInsertedHeaderText = "//Testtext";
+
+      var commentParserMock = MockRepository.GenerateMock<ICommentParser>();
+      commentParserMock.Expect (x => x.Parse (currentHeaderText)).Return (string.Empty);
+
+      var preparedHeader = LicenseHeaderPreparer.Prepare (toBeInsertedHeaderText, currentHeaderText, commentParserMock);
 
       Assert.AreEqual (toBeInsertedHeaderText, preparedHeader);
     }

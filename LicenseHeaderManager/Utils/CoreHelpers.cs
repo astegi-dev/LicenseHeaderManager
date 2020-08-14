@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using Core;
 using EnvDTE;
@@ -10,6 +9,7 @@ using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.SolutionUpdateViewModels;
 using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.Utils
 {
@@ -17,10 +17,10 @@ namespace LicenseHeaderManager.Utils
   {
     public static void OnProgressReported (ReplacerProgressReport progress)
     {
-      OutputWindowHandler.WriteMessage($"Processed {progress.ProcessedFileCount} of {progress.TotalFileCount} files.");
+      OutputWindowHandler.WriteMessage ($"Processed {progress.ProcessedFileCount} of {progress.TotalFileCount} files.");
     }
 
-    public static async System.Threading.Tasks.Task OnProgressReportedAsync(ReplacerProgressReport progress, SolutionUpdateViewModel solutionUpdateViewModel)
+    public static async Task OnProgressReportedAsync (ReplacerProgressReport progress, SolutionUpdateViewModel solutionUpdateViewModel)
     {
       if (solutionUpdateViewModel == null)
         return;
