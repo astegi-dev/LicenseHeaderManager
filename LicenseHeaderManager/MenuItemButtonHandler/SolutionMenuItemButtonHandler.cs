@@ -13,6 +13,9 @@
 
 using System;
 using System.ComponentModel;
+using Core;
+using EnvDTE;
+using EnvDTE80;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.UpdateViewModels;
@@ -23,52 +26,59 @@ using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.ButtonHandler
 {
-  internal class FolderProjectButtonHandler
+  internal class SolutionMenuItemButtonHandler
   {
-    private readonly ILicenseHeaderExtension _licenseHeaderExtension;
-    private readonly ButtonOperation _operation;
+    private readonly DTE2 _dte2;
+    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
+    private readonly MenuItemButtonOperation _mode;
 
-    private FolderProjectUpdateDialog _dialog;
+    private SolutionUpdateDialog _dialog;
+    private bool _reSharperSuspended;
 
-    public FolderProjectButtonHandler (ILicenseHeaderExtension licenseHeaderExtension, ButtonOperation operation)
+    public SolutionMenuItemButtonHandler (LicenseHeaderReplacer licenseHeaderReplacer, DTE2 dte2, MenuItemButtonOperation mode)
     {
-      _licenseHeaderExtension = licenseHeaderExtension;
-      _operation = operation;
+      _licenseHeaderReplacer = licenseHeaderReplacer;
+      _dte2 = dte2;
+      _mode = mode;
     }
 
     public void HandleButton (object sender, EventArgs e)
     {
-      var folderProjectUpdateViewModel = new FolderProjectUpdateViewModel();
-      IButtonCommand command;
-      switch (_operation)
+      var solutionUpdateViewModel = new SolutionUpdateViewModel();
+      IMenuItemButtonHandler handler;
+      switch (_mode)
       {
-        case ButtonOperation.Add:
-          command = new AddLicenseHeaderToAllFilesInFolderProjectHelper (_licenseHeaderExtension, folderProjectUpdateViewModel);
+        case MenuItemButtonOperation.Add:
+          handler = new AddLicenseHeaderToAllFilesInSolutionHelper (_licenseHeaderReplacer, solutionUpdateViewModel);
           break;
-        case ButtonOperation.Remove:
-          command = new RemoveLicenseHeaderToAllFilesInFolderProjectHelper (_licenseHeaderExtension, folderProjectUpdateViewModel);
+        case MenuItemButtonOperation.Remove:
+          handler = new RemoveLicenseHeaderFromAllFilesInSolutionHelper (_licenseHeaderReplacer, solutionUpdateViewModel);
           break;
         default:
-          throw new ArgumentOutOfRangeException (nameof(_operation), _operation, null);
+          throw new ArgumentOutOfRangeException (nameof(_mode), _mode, null);
       }
 
-      _dialog = new FolderProjectUpdateDialog (folderProjectUpdateViewModel);
+      _dialog = new SolutionUpdateDialog (solutionUpdateViewModel);
       _dialog.Closing += DialogOnClosing;
+      _reSharperSuspended = CommandUtility.TryExecuteCommand ("ReSharper_Suspend", _dte2);
 
-      Task.Run (() => HandleButtonInternalAsync (command)).FireAndForget();
+      Task.Run (() => HandleButtonInternalAsync (_dte2.Solution, handler)).FireAndForget();
       _dialog.ShowModal();
     }
 
-    private async Task HandleButtonInternalAsync (IButtonCommand command)
+    private async Task HandleButtonInternalAsync (object solutionObject, IMenuItemButtonHandler handler)
     {
+      if (!(solutionObject is Solution solution))
+        return;
+
       try
       {
-        await command.ExecuteAsync (null, _dialog);
+        await handler.ExecuteAsync (solution, _dialog);
       }
       catch (Exception exception)
       {
         MessageBoxHelper.ShowMessage (
-            $"The command '{command.GetCommandName()}' failed with the exception '{exception.Message}'. See Visual Studio Output Window for Details.");
+            $"The operation '{handler.Description}' failed with the exception '{exception.Message}'. See Visual Studio Output Window for Details.");
         OutputWindowHandler.WriteMessage (exception.ToString());
       }
 
@@ -79,6 +89,14 @@ namespace LicenseHeaderManager.ButtonHandler
     private void DialogOnClosing (object sender, CancelEventArgs e)
     {
       // TODO how to cancel Core operation?
+
+      ResumeReSharper();
+    }
+
+    private void ResumeReSharper ()
+    {
+      if (_reSharperSuspended)
+        CommandUtility.ExecuteCommand ("ReSharper_Resume", _dte2);
     }
   }
 }

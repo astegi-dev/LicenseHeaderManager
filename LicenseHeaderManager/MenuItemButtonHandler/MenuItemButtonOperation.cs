@@ -12,30 +12,23 @@
  */
 
 using System;
-using LicenseHeaderManager.Interfaces;
 
 namespace LicenseHeaderManager.ButtonHandler
 {
-  internal static class ButtonHandlerFactory
+ 
+  /// <summary>
+  /// Specifies different types of operations the click of a menu item button may invoke
+  /// </summary>
+  public enum MenuItemButtonOperation
   {
-    public static SolutionButtonHandler CreateAddLicenseHeaderToSolutionHandler (ILicenseHeaderExtension licenseHeadersPackage, ButtonOperation mode)
-    {
-      return new SolutionButtonHandler (licenseHeadersPackage.LicenseHeaderReplacer, licenseHeadersPackage.Dte2, mode);
-    }
+    /// <summary>
+    /// Inserts license headers into one or multiple files or replaces them.
+    /// </summary>
+    Add,
 
-    public static SolutionButtonHandler CreateRemoveLicenseHeaderFromSolutionHandler (ILicenseHeaderExtension licenseHeadersPackage, ButtonOperation mode)
-    {
-      return new SolutionButtonHandler (licenseHeadersPackage.LicenseHeaderReplacer, licenseHeadersPackage.Dte2, mode);
-    }
-
-    public static FolderProjectButtonHandler CreateAddLicenseHeaderToFolderProjectHandler (ILicenseHeaderExtension licenseHeadersPackage, ButtonOperation mode)
-    {
-      return new FolderProjectButtonHandler (licenseHeadersPackage, mode);
-    }
-
-    public static FolderProjectButtonHandler CreateRemoveLicenseHeaderFromFolderProjectHandler (ILicenseHeaderExtension licenseHeadersPackage, ButtonOperation mode)
-    {
-      return new FolderProjectButtonHandler (licenseHeadersPackage, mode);
-    }
+    /// <summary>
+    /// Removes license headers from one or multiple files.
+    /// </summary>
+    Remove
   }
 }

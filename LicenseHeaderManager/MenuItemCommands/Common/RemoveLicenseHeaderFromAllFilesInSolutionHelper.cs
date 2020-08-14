@@ -23,7 +23,7 @@ using Window = System.Windows.Window;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
-  public class RemoveLicenseHeaderFromAllFilesInSolutionHelper : IButtonCommand
+  public class RemoveLicenseHeaderFromAllFilesInSolutionHelper : IMenuItemButtonHandler
   {
     private const string c_commandName = "Remove LicenseHeader from all Projects";
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
@@ -36,10 +36,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       _licenseHeaderReplacer = licenseHeaderReplacer;
     }
 
-    public string GetCommandName ()
-    {
-      return c_commandName;
-    }
+    public string Description => c_commandName;
 
     public async Task ExecuteAsync (Solution solution, Window window)
     {

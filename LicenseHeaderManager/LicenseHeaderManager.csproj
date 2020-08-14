@@ -205,10 +205,10 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ButtonHandler\ButtonHandlerFactory.cs" />
-    <Compile Include="ButtonHandler\ButtonOperation.cs" />
-    <Compile Include="ButtonHandler\FolderProjectButtonHandler.cs" />
-    <Compile Include="ButtonHandler\SolutionButtonHandler.cs" />
+    <Compile Include="MenuItemButtonHandler\MenuItemButtonHandlerFactory.cs" />
+    <Compile Include="MenuItemButtonHandler\MenuItemButtonOperation.cs" />
+    <Compile Include="MenuItemButtonHandler\FolderProjectMenuItemButtonHandler.cs" />
+    <Compile Include="MenuItemButtonHandler\SolutionMenuItemButtonHandler.cs" />
     <Compile Include="MenuItemCommands\Common\AddLicenseHeaderToAllFilesInFolderProjectHelper.cs" />
     <Compile Include="MenuItemCommands\Common\FolderProjectMenuHelper.cs" />
     <Compile Include="MenuItemCommands\Common\RemoveLicenseHeaderToAllFilesInFolderProjectHelper.cs" />
@@ -243,7 +243,7 @@
     <Compile Include="Utils\CoreHelpers.cs" />
     <Compile Include="Utils\JsonBoolConverter.cs" />
     <Compile Include="Utils\ProjectItemParentFinder.cs" />
-    <Compile Include="Interfaces\IButtonCommand.cs" />
+    <Compile Include="Interfaces\IMenuItemButtonHandler.cs" />
     <Compile Include="MenuItemCommands\Common\ExistingLicenseHeaderDefinitionFileAdder.cs" />
     <Compile Include="Headers\NewLineConst.cs" />
     <Compile Include="OutputWindowHandler.cs" />

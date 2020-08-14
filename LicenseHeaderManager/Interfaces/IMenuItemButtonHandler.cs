@@ -12,12 +12,25 @@
  */
 
 using System;
+using System.Threading.Tasks;
+using EnvDTE;
+using Window = System.Windows.Window;
 
-namespace LicenseHeaderManager.ButtonHandler
+namespace LicenseHeaderManager.Interfaces
 {
-  public enum ButtonOperation
+  public interface IMenuItemButtonHandler
   {
-    Add,
-    Remove
+    /// <summary>
+    /// Gets a description of the current <see cref="IMenuItemButtonHandler"/> instance that is presented to the user in case of errors.
+    /// </summary>
+    string Description { get; }
+
+    /// <summary>
+    /// Executes a 
+    /// </summary>
+    /// <param name="solutionObject"></param>
+    /// <param name="window"></param>
+    /// <returns></returns>
+    Task ExecuteAsync (Solution solutionObject, Window window);
   }
 }

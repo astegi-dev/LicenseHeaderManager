@@ -102,7 +102,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      ButtonHandlerFactory.CreateRemoveLicenseHeaderFromFolderProjectHandler (ServiceProvider, ButtonOperation.Remove).HandleButton (sender, e);
+      MenuItemButtonHandlerFactory.CreateRemoveLicenseHeaderFromFolderProjectHandler (ServiceProvider, MenuItemButtonOperation.Remove).HandleButton (sender, e);
     }
   }
 }

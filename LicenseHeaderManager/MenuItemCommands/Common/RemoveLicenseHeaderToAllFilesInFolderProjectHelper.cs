@@ -20,7 +20,7 @@ using Window = System.Windows.Window;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
-  internal class RemoveLicenseHeaderToAllFilesInFolderProjectHelper : IButtonCommand
+  internal class RemoveLicenseHeaderToAllFilesInFolderProjectHelper : IMenuItemButtonHandler
   {
     private const string c_commandName = "Add LicenseHeader to all files in folder or project";
     private readonly FolderProjectUpdateViewModel _folderProjectUpdateViewModel;
@@ -33,10 +33,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       _folderProjectUpdateViewModel = folderProjectUpdateViewModel;
     }
 
-    public string GetCommandName ()
-    {
-      return c_commandName;
-    }
+    public string Description => c_commandName;
 
     public async Task ExecuteAsync (Solution solutionObject, Window window)
     {
