@@ -28,6 +28,15 @@ namespace LicenseHeaderManager.Utils
 {
   internal static class Extensions
   {
+    /// <summary>
+    /// Replaces occurrences of "\n" in a string by new line characters.
+    /// </summary>
+    /// <returns>A <see cref="string"/> where all occurrences of "\n" have been replaced by new line characters</returns>
+    public static string ReplaceNewLines (this string input)
+    {
+      return input.Replace (@"\n", "\n");
+    }
+
     public static IEnumerable<DocumentHeaderProperty> GetAdditionalProperties (this ProjectItem item)
     {
       //ThreadHelper.ThrowIfNotOnUIThread();

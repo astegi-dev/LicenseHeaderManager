@@ -69,7 +69,7 @@ namespace LicenseHeaderManager.Headers
 
     public static bool ShowQuestionForAddingLicenseHeaderFile (Project activeProject, IDefaultLicenseHeaderPage page)
     {
-      var message = string.Format (Resources.Error_NoHeaderDefinition, activeProject.Name).Replace (@"\n", "\n");
+      var message = string.Format (Resources.Error_NoHeaderDefinition, activeProject.Name).ReplaceNewLines();
       if (!MessageBoxHelper.AskYesNo(message, Resources.Error))
         return false;
       var licenseHeaderDefinitionFile = AddHeaderDefinitionFile (activeProject, page);
@@ -91,7 +91,7 @@ namespace LicenseHeaderManager.Headers
 
       if (newProjectItem == null)
       {
-        var message = string.Format (Resources.Error_CreatingFile).Replace (@"\n", "\n");
+        var message = string.Format (Resources.Error_CreatingFile).ReplaceNewLines();
         MessageBoxHelper.ShowError(message);
       }
 
@@ -132,7 +132,7 @@ namespace LicenseHeaderManager.Headers
         return true;
       }
 
-      var message = string.Format (Resources.Error_CreatingFile).Replace (@"\n", "\n");
+      var message = string.Format (Resources.Error_CreatingFile).ReplaceNewLines();
       MessageBoxHelper.ShowError (message);
       return false;
     }

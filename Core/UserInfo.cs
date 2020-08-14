@@ -84,10 +84,10 @@ namespace Core
       }
       catch (Exception e)
       {
-        var OutputMessage = string.Format (Resources.UserInfo_LookupFailure_Information, e).Replace (@"\n", "\n");
+        var OutputMessage = string.Format (Resources.UserInfo_LookupFailure_Information, e).ReplaceNewLines();
 
         if (e is FileNotFoundException)
-          OutputMessage = string.Format (Resources.UserInfo_LookupFailure_FileNotFoundException_Information).Replace (@"\n", "\n");
+          OutputMessage = string.Format (Resources.UserInfo_LookupFailure_FileNotFoundException_Information).ReplaceNewLines();
 
         // OutputWindowHandler.WriteMessage(OutputMessage);
         _displayName = Resources.UserInfo_UnknownDisplayNameString;

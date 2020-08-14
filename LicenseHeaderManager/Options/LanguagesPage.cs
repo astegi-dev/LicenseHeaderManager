@@ -163,7 +163,7 @@ namespace LicenseHeaderManager.Options
           l => updated |= UpdateIfNullOrEmpty (l, lang => lang.SkipExpression, "/// *<reference.*/>"));
 
       if (updated)
-        MessageBoxHelper.Show (Resources.Update_1_1_3.Replace (@"\n", "\n"), Resources.Update);
+        MessageBoxHelper.Show (Resources.Update_1_1_3.ReplaceNewLines(), Resources.Update);
     }
 
     private void AddDefaultRegionSettings_1_2_1 ()
@@ -194,7 +194,7 @@ namespace LicenseHeaderManager.Options
           });
 
       if (updated)
-        MessageBoxHelper.Show (Resources.Update_RegionSettings_1_2_1.Replace (@"\n", "\n"), Resources.Update);
+        MessageBoxHelper.Show (Resources.Update_RegionSettings_1_2_1.ReplaceNewLines(), Resources.Update);
     }
 
     private void AdjustDefaultXmlSkipExpression_1_2_2 ()
@@ -225,7 +225,7 @@ namespace LicenseHeaderManager.Options
           });
 
       if (updated)
-        MessageBoxHelper.Show (Resources.Update_SkipExpressions_1_2_2.Replace (@"\n", "\n"), Resources.Update);
+        MessageBoxHelper.Show (Resources.Update_SkipExpressions_1_2_2.ReplaceNewLines(), Resources.Update);
     }
 
     private void AddXmlXsd_1_3_2 ()
@@ -237,7 +237,7 @@ namespace LicenseHeaderManager.Options
       added |= AddExtensionToExistingExtension (".xml", ".xsd");
 
       if (added)
-        MessageBoxHelper.Show (Resources.Update_1_3_1.Replace (@"\n", "\n"), Resources.Update);
+        MessageBoxHelper.Show (Resources.Update_1_3_1.ReplaceNewLines(), Resources.Update);
     }
 
     private void ReduceToBaseExtensions_1_3_6 ()

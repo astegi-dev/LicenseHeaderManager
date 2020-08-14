@@ -47,14 +47,10 @@ namespace LicenseHeaderManager.Utils
 
       if (linkedFileFilter.NoLicenseHeaderFile.Any() || linkedFileFilter.NotInSolution.Any())
       {
-        var notProgressedItems =
-            linkedFileFilter.NoLicenseHeaderFile.Concat (linkedFileFilter.NotInSolution).ToList();
-
+        var notProgressedItems = linkedFileFilter.NoLicenseHeaderFile.Concat (linkedFileFilter.NotInSolution).ToList();
         var notProgressedNames = notProgressedItems.Select (x => x.Name).ToList();
 
-        Message +=
-            string.Format (Resources.LinkedFileUpdateInformation, string.Join ("\n", notProgressedNames))
-                .Replace (@"\n", "\n");
+        Message += string.Format (Resources.LinkedFileUpdateInformation, string.Join ("\n", notProgressedNames)).ReplaceNewLines();
       }
     }
   }

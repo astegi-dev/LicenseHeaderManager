@@ -126,7 +126,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
                 .ToList());
       }
 
-      var message = string.Format (errorResourceString, projects).Replace (@"\n", "\n");
+      var message = string.Format (errorResourceString, projects).ReplaceNewLines();
 
 
       return await MessageBoxHelper.AskYesNoAsync (window, message).ConfigureAwait (true);

@@ -81,7 +81,7 @@ namespace Core
           case CreateDocumentResult.DocumentCreated:
             if (!await document.ValidateHeader())
             {
-              var message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).Replace (@"\n", "\n");
+              var message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
               var addDespiteNonCommentText = nonCommentTextInquiry?.Invoke (message) ?? true;
               if (!addDespiteNonCommentText)
               {
@@ -101,7 +101,7 @@ namespace Core
             }
             catch (ParseException)
             {
-              var message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).Replace (@"\n", "\n");
+              var message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
               returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput.DocumentPath, ErrorType.ParsingError, message));
             }
 
@@ -109,7 +109,7 @@ namespace Core
           case CreateDocumentResult.LanguageNotFound:
             if (calledByUser)
             {
-              var message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).Replace (@"\n", "\n");
+              var message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
 
               // TODO test with project with .snk file (e.g. DependDB.Util)
               if (commentDefinitionNotFoundAction != null)
@@ -124,7 +124,7 @@ namespace Core
           case CreateDocumentResult.NoHeaderFound:
             if (calledByUser)
             {
-              var message = string.Format (Resources.Error_NoHeaderFound).Replace (@"\n", "\n");
+              var message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
               returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput.DocumentPath, ErrorType.NoHeaderFound, message));
             }
 
@@ -172,7 +172,7 @@ namespace Core
         var extension = Path.GetExtension (header.DocumentPath);
         if (!_extensionsWithInvalidHeaders.TryGetValue (extension, out replace))
         {
-          message = string.Format (Resources.Warning_InvalidLicenseHeader, extension).Replace (@"\n", "\n");
+          message = string.Format (Resources.Warning_InvalidLicenseHeader, extension).ReplaceNewLines();
           replace = nonCommentTextInquiry?.Invoke (message) ?? true;
           _extensionsWithInvalidHeaders[extension] = replace;
         }
@@ -190,7 +190,7 @@ namespace Core
       }
       catch (ParseException)
       {
-        message = string.Format (Resources.Error_InvalidLicenseHeader, header.DocumentPath).Replace (@"\n", "\n");
+        message = string.Format (Resources.Error_InvalidLicenseHeader, header.DocumentPath).ReplaceNewLines();
         errors.Enqueue (new ReplacerError (header.DocumentPath, ErrorType.ParsingError, message));
       }
 

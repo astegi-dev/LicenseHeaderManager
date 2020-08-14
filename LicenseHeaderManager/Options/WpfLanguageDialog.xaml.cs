@@ -23,7 +23,7 @@ namespace LicenseHeaderManager.Options
     public WpfLanguageDialog ()
     {
       InitializeComponent();
-      skipExpression.ToolTip = LicenseHeaderManager.Resources.SkipExpressionHelp.Replace (@"\n", "\n");
+      skipExpression.ToolTip = LicenseHeaderManager.Resources.SkipExpressionHelp.ReplaceNewLines();
     }
 
     public new Language Language
@@ -36,7 +36,7 @@ namespace LicenseHeaderManager.Options
     {
       if (Language == null)
         return;
-      
+
       if (Language.IsValid())
       {
         Language.NormalizeExtensions();

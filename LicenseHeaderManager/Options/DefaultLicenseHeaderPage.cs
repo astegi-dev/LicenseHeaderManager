@@ -82,7 +82,7 @@ namespace LicenseHeaderManager.Options
       if (string.IsNullOrEmpty (LicenseHeaderFileText))
       {
         InitializeFromResource();
-        MessageBoxHelper.Show (Resources.Update_DefaultLicenseHeader_1_2_1.Replace (@"\n", "\n"), Resources.Update);
+        MessageBoxHelper.Show (Resources.Update_DefaultLicenseHeader_1_2_1.ReplaceNewLines(), Resources.Update);
       }
     }
 
