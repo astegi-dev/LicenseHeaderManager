@@ -15,12 +15,13 @@
 #endregion
 
 using System;
-using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.SolutionUpdateViewModels;
 using LicenseHeaderManager.Utils;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
@@ -44,20 +45,26 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     public async Task ExecuteAsync (Solution solution)
     {
-      if (solution == null) return;
-
+      if (solution == null)
+        return;
       var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
       var projectsInSolution = allSolutionProjectsSearcher.GetAllProjects (solution);
 
+      _viewModel.ProcessedProjectCount = 0;
       _viewModel.ProjectCount = projectsInSolution.Count;
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseHeaderReplacer);
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseHeaderReplacer, _viewModel);
 
       foreach (var project in projectsInSolution)
       {
-        _viewModel.CurrentProject = project.Name;
         await removeAllLicenseHeadersCommand.ExecuteAsync (project);
-        _viewModel.ProcessedProjectCount++;
+        await IncrementProjectCountAsync (_viewModel).ConfigureAwait(true);
       }
+    }
+
+    private async Task IncrementProjectCountAsync(SolutionUpdateViewModel viewModel)
+    {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+      viewModel.ProcessedProjectCount++;
     }
   }
 }

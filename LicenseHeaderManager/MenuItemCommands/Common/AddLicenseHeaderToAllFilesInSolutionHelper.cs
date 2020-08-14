@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
@@ -25,6 +24,8 @@ using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
 using LicenseHeaderManager.SolutionUpdateViewModels;
 using LicenseHeaderManager.Utils;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
@@ -140,10 +141,15 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
       foreach (var project in projectsInSolution)
       {
-        _solutionUpdateViewModel.CurrentProject = project.Name;
         await addAllLicenseHeadersCommand.ExecuteAsync (project);
-        _solutionUpdateViewModel.ProcessedProjectCount++;
+        await IncrementProjectCountAsync (_solutionUpdateViewModel).ConfigureAwait(true);
       }
+    }
+
+    private async Task IncrementProjectCountAsync(SolutionUpdateViewModel viewModel)
+    {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+      viewModel.ProcessedProjectCount++;
     }
   }
 }

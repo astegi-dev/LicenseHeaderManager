@@ -47,7 +47,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           foreach (ProjectItem item in project.ProjectItems)
             replacerInput.AddRange (CoreHelpers.GetFilesToProcess (item, null, out _, false));
 
-          await RemoveOrReplaceHeaderAndHandleResultAsync (replacerInput);
+          await RemoveOrReplaceHeaderAndHandleResultAsync (replacerInput, project.Name);
 
           break;
         }
@@ -61,11 +61,11 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       }
     }
 
-    private async Task RemoveOrReplaceHeaderAndHandleResultAsync (ICollection<LicenseHeaderInput> replacerInput)
+    private async Task RemoveOrReplaceHeaderAndHandleResultAsync (ICollection<LicenseHeaderInput> replacerInput, string projectName = null)
     {
       var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (
           replacerInput,
-          new Progress<ReplacerProgressReport> (report => CoreHelpers.OnProgressReportedAsync (report, _solutionUpdateViewModel).FireAndForget()));
+          new Progress<ReplacerProgressReport> (report => CoreHelpers.OnProgressReportedAsync (report, _solutionUpdateViewModel, projectName).FireAndForget()));
       CoreHelpers.HandleResult (result);
     }
   }

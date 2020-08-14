@@ -20,7 +20,7 @@ namespace LicenseHeaderManager.Utils
       OutputWindowHandler.WriteMessage ($"Processed {progress.ProcessedFileCount} of {progress.TotalFileCount} files.");
     }
 
-    public static async Task OnProgressReportedAsync (ReplacerProgressReport progress, SolutionUpdateViewModel solutionUpdateViewModel)
+    public static async Task OnProgressReportedAsync (ReplacerProgressReport progress, SolutionUpdateViewModel solutionUpdateViewModel, string projectName)
     {
       if (solutionUpdateViewModel == null)
         return;
@@ -28,6 +28,7 @@ namespace LicenseHeaderManager.Utils
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       solutionUpdateViewModel.FileCountCurrentProject = progress.TotalFileCount;
       solutionUpdateViewModel.ProcessedFilesCountCurrentProject = progress.ProcessedFileCount;
+      solutionUpdateViewModel.CurrentProject = projectName;
     }
 
     /// <summary>

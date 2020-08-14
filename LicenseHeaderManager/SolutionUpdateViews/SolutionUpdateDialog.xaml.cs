@@ -15,8 +15,14 @@
 #endregion
 
 using System;
+using System.ComponentModel;
+using System.Windows.Controls;
+using System.Windows.Data;
 using LicenseHeaderManager.SolutionUpdateViewModels;
+using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager
 {
@@ -29,6 +35,32 @@ namespace LicenseHeaderManager
     {
       InitializeComponent();
       DataContext = solutionUpdateViewModel;
+      ((SolutionUpdateViewModel) DataContext).PropertyChanged += OnPropertyChanged1;
+    }
+
+    private void OnPropertyChanged1 (object sender, PropertyChangedEventArgs e)
+    {
+      UpdateTextBlockAsync (e).FireAndForget();
+    }
+
+    private async Task UpdateTextBlockAsync(PropertyChangedEventArgs args)
+    {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+      var context = (SolutionUpdateViewModel) DataContext;
+      switch (args.PropertyName)
+      {
+        case nameof(context.ProcessedProjectCount):
+          BindingOperations.GetMultiBindingExpression (ProjectsDoneTextBlock, TextBlock.TextProperty)?.UpdateTarget();
+          BindingOperations.GetBindingExpression(ProjectsDoneProgressBar, ProgressBar.ValueProperty)?.UpdateTarget();
+          break;
+        case nameof(context.CurrentProject):
+          BindingOperations.GetBindingExpression(CurrentProjectTextBlock, TextBlock.TextProperty)?.UpdateTarget();
+          break;
+        case nameof(context.ProjectCount):
+          BindingOperations.GetBindingExpression(ProjectsDoneProgressBar, ProgressBar.MaximumProperty)?.UpdateTarget();
+          break;
+      }
     }
   }
 }
