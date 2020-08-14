@@ -11,28 +11,28 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
-using System.ComponentModel;
 using LicenseHeaderManager.Interfaces;
-using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.UpdateViews;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
+using System;
+using System.ComponentModel;
+using System.Windows.Input;
 using Task = System.Threading.Tasks.Task;
 
-namespace LicenseHeaderManager.ButtonHandler
+namespace LicenseHeaderManager.MenuItemButtonHandler
 {
-  internal class FolderProjectMenuItemButtonHandler : IMenuItemButtonNewHandler
+  internal class FolderProjectMenuItemButtonHandler : IMenuItemButtonHandler
   {
-    private readonly ILicenseHeaderExtension _licenseHeaderExtension;
     private FolderProjectUpdateDialog _dialog;
+    private readonly MenuItemButtonHandlerHelper _handler;
 
-    public FolderProjectMenuItemButtonHandler (ILicenseHeaderExtension licenseHeaderExtension, MenuItemButtonOperation mode, MenuItemButtonLevel level)
+    public FolderProjectMenuItemButtonHandler (MenuItemButtonOperation mode, MenuItemButtonLevel level, MenuItemButtonHandlerHelper handler)
     {
-      _licenseHeaderExtension = licenseHeaderExtension;
       Mode = mode;
       Level = level;
+      _handler = handler;
     }
 
     public MenuItemButtonLevel Level { get; }
@@ -41,32 +41,22 @@ namespace LicenseHeaderManager.ButtonHandler
 
     public void HandleButton (object sender, EventArgs e)
     {
+      Mouse.OverrideCursor = Cursors.Wait;
       var folderProjectUpdateViewModel = new FolderProjectUpdateViewModel();
-      IMenuItemButtonHandler handler;
-      switch (Mode)
-      {
-        case MenuItemButtonOperation.Add:
-          handler = new AddLicenseHeaderToAllFilesInFolderProjectHelper (_licenseHeaderExtension, folderProjectUpdateViewModel);
-          break;
-        case MenuItemButtonOperation.Remove:
-          handler = new RemoveLicenseHeaderToAllFilesInFolderProjectHelper (_licenseHeaderExtension, folderProjectUpdateViewModel);
-          break;
-        default:
-          throw new ArgumentOutOfRangeException (nameof(Mode), Mode, null);
-      }
 
       _dialog = new FolderProjectUpdateDialog (folderProjectUpdateViewModel);
       _dialog.Closing += DialogOnClosing;
 
-      Task.Run (() => HandleButtonInternalAsync (handler)).FireAndForget();
+      Task.Run (() => HandleButtonInternalAsync (_handler, folderProjectUpdateViewModel)).FireAndForget();
+      Mouse.OverrideCursor = null;
       _dialog.ShowModal();
     }
 
-    private async Task HandleButtonInternalAsync (IMenuItemButtonHandler handler)
+    private async Task HandleButtonInternalAsync (MenuItemButtonHandlerHelper handler, BaseUpdateViewModel folderProjectUpdateViewModel)
     {
       try
       {
-        await handler.ExecuteAsync (null, _dialog);
+        await handler.DoWorkAsync (folderProjectUpdateViewModel, null, _dialog);
       }
       catch (Exception exception)
       {

@@ -28,7 +28,7 @@ namespace LicenseHeaderManager.Utils
         try
         {
           dte.ExecuteCommand (command);
-          OutputWindowHandler.WriteMessage ($"Command {command} successfully executed");
+          OutputWindowHandler.WriteMessage ($"Command '{command}' successfully executed");
         }
         catch (COMException e)
         {
@@ -50,7 +50,7 @@ namespace LicenseHeaderManager.Utils
       try
       {
         dte.ExecuteCommand (command);
-        OutputWindowHandler.WriteMessage ($"Command {command} successfully executed");
+        OutputWindowHandler.WriteMessage ($"Command '{command}' successfully executed");
       }
       catch (COMException e)
       {

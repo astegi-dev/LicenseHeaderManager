@@ -12,25 +12,33 @@
  */
 
 using System;
-using System.Threading.Tasks;
-using EnvDTE;
-using Window = System.Windows.Window;
+using LicenseHeaderManager.MenuItemButtonHandler;
+using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.Interfaces
 {
+  /// <summary>
+  /// Provides a common type for classes which encapsulate logic handling the execution of a menu item command
+  /// that is more sophisticated than in the most common use cases.
+  /// </summary>
   public interface IMenuItemButtonHandler
   {
     /// <summary>
-    /// Gets a description of the current <see cref="IMenuItemButtonHandler"/> instance that is presented to the user in case of errors.
+    /// Handles a click on a menu item.
     /// </summary>
-    string Description { get; }
+    /// <param name="sender">The clicked menu item.</param>
+    /// <param name="e">A corresponding <see cref="EventArgs"/> instance. In most cases, an instance of the
+    /// <see cref="OleMenuCmdEventArgs"/> class.</param>
+    void HandleButton (object sender, EventArgs e);
 
     /// <summary>
-    /// Executes a 
+    /// Gets the scope of menu item command this <see cref="IMenuItemButtonHandler"/> corresponds to.
     /// </summary>
-    /// <param name="solutionObject"></param>
-    /// <param name="window"></param>
-    /// <returns></returns>
-    Task ExecuteAsync (Solution solutionObject, Window window);
+    MenuItemButtonLevel Level { get; }
+
+    /// <summary>
+    /// Gets the type of operation an invocation of the command this <see cref="IMenuItemButtonHandler"/> corresponds to entails.
+    /// </summary>
+    MenuItemButtonOperation Mode { get; }
   }
 }

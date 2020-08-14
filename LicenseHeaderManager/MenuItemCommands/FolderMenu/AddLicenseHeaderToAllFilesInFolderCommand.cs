@@ -14,7 +14,7 @@
 using System;
 using System.ComponentModel.Design;
 using EnvDTE;
-using LicenseHeaderManager.ButtonHandler;
+using LicenseHeaderManager.MenuItemButtonHandler;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;

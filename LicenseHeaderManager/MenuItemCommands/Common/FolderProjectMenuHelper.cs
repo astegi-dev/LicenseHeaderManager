@@ -11,10 +11,6 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
@@ -23,6 +19,8 @@ using LicenseHeaderManager.ResultObjects;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
+using System.Collections.Generic;
+using System.Linq;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
@@ -53,7 +51,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (fileName, projectItems);
     }
 
-    public static async Task AddLicenseHeaderToAllFilesAsync (LicenseHeadersPackage serviceProvider, FolderProjectUpdateViewModel folderProjectUpdateViewModel)
+    public static async Task AddLicenseHeaderToAllFilesAsync (LicenseHeadersPackage serviceProvider, BaseUpdateViewModel folderProjectUpdateViewModel)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var obj = serviceProvider.GetSolutionExplorerItem();
@@ -83,21 +81,11 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       licenseHeaderDefinitionFile.Open (Constants.vsViewKindCode).Activate();
     }
 
-    public static async Task RemoveLicenseHeaderFromAllFilesAsync (LicenseHeadersPackage serviceProvider, FolderProjectUpdateViewModel folderProjectUpdateViewModel)
-    {
-      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-      var obj = serviceProvider.GetSolutionExplorerItem();
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (serviceProvider.LicenseHeaderReplacer, folderProjectUpdateViewModel);
-
-      await removeAllLicenseHeadersCommand.ExecuteAsync (obj);
-    }
-
     private static async Task HandleAddLicenseHeaderToAllFilesInProjectResultAsync (
         LicenseHeadersPackage serviceProvider,
         object obj,
         AddLicenseHeaderToAllFilesResult addResult,
-        FolderProjectUpdateViewModel baseUpdateViewModel)
+        BaseUpdateViewModel baseUpdateViewModel)
     {
       var project = obj as Project;
       var projectItem = obj as ProjectItem;

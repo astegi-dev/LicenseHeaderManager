@@ -12,32 +12,46 @@
  */
 
 using System;
-using System.Threading.Tasks;
 using EnvDTE;
 using LicenseHeaderManager.Interfaces;
+using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.UpdateViewModels;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 using Window = System.Windows.Window;
 
-namespace LicenseHeaderManager.MenuItemCommands.Common
+namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 {
-  internal class RemoveLicenseHeaderToAllFilesInFolderProjectHelper : IMenuItemButtonHandler
+  internal class RemoveLicenseHeaderToAllFilesInFolderProjectHelper : MenuItemButtonHandlerHelper
   {
     private const string c_commandName = "Add LicenseHeader to all files in folder or project";
-    private readonly FolderProjectUpdateViewModel _folderProjectUpdateViewModel;
-
     private readonly ILicenseHeaderExtension _licenseHeaderExtension;
 
-    public RemoveLicenseHeaderToAllFilesInFolderProjectHelper (ILicenseHeaderExtension licenseHeaderExtension, FolderProjectUpdateViewModel folderProjectUpdateViewModel)
+    public RemoveLicenseHeaderToAllFilesInFolderProjectHelper (ILicenseHeaderExtension licenseHeaderExtension)
     {
       _licenseHeaderExtension = licenseHeaderExtension;
-      _folderProjectUpdateViewModel = folderProjectUpdateViewModel;
     }
 
-    public string Description => c_commandName;
+    public override string Description => c_commandName;
 
-    public async Task ExecuteAsync (Solution solutionObject, Window window)
+    public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution, Window window)
     {
-      await FolderProjectMenuHelper.RemoveLicenseHeaderFromAllFilesAsync ((LicenseHeadersPackage) _licenseHeaderExtension, _folderProjectUpdateViewModel);
+      return DoWorkAsync (viewModel);
+    }
+
+    public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution)
+    {
+      return DoWorkAsync (viewModel);
+    }
+
+    public override async Task DoWorkAsync (BaseUpdateViewModel viewModel)
+    {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+      var obj = ((LicenseHeadersPackage) _licenseHeaderExtension).GetSolutionExplorerItem();
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseHeaderExtension.LicenseHeaderReplacer, viewModel);
+
+      await removeAllLicenseHeadersCommand.ExecuteAsync (obj);
     }
   }
 }

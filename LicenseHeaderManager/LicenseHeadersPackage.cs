@@ -342,7 +342,7 @@ namespace LicenseHeaderManager
           continue;
 
         var result = await LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new LicenseHeaderInput (item.Document.FullName, headers, item.GetAdditionalProperties()),
+            new LicenseHeaderInput (item.FileNames[1], headers, item.GetAdditionalProperties()),
             false,
             CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
             message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, this));

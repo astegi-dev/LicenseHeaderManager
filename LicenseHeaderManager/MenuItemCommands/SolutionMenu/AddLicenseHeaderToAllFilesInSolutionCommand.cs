@@ -13,7 +13,7 @@
 
 using System;
 using System.ComponentModel.Design;
-using LicenseHeaderManager.ButtonHandler;
+using LicenseHeaderManager.MenuItemButtonHandler;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 

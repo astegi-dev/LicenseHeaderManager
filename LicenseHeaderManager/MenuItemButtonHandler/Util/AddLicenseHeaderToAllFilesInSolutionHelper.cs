@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
-using LicenseHeaderManager.Interfaces;
+using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
@@ -26,29 +26,28 @@ using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 using Window = System.Windows.Window;
 
-namespace LicenseHeaderManager.MenuItemCommands.Common
+namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 {
-  public class AddLicenseHeaderToAllFilesInSolutionHelper : IMenuItemButtonHandler
+  public class AddLicenseHeaderToAllFilesInSolutionHelper : MenuItemButtonHandlerHelper
   {
     private const string c_commandName = "Add LicenseHeader to all files in Solution";
     private const int MaxProjectsWithoutDefinitionFileShownInMessage = 5;
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    private readonly SolutionUpdateViewModel _solutionUpdateViewModel;
-
-    public AddLicenseHeaderToAllFilesInSolutionHelper (
-        LicenseHeaderReplacer licenseHeaderReplacer,
-        SolutionUpdateViewModel solutionUpdateViewModel)
+    public AddLicenseHeaderToAllFilesInSolutionHelper (LicenseHeaderReplacer licenseHeaderReplacer)
     {
       _licenseHeaderReplacer = licenseHeaderReplacer;
-      _solutionUpdateViewModel = solutionUpdateViewModel;
     }
 
-    public string Description => c_commandName;
+    public override string Description => c_commandName;
 
-    public async Task ExecuteAsync (Solution solution, Window window)
+    public override async Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution, Window window)
     {
-      if (solution == null) return;
+      if (solution == null)
+        return;
+
+      if (!(viewModel is SolutionUpdateViewModel updateViewModel))
+        throw new ArgumentException ($"Argument {nameof(viewModel)} must be of type {nameof(SolutionUpdateViewModel)}");
 
       var solutionHeaderDefinitions = LicenseHeaderFinder.GetHeaderDefinitionForSolution (solution);
 
@@ -65,8 +64,8 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
       if (solutionHeaderDefinitions != null || !projectsWithoutLicenseHeaderFile.Any())
       {
-        // Every project is covered either by a solution or project level license header defintion, go ahead and add them.
-        await AddLicenseHeaderToProjectsAsync (projectsInSolution);
+        // Every project is covered either by a solution or project level license header definition, go ahead and add them.
+        await AddLicenseHeaderToProjectsAsync (projectsInSolution, updateViewModel);
       }
       else
       {
@@ -79,7 +78,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           if (await DefinitionFilesShouldBeAddedAsync (projectsWithoutLicenseHeaderFile, window))
             ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToMultipleProjects (projectsWithoutLicenseHeaderFile);
 
-          await AddLicenseHeaderToProjectsAsync (projectsInSolution);
+          await AddLicenseHeaderToProjectsAsync (projectsInSolution, updateViewModel);
         }
         else
         {
@@ -90,13 +89,23 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
             // They want to go ahead and apply without editing.
             if (!await MessageBoxHelper.AskYesNoAsync (window, Resources.Question_StopForConfiguringDefinitionFilesSingleFile).ConfigureAwait (true))
-              await AddLicenseHeaderToProjectsAsync (projectsInSolution);
+              await AddLicenseHeaderToProjectsAsync (projectsInSolution, updateViewModel);
           }
         }
       }
     }
 
-    private async Task<bool> DefinitionFilesShouldBeAddedAsync (List<Project> projectsWithoutLicenseHeaderFile, Window window)
+    public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution)
+    {
+      throw new NotSupportedException (UnsupportedOverload);
+    }
+
+    public override Task DoWorkAsync (BaseUpdateViewModel viewModel)
+    {
+      throw new NotSupportedException (UnsupportedOverload);
+    }
+
+    private async Task<bool> DefinitionFilesShouldBeAddedAsync (ICollection<Project> projectsWithoutLicenseHeaderFile, Window window)
     {
       if (!projectsWithoutLicenseHeaderFile.Any()) return false;
 
@@ -105,44 +114,32 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
       if (projectsWithoutLicenseHeaderFile.Count > MaxProjectsWithoutDefinitionFileShownInMessage)
       {
-        projects = string.Join (
-            "\n",
-            projectsWithoutLicenseHeaderFile
-                .Select (x => x.Name)
-                .Take (5)
-                .ToList());
-
+        projects = string.Join ("\n", projectsWithoutLicenseHeaderFile.Select (x => x.Name).Take (5).ToList());
         projects += "\n...";
       }
       else
       {
-        projects = string.Join (
-            "\n",
-            projectsWithoutLicenseHeaderFile
-                .Select (x => x.Name)
-                .ToList());
+        projects = string.Join ("\n", projectsWithoutLicenseHeaderFile.Select (x => x.Name).ToList());
       }
 
       var message = string.Format (errorResourceString, projects).ReplaceNewLines();
-
-
       return await MessageBoxHelper.AskYesNoAsync (window, message).ConfigureAwait (true);
     }
 
-    private async Task AddLicenseHeaderToProjectsAsync (ICollection<Project> projectsInSolution)
+    private async Task AddLicenseHeaderToProjectsAsync (ICollection<Project> projectsInSolution, SolutionUpdateViewModel viewModel)
     {
-      _solutionUpdateViewModel.ProcessedProjectCount = 0;
-      _solutionUpdateViewModel.ProjectCount = projectsInSolution.Count;
-      var addAllLicenseHeadersCommand = new AddLicenseHeaderToAllFilesInProjectHelper (_licenseHeaderReplacer, _solutionUpdateViewModel);
+      viewModel.ProcessedProjectCount = 0;
+      viewModel.ProjectCount = projectsInSolution.Count;
+      var addAllLicenseHeadersCommand = new AddLicenseHeaderToAllFilesInProjectHelper (_licenseHeaderReplacer, viewModel);
 
       foreach (var project in projectsInSolution)
       {
         await addAllLicenseHeadersCommand.ExecuteAsync (project);
-        await IncrementProjectCountAsync (_solutionUpdateViewModel).ConfigureAwait (true);
+        await IncrementProjectCountAsync (viewModel).ConfigureAwait (true);
       }
     }
 
-    private async Task IncrementProjectCountAsync (SolutionUpdateViewModel viewModel)
+    private async Task IncrementProjectCountAsync (BaseUpdateViewModel viewModel)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       viewModel.ProcessedProjectCount++;

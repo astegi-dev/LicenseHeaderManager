@@ -11,17 +11,15 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
 using LicenseHeaderManager.Interfaces;
+using LicenseHeaderManager.MenuItemButtonHandler.Util;
+using System;
 
-namespace LicenseHeaderManager.ButtonHandler
+namespace LicenseHeaderManager.MenuItemButtonHandler
 {
   internal static class MenuItemButtonHandlerFactory
   {
-    public static IMenuItemButtonNewHandler CreateHandler (
-        MenuItemButtonLevel level,
-        MenuItemButtonOperation mode,
-        ILicenseHeaderExtension licenseHeadersPackage)
+    public static IMenuItemButtonHandler CreateHandler (MenuItemButtonLevel level, MenuItemButtonOperation mode, ILicenseHeaderExtension licenseHeadersPackage)
     {
       return level switch
       {
@@ -34,17 +32,38 @@ namespace LicenseHeaderManager.ButtonHandler
 
     private static SolutionMenuItemButtonHandler CreateSolutionHandler (ILicenseHeaderExtension licenseHeadersPackage, MenuItemButtonOperation mode)
     {
-      return new SolutionMenuItemButtonHandler (licenseHeadersPackage.LicenseHeaderReplacer, licenseHeadersPackage.Dte2, mode);
+      MenuItemButtonHandlerHelper helper = mode switch
+      {
+          MenuItemButtonOperation.Add => new AddLicenseHeaderToAllFilesInSolutionHelper (licenseHeadersPackage.LicenseHeaderReplacer),
+          MenuItemButtonOperation.Remove => new RemoveLicenseHeaderFromAllFilesInSolutionHelper (licenseHeadersPackage.LicenseHeaderReplacer),
+          _ => throw new ArgumentOutOfRangeException (nameof(mode), mode, null)
+      };
+
+      return new SolutionMenuItemButtonHandler (licenseHeadersPackage.Dte2, mode, helper);
     }
 
     private static FolderProjectMenuItemButtonHandler CreateFolderHandler (ILicenseHeaderExtension licenseHeadersPackage, MenuItemButtonOperation mode)
     {
-      return new FolderProjectMenuItemButtonHandler (licenseHeadersPackage, mode, MenuItemButtonLevel.Folder);
+      MenuItemButtonHandlerHelper helper = mode switch
+      {
+          MenuItemButtonOperation.Add => new AddLicenseHeaderToAllFilesInFolderProjectHelper (licenseHeadersPackage),
+          MenuItemButtonOperation.Remove => new RemoveLicenseHeaderToAllFilesInFolderProjectHelper (licenseHeadersPackage),
+          _ => throw new ArgumentOutOfRangeException (nameof(mode), mode, null)
+      };
+
+      return new FolderProjectMenuItemButtonHandler (mode, MenuItemButtonLevel.Folder, helper);
     }
 
     private static FolderProjectMenuItemButtonHandler CreateProjectHandler (ILicenseHeaderExtension licenseHeadersPackage, MenuItemButtonOperation mode)
     {
-      return new FolderProjectMenuItemButtonHandler (licenseHeadersPackage, mode, MenuItemButtonLevel.Project);
+      MenuItemButtonHandlerHelper helper = mode switch
+      {
+          MenuItemButtonOperation.Add => new AddLicenseHeaderToAllFilesInFolderProjectHelper (licenseHeadersPackage),
+          MenuItemButtonOperation.Remove => new RemoveLicenseHeaderToAllFilesInFolderProjectHelper (licenseHeadersPackage),
+          _ => throw new ArgumentOutOfRangeException (nameof(mode), mode, null)
+      };
+
+      return new FolderProjectMenuItemButtonHandler (mode, MenuItemButtonLevel.Project, helper);
     }
   }
 }

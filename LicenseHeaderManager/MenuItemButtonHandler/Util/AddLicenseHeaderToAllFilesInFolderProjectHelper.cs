@@ -15,29 +15,37 @@ using System;
 using System.Threading.Tasks;
 using EnvDTE;
 using LicenseHeaderManager.Interfaces;
+using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.UpdateViewModels;
 using Window = System.Windows.Window;
 
-namespace LicenseHeaderManager.MenuItemCommands.Common
+namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 {
-  internal class AddLicenseHeaderToAllFilesInFolderProjectHelper : IMenuItemButtonHandler
+  internal class AddLicenseHeaderToAllFilesInFolderProjectHelper : MenuItemButtonHandlerHelper
   {
     private const string c_commandName = "Add LicenseHeader to all files in folder or project";
-    private readonly FolderProjectUpdateViewModel _folderProjectUpdateViewModel;
-
     private readonly ILicenseHeaderExtension _licenseHeaderExtension;
 
-    public AddLicenseHeaderToAllFilesInFolderProjectHelper (ILicenseHeaderExtension licenseHeaderExtension, FolderProjectUpdateViewModel folderProjectUpdateViewModel)
+    public AddLicenseHeaderToAllFilesInFolderProjectHelper (ILicenseHeaderExtension licenseHeaderExtension)
     {
       _licenseHeaderExtension = licenseHeaderExtension;
-      _folderProjectUpdateViewModel = folderProjectUpdateViewModel;
     }
 
-    public string Description => c_commandName;
+    public override string Description => c_commandName;
 
-    public async Task ExecuteAsync (Solution solutionObject, Window window)
+    public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution, Window window)
     {
-      await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync ((LicenseHeadersPackage) _licenseHeaderExtension, _folderProjectUpdateViewModel);
+      return DoWorkAsync(viewModel);
+    }
+
+    public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution)
+    {
+      return DoWorkAsync(viewModel);
+    }
+
+    public override async Task DoWorkAsync (BaseUpdateViewModel viewModel)
+    {
+      await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync((LicenseHeadersPackage)_licenseHeaderExtension, viewModel);
     }
   }
 }

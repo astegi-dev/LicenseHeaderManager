@@ -11,34 +11,33 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
-using System.ComponentModel;
-using Core;
 using EnvDTE;
 using EnvDTE80;
 using LicenseHeaderManager.Interfaces;
-using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.UpdateViews;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
+using System;
+using System.ComponentModel;
+using System.Windows.Input;
 using Task = System.Threading.Tasks.Task;
 
-namespace LicenseHeaderManager.ButtonHandler
+namespace LicenseHeaderManager.MenuItemButtonHandler
 {
-  internal class SolutionMenuItemButtonHandler : IMenuItemButtonNewHandler
+  internal class SolutionMenuItemButtonHandler : IMenuItemButtonHandler
   {
     private readonly DTE2 _dte2;
-    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
     private SolutionUpdateDialog _dialog;
     private bool _reSharperSuspended;
+    private readonly MenuItemButtonHandlerHelper _handler;
 
-    public SolutionMenuItemButtonHandler (LicenseHeaderReplacer licenseHeaderReplacer, DTE2 dte2, MenuItemButtonOperation mode)
+    public SolutionMenuItemButtonHandler (DTE2 dte2, MenuItemButtonOperation mode, MenuItemButtonHandlerHelper handler)
     {
-      _licenseHeaderReplacer = licenseHeaderReplacer;
       _dte2 = dte2;
       Mode = mode;
+      _handler = handler;
     }
 
     public MenuItemButtonLevel Level => MenuItemButtonLevel.Solution;
@@ -47,36 +46,26 @@ namespace LicenseHeaderManager.ButtonHandler
 
     public void HandleButton (object sender, EventArgs e)
     {
+      Mouse.OverrideCursor = Cursors.Wait;
       var solutionUpdateViewModel = new SolutionUpdateViewModel();
-      IMenuItemButtonHandler handler;
-      switch (Mode)
-      {
-        case MenuItemButtonOperation.Add:
-          handler = new AddLicenseHeaderToAllFilesInSolutionHelper (_licenseHeaderReplacer, solutionUpdateViewModel);
-          break;
-        case MenuItemButtonOperation.Remove:
-          handler = new RemoveLicenseHeaderFromAllFilesInSolutionHelper (_licenseHeaderReplacer, solutionUpdateViewModel);
-          break;
-        default:
-          throw new ArgumentOutOfRangeException (nameof(Mode), Mode, null);
-      }
 
       _dialog = new SolutionUpdateDialog (solutionUpdateViewModel);
       _dialog.Closing += DialogOnClosing;
       _reSharperSuspended = CommandUtility.TryExecuteCommand ("ReSharper_Suspend", _dte2);
 
-      Task.Run (() => HandleButtonInternalAsync (_dte2.Solution, handler)).FireAndForget();
+      Task.Run (() => HandleButtonInternalAsync (_dte2.Solution, _handler, solutionUpdateViewModel)).FireAndForget();
+      Mouse.OverrideCursor = null;
       _dialog.ShowModal();
     }
 
-    private async Task HandleButtonInternalAsync (object solutionObject, IMenuItemButtonHandler handler)
+    private async Task HandleButtonInternalAsync (object solutionObject, MenuItemButtonHandlerHelper handler, BaseUpdateViewModel solutionUpdateViewModel)
     {
       if (!(solutionObject is Solution solution))
         return;
 
       try
       {
-        await handler.ExecuteAsync (solution, _dialog);
+        await handler.DoWorkAsync (solutionUpdateViewModel, solution, _dialog);
       }
       catch (Exception exception)
       {
@@ -92,7 +81,6 @@ namespace LicenseHeaderManager.ButtonHandler
     private void DialogOnClosing (object sender, CancelEventArgs e)
     {
       // TODO how to cancel Core operation?
-
       ResumeReSharper();
     }
 

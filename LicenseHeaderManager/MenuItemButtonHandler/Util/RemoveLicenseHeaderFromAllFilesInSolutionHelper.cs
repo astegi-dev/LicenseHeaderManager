@@ -14,49 +14,60 @@
 using System;
 using Core;
 using EnvDTE;
-using LicenseHeaderManager.Interfaces;
+using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 using Window = System.Windows.Window;
 
-namespace LicenseHeaderManager.MenuItemCommands.Common
+namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 {
-  public class RemoveLicenseHeaderFromAllFilesInSolutionHelper : IMenuItemButtonHandler
+  public class RemoveLicenseHeaderFromAllFilesInSolutionHelper : MenuItemButtonHandlerHelper
   {
     private const string c_commandName = "Remove LicenseHeader from all Projects";
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    private readonly SolutionUpdateViewModel _viewModel;
-
-    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (LicenseHeaderReplacer licenseHeaderReplacer, SolutionUpdateViewModel viewModel)
+    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (LicenseHeaderReplacer licenseHeaderReplacer)
     {
-      _viewModel = viewModel;
       _licenseHeaderReplacer = licenseHeaderReplacer;
     }
 
-    public string Description => c_commandName;
+    public override string Description => c_commandName;
 
-    public async Task ExecuteAsync (Solution solution, Window window)
+    public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution, Window window)
+    {
+      return DoWorkAsync (viewModel, solution);
+    }
+
+    public override async Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution)
     {
       if (solution == null)
         return;
+
+      if (!(viewModel is SolutionUpdateViewModel updateViewModel))
+        throw new ArgumentException($"Argument {nameof(viewModel)} must be of type {nameof(SolutionUpdateViewModel)}");
+
       var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
       var projectsInSolution = allSolutionProjectsSearcher.GetAllProjects (solution);
 
-      _viewModel.ProcessedProjectCount = 0;
-      _viewModel.ProjectCount = projectsInSolution.Count;
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseHeaderReplacer, _viewModel);
+      updateViewModel.ProcessedProjectCount = 0;
+      updateViewModel.ProjectCount = projectsInSolution.Count;
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseHeaderReplacer, updateViewModel);
 
       foreach (var project in projectsInSolution)
       {
         await removeAllLicenseHeadersCommand.ExecuteAsync (project);
-        await IncrementProjectCountAsync (_viewModel).ConfigureAwait (true);
+        await IncrementProjectCountAsync (updateViewModel).ConfigureAwait (true);
       }
     }
 
-    private async Task IncrementProjectCountAsync (SolutionUpdateViewModel viewModel)
+    public override Task DoWorkAsync (BaseUpdateViewModel viewModel)
+    {
+      throw new NotSupportedException (UnsupportedOverload);
+    }
+
+    private async Task IncrementProjectCountAsync (BaseUpdateViewModel viewModel)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       viewModel.ProcessedProjectCount++;
