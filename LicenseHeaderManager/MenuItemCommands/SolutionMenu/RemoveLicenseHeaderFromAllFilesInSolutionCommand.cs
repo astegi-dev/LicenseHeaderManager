@@ -34,8 +34,6 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     /// </summary>
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
-    private readonly ButtonHandlerFactory _buttonHandlerFactory;
-
     /// <summary>
     ///   Initializes a new instance of the <see cref="RemoveLicenseHeaderFromAllFilesInSolutionCommand" /> class.
     ///   Adds our command handlers for menu (commands must exist in the command table file)
@@ -46,8 +44,6 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     {
       ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
-
-      _buttonHandlerFactory = new ButtonHandlerFactory (ServiceProvider);
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
       var menuItem = new OleMenuCommand (Execute, menuCommandID);
@@ -89,7 +85,7 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      _buttonHandlerFactory.CreateRemoveLicenseHeaderFromSolutionHandler (ButtonOperation.Remove).HandleButton (sender, e);
+      ButtonHandlerFactory.CreateRemoveLicenseHeaderFromSolutionHandler (ServiceProvider, ButtonOperation.Remove).HandleButton (sender, e);
     }
   }
 }

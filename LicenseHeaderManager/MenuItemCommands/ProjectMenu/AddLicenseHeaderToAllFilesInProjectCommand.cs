@@ -35,8 +35,6 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
     /// </summary>
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
-    private readonly ButtonHandlerFactory _buttonHandlerFactory;
-
     private readonly OleMenuCommand _menuItem;
 
     /// <summary>
@@ -49,8 +47,6 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
     {
       ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
-
-      _buttonHandlerFactory = new ButtonHandlerFactory (ServiceProvider);
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
       _menuItem = new OleMenuCommand (Execute, menuCommandID);
@@ -106,7 +102,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      _buttonHandlerFactory.CreateAddLicenseHeaderToFolderProjectHandler (ButtonOperation.Add).HandleButton (sender, e);
+      ButtonHandlerFactory.CreateAddLicenseHeaderToFolderProjectHandler (ServiceProvider, ButtonOperation.Add).HandleButton (sender, e);
     }
   }
 }

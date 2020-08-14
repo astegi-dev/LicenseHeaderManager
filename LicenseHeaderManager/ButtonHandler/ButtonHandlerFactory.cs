@@ -16,33 +16,26 @@ using LicenseHeaderManager.Interfaces;
 
 namespace LicenseHeaderManager.ButtonHandler
 {
-  internal class ButtonHandlerFactory
+  internal static class ButtonHandlerFactory
   {
-    private readonly ILicenseHeaderExtension _licenseHeadersPackage;
-
-    public ButtonHandlerFactory (ILicenseHeaderExtension licenseHeadersPackage)
+    public static SolutionButtonHandler CreateAddLicenseHeaderToSolutionHandler (ILicenseHeaderExtension licenseHeadersPackage, ButtonOperation mode)
     {
-      _licenseHeadersPackage = licenseHeadersPackage;
+      return new SolutionButtonHandler (licenseHeadersPackage.LicenseHeaderReplacer, licenseHeadersPackage.Dte2, mode);
     }
 
-    public SolutionButtonHandler CreateAddLicenseHeaderToSolutionHandler (ButtonOperation operation)
+    public static SolutionButtonHandler CreateRemoveLicenseHeaderFromSolutionHandler (ILicenseHeaderExtension licenseHeadersPackage, ButtonOperation mode)
     {
-      return new SolutionButtonHandler (_licenseHeadersPackage.LicenseHeaderReplacer, _licenseHeadersPackage.Dte2, operation);
+      return new SolutionButtonHandler (licenseHeadersPackage.LicenseHeaderReplacer, licenseHeadersPackage.Dte2, mode);
     }
 
-    public SolutionButtonHandler CreateRemoveLicenseHeaderFromSolutionHandler (ButtonOperation operation)
+    public static FolderProjectButtonHandler CreateAddLicenseHeaderToFolderProjectHandler (ILicenseHeaderExtension licenseHeadersPackage, ButtonOperation mode)
     {
-      return new SolutionButtonHandler (_licenseHeadersPackage.LicenseHeaderReplacer, _licenseHeadersPackage.Dte2, operation);
+      return new FolderProjectButtonHandler (licenseHeadersPackage, mode);
     }
 
-    public FolderProjectButtonHandler CreateAddLicenseHeaderToFolderProjectHandler (ButtonOperation operation)
+    public static FolderProjectButtonHandler CreateRemoveLicenseHeaderFromFolderProjectHandler (ILicenseHeaderExtension licenseHeadersPackage, ButtonOperation mode)
     {
-      return new FolderProjectButtonHandler (_licenseHeadersPackage, operation);
-    }
-
-    public FolderProjectButtonHandler CreateRemoveLicenseHeaderFromFolderProjectHandler (ButtonOperation operation)
-    {
-      return new FolderProjectButtonHandler (_licenseHeadersPackage, operation);
+      return new FolderProjectButtonHandler (licenseHeadersPackage, mode);
     }
   }
 }
