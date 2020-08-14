@@ -19,7 +19,6 @@ using LicenseHeaderManager.Utils;
 using NUnit.Framework;
 using Rhino.Mocks;
 
-
 namespace LicenseHeaderManager.Test
 {
   [TestFixture]

@@ -25,8 +25,8 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 {
   internal class AddLicenseHeaderToAllFilesInProjectHelper
   {
-    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
     private readonly BaseUpdateViewModel _baseUpdateViewModel;
+    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
     public AddLicenseHeaderToAllFilesInProjectHelper (LicenseHeaderReplacer licenseHeaderReplacer, BaseUpdateViewModel baseUpdateViewModel)
     {

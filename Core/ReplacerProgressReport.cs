@@ -40,7 +40,7 @@ namespace Core
     /// <summary>
     ///   Gets the number of file that have already been processed over the course of one invocation of the
     ///   <see
-    ///     cref="LicenseHeaderReplacer.RemoveOrReplaceHeader(ICollection{LicenseHeaderInput}, IProgress{ReplacerProgressReport}, Func{string, bool})" />
+    ///     cref="LicenseHeaderReplacer.RemoveOrReplaceHeader(System.Collections.Generic.ICollection{Core.LicenseHeaderInput}, IProgress{ReplacerProgressReport}, Func{string, bool})" />
     ///   method.
     /// </summary>
     public int ProcessedFileCount { get; }

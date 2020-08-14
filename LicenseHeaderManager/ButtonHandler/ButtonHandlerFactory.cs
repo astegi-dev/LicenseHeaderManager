@@ -32,17 +32,17 @@ namespace LicenseHeaderManager.ButtonHandler
 
     public SolutionButtonHandler CreateRemoveLicenseHeaderFromSolutionHandler (ButtonOperation operation)
     {
-      return new SolutionButtonHandler(_licenseHeadersPackage.LicenseHeaderReplacer, _licenseHeadersPackage.Dte2, operation);
+      return new SolutionButtonHandler (_licenseHeadersPackage.LicenseHeaderReplacer, _licenseHeadersPackage.Dte2, operation);
     }
 
-    public FolderProjectButtonHandler CreateAddLicenseHeaderToFolderProjectHandler(ButtonOperation operation)
+    public FolderProjectButtonHandler CreateAddLicenseHeaderToFolderProjectHandler (ButtonOperation operation)
     {
-      return new FolderProjectButtonHandler(_licenseHeadersPackage, operation);
+      return new FolderProjectButtonHandler (_licenseHeadersPackage, operation);
     }
 
-    public FolderProjectButtonHandler CreateRemoveLicenseHeaderFromFolderProjectHandler(ButtonOperation operation)
+    public FolderProjectButtonHandler CreateRemoveLicenseHeaderFromFolderProjectHandler (ButtonOperation operation)
     {
-      return new FolderProjectButtonHandler(_licenseHeadersPackage, operation);
+      return new FolderProjectButtonHandler (_licenseHeadersPackage, operation);
     }
   }
 }

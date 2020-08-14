@@ -12,10 +12,7 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using Core;
 using EnvDTE;
 using EnvDTE80;
@@ -32,8 +29,8 @@ namespace LicenseHeaderManager.ButtonHandler
   internal class SolutionButtonHandler
   {
     private readonly DTE2 _dte2;
-    private readonly ButtonOperation _operation;
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
+    private readonly ButtonOperation _operation;
 
     private SolutionUpdateDialog _dialog;
     private bool _reSharperSuspended;
@@ -45,61 +42,61 @@ namespace LicenseHeaderManager.ButtonHandler
       _operation = operation;
     }
 
-    public void HandleButton(object sender, EventArgs e)
+    public void HandleButton (object sender, EventArgs e)
     {
       var solutionUpdateViewModel = new SolutionUpdateViewModel();
       IButtonCommand command;
       switch (_operation)
       {
         case ButtonOperation.Add:
-          command = new AddLicenseHeaderToAllFilesInSolutionHelper(_licenseHeaderReplacer, solutionUpdateViewModel);
+          command = new AddLicenseHeaderToAllFilesInSolutionHelper (_licenseHeaderReplacer, solutionUpdateViewModel);
           break;
         case ButtonOperation.Remove:
-          command = new RemoveLicenseHeaderFromAllFilesInSolutionHelper(_licenseHeaderReplacer, solutionUpdateViewModel);
+          command = new RemoveLicenseHeaderFromAllFilesInSolutionHelper (_licenseHeaderReplacer, solutionUpdateViewModel);
           break;
         default:
-          throw new ArgumentOutOfRangeException(nameof(_operation), _operation, null);
+          throw new ArgumentOutOfRangeException (nameof(_operation), _operation, null);
       }
 
-      _dialog = new SolutionUpdateDialog(solutionUpdateViewModel);
+      _dialog = new SolutionUpdateDialog (solutionUpdateViewModel);
       _dialog.Closing += DialogOnClosing;
-      _reSharperSuspended = CommandUtility.TryExecuteCommand("ReSharper_Suspend", _dte2);
+      _reSharperSuspended = CommandUtility.TryExecuteCommand ("ReSharper_Suspend", _dte2);
 
-      Task.Run(() => HandleButtonInternalAsync(_dte2.Solution, command)).FireAndForget();
+      Task.Run (() => HandleButtonInternalAsync (_dte2.Solution, command)).FireAndForget();
       _dialog.ShowModal();
     }
 
-    private async Task HandleButtonInternalAsync(object solutionObject, IButtonCommand command)
+    private async Task HandleButtonInternalAsync (object solutionObject, IButtonCommand command)
     {
       if (!(solutionObject is Solution solution))
         return;
 
       try
       {
-        await command.ExecuteAsync(solution, _dialog);
+        await command.ExecuteAsync (solution, _dialog);
       }
       catch (Exception exception)
       {
-        MessageBoxHelper.ShowInformation(
+        MessageBoxHelper.ShowInformation (
             $"The command '{command.GetCommandName()}' failed with the exception '{exception.Message}'. See Visual Studio Output Window for Details.");
-        OutputWindowHandler.WriteMessage(exception.ToString());
+        OutputWindowHandler.WriteMessage (exception.ToString());
       }
 
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       _dialog.Close();
     }
 
-    private void DialogOnClosing(object sender, CancelEventArgs e)
+    private void DialogOnClosing (object sender, CancelEventArgs e)
     {
       // TODO how to cancel Core operation?
 
       ResumeReSharper();
     }
 
-    private void ResumeReSharper()
+    private void ResumeReSharper ()
     {
       if (_reSharperSuspended)
-        CommandUtility.ExecuteCommand("ReSharper_Resume", _dte2);
+        CommandUtility.ExecuteCommand ("ReSharper_Resume", _dte2);
     }
   }
 }

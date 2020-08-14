@@ -20,64 +20,64 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
              xmlns:lhoc="clr-namespace:LicenseHeaderManager.Options.Converters"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="400">
-    <UserControl.Resources>
-        <lhoc:ExtensionConverter x:Key="ExtensionConverter" Separator=" " />
-    </UserControl.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="auto" />
-        </Grid.RowDefinitions>
+  <UserControl.Resources>
+    <lhoc:ExtensionConverter x:Key="ExtensionConverter" Separator=" " />
+  </UserControl.Resources>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="auto" />
+    </Grid.RowDefinitions>
 
-        <Grid HorizontalAlignment="Stretch">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="5*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <TextBlock Name="firstColumn" Text="{x:Static lh:Resources.Extensions}" Grid.Column="0" TextAlignment="Center" Margin="2" />
-            <TextBlock Text="{x:Static lh:Resources.Line}" Grid.Column="1" Margin="2" />
-            <TextBlock Text="{x:Static lh:Resources.Begin}" Grid.Column="2" Margin="2" />
-            <TextBlock Text="{x:Static lh:Resources.End}" Grid.Column="3" Margin="2" />
-        </Grid>
-
-        <ListBox Name="grid" HorizontalContentAlignment="Stretch" Grid.Row="1" AlternationCount="2" SelectionChanged="OnSelectionChanged">
-            <ListBox.ItemContainerStyle>
-                <Style>
-                    <Setter Property="Control.Background" Value="White" />
-                    <Style.Triggers>
-                        <Trigger Property="ListBox.AlternationIndex" Value="1">
-                            <Setter Property="Control.Background" Value="#D4D0C8" />
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </ListBox.ItemContainerStyle>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid HorizontalAlignment="Stretch" MouseLeftButtonDown="OnClick">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="5*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding Extensions, Converter={StaticResource ExtensionConverter}}" Grid.Column="0" Margin="2"
-                                   TextWrapping="Wrap"
-                                   MaxWidth="{Binding ElementName=firstColumn, Path=ActualWidth}" />
-                        <TextBlock Text="{Binding LineComment}" Grid.Column="1" Margin="2" />
-                        <TextBlock Text="{Binding BeginComment}" Grid.Column="2" Margin="2" />
-                        <TextBlock Text="{Binding EndComment}" Grid.Column="3" Margin="2" />
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-
-        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2">
-            <Button Name="add" Content="{x:Static lh:Resources.Add}" Click="Add" Width="50" Margin="2" HorizontalAlignment="Right" />
-            <Button Name="edit" Content="{x:Static lh:Resources.Edit}" Click="Edit" Width="50" Margin="2" HorizontalAlignment="Right" />
-            <Button Name="remove" Content="{x:Static lh:Resources.Remove}" Click="Remove" Width="50" Margin="2" HorizontalAlignment="Right" />
-        </WrapPanel>
+    <Grid HorizontalAlignment="Stretch">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="5*" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <TextBlock Name="firstColumn" Text="{x:Static lh:Resources.Extensions}" Grid.Column="0" TextAlignment="Center" Margin="2" />
+      <TextBlock Text="{x:Static lh:Resources.Line}" Grid.Column="1" Margin="2" />
+      <TextBlock Text="{x:Static lh:Resources.Begin}" Grid.Column="2" Margin="2" />
+      <TextBlock Text="{x:Static lh:Resources.End}" Grid.Column="3" Margin="2" />
     </Grid>
+
+    <ListBox Name="grid" HorizontalContentAlignment="Stretch" Grid.Row="1" AlternationCount="2" SelectionChanged="OnSelectionChanged">
+      <ListBox.ItemContainerStyle>
+        <Style>
+          <Setter Property="Control.Background" Value="White" />
+          <Style.Triggers>
+            <Trigger Property="ListBox.AlternationIndex" Value="1">
+              <Setter Property="Control.Background" Value="#D4D0C8" />
+            </Trigger>
+          </Style.Triggers>
+        </Style>
+      </ListBox.ItemContainerStyle>
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <Grid HorizontalAlignment="Stretch" MouseLeftButtonDown="OnClick">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="5*" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Extensions, Converter={StaticResource ExtensionConverter}}" Grid.Column="0" Margin="2"
+                       TextWrapping="Wrap"
+                       MaxWidth="{Binding ElementName=firstColumn, Path=ActualWidth}" />
+            <TextBlock Text="{Binding LineComment}" Grid.Column="1" Margin="2" />
+            <TextBlock Text="{Binding BeginComment}" Grid.Column="2" Margin="2" />
+            <TextBlock Text="{Binding EndComment}" Grid.Column="3" Margin="2" />
+          </Grid>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+
+    <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right" Grid.Row="2">
+      <Button Name="add" Content="{x:Static lh:Resources.Add}" Click="Add" Width="50" Margin="2" HorizontalAlignment="Right" />
+      <Button Name="edit" Content="{x:Static lh:Resources.Edit}" Click="Edit" Width="50" Margin="2" HorizontalAlignment="Right" />
+      <Button Name="remove" Content="{x:Static lh:Resources.Remove}" Click="Remove" Width="50" Margin="2" HorizontalAlignment="Right" />
+    </WrapPanel>
+  </Grid>
 </UserControl>

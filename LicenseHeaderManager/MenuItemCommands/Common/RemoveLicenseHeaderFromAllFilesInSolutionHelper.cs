@@ -55,11 +55,11 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       foreach (var project in projectsInSolution)
       {
         await removeAllLicenseHeadersCommand.ExecuteAsync (project);
-        await IncrementProjectCountAsync (_viewModel).ConfigureAwait(true);
+        await IncrementProjectCountAsync (_viewModel).ConfigureAwait (true);
       }
     }
 
-    private async Task IncrementProjectCountAsync(SolutionUpdateViewModel viewModel)
+    private async Task IncrementProjectCountAsync (SolutionUpdateViewModel viewModel)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       viewModel.ProcessedProjectCount++;

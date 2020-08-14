@@ -22,10 +22,7 @@ using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
 using LicenseHeaderManager.ResultObjects;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
-using Microsoft;
 using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Constants = EnvDTE.Constants;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
@@ -99,7 +96,8 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     private static async Task HandleAddLicenseHeaderToAllFilesInProjectResultAsync (
         LicenseHeadersPackage serviceProvider,
         object obj,
-        AddLicenseHeaderToAllFilesResult addResult, FolderProjectUpdateViewModel baseUpdateViewModel)
+        AddLicenseHeaderToAllFilesResult addResult,
+        FolderProjectUpdateViewModel baseUpdateViewModel)
     {
       var project = obj as Project;
       var projectItem = obj as ProjectItem;
@@ -120,7 +118,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         {
           //TODO owner window as parameter
           // If another project has a license header, offer to add a link to the existing one.
-          if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddExistingDefinitionFileToProject, null).ConfigureAwait(true))
+          if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddExistingDefinitionFileToProject, null).ConfigureAwait (true))
           {
             ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (currentProject.FileName, currentProject.ProjectItems);
             await AddLicenseHeaderToAllFilesAsync (serviceProvider, baseUpdateViewModel);
@@ -129,7 +127,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         else
         {
           // If no project has a license header, offer to add one for the solution.
-          if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddNewLicenseHeaderDefinitionForSolution, null).ConfigureAwait(true))
+          if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddNewLicenseHeaderDefinitionForSolution, null).ConfigureAwait (true))
             AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (serviceProvider.Dte2.Solution);
         }
       }

@@ -35,7 +35,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
     private readonly SolutionUpdateViewModel _solutionUpdateViewModel;
-    
+
     public AddLicenseHeaderToAllFilesInSolutionHelper (
         LicenseHeaderReplacer licenseHeaderReplacer,
         SolutionUpdateViewModel solutionUpdateViewModel)
@@ -87,19 +87,19 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         else
         {
           // No projects have definition. Ask the user if they want to add a solution level header definition.
-          if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddNewLicenseHeaderDefinitionForSolution, window).ConfigureAwait(true))
+          if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddNewLicenseHeaderDefinitionForSolution, window).ConfigureAwait (true))
           {
             AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (solution);
 
             // They want to go ahead and apply without editing.
-            if (!await MessageBoxHelper.AskYesNoAsync (Resources.Question_StopForConfiguringDefinitionFilesSingleFile, window).ConfigureAwait(true))
+            if (!await MessageBoxHelper.AskYesNoAsync (Resources.Question_StopForConfiguringDefinitionFilesSingleFile, window).ConfigureAwait (true))
               await AddLicenseHeaderToProjectsAsync (projectsInSolution);
           }
         }
       }
     }
 
-    private async Task<bool> DefinitionFilesShouldBeAddedAsync (List<Project> projectsWithoutLicenseHeaderFile, System.Windows.Window window)
+    private async Task<bool> DefinitionFilesShouldBeAddedAsync (List<Project> projectsWithoutLicenseHeaderFile, Window window)
     {
       if (!projectsWithoutLicenseHeaderFile.Any()) return false;
 
@@ -129,7 +129,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       var message = string.Format (errorResourceString, projects).Replace (@"\n", "\n");
 
 
-      return await MessageBoxHelper.AskYesNoAsync (message, window).ConfigureAwait(true);
+      return await MessageBoxHelper.AskYesNoAsync (message, window).ConfigureAwait (true);
     }
 
     private async Task AddLicenseHeaderToProjectsAsync (ICollection<Project> projectsInSolution)
@@ -141,11 +141,11 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       foreach (var project in projectsInSolution)
       {
         await addAllLicenseHeadersCommand.ExecuteAsync (project);
-        await IncrementProjectCountAsync (_solutionUpdateViewModel).ConfigureAwait(true);
+        await IncrementProjectCountAsync (_solutionUpdateViewModel).ConfigureAwait (true);
       }
     }
 
-    private async Task IncrementProjectCountAsync(SolutionUpdateViewModel viewModel)
+    private async Task IncrementProjectCountAsync (SolutionUpdateViewModel viewModel)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       viewModel.ProcessedProjectCount++;

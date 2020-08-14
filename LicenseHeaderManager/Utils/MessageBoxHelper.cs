@@ -20,37 +20,34 @@ namespace LicenseHeaderManager.Utils
 {
   public static class MessageBoxHelper
   {
-    public static void ShowInformation(string message)
+    public static void ShowInformation (string message)
     {
-      MessageBox.Show(
+      MessageBox.Show (
           message,
           Resources.LicenseHeaderManagerName,
           MessageBoxButton.OK,
           MessageBoxImage.Information);
     }
 
-    public static async Task<bool> AskYesNoAsync(string message, Window owner)
+    public static async Task<bool> AskYesNoAsync (string message, Window owner)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
       if (owner != null)
-      {
-        return MessageBox.Show(
+        return MessageBox.Show (
             owner,
             message,
             Resources.LicenseHeaderManagerName,
             MessageBoxButton.YesNo,
             MessageBoxImage.Information,
             MessageBoxResult.No) == MessageBoxResult.Yes;
-      }
 
-      return MessageBox.Show(
-                 message,
-                 Resources.LicenseHeaderManagerName,
-                 MessageBoxButton.YesNo,
-                 MessageBoxImage.Information,
-                 MessageBoxResult.No) == MessageBoxResult.Yes;
-
+      return MessageBox.Show (
+          message,
+          Resources.LicenseHeaderManagerName,
+          MessageBoxButton.YesNo,
+          MessageBoxImage.Information,
+          MessageBoxResult.No) == MessageBoxResult.Yes;
     }
   }
 }

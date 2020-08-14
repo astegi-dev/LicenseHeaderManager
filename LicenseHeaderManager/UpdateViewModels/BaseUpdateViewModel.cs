@@ -11,9 +11,10 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using Microsoft.VisualStudio.PlatformUI;
+using System;
 using System.ComponentModel;
 using System.Windows.Input;
+using Microsoft.VisualStudio.PlatformUI;
 
 namespace LicenseHeaderManager.UpdateViewModels
 {
@@ -29,7 +30,7 @@ namespace LicenseHeaderManager.UpdateViewModels
       set
       {
         _processedProjectCount = value;
-        NotifyPropertyChanged(nameof(ProcessedProjectCount));
+        NotifyPropertyChanged (nameof(ProcessedProjectCount));
       }
     }
 
@@ -39,7 +40,7 @@ namespace LicenseHeaderManager.UpdateViewModels
       set
       {
         _fileCountCurrentProject = value;
-        NotifyPropertyChanged(nameof(FileCountCurrentProject));
+        NotifyPropertyChanged (nameof(FileCountCurrentProject));
       }
     }
 
@@ -49,20 +50,20 @@ namespace LicenseHeaderManager.UpdateViewModels
       set
       {
         _processedFilesCountCurrentProject = value;
-        NotifyPropertyChanged(nameof(ProcessedFilesCountCurrentProject));
+        NotifyPropertyChanged (nameof(ProcessedFilesCountCurrentProject));
       }
     }
 
     public ICommand CloseCommand
     {
-      get { return new RelayCommand(o => ((DialogWindow)o).Close()); }
+      get { return new RelayCommand (o => ((DialogWindow) o).Close()); }
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    internal void NotifyPropertyChanged(string propertyName = "")
+    internal void NotifyPropertyChanged (string propertyName = "")
     {
-      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+      PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (propertyName));
     }
   }
 }

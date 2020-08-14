@@ -11,13 +11,14 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+using System;
+using System.ComponentModel;
+using System.Windows.Controls;
+using System.Windows.Data;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio.Shell;
-using System.ComponentModel;
-using System.Windows.Controls;
-using System.Windows.Data;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.UpdateViews
@@ -39,7 +40,7 @@ namespace LicenseHeaderManager.UpdateViews
       UpdateControlsAsync (e).FireAndForget();
     }
 
-    private async Task UpdateControlsAsync(PropertyChangedEventArgs args)
+    private async Task UpdateControlsAsync (PropertyChangedEventArgs args)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
@@ -48,13 +49,13 @@ namespace LicenseHeaderManager.UpdateViews
       {
         case nameof(context.ProcessedProjectCount):
           BindingOperations.GetMultiBindingExpression (ProjectsDoneTextBlock, TextBlock.TextProperty)?.UpdateTarget();
-          BindingOperations.GetBindingExpression(ProjectsDoneProgressBar, ProgressBar.ValueProperty)?.UpdateTarget();
+          BindingOperations.GetBindingExpression (ProjectsDoneProgressBar, ProgressBar.ValueProperty)?.UpdateTarget();
           break;
         case nameof(context.CurrentProject):
-          BindingOperations.GetBindingExpression(CurrentProjectTextBlock, TextBlock.TextProperty)?.UpdateTarget();
+          BindingOperations.GetBindingExpression (CurrentProjectTextBlock, TextBlock.TextProperty)?.UpdateTarget();
           break;
         case nameof(context.ProjectCount):
-          BindingOperations.GetBindingExpression(ProjectsDoneProgressBar, ProgressBar.MaximumProperty)?.UpdateTarget();
+          BindingOperations.GetBindingExpression (ProjectsDoneProgressBar, ProgressBar.MaximumProperty)?.UpdateTarget();
           break;
       }
     }

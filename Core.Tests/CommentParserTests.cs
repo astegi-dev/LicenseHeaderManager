@@ -84,7 +84,6 @@ namespace LicenseHeaderManager.Test
       Test (header, text);
     }
 
-
     [Test]
     public void TestEndRegionWithSpace ()
     {

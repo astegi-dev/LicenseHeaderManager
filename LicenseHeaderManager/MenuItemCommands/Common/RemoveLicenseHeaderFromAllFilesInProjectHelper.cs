@@ -23,8 +23,8 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 {
   public class RemoveLicenseHeaderFromAllFilesInProjectHelper
   {
-    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
     private readonly BaseUpdateViewModel _baseUpdateViewModel;
+    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
     public RemoveLicenseHeaderFromAllFilesInProjectHelper (LicenseHeaderReplacer licenseHeaderReplacer, BaseUpdateViewModel baseUpdateViewModel)
     {

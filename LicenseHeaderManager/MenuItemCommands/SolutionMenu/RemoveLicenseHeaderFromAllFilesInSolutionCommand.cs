@@ -89,7 +89,7 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      _buttonHandlerFactory.CreateRemoveLicenseHeaderFromSolutionHandler(ButtonOperation.Remove).HandleButton (sender, e);
+      _buttonHandlerFactory.CreateRemoveLicenseHeaderFromSolutionHandler (ButtonOperation.Remove).HandleButton (sender, e);
     }
   }
 }

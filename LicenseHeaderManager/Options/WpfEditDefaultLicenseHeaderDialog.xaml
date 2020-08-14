@@ -20,13 +20,13 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
         mc:Ignorable="d"
         d:DesignHeight="300" d:DesignWidth="300"
         Title="{x:Static lh:Resources.WpfDefaultLicenseHeaderDialogTitle}">
-    <DockPanel>
-        <WrapPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Grid.Row="7" Grid.ColumnSpan="2" HorizontalAlignment="Center">
-            <Button TabIndex="1" Name="ok" Content="{x:Static lh:Resources.Ok}" Margin="2" Width="50" IsDefault="True" Click="OKButtonClick" />
-            <Button TabIndex="2" Name="cancel" Content="{x:Static lh:Resources.Cancel}" Margin="2" Width="50" IsCancel="True" />
-        </WrapPanel>
-        <TextBox x:Name="defaultText" DockPanel.Dock="Top" TabIndex="0" Text="{Binding LicenseHeaderFileText, UpdateSourceTrigger=Explicit}"
-                 HorizontalContentAlignment="Stretch" AcceptsReturn="True" AcceptsTab="True" HorizontalScrollBarVisibility="Visible"
-                 VerticalScrollBarVisibility="Visible" />
-    </DockPanel>
+  <DockPanel>
+    <WrapPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Grid.Row="7" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+      <Button TabIndex="1" Name="ok" Content="{x:Static lh:Resources.Ok}" Margin="2" Width="50" IsDefault="True" Click="OKButtonClick" />
+      <Button TabIndex="2" Name="cancel" Content="{x:Static lh:Resources.Cancel}" Margin="2" Width="50" IsCancel="True" />
+    </WrapPanel>
+    <TextBox x:Name="defaultText" DockPanel.Dock="Top" TabIndex="0" Text="{Binding LicenseHeaderFileText, UpdateSourceTrigger=Explicit}"
+             HorizontalContentAlignment="Stretch" AcceptsReturn="True" AcceptsTab="True" HorizontalScrollBarVisibility="Visible"
+             VerticalScrollBarVisibility="Visible" />
+  </DockPanel>
 </Window>

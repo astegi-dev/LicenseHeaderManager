@@ -11,22 +11,21 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using Core;
+using System;
+using System.Threading.Tasks;
 using EnvDTE;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.UpdateViewModels;
-using System.Threading.Tasks;
-using LicenseHeaderManager.Utils;
 using Window = System.Windows.Window;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
-  internal class RemoveLicenseHeaderToAllFilesInFolderProjectHelper: IButtonCommand
+  internal class RemoveLicenseHeaderToAllFilesInFolderProjectHelper : IButtonCommand
   {
     private const string c_commandName = "Add LicenseHeader to all files in folder or project";
+    private readonly FolderProjectUpdateViewModel _folderProjectUpdateViewModel;
 
     private readonly ILicenseHeaderExtension _licenseHeaderExtension;
-    private readonly FolderProjectUpdateViewModel _folderProjectUpdateViewModel;
 
     public RemoveLicenseHeaderToAllFilesInFolderProjectHelper (ILicenseHeaderExtension licenseHeaderExtension, FolderProjectUpdateViewModel folderProjectUpdateViewModel)
     {
@@ -41,7 +40,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     public async Task ExecuteAsync (Solution solutionObject, Window window)
     {
-      await FolderProjectMenuHelper.RemoveLicenseHeaderFromAllFilesAsync((LicenseHeadersPackage)_licenseHeaderExtension, _folderProjectUpdateViewModel);
+      await FolderProjectMenuHelper.RemoveLicenseHeaderFromAllFilesAsync ((LicenseHeadersPackage) _licenseHeaderExtension, _folderProjectUpdateViewModel);
     }
   }
 }
