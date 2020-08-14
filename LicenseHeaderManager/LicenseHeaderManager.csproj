@@ -207,8 +207,11 @@
   <ItemGroup>
     <Compile Include="ButtonHandler\ButtonHandlerFactory.cs" />
     <Compile Include="ButtonHandler\ButtonOperation.cs" />
+    <Compile Include="ButtonHandler\FolderProjectButtonHandler.cs" />
     <Compile Include="ButtonHandler\SolutionButtonHandler.cs" />
+    <Compile Include="MenuItemCommands\Common\AddLicenseHeaderToAllFilesInFolderProjectHelper.cs" />
     <Compile Include="MenuItemCommands\Common\FolderProjectMenuHelper.cs" />
+    <Compile Include="MenuItemCommands\Common\RemoveLicenseHeaderToAllFilesInFolderProjectHelper.cs" />
     <Compile Include="MenuItemCommands\FolderMenu\AddExistingLicenseHeaderDefinitionFileToFolderCommand.cs" />
     <Compile Include="MenuItemCommands\ProjectMenu\AddExistingLicenseHeaderDefinitionFileToProjectCommand.cs" />
     <Compile Include="MenuItemCommands\ProjectItemMenu\AddHeaderToProjectItemCommand.cs" />
@@ -240,7 +243,7 @@
     <Compile Include="Utils\CoreHelpers.cs" />
     <Compile Include="Utils\JsonBoolConverter.cs" />
     <Compile Include="Utils\ProjectItemParentFinder.cs" />
-    <Compile Include="Interfaces\ISolutionLevelCommand.cs" />
+    <Compile Include="Interfaces\IButtonCommand.cs" />
     <Compile Include="MenuItemCommands\Common\ExistingLicenseHeaderDefinitionFileAdder.cs" />
     <Compile Include="Headers\NewLineConst.cs" />
     <Compile Include="OutputWindowHandler.cs" />

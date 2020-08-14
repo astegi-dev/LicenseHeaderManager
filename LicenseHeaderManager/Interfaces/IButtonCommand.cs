@@ -21,7 +21,7 @@ using Window = System.Windows.Window;
 
 namespace LicenseHeaderManager.Interfaces
 {
-  public interface ISolutionLevelCommand
+  public interface IButtonCommand
   {
     string GetCommandName ();
 

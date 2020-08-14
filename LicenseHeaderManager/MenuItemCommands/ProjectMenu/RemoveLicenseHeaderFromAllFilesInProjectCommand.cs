@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Design;
 using EnvDTE;
+using LicenseHeaderManager.ButtonHandler;
 using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
@@ -24,6 +25,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
     private readonly OleMenuCommand _menuItem;
+    private ButtonHandlerFactory _buttonHandlerFactory;
 
     /// <summary>
     ///   Initializes a new instance of the <see cref="RemoveLicenseHeaderFromAllFilesInProjectCommand" /> class.
@@ -35,6 +37,8 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
     {
       ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
+
+      _buttonHandlerFactory = new ButtonHandlerFactory(ServiceProvider);
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
       _menuItem = new OleMenuCommand (Execute, menuCommandID);
@@ -90,7 +94,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      FolderProjectMenuHelper.RemoveLicenseHeadersFromAllFilesAsync (ServiceProvider).FireAndForget();
+      _buttonHandlerFactory.CreateRemoveLicenseHeaderFromFolderProjectHandler(ButtonOperation.Remove).HandleButton(sender, e);
     }
   }
 }

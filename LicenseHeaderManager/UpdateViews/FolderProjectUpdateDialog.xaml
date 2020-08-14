@@ -30,8 +30,8 @@
                      Value="{Binding ProcessedFilesCountCurrentProject}" RenderTransformOrigin="0.504,0.4" />
 
         <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="363">
-            Updating license header in the solution.
-            If you have a big solution, this may take some time. Closing of the Window stops the process.
+            Updating license headers.
+            If you have selected a big folder or project, this may take some time. Closing of the Window stops the process.
         </TextBlock>
         <Button Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75"
                 Command="{Binding CloseCommand}"

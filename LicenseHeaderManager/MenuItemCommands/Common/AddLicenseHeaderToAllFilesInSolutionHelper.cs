@@ -31,7 +31,7 @@ using Window = System.Windows.Window;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
-  public class AddLicenseHeaderToAllFilesInSolutionHelper : ISolutionLevelCommand
+  public class AddLicenseHeaderToAllFilesInSolutionHelper : IButtonCommand
   {
     private const string c_commandName = "Add LicenseHeader to all files in Solution";
     private const int MaxProjectsWithoutDefinitionFileShownInMessage = 5;

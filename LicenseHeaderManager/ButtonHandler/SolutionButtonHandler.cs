@@ -35,7 +35,7 @@ namespace LicenseHeaderManager.ButtonHandler
     public void HandleButton(object sender, EventArgs e)
     {
       var solutionUpdateViewModel = new SolutionUpdateViewModel();
-      ISolutionLevelCommand command;
+      IButtonCommand command;
       switch (_operation)
       {
         case ButtonOperation.Add:
@@ -56,7 +56,7 @@ namespace LicenseHeaderManager.ButtonHandler
       _dialog.ShowModal();
     }
 
-    private async Task HandleButtonInternalAsync(object solutionObject, ISolutionLevelCommand command)
+    private async Task HandleButtonInternalAsync(object solutionObject, IButtonCommand command)
     {
       if (!(solutionObject is Solution solution))
         return;

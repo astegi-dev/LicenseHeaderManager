@@ -26,7 +26,7 @@ using Window = System.Windows.Window;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
-  public class RemoveLicenseHeaderFromAllFilesInSolutionHelper : ISolutionLevelCommand
+  public class RemoveLicenseHeaderFromAllFilesInSolutionHelper : IButtonCommand
   {
     private const string c_commandName = "Remove LicenseHeader from all Projects";
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;

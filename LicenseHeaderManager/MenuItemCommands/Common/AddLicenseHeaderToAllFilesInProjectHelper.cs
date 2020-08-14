@@ -29,12 +29,12 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
   internal class AddLicenseHeaderToAllFilesInProjectHelper
   {
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
-    private readonly SolutionUpdateViewModel _solutionUpdateViewModel;
+    private readonly BaseUpdateViewModel _baseUpdateViewModel;
 
-    public AddLicenseHeaderToAllFilesInProjectHelper (LicenseHeaderReplacer licenseHeaderReplacer, SolutionUpdateViewModel solutionUpdateViewModel = null)
+    public AddLicenseHeaderToAllFilesInProjectHelper (LicenseHeaderReplacer licenseHeaderReplacer, BaseUpdateViewModel baseUpdateViewModel)
     {
       _licenseHeaderReplacer = licenseHeaderReplacer;
-      _solutionUpdateViewModel = solutionUpdateViewModel;
+      _baseUpdateViewModel = baseUpdateViewModel;
     }
 
     public async Task<AddLicenseHeaderToAllFilesResult> ExecuteAsync (object projectOrProjectItem)
@@ -77,7 +77,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
       var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (
           replacerInput,
-          new Progress<ReplacerProgressReport> (report => CoreHelpers.OnProgressReportedAsync (report, _solutionUpdateViewModel, project?.Name).FireAndForget()),
+          new Progress<ReplacerProgressReport> (report => CoreHelpers.OnProgressReportedAsync (report, _baseUpdateViewModel, project?.Name).FireAndForget()),
           CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
       CoreHelpers.HandleResult (result);
 

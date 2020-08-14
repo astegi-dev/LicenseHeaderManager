@@ -13,6 +13,7 @@ using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
 using LicenseHeaderManager.ResultObjects;
+using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
@@ -48,21 +49,16 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (fileName, projectItems);
     }
 
-    public static async Task AddLicenseHeaderToAllFilesAsync (LicenseHeadersPackage serviceProvider)
+    public static async Task AddLicenseHeaderToAllFilesAsync (LicenseHeadersPackage serviceProvider, FolderProjectUpdateViewModel folderProjectUpdateViewModel)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var obj = serviceProvider.GetSolutionExplorerItem();
-      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (serviceProvider.LicenseHeaderReplacer);
+      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (serviceProvider.LicenseHeaderReplacer, folderProjectUpdateViewModel);
 
-      var statusBar = (IVsStatusbar) await serviceProvider.GetServiceAsync (typeof (SVsStatusbar));
-      Assumes.Present (statusBar);
-
-      statusBar.SetText (Resources.UpdatingFiles);
       var addLicenseHeaderToAllFilesReturn = await addLicenseHeaderToAllFilesCommand.ExecuteAsync (obj);
-      statusBar.SetText (string.Empty);
 
       await HandleLinkedFilesAndShowMessageBoxAsync (serviceProvider, addLicenseHeaderToAllFilesReturn.LinkedItems);
-      await HandleAddLicenseHeaderToAllFilesInProjectResultAsync (serviceProvider, obj, addLicenseHeaderToAllFilesReturn);
+      await HandleAddLicenseHeaderToAllFilesInProjectResultAsync (serviceProvider, obj, addLicenseHeaderToAllFilesReturn, folderProjectUpdateViewModel);
     }
 
     public static void AddNewLicenseHeaderDefinitionFile (LicenseHeadersPackage serviceProvider)
@@ -83,26 +79,20 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       licenseHeaderDefinitionFile.Open (Constants.vsViewKindCode).Activate();
     }
 
-    public static async Task RemoveLicenseHeadersFromAllFilesAsync (LicenseHeadersPackage serviceProvider)
+    public static async Task RemoveLicenseHeaderFromAllFilesAsync (LicenseHeadersPackage serviceProvider, FolderProjectUpdateViewModel folderProjectUpdateViewModel)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
       var obj = serviceProvider.GetSolutionExplorerItem();
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (serviceProvider.LicenseHeaderReplacer);
-
-      var statusBar = (IVsStatusbar) await serviceProvider.GetServiceAsync (typeof (SVsStatusbar));
-      Assumes.Present (statusBar);
-      statusBar.SetText (Resources.UpdatingFiles);
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (serviceProvider.LicenseHeaderReplacer, folderProjectUpdateViewModel);
 
       await removeAllLicenseHeadersCommand.ExecuteAsync (obj);
-
-      statusBar.SetText (string.Empty);
     }
 
     private static async Task HandleAddLicenseHeaderToAllFilesInProjectResultAsync (
         LicenseHeadersPackage serviceProvider,
         object obj,
-        AddLicenseHeaderToAllFilesResult addResult)
+        AddLicenseHeaderToAllFilesResult addResult, FolderProjectUpdateViewModel baseUpdateViewModel)
     {
       var project = obj as Project;
       var projectItem = obj as ProjectItem;
@@ -126,7 +116,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           if (await MessageBoxHelper.AskYesNoAsync (Resources.Question_AddExistingDefinitionFileToProject, null).ConfigureAwait(true))
           {
             ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (currentProject.FileName, currentProject.ProjectItems);
-            await AddLicenseHeaderToAllFilesAsync (serviceProvider);
+            await AddLicenseHeaderToAllFilesAsync (serviceProvider, baseUpdateViewModel);
           }
         }
         else
