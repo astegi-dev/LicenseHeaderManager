@@ -30,7 +30,10 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     private readonly CancellationToken _cancellationToken;
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public AddLicenseHeaderToAllFilesInProjectHelper (CancellationToken cancellationToken, LicenseHeaderReplacer licenseHeaderReplacer, BaseUpdateViewModel baseUpdateViewModel)
+    public AddLicenseHeaderToAllFilesInProjectHelper (
+        CancellationToken cancellationToken,
+        LicenseHeaderReplacer licenseHeaderReplacer,
+        BaseUpdateViewModel baseUpdateViewModel)
     {
       _cancellationToken = cancellationToken;
       _licenseHeaderReplacer = licenseHeaderReplacer;

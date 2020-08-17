@@ -14,6 +14,7 @@
 using System;
 using System.ComponentModel;
 using System.Threading;
+using System.Windows;
 using System.Windows.Input;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.UpdateViewModels;
@@ -27,8 +28,8 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
   internal class FolderProjectMenuItemButtonHandler : IMenuItemButtonHandler
   {
     private readonly MenuItemButtonHandlerHelper _handler;
-    private FolderProjectUpdateDialog _dialog;
     private CancellationTokenSource _cancellationTokenSource;
+    private FolderProjectUpdateDialog _dialog;
 
     public FolderProjectMenuItemButtonHandler (MenuItemButtonOperation mode, MenuItemButtonLevel level, MenuItemButtonHandlerHelper handler)
     {
@@ -46,7 +47,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
       Mouse.OverrideCursor = Cursors.Wait;
       var folderProjectUpdateViewModel = new FolderProjectUpdateViewModel();
 
-      _dialog = new FolderProjectUpdateDialog (folderProjectUpdateViewModel) { WindowStartupLocation = System.Windows.WindowStartupLocation.CenterOwner };
+      _dialog = new FolderProjectUpdateDialog (folderProjectUpdateViewModel) { WindowStartupLocation = WindowStartupLocation.CenterOwner };
       _dialog.Closing += DialogOnClosing;
 
       Task.Run (() => HandleButtonInternalAsync (_handler, folderProjectUpdateViewModel)).FireAndForget();
@@ -79,7 +80,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
 
     private void DialogOnClosing (object sender, CancelEventArgs e)
     {
-      _cancellationTokenSource?.Cancel(true);
+      _cancellationTokenSource?.Cancel (true);
     }
   }
 }

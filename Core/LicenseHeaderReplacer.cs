@@ -32,10 +32,10 @@ namespace Core
 
     private readonly IEnumerable<string> _keywords;
     private readonly IEnumerable<Language> _languages;
-
-    private int _processedFileCount;
     private readonly SemaphoreSlim _progressReportSemaphore;
     private readonly SemaphoreSlim _taskStartSemaphore;
+
+    private int _processedFileCount;
     private int _totalFileCount;
 
     public LicenseHeaderReplacer (IEnumerable<Language> languages, IEnumerable<string> keywords, int maxSimultaneousTasks = 15)

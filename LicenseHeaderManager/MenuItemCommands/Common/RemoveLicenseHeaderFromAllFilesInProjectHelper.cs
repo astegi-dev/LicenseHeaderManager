@@ -28,7 +28,10 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     private readonly CancellationToken _cancellationToken;
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public RemoveLicenseHeaderFromAllFilesInProjectHelper (CancellationToken cancellationToken, LicenseHeaderReplacer licenseHeaderReplacer, BaseUpdateViewModel baseUpdateViewModel)
+    public RemoveLicenseHeaderFromAllFilesInProjectHelper (
+        CancellationToken cancellationToken,
+        LicenseHeaderReplacer licenseHeaderReplacer,
+        BaseUpdateViewModel baseUpdateViewModel)
     {
       _cancellationToken = cancellationToken;
       _licenseHeaderReplacer = licenseHeaderReplacer;
@@ -65,7 +68,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     {
       var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (
           replacerInput,
-          new Progress<ReplacerProgressReport> (report => CoreHelpers.OnProgressReportedAsync (report, _baseUpdateViewModel, projectName).FireAndForget()), 
+          new Progress<ReplacerProgressReport> (report => CoreHelpers.OnProgressReportedAsync (report, _baseUpdateViewModel, projectName).FireAndForget()),
           _cancellationToken);
       CoreHelpers.HandleResult (result);
     }

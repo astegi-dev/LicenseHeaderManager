@@ -31,10 +31,10 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
   {
     private readonly DTE2 _dte2;
     private readonly MenuItemButtonHandlerHelper _handler;
+    private CancellationTokenSource _cancellationTokenSource;
 
     private SolutionUpdateDialog _dialog;
     private bool _reSharperSuspended;
-    private CancellationTokenSource _cancellationTokenSource;
 
     public SolutionMenuItemButtonHandler (DTE2 dte2, MenuItemButtonOperation mode, MenuItemButtonHandlerHelper handler)
     {
@@ -89,7 +89,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
 
     private void DialogOnClosing (object sender, CancelEventArgs e)
     {
-      _cancellationTokenSource?.Cancel(true);
+      _cancellationTokenSource?.Cancel (true);
       ResumeReSharper();
     }
 

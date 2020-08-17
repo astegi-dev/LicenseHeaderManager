@@ -59,13 +59,12 @@ namespace LicenseHeaderManager.UpdateViews
           BindingOperations.GetBindingExpression (ProjectsDoneProgressBar, ProgressBar.MaximumProperty)?.UpdateTarget();
           break;
         case nameof(context.ProcessedFilesCountCurrentProject):
-          BindingOperations.GetMultiBindingExpression(FilesDoneTextBlock, TextBlock.TextProperty)?.UpdateTarget();
-          BindingOperations.GetBindingExpression(FilesDoneProgressBar, ProgressBar.ValueProperty)?.UpdateTarget();
+          BindingOperations.GetMultiBindingExpression (FilesDoneTextBlock, TextBlock.TextProperty)?.UpdateTarget();
+          BindingOperations.GetBindingExpression (FilesDoneProgressBar, ProgressBar.ValueProperty)?.UpdateTarget();
           break;
         case nameof(context.FileCountCurrentProject):
-          BindingOperations.GetBindingExpression(FilesDoneTextBlock, TextBlock.TextProperty)?.UpdateTarget();
+          BindingOperations.GetBindingExpression (FilesDoneTextBlock, TextBlock.TextProperty)?.UpdateTarget();
           break;
-
       }
     }
   }

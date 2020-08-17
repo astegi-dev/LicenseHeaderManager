@@ -113,7 +113,7 @@ namespace LicenseHeaderManager.Headers
       string headerFile;
       try
       {
-        headerFile = SearchItemsDirectlyGetHeaderDefinitionFileName(project.ProjectItems);
+        headerFile = SearchItemsDirectlyGetHeaderDefinitionFileName (project.ProjectItems);
       }
       catch (COMException)
       {

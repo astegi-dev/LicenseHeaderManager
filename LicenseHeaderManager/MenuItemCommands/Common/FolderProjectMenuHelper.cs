@@ -53,16 +53,27 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToOneProject (fileName, projectItems);
     }
 
-    public static async Task AddLicenseHeaderToAllFilesAsync (CancellationToken cancellationToken, LicenseHeadersPackage serviceProvider, BaseUpdateViewModel folderProjectUpdateViewModel)
+    public static async Task AddLicenseHeaderToAllFilesAsync (
+        CancellationToken cancellationToken,
+        LicenseHeadersPackage serviceProvider,
+        BaseUpdateViewModel folderProjectUpdateViewModel)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var obj = serviceProvider.GetSolutionExplorerItem();
-      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (cancellationToken, serviceProvider.LicenseHeaderReplacer, folderProjectUpdateViewModel);
+      var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (
+          cancellationToken,
+          serviceProvider.LicenseHeaderReplacer,
+          folderProjectUpdateViewModel);
 
       var addLicenseHeaderToAllFilesResult = await addLicenseHeaderToAllFilesCommand.ExecuteAsync (obj);
 
       await HandleLinkedFilesAndShowMessageBoxAsync (serviceProvider, addLicenseHeaderToAllFilesResult.LinkedItems);
-      await HandleAddLicenseHeaderToAllFilesInProjectResultAsync (cancellationToken, serviceProvider, obj, addLicenseHeaderToAllFilesResult, folderProjectUpdateViewModel);
+      await HandleAddLicenseHeaderToAllFilesInProjectResultAsync (
+          cancellationToken,
+          serviceProvider,
+          obj,
+          addLicenseHeaderToAllFilesResult,
+          folderProjectUpdateViewModel);
     }
 
     public static void AddNewLicenseHeaderDefinitionFile (LicenseHeadersPackage serviceProvider)

@@ -116,7 +116,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
       await ServiceProvider.LicenseHeaderReplacer.RemoveOrReplaceHeader (
           replacerInput,
           new Progress<ReplacerProgressReport>(),
-          new CancellationToken (),
+          new CancellationToken(),
           CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
     }
   }
