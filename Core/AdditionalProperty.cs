@@ -13,25 +13,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Core
 {
-  public class LicenseHeaderInput
+  public class AdditionalProperty
   {
-    public LicenseHeaderInput (
-        string documentPath,
-        IDictionary<string, string[]> headers,
-        IEnumerable<AdditionalProperty> additionalProperties = null)
+    public AdditionalProperty (string token, string value)
     {
-      DocumentPath = documentPath;
-      Headers = headers;
-      AdditionalProperties = additionalProperties;
+      Token = token;
+      Value = value;
     }
 
-    public string DocumentPath { get; }
+    public string Token { get; }
 
-    public IDictionary<string, string[]> Headers { get; }
-
-    public IEnumerable<AdditionalProperty> AdditionalProperties { get; }
+    public string Value { get; }
   }
 }

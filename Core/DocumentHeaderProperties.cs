@@ -23,7 +23,7 @@ namespace Core
   {
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 
-    public DocumentHeaderProperties (IEnumerable<DocumentHeaderProperty> additionalProperties = null)
+    public DocumentHeaderProperties (IEnumerable<AdditionalProperty> additionalProperties = null)
     {
       _properties = CreateProperties (additionalProperties);
     }
@@ -38,7 +38,7 @@ namespace Core
       return GetEnumerator();
     }
 
-    private IEnumerable<DocumentHeaderProperty> CreateProperties (IEnumerable<DocumentHeaderProperty> additionalProperties)
+    private IEnumerable<DocumentHeaderProperty> CreateProperties (IEnumerable<AdditionalProperty> additionalProperties)
     {
       var properties = new List<DocumentHeaderProperty>
                        {
@@ -92,8 +92,15 @@ namespace Core
                                documentHeader => UserInfo.DisplayName)
                        };
 
-      additionalProperties ??= Enumerable.Empty<DocumentHeaderProperty>();
-      properties.AddRange (additionalProperties);
+      if (additionalProperties != null)
+      {
+        properties.AddRange (
+            additionalProperties.Select (
+                property => new DocumentHeaderProperty (
+                    property.Token,
+                    documentHeader => true,
+                    documentHeader => property.Value)));
+      }
 
       return properties;
     }

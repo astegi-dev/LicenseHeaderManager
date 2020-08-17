@@ -18,7 +18,7 @@ using System.Text.RegularExpressions;
 
 namespace Core
 {
-  public class DocumentHeader
+  internal class DocumentHeader
   {
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 

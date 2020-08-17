@@ -11,15 +11,15 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 using Microsoft.VisualStudio.Shell;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using LicenseHeader = LicenseHeaderManager.Headers.LicenseHeader;
 using Task = System.Threading.Tasks.Task;
 
@@ -36,26 +36,23 @@ namespace LicenseHeaderManager.Utils
       return input.Replace (@"\n", "\n");
     }
 
-    public static IEnumerable<DocumentHeaderProperty> GetAdditionalProperties (this ProjectItem item)
+    public static IEnumerable<AdditionalProperty> GetAdditionalProperties (this ProjectItem item)
     {
-      //ThreadHelper.ThrowIfNotOnUIThread ();
+      ThreadHelper.ThrowIfNotOnUIThread();
 
-      return new List<DocumentHeaderProperty>
+      return new List<AdditionalProperty>
              {
-                 new DocumentHeaderProperty (
-                     "%Project%",
-                     documentHeader => item.ContainingProject != null,
-                     documentHeader => item.ContainingProject.Name),
-                 new DocumentHeaderProperty (
+                 CreateAdditionalProperty ("%Project%", () => item.ContainingProject != null, () => item.ContainingProject.Name),
+                 CreateAdditionalProperty (
                      "%Namespace%",
-                     documentHeader =>
-                         item.FileCodeModel != null &&
-                         item.FileCodeModel.CodeElements.Cast<CodeElement>()
-                             .Any (ce => ce.Kind == vsCMElement.vsCMElementNamespace),
-                     documentHeader =>
-                         item.FileCodeModel.CodeElements.Cast<CodeElement>()
-                             .First (ce => ce.Kind == vsCMElement.vsCMElementNamespace).Name)
+                     () => item.FileCodeModel != null && item.FileCodeModel.CodeElements.Cast<CodeElement>().Any (ce => ce.Kind == vsCMElement.vsCMElementNamespace),
+                     () => item.FileCodeModel.CodeElements.Cast<CodeElement>().First (ce => ce.Kind == vsCMElement.vsCMElementNamespace).Name),
              };
+    }
+
+    private static AdditionalProperty CreateAdditionalProperty (string token, Func<bool> canCreateValue, Func<string> createValue)
+    {
+      return new AdditionalProperty (token, canCreateValue() ? createValue() : token);
     }
 
     public static async Task<ReplacerResult<ReplacerError>> AddLicenseHeaderToItemAsync (this ProjectItem item, ILicenseHeaderExtension extension, bool calledByUser)

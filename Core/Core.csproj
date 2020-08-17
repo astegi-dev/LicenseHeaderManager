@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalProperty.cs" />
     <Compile Include="CommentParser.cs" />
     <Compile Include="CreateDocumentResult.cs" />
     <Compile Include="Document.cs" />

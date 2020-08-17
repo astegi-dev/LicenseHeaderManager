@@ -24,7 +24,7 @@ namespace Core
 {
   public class Document
   {
-    private readonly IEnumerable<DocumentHeaderProperty> _additionalProperties;
+    private readonly IEnumerable<AdditionalProperty> _additionalProperties;
     private readonly CommentParser _commentParser;
     private readonly string _documentFilePath;
     private readonly string[] _headerLines;
@@ -38,7 +38,7 @@ namespace Core
         string documentFilePath,
         Language language,
         string[] headerLines,
-        IEnumerable<DocumentHeaderProperty> additionalProperties = null,
+        IEnumerable<AdditionalProperty> additionalProperties = null,
         IEnumerable<string> keywords = null)
     {
       _documentFilePath = documentFilePath;

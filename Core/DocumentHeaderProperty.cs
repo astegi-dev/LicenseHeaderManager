@@ -15,7 +15,7 @@ using System;
 
 namespace Core
 {
-  public class DocumentHeaderProperty
+  internal class DocumentHeaderProperty
   {
     private readonly Predicate<DocumentHeader> _canCreateValue;
     private readonly Func<DocumentHeader, string> _createValue;
