@@ -44,7 +44,7 @@ namespace LicenseHeaderManager.UpdateViews
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-      // for unknown reasons, changes in below DependencyProperties' data source are not reflected in the UI => trigger update manually
+      // for unknown reasons, changes in below DependencyProperties' data source are sometimes not reflected in the UI => trigger update manually
       var context = (SolutionUpdateViewModel) DataContext;
       switch (args.PropertyName)
       {
@@ -58,6 +58,14 @@ namespace LicenseHeaderManager.UpdateViews
         case nameof(context.ProjectCount):
           BindingOperations.GetBindingExpression (ProjectsDoneProgressBar, ProgressBar.MaximumProperty)?.UpdateTarget();
           break;
+        case nameof(context.ProcessedFilesCountCurrentProject):
+          BindingOperations.GetMultiBindingExpression(FilesDoneTextBlock, TextBlock.TextProperty)?.UpdateTarget();
+          BindingOperations.GetBindingExpression(FilesDoneProgressBar, ProgressBar.ValueProperty)?.UpdateTarget();
+          break;
+        case nameof(context.FileCountCurrentProject):
+          BindingOperations.GetBindingExpression(FilesDoneTextBlock, TextBlock.TextProperty)?.UpdateTarget();
+          break;
+
       }
     }
   }

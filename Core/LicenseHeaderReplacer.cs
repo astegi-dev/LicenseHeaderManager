@@ -34,14 +34,17 @@ namespace Core
     private readonly IEnumerable<Language> _languages;
 
     private int _processedFileCount;
-    private readonly SemaphoreSlim _semaphore;
+    private readonly SemaphoreSlim _progressReportSemaphore;
+    private readonly SemaphoreSlim _taskStartSemaphore;
     private int _totalFileCount;
 
-    public LicenseHeaderReplacer (IEnumerable<Language> languages, IEnumerable<string> keywords)
+    public LicenseHeaderReplacer (IEnumerable<Language> languages, IEnumerable<string> keywords, int maxSimultaneousTasks = 15)
     {
-      _semaphore = new SemaphoreSlim (1, 1);
       _languages = languages;
       _keywords = keywords;
+
+      _progressReportSemaphore = new SemaphoreSlim (1, 1);
+      _taskStartSemaphore = new SemaphoreSlim (maxSimultaneousTasks, maxSimultaneousTasks);
     }
 
     public void ResetExtensionsWithInvalidHeaders ()
@@ -144,42 +147,17 @@ namespace Core
       _totalFileCount = totalFileCount;
     }
 
-    private void ReportProgress (IProgress<ReplacerProgressReport> progress)
+    private async Task ReportProgress (IProgress<ReplacerProgressReport> progress, CancellationToken cancellationToken)
     {
-      lock (this)
-      {
-        Interlocked.Increment (ref _processedFileCount);
-        progress.Report (new ReplacerProgressReport (_totalFileCount, _processedFileCount));
-      }
-
-      //await _semaphore.WaitAsync ();
-      //try
-      //{
-      //  Interlocked.Increment (ref _processedFileCount);
-      //  progress.Report (new ReplacerProgressReport (_totalFileCount, _processedFileCount));
-      //}
-      //finally
-      //{
-      //  _semaphore.Release ();
-      //}
-    }
-
-    private async Task ReportProgressAsync (IProgress<ReplacerProgressReport> progress)
-    {
-      //lock (this)
-      //{
-      //  Interlocked.Increment (ref _processedFileCount);
-      //  progress.Report (new ReplacerProgressReport (_totalFileCount, _processedFileCount));
-      //}
-      await _semaphore.WaitAsync();
+      await _progressReportSemaphore.WaitAsync (cancellationToken);
       try
       {
-        Interlocked.Increment (ref _processedFileCount);
+        _processedFileCount++;
         progress.Report (new ReplacerProgressReport (_totalFileCount, _processedFileCount));
       }
       finally
       {
-        _semaphore.Release();
+        _progressReportSemaphore.Release();
       }
     }
 
@@ -193,7 +171,7 @@ namespace Core
       cancellationToken.ThrowIfCancellationRequested();
       if (TryCreateDocument (header.DocumentPath, out var document, header.AdditionalProperties, header.Headers) != CreateDocumentResult.DocumentCreated)
       {
-        await ReportProgressAsync (progress);
+        await ReportProgress (progress, cancellationToken);
         return;
       }
 
@@ -214,7 +192,7 @@ namespace Core
       if (!replace)
       {
         cancellationToken.ThrowIfCancellationRequested();
-        await ReportProgressAsync (progress);
+        await ReportProgress (progress, cancellationToken);
         return;
       }
 
@@ -229,7 +207,7 @@ namespace Core
         errors.Enqueue (new ReplacerError (header.DocumentPath, ErrorType.ParsingError, message));
       }
 
-      await ReportProgressAsync (progress);
+      await ReportProgress (progress, cancellationToken);
     }
 
     public async Task<ReplacerResult<IEnumerable<ReplacerError>>> RemoveOrReplaceHeader (
@@ -241,15 +219,26 @@ namespace Core
       var errorList = new ConcurrentQueue<ReplacerError>();
       ResetProgress (licenseHeaders.Count);
 
-      //licenseHeaders.AsParallel().ForAll (x => RemoveOrReplaceHeaderForOneFile (x, nonCommentTextInquiry, progress, cancellationToken, errorList));
-      //Parallel.ForEach (licenseHeaders, x => RemoveOrReplaceHeaderForOneFile (x, nonCommentTextInquiry, progress, cancellationToken, errorList));
-      //var tasks = licenseHeaders.Select (x => RemoveOrReplaceHeaderForOneFile(x, nonCommentTextInquiry, progress, cancellationToken, errorList));
-      //foreach (var licenseHeader in licenseHeaders)
-      //{
-      //  await RemoveOrReplaceHeaderForOneFile (licenseHeader, nonCommentTextInquiry, progress, cancellationToken, errorList);
-      //}
-      var tasks = licenseHeaders.Select (
-          x => Task.Run (() => RemoveOrReplaceHeaderForOneFile (x, nonCommentTextInquiry, progress, cancellationToken, errorList), cancellationToken));
+      var tasks = new List<Task>();
+      foreach (var licenseHeaderInput in licenseHeaders)
+      {
+        await _taskStartSemaphore.WaitAsync (cancellationToken);
+        tasks.Add (
+            Task.Run (
+                () =>
+                {
+                  try
+                  {
+                    return RemoveOrReplaceHeaderForOneFile (licenseHeaderInput, nonCommentTextInquiry, progress, cancellationToken, errorList);
+                  }
+                  finally
+                  {
+                    _taskStartSemaphore.Release();
+                  }
+                },
+                cancellationToken));
+      }
+
       await Task.WhenAll (tasks);
 
       return errorList.Count == 0 ? new ReplacerResult<IEnumerable<ReplacerError>>() : new ReplacerResult<IEnumerable<ReplacerError>> (errorList);

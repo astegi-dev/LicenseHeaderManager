@@ -13,6 +13,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using LicenseHeaderManager.UpdateViewModels;
@@ -44,7 +45,7 @@ namespace LicenseHeaderManager.UpdateViews
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-      // for unknown reasons, changes in below DependencyProperties' data source are not reflected in the UI => trigger update manually
+      // for unknown reasons, changes in below DependencyProperties' data source are sometimes not reflected in the UI => trigger update manually
       var context = (FolderProjectUpdateViewModel) DataContext;
       switch (args.PropertyName)
       {
@@ -54,6 +55,7 @@ namespace LicenseHeaderManager.UpdateViews
           break;
         case nameof(context.FileCountCurrentProject):
           BindingOperations.GetBindingExpression (FilesDoneTextBlock, TextBlock.TextProperty)?.UpdateTarget();
+          PreparingTextBlock.Visibility = Visibility.Hidden;
           break;
       }
     }

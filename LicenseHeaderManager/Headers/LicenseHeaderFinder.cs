@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using EnvDTE;
 using LicenseHeaderManager.Utils;
 
@@ -109,7 +110,16 @@ namespace LicenseHeaderManager.Headers
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
     private static IDictionary<string, string[]> GetHeaderDefinitionDirectlyOnProject (Project project)
     {
-      var headerFile = SearchItemsDirectlyGetHeaderDefinitionFileName (project.ProjectItems);
+      string headerFile;
+      try
+      {
+        headerFile = SearchItemsDirectlyGetHeaderDefinitionFileName(project.ProjectItems);
+      }
+      catch (COMException)
+      {
+        return new Dictionary<string, string[]>();
+      }
+
       var definition = LoadHeaderDefinition (headerFile);
       return definition;
     }
@@ -122,7 +132,16 @@ namespace LicenseHeaderManager.Headers
     private static IDictionary<string, string[]> SearchWithinProjectGetHeaderDefinitionForItem (ProjectItem projectItem)
     {
       //Check for License-file within this level
-      var headerFile = SearchItemsDirectlyGetHeaderDefinitionFileName (projectItem.ProjectItems);
+      string headerFile;
+      try
+      {
+        headerFile = SearchItemsDirectlyGetHeaderDefinitionFileName (projectItem.ProjectItems);
+      }
+      catch (COMException)
+      {
+        return new Dictionary<string, string[]>();
+      }
+
       if (!string.IsNullOrEmpty (headerFile))
         return LoadHeaderDefinition (headerFile); //Found a License header file on this level
 

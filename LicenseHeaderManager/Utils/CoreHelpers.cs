@@ -39,8 +39,8 @@ namespace LicenseHeaderManager.Utils
       // in the same order as they are reported from the Core (especially if reports happen at the same time). Countering that, the ProgressBar value is updated
       // only if reported value is higher than last one (or on reset). The resulting drawback that some progress "steps" might be skipped is negligible and not
       // detrimental to the user feedback (for instance, it happens if a few Core threads being responsible for small files finish at roughly the same time).
-      // if (progress.ProcessedFileCount <= 1 || progress.ProcessedFileCount > baseUpdateViewModel.ProcessedFilesCountCurrentProject)
-      baseUpdateViewModel.ProcessedFilesCountCurrentProject = progress.ProcessedFileCount;
+      if (progress.ProcessedFileCount <= 1 || progress.ProcessedFileCount > baseUpdateViewModel.ProcessedFilesCountCurrentProject)
+        baseUpdateViewModel.ProcessedFilesCountCurrentProject = progress.ProcessedFileCount;
 
       if (baseUpdateViewModel is SolutionUpdateViewModel solutionUpdateViewModel)
         solutionUpdateViewModel.CurrentProject = projectName;
