@@ -212,9 +212,9 @@
     <Compile Include="MenuItemButtonHandler\MenuItemButtonOperation.cs" />
     <Compile Include="MenuItemButtonHandler\FolderProjectMenuItemButtonHandler.cs" />
     <Compile Include="MenuItemButtonHandler\SolutionMenuItemButtonHandler.cs" />
-    <Compile Include="MenuItemButtonHandler\Util\AddLicenseHeaderToAllFilesInFolderProjectHelper.cs" />
+    <Compile Include="MenuItemButtonHandler\Helpers\AddLicenseHeaderToAllFilesInFolderProjectHelper.cs" />
     <Compile Include="MenuItemCommands\Common\FolderProjectMenuHelper.cs" />
-    <Compile Include="MenuItemButtonHandler\Util\RemoveLicenseHeaderToAllFilesInFolderProjectHelper.cs" />
+    <Compile Include="MenuItemButtonHandler\Helpers\RemoveLicenseHeaderToAllFilesInFolderProjectHelper.cs" />
     <Compile Include="MenuItemCommands\FolderMenu\AddExistingLicenseHeaderDefinitionFileToFolderCommand.cs" />
     <Compile Include="MenuItemCommands\ProjectMenu\AddExistingLicenseHeaderDefinitionFileToProjectCommand.cs" />
     <Compile Include="MenuItemCommands\ProjectItemMenu\AddHeaderToProjectItemCommand.cs" />
@@ -250,7 +250,7 @@
     <Compile Include="Headers\NewLineConst.cs" />
     <Compile Include="OutputWindowHandler.cs" />
     <Compile Include="MenuItemCommands\Common\AddLicenseHeaderToAllFilesInProjectHelper.cs" />
-    <Compile Include="MenuItemButtonHandler\Util\AddLicenseHeaderToAllFilesInSolutionHelper.cs" />
+    <Compile Include="MenuItemButtonHandler\Helpers\AddLicenseHeaderToAllFilesInSolutionHelper.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="Headers\LicenseHeaderFinder.cs" />
     <Compile Include="Headers\LicenseHeader.cs" />
@@ -290,7 +290,7 @@
       <DependentUpon>WpfLanguages.xaml</DependentUpon>
     </Compile>
     <Compile Include="MenuItemCommands\Common\RemoveLicenseHeaderFromAllFilesInProjectHelper.cs" />
-    <Compile Include="MenuItemButtonHandler\Util\RemoveLicenseHeaderFromAllFilesInSolutionHelper.cs" />
+    <Compile Include="MenuItemButtonHandler\Helpers\RemoveLicenseHeaderFromAllFilesInSolutionHelper.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -13,7 +13,7 @@
 
 using System;
 using LicenseHeaderManager.Interfaces;
-using LicenseHeaderManager.MenuItemButtonHandler.Util;
+using LicenseHeaderManager.MenuItemButtonHandler.Helpers;
 
 namespace LicenseHeaderManager.MenuItemButtonHandler
 {

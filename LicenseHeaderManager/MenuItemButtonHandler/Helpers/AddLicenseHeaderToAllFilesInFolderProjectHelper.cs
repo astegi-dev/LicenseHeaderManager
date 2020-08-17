@@ -20,7 +20,7 @@ using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.UpdateViewModels;
 using Window = System.Windows.Window;
 
-namespace LicenseHeaderManager.MenuItemButtonHandler.Util
+namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
 {
   internal class AddLicenseHeaderToAllFilesInFolderProjectHelper : MenuItemButtonHandlerHelper
   {

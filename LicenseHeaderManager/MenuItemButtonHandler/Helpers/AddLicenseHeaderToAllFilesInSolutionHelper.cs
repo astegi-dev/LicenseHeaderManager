@@ -27,7 +27,7 @@ using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 using Window = System.Windows.Window;
 
-namespace LicenseHeaderManager.MenuItemButtonHandler.Util
+namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
 {
   public class AddLicenseHeaderToAllFilesInSolutionHelper : MenuItemButtonHandlerHelper
   {
