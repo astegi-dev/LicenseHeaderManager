@@ -12,6 +12,7 @@
  */
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EnvDTE;
 using LicenseHeaderManager.Interfaces;
@@ -51,7 +52,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
     ///   suitable
     ///   overload that does not expect the superfluous parameters is called by the actual implementation.
     /// </remarks>
-    public abstract Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution, Window window);
+    public abstract Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel, Solution solution, Window window);
 
     /// <summary>
     ///   Carries out the work that the corresponding <see cref="IMenuItemButtonHandler" />  instance wants to delegate to this
@@ -69,7 +70,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
     ///   parameters is called by
     ///   the actual implementation.
     /// </remarks>
-    public abstract Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution);
+    public abstract Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel, Solution solution);
 
     /// <summary>
     ///   Carries out the work that the corresponding <see cref="IMenuItemButtonHandler" />
@@ -79,6 +80,6 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
     ///   The view model this helper needs to update in order to reflect process in the corresponding
     ///   dialog window.
     /// </param>
-    public abstract Task DoWorkAsync (BaseUpdateViewModel viewModel);
+    public abstract Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel);
   }
 }

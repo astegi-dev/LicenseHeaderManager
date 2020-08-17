@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Core;
 using EnvDTE;
@@ -26,10 +27,12 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
   internal class AddLicenseHeaderToAllFilesInProjectHelper
   {
     private readonly BaseUpdateViewModel _baseUpdateViewModel;
+    private readonly CancellationToken _cancellationToken;
     private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
 
-    public AddLicenseHeaderToAllFilesInProjectHelper (LicenseHeaderReplacer licenseHeaderReplacer, BaseUpdateViewModel baseUpdateViewModel)
+    public AddLicenseHeaderToAllFilesInProjectHelper (CancellationToken cancellationToken, LicenseHeaderReplacer licenseHeaderReplacer, BaseUpdateViewModel baseUpdateViewModel)
     {
+      _cancellationToken = cancellationToken;
       _licenseHeaderReplacer = licenseHeaderReplacer;
       _baseUpdateViewModel = baseUpdateViewModel;
     }
@@ -75,6 +78,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (
           replacerInput,
           new Progress<ReplacerProgressReport> (report => CoreHelpers.OnProgressReportedAsync (report, _baseUpdateViewModel, project?.Name).FireAndForget()),
+          _cancellationToken,
           CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
       CoreHelpers.HandleResult (result);
 

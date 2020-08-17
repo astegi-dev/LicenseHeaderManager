@@ -13,6 +13,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Threading;
 using System.Windows.Input;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.UpdateViewModels;
@@ -27,6 +28,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
   {
     private readonly MenuItemButtonHandlerHelper _handler;
     private FolderProjectUpdateDialog _dialog;
+    private CancellationTokenSource _cancellationTokenSource;
 
     public FolderProjectMenuItemButtonHandler (MenuItemButtonOperation mode, MenuItemButtonLevel level, MenuItemButtonHandlerHelper handler)
     {
@@ -54,9 +56,15 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
 
     private async Task HandleButtonInternalAsync (MenuItemButtonHandlerHelper handler, BaseUpdateViewModel folderProjectUpdateViewModel)
     {
+      _cancellationTokenSource = new CancellationTokenSource();
       try
       {
-        await handler.DoWorkAsync (folderProjectUpdateViewModel, null, _dialog);
+        await handler.DoWorkAsync (_cancellationTokenSource.Token, folderProjectUpdateViewModel, null, _dialog);
+      }
+      catch (OperationCanceledException)
+      {
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+        _dialog.Close();
       }
       catch (Exception exception)
       {
@@ -71,7 +79,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
 
     private void DialogOnClosing (object sender, CancelEventArgs e)
     {
-      // TODO how to cancel Core operation?
+      _cancellationTokenSource?.Cancel(true);
     }
   }
 }

@@ -14,6 +14,7 @@
 using System;
 using System.ComponentModel.Design;
 using System.IO;
+using System.Threading;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Utils;
@@ -115,6 +116,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
       await ServiceProvider.LicenseHeaderReplacer.RemoveOrReplaceHeader (
           replacerInput,
           new Progress<ReplacerProgressReport>(),
+          new CancellationToken (),
           CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry);
     }
   }

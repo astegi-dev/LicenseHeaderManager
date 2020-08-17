@@ -12,8 +12,14 @@
  */
 
 using System;
+using System.ComponentModel;
+using System.Windows.Controls;
+using System.Windows.Data;
 using LicenseHeaderManager.UpdateViewModels;
+using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.UpdateViews
 {
@@ -26,6 +32,30 @@ namespace LicenseHeaderManager.UpdateViews
     {
       InitializeComponent();
       DataContext = folderProjectUpdateViewModel;
+      ((FolderProjectUpdateViewModel) DataContext).PropertyChanged += OnViewModelUpdated;
+    }
+
+    private void OnViewModelUpdated (object sender, PropertyChangedEventArgs e)
+    {
+      UpdateControlsAsync (e).FireAndForget();
+    }
+
+    private async Task UpdateControlsAsync (PropertyChangedEventArgs args)
+    {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+      // for unknown reasons, changes in below DependencyProperties' data source are not reflected in the UI => trigger update manually
+      var context = (FolderProjectUpdateViewModel) DataContext;
+      switch (args.PropertyName)
+      {
+        case nameof(context.ProcessedFilesCountCurrentProject):
+          BindingOperations.GetMultiBindingExpression (FilesDoneTextBlock, TextBlock.TextProperty)?.UpdateTarget();
+          BindingOperations.GetBindingExpression (FilesDoneProgressBar, ProgressBar.ValueProperty)?.UpdateTarget();
+          break;
+        case nameof(context.FileCountCurrentProject):
+          BindingOperations.GetBindingExpression (FilesDoneTextBlock, TextBlock.TextProperty)?.UpdateTarget();
+          break;
+      }
     }
   }
 }

@@ -12,6 +12,7 @@
  */
 
 using System;
+using System.Threading;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.MenuItemCommands.Common;
@@ -35,12 +36,12 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 
     public override string Description => c_commandName;
 
-    public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution, Window window)
+    public override Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel, Solution solution, Window window)
     {
-      return DoWorkAsync (viewModel, solution);
+      return DoWorkAsync (cancellationToken, viewModel, solution);
     }
 
-    public override async Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution)
+    public override async Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel, Solution solution)
     {
       if (solution == null)
         return;
@@ -53,7 +54,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 
       updateViewModel.ProcessedProjectCount = 0;
       updateViewModel.ProjectCount = projectsInSolution.Count;
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseHeaderReplacer, updateViewModel);
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (cancellationToken, _licenseHeaderReplacer, updateViewModel);
 
       foreach (var project in projectsInSolution)
       {
@@ -62,7 +63,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
       }
     }
 
-    public override Task DoWorkAsync (BaseUpdateViewModel viewModel)
+    public override Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel)
     {
       throw new NotSupportedException (UnsupportedOverload);
     }

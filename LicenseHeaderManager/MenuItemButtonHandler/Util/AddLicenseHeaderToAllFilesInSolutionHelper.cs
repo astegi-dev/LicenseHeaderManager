@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Core;
 using EnvDTE;
@@ -41,7 +42,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 
     public override string Description => c_commandName;
 
-    public override async Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution, Window window)
+    public override async Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel, Solution solution, Window window)
     {
       if (solution == null)
         return;
@@ -65,7 +66,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
       if (solutionHeaderDefinitions != null || !projectsWithoutLicenseHeaderFile.Any())
       {
         // Every project is covered either by a solution or project level license header definition, go ahead and add them.
-        await AddLicenseHeaderToProjectsAsync (projectsInSolution, updateViewModel);
+        await AddLicenseHeaderToProjectsAsync (cancellationToken, projectsInSolution, updateViewModel);
       }
       else
       {
@@ -78,7 +79,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
           if (await DefinitionFilesShouldBeAddedAsync (projectsWithoutLicenseHeaderFile, window))
             ExistingLicenseHeaderDefinitionFileAdder.AddDefinitionFileToMultipleProjects (projectsWithoutLicenseHeaderFile);
 
-          await AddLicenseHeaderToProjectsAsync (projectsInSolution, updateViewModel);
+          await AddLicenseHeaderToProjectsAsync (cancellationToken, projectsInSolution, updateViewModel);
         }
         else
         {
@@ -89,18 +90,18 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 
             // They want to go ahead and apply without editing.
             if (!await MessageBoxHelper.AskYesNoAsync (window, Resources.Question_StopForConfiguringDefinitionFilesSingleFile).ConfigureAwait (true))
-              await AddLicenseHeaderToProjectsAsync (projectsInSolution, updateViewModel);
+              await AddLicenseHeaderToProjectsAsync (cancellationToken, projectsInSolution, updateViewModel);
           }
         }
       }
     }
 
-    public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution)
+    public override Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel, Solution solution)
     {
       throw new NotSupportedException (UnsupportedOverload);
     }
 
-    public override Task DoWorkAsync (BaseUpdateViewModel viewModel)
+    public override Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel)
     {
       throw new NotSupportedException (UnsupportedOverload);
     }
@@ -126,11 +127,11 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
       return await MessageBoxHelper.AskYesNoAsync (window, message).ConfigureAwait (true);
     }
 
-    private async Task AddLicenseHeaderToProjectsAsync (ICollection<Project> projectsInSolution, SolutionUpdateViewModel viewModel)
+    private async Task AddLicenseHeaderToProjectsAsync (CancellationToken cancellationToken, ICollection<Project> projectsInSolution, SolutionUpdateViewModel viewModel)
     {
       viewModel.ProcessedProjectCount = 0;
       viewModel.ProjectCount = projectsInSolution.Count;
-      var addAllLicenseHeadersCommand = new AddLicenseHeaderToAllFilesInProjectHelper (_licenseHeaderReplacer, viewModel);
+      var addAllLicenseHeadersCommand = new AddLicenseHeaderToAllFilesInProjectHelper (cancellationToken, _licenseHeaderReplacer, viewModel);
 
       foreach (var project in projectsInSolution)
       {

@@ -17,6 +17,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Core
@@ -69,26 +70,36 @@ namespace Core
       return (await GetHeader()).IsEmpty || LicenseHeader.Validate ((await GetHeader()).Text, _commentParser);
     }
 
-    public async Task ReplaceHeaderIfNecessary ()
+    public async Task ReplaceHeaderIfNecessary (CancellationToken cancellationToken)
     {
       var skippedText = await SkipText();
       if (!string.IsNullOrEmpty (skippedText))
+      {
+        cancellationToken.ThrowIfCancellationRequested();
         await RemoveHeader (skippedText);
+      }
 
       var existingHeader = await GetExistingHeader();
 
       if (!(await GetHeader()).IsEmpty)
       {
         if (existingHeader != (await GetHeader()).Text)
+        {
+          cancellationToken.ThrowIfCancellationRequested();
           await ReplaceHeader (existingHeader, (await GetHeader()).Text);
+        }
       }
       else
       {
+        cancellationToken.ThrowIfCancellationRequested();
         await RemoveHeader (existingHeader);
       }
 
       if (!string.IsNullOrEmpty (skippedText))
+      {
+        cancellationToken.ThrowIfCancellationRequested();
         await AddHeader (skippedText);
+      }
     }
 
     private async Task<string> CreateHeaderText (string[] headerLines)

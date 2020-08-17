@@ -12,6 +12,7 @@
  */
 
 using System;
+using System.Threading;
 using EnvDTE;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.MenuItemCommands.Common;
@@ -34,22 +35,22 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 
     public override string Description => c_commandName;
 
-    public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution, Window window)
+    public override Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel, Solution solution, Window window)
     {
-      return DoWorkAsync (viewModel);
+      return DoWorkAsync (cancellationToken, viewModel);
     }
 
-    public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution)
+    public override Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel, Solution solution)
     {
-      return DoWorkAsync (viewModel);
+      return DoWorkAsync (cancellationToken, viewModel);
     }
 
-    public override async Task DoWorkAsync (BaseUpdateViewModel viewModel)
+    public override async Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
       var obj = ((LicenseHeadersPackage) _licenseHeaderExtension).GetSolutionExplorerItem();
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (_licenseHeaderExtension.LicenseHeaderReplacer, viewModel);
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (cancellationToken, _licenseHeaderExtension.LicenseHeaderReplacer, viewModel);
 
       await removeAllLicenseHeadersCommand.ExecuteAsync (obj);
     }

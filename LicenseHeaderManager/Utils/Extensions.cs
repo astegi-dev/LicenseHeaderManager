@@ -38,7 +38,7 @@ namespace LicenseHeaderManager.Utils
 
     public static IEnumerable<DocumentHeaderProperty> GetAdditionalProperties (this ProjectItem item)
     {
-      //ThreadHelper.ThrowIfNotOnUIThread();
+      //ThreadHelper.ThrowIfNotOnUIThread ();
 
       return new List<DocumentHeaderProperty>
              {

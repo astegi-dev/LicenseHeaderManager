@@ -12,6 +12,7 @@
  */
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using EnvDTE;
 using LicenseHeaderManager.Interfaces;
@@ -33,19 +34,19 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Util
 
     public override string Description => c_commandName;
 
-    public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution, Window window)
+    public override Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel, Solution solution, Window window)
     {
-      return DoWorkAsync (viewModel);
+      return DoWorkAsync (cancellationToken, viewModel);
     }
 
-    public override Task DoWorkAsync (BaseUpdateViewModel viewModel, Solution solution)
+    public override Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel, Solution solution)
     {
-      return DoWorkAsync (viewModel);
+      return DoWorkAsync (cancellationToken, viewModel);
     }
 
-    public override async Task DoWorkAsync (BaseUpdateViewModel viewModel)
+    public override async Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel)
     {
-      await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync ((LicenseHeadersPackage) _licenseHeaderExtension, viewModel);
+      await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync (cancellationToken, (LicenseHeadersPackage) _licenseHeaderExtension, viewModel);
     }
   }
 }

@@ -13,6 +13,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Threading;
 using System.Windows;
 using System.Windows.Input;
 using EnvDTE;
@@ -33,6 +34,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
 
     private SolutionUpdateDialog _dialog;
     private bool _reSharperSuspended;
+    private CancellationTokenSource _cancellationTokenSource;
 
     public SolutionMenuItemButtonHandler (DTE2 dte2, MenuItemButtonOperation mode, MenuItemButtonHandlerHelper handler)
     {
@@ -64,15 +66,21 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
       if (!(solutionObject is Solution solution))
         return;
 
+      _cancellationTokenSource = new CancellationTokenSource();
       try
       {
-        await handler.DoWorkAsync (solutionUpdateViewModel, solution, _dialog);
+        await handler.DoWorkAsync (_cancellationTokenSource.Token, solutionUpdateViewModel, solution, _dialog);
       }
-      catch (Exception exception)
+      catch (OperationCanceledException)
+      {
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+        _dialog.Close();
+      }
+      catch (Exception ex)
       {
         MessageBoxHelper.ShowMessage (
-            $"The operation '{handler.Description}' failed with the exception '{exception.Message}'. See Visual Studio Output Window for Details.");
-        OutputWindowHandler.WriteMessage (exception.ToString());
+            $"The operation '{handler.Description}' failed with the exception '{ex.Message}'. See Visual Studio Output Window for Details.");
+        OutputWindowHandler.WriteMessage (ex.ToString());
       }
 
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -81,7 +89,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
 
     private void DialogOnClosing (object sender, CancelEventArgs e)
     {
-      // TODO how to cancel Core operation?
+      _cancellationTokenSource?.Cancel(true);
       ResumeReSharper();
     }
 
