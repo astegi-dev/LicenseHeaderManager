@@ -15,6 +15,8 @@ using System;
 using System.Collections.Specialized;
 using System.ComponentModel.Design;
 using System.Linq;
+using System.Windows.Media;
+using Core.Options;
 using LicenseHeaderManager.Options;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
@@ -49,8 +51,6 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
       this.ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
-
-      OptionsStore.CurrentConfig.LinkedCommandsChanged += CurrentConfig_OnLinkedCommandsChanged;
       var menuCommandID = new CommandID (CommandSet, CommandId);
       var menuItem = new MenuCommand (Execute, menuCommandID);
       commandService.AddCommand (menuItem);
@@ -91,12 +91,6 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      OptionsStore.CurrentConfig.LinkedCommands.Add (new LinkedCommand());
-      foreach (var currentConfigLinkedCommand in OptionsStore.CurrentConfig.LinkedCommands)
-      {
-        currentConfigLinkedCommand.Name = "okwefkoweof";
-      }
-
       var dlg = new OpenFileDialog
                 {
                     Title = "Select config file to open...",
@@ -108,13 +102,10 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
       ExecuteInternalAsync (dlg.FileName).FireAndForget();
     }
 
-    private void CurrentConfig_OnLinkedCommandsChanged (object sender, NotifyCollectionChangedEventArgs e)
-    {
-    }
-
     private async Task ExecuteInternalAsync (string fileName)
     {
-      OptionsStore.CurrentConfig = await OptionsStore.LoadAsync (fileName);
+      CoreOptions.CurrentConfig = await CoreOptions.LoadAsync (fileName + "_core");
+      VisualStudioOptions.CurrentConfig = await VisualStudioOptions.LoadAsync (fileName);
     }
   }
 }

@@ -1,22 +1,6 @@
-﻿/* Copyright (c) rubicon IT GmbH
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
- * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
- */
-
-using Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -26,16 +10,13 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace LicenseHeaderManager.Options
+namespace Core.Options
 {
-  internal class OptionsStore : IOptionsStore
+  [LicenseHeaderManagerOptions]
+  public class CoreOptions : ICoreOptions
   {
-    private const bool c_defaultInsertHeaderIntoNewFiles = false;
     private const bool c_defaultUseRequiredKeywords = true;
     private const string c_defaultRequiredKeywords = "license, copyright, (c), ©";
-
-    private static readonly ObservableCollection<LinkedCommand> _defaultLinkedCommands = new ObservableCollection<LinkedCommand>();
-
     private readonly string _defaultDefaultLicenseHeaderFileText = GetDefaultLicenseHeader();
 
     private readonly ObservableCollection<Language> _defaultLanguages = new ObservableCollection<Language>
@@ -106,31 +87,17 @@ namespace LicenseHeaderManager.Options
                                                                             }
                                                                         };
 
-    private ObservableCollection<LinkedCommand> _linkedCommands;
-
-    private static readonly JsonSerializerOptions _jsonSerializerOptions =
-        new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            ReadCommentHandling = JsonCommentHandling.Skip,
-            AllowTrailingCommas = true,
-            WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            Converters = { new JsonStringEnumConverter (JsonNamingPolicy.CamelCase, false) }
-        };
-
-    static OptionsStore ()
+    static CoreOptions ()
     {
-      CurrentConfig = new OptionsStore (true);
+      CurrentConfig = new CoreOptions(true);
     }
 
-    public OptionsStore ()
+    public CoreOptions ()
     {
       SetDefaults();
     }
 
-    public OptionsStore (bool initializeWithDefaultValues)
+    public CoreOptions (bool initializeWithDefaultValues)
     {
       if (initializeWithDefaultValues)
         SetDefaults();
@@ -139,151 +106,72 @@ namespace LicenseHeaderManager.Options
     /// <summary>
     ///   Gets or sets the currently up-to-date configuration of the License Header Manager Extension.
     /// </summary>
-    public static OptionsStore CurrentConfig { get; set; }
-
-    //[JsonConverter (typeof (JsonBoolConverter))]
-    public bool InsertHeaderIntoNewFiles { get; set; }
-
-    //[JsonConverter (typeof (JsonBoolConverter))]
+    public static CoreOptions CurrentConfig { get; set; }
     public bool UseRequiredKeywords { get; set; }
-
     public string RequiredKeywords { get; set; }
+    public string DefaultLicenseHeaderFileText { get; set; }
+    public ICollection<Language> Languages { get; set; }
 
-    public ICollection<LinkedCommand> LinkedCommands
+    /// <summary>
+    ///   Sets all public members of this <see cref="ICoreOptions" /> instance to their default values.
+    /// </summary>
+    /// <remarks>The default values are implementation-dependent.</remarks>
+    public void SetDefaults ()
     {
-      get => _linkedCommands;
-      set
-      {
-        if (_linkedCommands != null)
-        {
-          _linkedCommands.CollectionChanged -= InvokeLinkedCommandsChanged;
-          InvokeLinkedCommandsChanged (_linkedCommands, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, _linkedCommands));
-        }
-
-        _linkedCommands = new ObservableCollection<LinkedCommand> (value);
-        if (_linkedCommands != null)
-        {
-          _linkedCommands.CollectionChanged += InvokeLinkedCommandsChanged;
-          InvokeLinkedCommandsChanged (_linkedCommands, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, _linkedCommands));
-        }
-      }
+      UseRequiredKeywords = c_defaultUseRequiredKeywords;
+      RequiredKeywords = c_defaultRequiredKeywords;
+      DefaultLicenseHeaderFileText = _defaultDefaultLicenseHeaderFileText;
+      Languages = new ObservableCollection<Language> (_defaultLanguages);
     }
 
-    public string DefaultLicenseHeaderFileText { get; set; }
-
-    public IEnumerable<Language> Languages { get; set; }
-
-    public IOptionsStore Clone ()
+    public ICoreOptions Clone ()
     {
-      var clonedObject = new OptionsStore
+      var clonedObject = new CoreOptions
                          {
-                             InsertHeaderIntoNewFiles = InsertHeaderIntoNewFiles,
                              UseRequiredKeywords = UseRequiredKeywords,
                              RequiredKeywords = RequiredKeywords,
-                             LinkedCommands = LinkedCommands.Select (x => x.Clone()).ToList(),
                              DefaultLicenseHeaderFileText = DefaultLicenseHeaderFileText,
-                             Languages = Languages.Select (x => x.Clone())
+                             Languages = Languages.Select (x => x.Clone()).ToList()
                          };
 
       return clonedObject;
     }
 
-    public event EventHandler<NotifyCollectionChangedEventArgs> LinkedCommandsChanged;
-
     /// <summary>
-    ///   Serializes an <see cref="IOptionsStore" /> instance to a file in the file system.
+    ///   Serializes an <see cref="CoreOptions" /> instance to a file in the file system.
     /// </summary>
-    /// <param name="options">The <see cref="IOptionsStore" /> instance to serialize.</param>
+    /// <param name="options">The <see cref="CoreOptions" /> instance to serialize.</param>
     /// <param name="filePath">The path to which an options file should be persisted.</param>
-    public static async Task SaveAsync (OptionsStore options, string filePath)
+    public static async Task SaveAsync (CoreOptions options, string filePath)
     {
-      try
-      {
-        using var stream = new FileStream (filePath, FileMode.Create, FileAccess.Write, FileShare.None);
-        await JsonSerializer.SerializeAsync (stream, options, _jsonSerializerOptions);
-      }
-      catch (ArgumentNullException ex)
-      {
-        throw new SerializationException ("File stream for serializing configuration was not present", ex);
-      }
-      catch (NotSupportedException ex)
-      {
-        throw new SerializationException ("At least one JSON converter for serializing configuration members was not found", ex);
-      }
-      catch (Exception ex)
-      {
-        throw new SerializationException ("An unspecified error occured while serializing configuration", ex);
-      }
+      await JsonOptionsManager.SerializeAsync (options, filePath);
     }
 
     /// <summary>
-    ///   Deserializes an <see cref="IOptionsStore" /> instance from a file in the file system.
+    ///   Deserializes an <see cref="CoreOptions" /> instance from a file in the file system.
     /// </summary>
     /// <param name="filePath">
-    ///   The path to an options file from which a corresponding <see cref="IOptionsStore" /> instance
+    ///   The path to an options file from which a corresponding <see cref="CoreOptions" /> instance
     ///   should be constructed.
     /// </param>
     /// <returns>
-    ///   An <see cref="IOptionsStore" /> instance that represents to configuration contained in the file specified by
+    ///   An <see cref="CoreOptions" /> instance that represents to configuration contained in the file specified by
     ///   <paramref name="filePath" />.
     ///   If there were errors upon deserialization, <see langword="null" /> is returned.
     /// </returns>
-    public static async Task<OptionsStore> LoadAsync (string filePath)
+    public static async Task<CoreOptions> LoadAsync (string filePath)
     {
-      try
-      {
-        using var stream = new FileStream (filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        return await JsonSerializer.DeserializeAsync<OptionsStore> (stream, _jsonSerializerOptions);
-      }
-      catch (ArgumentNullException ex)
-      {
-        throw new SerializationException ("File stream for deserializing configuration was not present", ex);
-      }
-      catch (NotSupportedException ex)
-      {
-        throw new SerializationException ("At least one JSON converter for deserializing configuration members was not found", ex);
-      }
-      catch (FileNotFoundException ex)
-      {
-        throw new SerializationException ("File to deserialize configuration from was not found", ex);
-      }
-      catch (JsonException ex)
-      {
-        throw new SerializationException ("The file content is not in a valid format", ex);
-      }
-      catch (Exception ex)
-      {
-        throw new SerializationException ("An unspecified error occured while deserializing configuration", ex);
-      }
-    }
-
-    /// <summary>
-    ///   Sets all public members of this <see cref="IOptionsStore" /> instance to their default values.
-    /// </summary>
-    /// <remarks>The default values are implementation-dependent.</remarks>
-    public void SetDefaults ()
-    {
-      InsertHeaderIntoNewFiles = c_defaultInsertHeaderIntoNewFiles;
-      UseRequiredKeywords = c_defaultUseRequiredKeywords;
-      RequiredKeywords = c_defaultRequiredKeywords;
-      LinkedCommands = new ObservableCollection<LinkedCommand> (_defaultLinkedCommands);
-      DefaultLicenseHeaderFileText = _defaultDefaultLicenseHeaderFileText;
-      Languages = new ObservableCollection<Language> (_defaultLanguages);
+      return await JsonOptionsManager.DeserializeAsync<CoreOptions> (filePath);
     }
 
     private static string GetDefaultLicenseHeader ()
     {
-      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream (typeof (LicenseHeadersPackage), "Resources.default.licenseheader");
+      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream (typeof (ICoreOptions), "default.licenseheader");
       if (resource == null)
         return string.Empty;
 
       using var reader = new StreamReader (resource, Encoding.UTF8);
       return reader.ReadToEnd();
-    }
-
-    protected virtual void InvokeLinkedCommandsChanged (object sender, NotifyCollectionChangedEventArgs e)
-    {
-      LinkedCommandsChanged?.Invoke (sender, e);
     }
   }
 }

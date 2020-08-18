@@ -14,6 +14,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using Core.Options;
 using LicenseHeaderManager.Options;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
@@ -102,8 +103,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
 
     private async Task ExecuteInternalAsync (string filePath)
     {
-      OptionsStore.CurrentConfig.LinkedCommands = new List<LinkedCommand> (ServiceProvider.OptionsPage.LinkedCommands);
-      await OptionsStore.SaveAsync (OptionsStore.CurrentConfig, filePath);
+      await CoreOptions.SaveAsync (CoreOptions.CurrentConfig, filePath + "_core");
+      VisualStudioOptions.CurrentConfig.LinkedCommands = new List<LinkedCommand> (ServiceProvider.OptionsPage.LinkedCommands);
+      await VisualStudioOptions.SaveAsync (VisualStudioOptions.CurrentConfig, filePath);
     }
   }
 }

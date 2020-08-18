@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace LicenseHeaderManager.Options
+namespace Core.Options
 {
-  internal class SerializationException : Exception
+  public class SerializationException : Exception
   {
     public SerializationException ()
     {

@@ -96,6 +96,11 @@
     <Compile Include="LineEndInformation.cs" />
     <Compile Include="NewLineConst.cs" />
     <Compile Include="NewLineManager.cs" />
+    <Compile Include="Options\CoreOptions.cs" />
+    <Compile Include="Options\ICoreOptions.cs" />
+    <Compile Include="Options\JsonOptionsManager.cs" />
+    <Compile Include="Options\LicenseHeaderManagerOptions.cs" />
+    <Compile Include="Options\SerializationException.cs" />
     <Compile Include="ParseException.cs" />
     <Compile Include="PathUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -122,7 +127,9 @@
     </None>
     <None Include="app.config" />
     <None Include="Key.snk" />
+    <EmbeddedResource Include="Options\default.licenseheader" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
