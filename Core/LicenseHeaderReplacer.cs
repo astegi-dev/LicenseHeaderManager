@@ -79,7 +79,7 @@ namespace Core
       var returnObject = new ReplacerResult<ReplacerError>();
       try
       {
-        var result = TryCreateDocument (licenseHeaderInput.DocumentPath, out var document, licenseHeaderInput.AdditionalProperties, licenseHeaderInput.Headers);
+        var result = TryCreateDocument (licenseHeaderInput, out var document);
 
         switch (result)
         {
@@ -162,14 +162,14 @@ namespace Core
     }
 
     private async Task RemoveOrReplaceHeaderForOneFile (
-        LicenseHeaderInput header,
+        LicenseHeaderInput licenseHeaderInput,
         Func<string, bool> nonCommentTextInquiry,
         IProgress<ReplacerProgressReport> progress,
         CancellationToken cancellationToken,
         ConcurrentQueue<ReplacerError> errors)
     {
       cancellationToken.ThrowIfCancellationRequested();
-      if (TryCreateDocument (header.DocumentPath, out var document, header.AdditionalProperties, header.Headers) != CreateDocumentResult.DocumentCreated)
+      if (TryCreateDocument (licenseHeaderInput, out var document) != CreateDocumentResult.DocumentCreated)
       {
         await ReportProgress (progress, cancellationToken);
         return;
@@ -180,7 +180,7 @@ namespace Core
 
       if (!await document.ValidateHeader())
       {
-        var extension = Path.GetExtension (header.DocumentPath);
+        var extension = Path.GetExtension (licenseHeaderInput.DocumentPath);
         if (!_extensionsWithInvalidHeaders.TryGetValue (extension, out replace))
         {
           message = string.Format (Resources.Warning_InvalidLicenseHeader, extension).ReplaceNewLines();
@@ -203,8 +203,8 @@ namespace Core
       }
       catch (ParseException)
       {
-        message = string.Format (Resources.Error_InvalidLicenseHeader, header.DocumentPath).ReplaceNewLines();
-        errors.Enqueue (new ReplacerError (header.DocumentPath, ErrorType.ParsingError, message));
+        message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
+        errors.Enqueue (new ReplacerError (licenseHeaderInput.DocumentPath, ErrorType.ParsingError, message));
       }
 
       await ReportProgress (progress, cancellationToken);
@@ -260,39 +260,35 @@ namespace Core
     ///   headers should only be removed.
     /// </param>
     /// <returns>A value indicating the result of the operation. Document will be null unless DocumentCreated is returned.</returns>
-    public CreateDocumentResult TryCreateDocument (
-        string documentPath,
-        out Document document,
-        IEnumerable<AdditionalProperty> additionalProperties = null,
-        IDictionary<string, string[]> headers = null)
+    public CreateDocumentResult TryCreateDocument (LicenseHeaderInput licenseHeaderInput, out Document document)
     {
       document = null;
 
-      if (IsLicenseHeader (documentPath))
+      if (IsLicenseHeader (licenseHeaderInput.DocumentPath))
         return CreateDocumentResult.LicenseHeaderDocument;
 
-      var language = _languages.FirstOrDefault (x => x.Extensions.Any (y => documentPath.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
+      var language = _languages.FirstOrDefault (x => x.Extensions.Any (y => licenseHeaderInput.DocumentPath.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
 
       if (language == null)
         return CreateDocumentResult.LanguageNotFound;
 
       string[] header = null;
-      if (headers != null)
+      if (licenseHeaderInput.Headers != null)
       {
-        var extension = headers.Keys
+        var extension = licenseHeaderInput.Headers.Keys
             .OrderByDescending (x => x.Length)
-            .FirstOrDefault (x => documentPath.EndsWith (x, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault (x => licenseHeaderInput.DocumentPath.EndsWith (x, StringComparison.OrdinalIgnoreCase));
 
         if (extension == null)
           return CreateDocumentResult.NoHeaderFound;
 
-        header = headers[extension];
+        header = licenseHeaderInput.Headers[extension];
 
         if (header.All (string.IsNullOrEmpty))
           return CreateDocumentResult.EmptyHeader;
       }
 
-      document = new Document (documentPath, language, header, additionalProperties, _keywords);
+      document = new Document (licenseHeaderInput.DocumentPath, language, header, licenseHeaderInput.AdditionalProperties, _keywords);
 
       return CreateDocumentResult.DocumentCreated;
     }

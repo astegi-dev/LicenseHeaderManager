@@ -222,7 +222,7 @@ namespace LicenseHeaderManager
       var visible = false;
 
       if (ProjectItemInspection.IsPhysicalFile (item))
-        visible = LicenseHeaderReplacer.TryCreateDocument (item.FileNames[1], out _) == CreateDocumentResult.DocumentCreated;
+        visible = LicenseHeaderReplacer.TryCreateDocument (new LicenseHeaderInput(item.FileNames[1], null, null), out _) == CreateDocumentResult.DocumentCreated;
 
       return visible;
     }
