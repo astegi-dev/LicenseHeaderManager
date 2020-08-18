@@ -14,7 +14,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace LicenseHeaderManager.Utils
+namespace LicenseHeaderManager.Options.Converters
 {
   /// <summary>
   ///   Converts boolean literals found in JSON files to a <see cref="bool" /> value and vice versa.

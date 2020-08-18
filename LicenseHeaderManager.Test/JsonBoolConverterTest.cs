@@ -12,6 +12,7 @@
  */
 
 using System;
+using LicenseHeaderManager.Options.Converters;
 using LicenseHeaderManager.Utils;
 using Newtonsoft.Json;
 using NUnit.Framework;

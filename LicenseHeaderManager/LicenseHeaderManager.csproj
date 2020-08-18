@@ -24,7 +24,7 @@
     <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <FileUpgradeFlags>
@@ -244,7 +244,7 @@
     </Compile>
     <Compile Include="UpdateViews\IntToMaximumConverter.cs" />
     <Compile Include="Utils\CoreHelpers.cs" />
-    <Compile Include="Utils\JsonBoolConverter.cs" />
+    <Compile Include="Options\Converters\JsonBoolConverter.cs" />
     <Compile Include="Utils\ProjectItemParentFinder.cs" />
     <Compile Include="MenuItemCommands\Common\ExistingLicenseHeaderDefinitionFileAdder.cs" />
     <Compile Include="Headers\NewLineConst.cs" />
