@@ -14,6 +14,7 @@
 using System;
 using System.ComponentModel.Design;
 using LicenseHeaderManager.Options;
+using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.Win32;
 using Task = System.Threading.Tasks.Task;
@@ -100,7 +101,12 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
       if (dlg.ShowDialog() != true)
         return;
 
-      OptionsStore.Save (OptionsStore.CurrentConfig, dlg.FileName);
+      ExecuteInternalAsync(dlg.FileName).FireAndForget();
+    }
+
+    private async Task ExecuteInternalAsync(string filePath)
+    {
+      await OptionsStore.SaveAsync (OptionsStore.CurrentConfig, filePath);
     }
   }
 }

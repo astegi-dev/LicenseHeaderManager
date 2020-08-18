@@ -18,11 +18,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Core;
 using LicenseHeaderManager.Options.Converters;
 using LicenseHeaderManager.Utils;
-using Newtonsoft.Json;
-using ErrorEventArgs = Newtonsoft.Json.Serialization.ErrorEventArgs;
 
 namespace LicenseHeaderManager.Options
 {
@@ -104,18 +105,28 @@ namespace LicenseHeaderManager.Options
                                                                             }
                                                                         };
 
-    static OptionsStore ()
+    private static readonly JsonSerializerOptions _jsonSerializerOptions =
+        new JsonSerializerOptions
+        {
+          PropertyNameCaseInsensitive = true,
+          PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+          ReadCommentHandling = JsonCommentHandling.Skip,
+          AllowTrailingCommas = true,
+          WriteIndented = true,
+          Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+
+    static OptionsStore()
     {
-      CurrentConfig = new OptionsStore (true);
+      CurrentConfig = new OptionsStore(true);
     }
 
-    [JsonConstructor]
-    public OptionsStore ()
+    public OptionsStore()
     {
       SetDefaults();
     }
 
-    public OptionsStore (bool initializeWithDefaultValues)
+    public OptionsStore(bool initializeWithDefaultValues)
     {
       if (initializeWithDefaultValues)
         SetDefaults();
@@ -126,10 +137,10 @@ namespace LicenseHeaderManager.Options
     /// </summary>
     public static OptionsStore CurrentConfig { get; set; }
 
-    [JsonConverter (typeof (JsonBoolConverter))]
+    //[JsonConverter (typeof (JsonBoolConverter))]
     public bool InsertHeaderIntoNewFiles { get; set; }
 
-    [JsonConverter (typeof (JsonBoolConverter))]
+    //[JsonConverter (typeof (JsonBoolConverter))]
     public bool UseRequiredKeywords { get; set; }
 
     public string RequiredKeywords { get; set; }
@@ -140,17 +151,17 @@ namespace LicenseHeaderManager.Options
 
     public IEnumerable<Language> Languages { get; set; }
 
-    public IOptionsStore Clone ()
+    public IOptionsStore Clone()
     {
       var clonedObject = new OptionsStore
-                         {
-                             InsertHeaderIntoNewFiles = InsertHeaderIntoNewFiles,
-                             UseRequiredKeywords = UseRequiredKeywords,
-                             RequiredKeywords = RequiredKeywords,
-                             LinkedCommands = LinkedCommands.Select (x => x.Clone()),
-                             DefaultLicenseHeaderFileText = DefaultLicenseHeaderFileText,
-                             Languages = Languages.Select (x => x.Clone())
-                         };
+      {
+        InsertHeaderIntoNewFiles = InsertHeaderIntoNewFiles,
+        UseRequiredKeywords = UseRequiredKeywords,
+        RequiredKeywords = RequiredKeywords,
+        LinkedCommands = LinkedCommands.Select(x => x.Clone()),
+        DefaultLicenseHeaderFileText = DefaultLicenseHeaderFileText,
+        Languages = Languages.Select(x => x.Clone())
+      };
 
       return clonedObject;
     }
@@ -160,25 +171,25 @@ namespace LicenseHeaderManager.Options
     /// </summary>
     /// <param name="options">The <see cref="IOptionsStore" /> instance to serialize.</param>
     /// <param name="filePath">The path to which an options file should be persisted.</param>
-    public static void Save (IOptionsStore options, string filePath)
+    public static async Task SaveAsync(OptionsStore options, string filePath)
     {
-      var errors = new List<string>();
-      var serializer = new JsonSerializer
-                       {
-                           Formatting = Formatting.Indented
-                       };
-      serializer.Error += (sender, args) => OnSerializerError (args, errors);
-
-      using var sw = new StreamWriter (filePath);
-      using JsonWriter writer = new JsonTextWriter (sw);
-      serializer.Serialize (writer, options);
-
-      if (errors.Count == 0)
-        return;
-
-      MessageBoxHelper.ShowError (
-          $"{errors.Count} errors were encountered while serialization:\n*) {string.Join ("\n*) ", errors)}",
-          Resources.SerializationFailed);
+      try
+      {
+        using var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        await JsonSerializer.SerializeAsync(stream, options, _jsonSerializerOptions);
+      }
+      catch (ArgumentNullException ex)
+      {
+        throw new SerializationException("File stream for serializing configuration was not present", ex);
+      }
+      catch (NotSupportedException ex)
+      {
+        throw new SerializationException("At least one JSON converter for serializing configuration members was not found", ex);
+      }
+      catch (Exception ex)
+      {
+        throw new SerializationException("An unspecified error occured while serializing configuration", ex);
+      }
     }
 
     /// <summary>
@@ -193,59 +204,56 @@ namespace LicenseHeaderManager.Options
     ///   <paramref name="filePath" />.
     ///   If there were errors upon deserialization, <see langword="null" /> is returned.
     /// </returns>
-    public static OptionsStore Load (string filePath)
+    public static async Task<OptionsStore> LoadAsync(string filePath)
     {
-      var errors = new List<string>();
-      using var file = File.OpenText (filePath);
-      var serializer = new JsonSerializer
-                       {
-                           ObjectCreationHandling = ObjectCreationHandling.Replace
-                       };
-
-      serializer.Error += (sender, args) => OnSerializerError (args, errors);
-      var deserializedObject = (OptionsStore) serializer.Deserialize (file, typeof (OptionsStore));
-
-      if (errors.Count == 0)
-        return deserializedObject;
-
-      MessageBoxHelper.ShowError (
-          $"{errors.Count} errors were encountered while deserializing:\n*) {string.Join ("\n*) ", errors)}",
-          Resources.DeserializationFailed);
-      return null;
-    }
-
-    private static void OnSerializerError (ErrorEventArgs args, ICollection<string> errors)
-    {
-      // log errors only once
-      if (args.CurrentObject != args.ErrorContext.OriginalObject)
-        return;
-      args.ErrorContext.Handled = true;
-
-      if (!errors.Contains (args.ErrorContext.Error.Message))
-        errors.Add (args.ErrorContext.Error.Message);
+      try
+      {
+        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        return await JsonSerializer.DeserializeAsync<OptionsStore>(stream, _jsonSerializerOptions);
+      }
+      catch (ArgumentNullException ex)
+      {
+        throw new SerializationException("File stream for deserializing configuration was not present", ex);
+      }
+      catch (NotSupportedException ex)
+      {
+        throw new SerializationException("At least one JSON converter for deserializing configuration members was not found", ex);
+      }
+      catch (FileNotFoundException ex)
+      {
+        throw new SerializationException("File to deserialize configuration from was not found", ex);
+      }
+      catch (JsonException ex)
+      {
+        throw new SerializationException("The file content is not in a valid format", ex);
+      }
+      catch (Exception ex)
+      {
+        throw new SerializationException("An unspecified error occured while deserializing configuration", ex);
+      }
     }
 
     /// <summary>
     ///   Sets all public members of this <see cref="IOptionsStore" /> instance to their default values.
     /// </summary>
     /// <remarks>The default values are implementation-dependent.</remarks>
-    public void SetDefaults ()
+    public void SetDefaults()
     {
       InsertHeaderIntoNewFiles = c_defaultInsertHeaderIntoNewFiles;
       UseRequiredKeywords = c_defaultUseRequiredKeywords;
       RequiredKeywords = c_defaultRequiredKeywords;
-      LinkedCommands = new ObservableCollection<LinkedCommand> (_defaultLinkedCommands);
+      LinkedCommands = new ObservableCollection<LinkedCommand>(_defaultLinkedCommands);
       DefaultLicenseHeaderFileText = _defaultDefaultLicenseHeaderFileText;
-      Languages = new ObservableCollection<Language> (_defaultLanguages);
+      Languages = new ObservableCollection<Language>(_defaultLanguages);
     }
 
-    private static string GetDefaultLicenseHeader ()
+    private static string GetDefaultLicenseHeader()
     {
-      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream (typeof (LicenseHeadersPackage), "Resources.default.licenseheader");
+      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(LicenseHeadersPackage), "Resources.default.licenseheader");
       if (resource == null)
         return string.Empty;
 
-      using var reader = new StreamReader (resource, Encoding.UTF8);
+      using var reader = new StreamReader(resource, Encoding.UTF8);
       return reader.ReadToEnd();
     }
   }
