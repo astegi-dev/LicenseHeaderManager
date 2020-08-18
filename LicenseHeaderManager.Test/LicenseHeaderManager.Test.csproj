@@ -115,7 +115,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AllSolutionProjectsSearcherTest.cs" />
-    <Compile Include="JsonBoolConverterTest.cs" />
     <Compile Include="LinkedFileFilterTest.cs" />
     <Compile Include="LinkedFileHandlerTest.cs" />
     <Compile Include="OptionsPageTest.cs" />

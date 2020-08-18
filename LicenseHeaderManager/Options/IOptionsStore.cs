@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using Core;
 
 namespace LicenseHeaderManager.Options
@@ -40,7 +41,9 @@ namespace LicenseHeaderManager.Options
     ///   Gets or sets commands provided by Visual Studio before or after which the "Add License Header" command should be
     ///   automatically executed.
     /// </summary>
-    IEnumerable<LinkedCommand> LinkedCommands { get; set; }
+    /// <remarks>Note that upon setter invocation, a copy of the supplied <see cref="ICollection{T}"/> is created. Hence, future updates to this
+    /// initial collection are not reflected in this property.</remarks>
+    ICollection<LinkedCommand> LinkedCommands { get; set; }
 
     /// <summary>
     ///   Gets or sets the text for new license header definition files.
@@ -58,5 +61,10 @@ namespace LicenseHeaderManager.Options
     /// </summary>
     /// <returns></returns>
     IOptionsStore Clone ();
+
+    /// <summary>
+    /// Is triggered when the contents of the collection held by <see cref="LinkedCommands"/> has changed.
+    /// </summary>
+    event EventHandler<NotifyCollectionChangedEventArgs> LinkedCommandsChanged;
   }
 }

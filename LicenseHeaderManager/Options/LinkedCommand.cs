@@ -13,25 +13,28 @@
 
 using System;
 using System.ComponentModel;
+using System.Text.Json.Serialization;
 using EnvDTE;
 
 namespace LicenseHeaderManager.Options
 {
   public enum ExecutionTime
   {
-    Before,
-    After
+    Before = 0,
+    After = 1
   }
 
-  // TODO examine how to serialize and deserialize (due to CommandEvents property)
   public class LinkedCommand : INotifyPropertyChanged
   {
     private ExecutionTime _executionTime;
 
     private string _name;
+
     public string Guid { get; set; }
+
     public int Id { get; set; }
-    public CommandEvents Events { get; set; }
+
+    [JsonIgnore] public CommandEvents Events { get; set; }
 
     public string Name
     {
@@ -41,7 +44,7 @@ namespace LicenseHeaderManager.Options
         if (value != _name)
         {
           _name = value;
-          OnPropertyChanged ("Name");
+          OnPropertyChanged (nameof(Name));
         }
       }
     }
@@ -54,7 +57,7 @@ namespace LicenseHeaderManager.Options
         if (value != _executionTime)
         {
           _executionTime = value;
-          OnPropertyChanged ("ExecutionTime");
+          OnPropertyChanged (nameof(ExecutionTime));
         }
       }
     }

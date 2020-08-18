@@ -11,19 +11,20 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+using Core;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Core;
-using LicenseHeaderManager.Options.Converters;
-using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.Options
 {
@@ -105,28 +106,31 @@ namespace LicenseHeaderManager.Options
                                                                             }
                                                                         };
 
+    private ObservableCollection<LinkedCommand> _linkedCommands;
+
     private static readonly JsonSerializerOptions _jsonSerializerOptions =
         new JsonSerializerOptions
         {
-          PropertyNameCaseInsensitive = true,
-          PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-          ReadCommentHandling = JsonCommentHandling.Skip,
-          AllowTrailingCommas = true,
-          WriteIndented = true,
-          Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            AllowTrailingCommas = true,
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            Converters = { new JsonStringEnumConverter (JsonNamingPolicy.CamelCase, false) }
         };
 
-    static OptionsStore()
+    static OptionsStore ()
     {
-      CurrentConfig = new OptionsStore(true);
+      CurrentConfig = new OptionsStore (true);
     }
 
-    public OptionsStore()
+    public OptionsStore ()
     {
       SetDefaults();
     }
 
-    public OptionsStore(bool initializeWithDefaultValues)
+    public OptionsStore (bool initializeWithDefaultValues)
     {
       if (initializeWithDefaultValues)
         SetDefaults();
@@ -145,50 +149,70 @@ namespace LicenseHeaderManager.Options
 
     public string RequiredKeywords { get; set; }
 
-    public IEnumerable<LinkedCommand> LinkedCommands { get; set; }
+    public ICollection<LinkedCommand> LinkedCommands
+    {
+      get => _linkedCommands;
+      set
+      {
+        if (_linkedCommands != null)
+        {
+          _linkedCommands.CollectionChanged -= InvokeLinkedCommandsChanged;
+          InvokeLinkedCommandsChanged (_linkedCommands, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, _linkedCommands));
+        }
+
+        _linkedCommands = new ObservableCollection<LinkedCommand> (value);
+        if (_linkedCommands != null)
+        {
+          _linkedCommands.CollectionChanged += InvokeLinkedCommandsChanged;
+          InvokeLinkedCommandsChanged (_linkedCommands, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, _linkedCommands));
+        }
+      }
+    }
 
     public string DefaultLicenseHeaderFileText { get; set; }
 
     public IEnumerable<Language> Languages { get; set; }
 
-    public IOptionsStore Clone()
+    public IOptionsStore Clone ()
     {
       var clonedObject = new OptionsStore
-      {
-        InsertHeaderIntoNewFiles = InsertHeaderIntoNewFiles,
-        UseRequiredKeywords = UseRequiredKeywords,
-        RequiredKeywords = RequiredKeywords,
-        LinkedCommands = LinkedCommands.Select(x => x.Clone()),
-        DefaultLicenseHeaderFileText = DefaultLicenseHeaderFileText,
-        Languages = Languages.Select(x => x.Clone())
-      };
+                         {
+                             InsertHeaderIntoNewFiles = InsertHeaderIntoNewFiles,
+                             UseRequiredKeywords = UseRequiredKeywords,
+                             RequiredKeywords = RequiredKeywords,
+                             LinkedCommands = LinkedCommands.Select (x => x.Clone()).ToList(),
+                             DefaultLicenseHeaderFileText = DefaultLicenseHeaderFileText,
+                             Languages = Languages.Select (x => x.Clone())
+                         };
 
       return clonedObject;
     }
+
+    public event EventHandler<NotifyCollectionChangedEventArgs> LinkedCommandsChanged;
 
     /// <summary>
     ///   Serializes an <see cref="IOptionsStore" /> instance to a file in the file system.
     /// </summary>
     /// <param name="options">The <see cref="IOptionsStore" /> instance to serialize.</param>
     /// <param name="filePath">The path to which an options file should be persisted.</param>
-    public static async Task SaveAsync(OptionsStore options, string filePath)
+    public static async Task SaveAsync (OptionsStore options, string filePath)
     {
       try
       {
-        using var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
-        await JsonSerializer.SerializeAsync(stream, options, _jsonSerializerOptions);
+        using var stream = new FileStream (filePath, FileMode.Create, FileAccess.Write, FileShare.None);
+        await JsonSerializer.SerializeAsync (stream, options, _jsonSerializerOptions);
       }
       catch (ArgumentNullException ex)
       {
-        throw new SerializationException("File stream for serializing configuration was not present", ex);
+        throw new SerializationException ("File stream for serializing configuration was not present", ex);
       }
       catch (NotSupportedException ex)
       {
-        throw new SerializationException("At least one JSON converter for serializing configuration members was not found", ex);
+        throw new SerializationException ("At least one JSON converter for serializing configuration members was not found", ex);
       }
       catch (Exception ex)
       {
-        throw new SerializationException("An unspecified error occured while serializing configuration", ex);
+        throw new SerializationException ("An unspecified error occured while serializing configuration", ex);
       }
     }
 
@@ -204,32 +228,32 @@ namespace LicenseHeaderManager.Options
     ///   <paramref name="filePath" />.
     ///   If there were errors upon deserialization, <see langword="null" /> is returned.
     /// </returns>
-    public static async Task<OptionsStore> LoadAsync(string filePath)
+    public static async Task<OptionsStore> LoadAsync (string filePath)
     {
       try
       {
-        using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-        return await JsonSerializer.DeserializeAsync<OptionsStore>(stream, _jsonSerializerOptions);
+        using var stream = new FileStream (filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+        return await JsonSerializer.DeserializeAsync<OptionsStore> (stream, _jsonSerializerOptions);
       }
       catch (ArgumentNullException ex)
       {
-        throw new SerializationException("File stream for deserializing configuration was not present", ex);
+        throw new SerializationException ("File stream for deserializing configuration was not present", ex);
       }
       catch (NotSupportedException ex)
       {
-        throw new SerializationException("At least one JSON converter for deserializing configuration members was not found", ex);
+        throw new SerializationException ("At least one JSON converter for deserializing configuration members was not found", ex);
       }
       catch (FileNotFoundException ex)
       {
-        throw new SerializationException("File to deserialize configuration from was not found", ex);
+        throw new SerializationException ("File to deserialize configuration from was not found", ex);
       }
       catch (JsonException ex)
       {
-        throw new SerializationException("The file content is not in a valid format", ex);
+        throw new SerializationException ("The file content is not in a valid format", ex);
       }
       catch (Exception ex)
       {
-        throw new SerializationException("An unspecified error occured while deserializing configuration", ex);
+        throw new SerializationException ("An unspecified error occured while deserializing configuration", ex);
       }
     }
 
@@ -237,24 +261,29 @@ namespace LicenseHeaderManager.Options
     ///   Sets all public members of this <see cref="IOptionsStore" /> instance to their default values.
     /// </summary>
     /// <remarks>The default values are implementation-dependent.</remarks>
-    public void SetDefaults()
+    public void SetDefaults ()
     {
       InsertHeaderIntoNewFiles = c_defaultInsertHeaderIntoNewFiles;
       UseRequiredKeywords = c_defaultUseRequiredKeywords;
       RequiredKeywords = c_defaultRequiredKeywords;
-      LinkedCommands = new ObservableCollection<LinkedCommand>(_defaultLinkedCommands);
+      LinkedCommands = new ObservableCollection<LinkedCommand> (_defaultLinkedCommands);
       DefaultLicenseHeaderFileText = _defaultDefaultLicenseHeaderFileText;
-      Languages = new ObservableCollection<Language>(_defaultLanguages);
+      Languages = new ObservableCollection<Language> (_defaultLanguages);
     }
 
-    private static string GetDefaultLicenseHeader()
+    private static string GetDefaultLicenseHeader ()
     {
-      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(LicenseHeadersPackage), "Resources.default.licenseheader");
+      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream (typeof (LicenseHeadersPackage), "Resources.default.licenseheader");
       if (resource == null)
         return string.Empty;
 
-      using var reader = new StreamReader(resource, Encoding.UTF8);
+      using var reader = new StreamReader (resource, Encoding.UTF8);
       return reader.ReadToEnd();
+    }
+
+    protected virtual void InvokeLinkedCommandsChanged (object sender, NotifyCollectionChangedEventArgs e)
+    {
+      LinkedCommandsChanged?.Invoke (sender, e);
     }
   }
 }

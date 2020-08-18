@@ -12,6 +12,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using LicenseHeaderManager.Options;
 using LicenseHeaderManager.Utils;
@@ -37,11 +38,6 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
     public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
     /// <summary>
-    ///   VS Package that provides this command, not null.
-    /// </summary>
-    private readonly AsyncPackage package;
-
-    /// <summary>
     ///   Initializes a new instance of the <see cref="SaveSettingsCommand" /> class.
     ///   Adds our command handlers for menu (commands must exist in the command table file)
     /// </summary>
@@ -49,7 +45,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
     /// <param name="commandService">Command service to add command to, not null.</param>
     private SaveSettingsCommand (AsyncPackage package, OleMenuCommandService commandService)
     {
-      this.package = package ?? throw new ArgumentNullException (nameof(package));
+      this.ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       var menuCommandID = new CommandID (CommandSet, CommandId);
@@ -65,7 +61,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
     /// <summary>
     ///   Gets the service provider from the owner package.
     /// </summary>
-    private IAsyncServiceProvider ServiceProvider => package;
+    private LicenseHeadersPackage ServiceProvider { get; }
 
     /// <summary>
     ///   Initializes the singleton instance of the command.
@@ -101,11 +97,12 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
       if (dlg.ShowDialog() != true)
         return;
 
-      ExecuteInternalAsync(dlg.FileName).FireAndForget();
+      ExecuteInternalAsync (dlg.FileName).FireAndForget();
     }
 
-    private async Task ExecuteInternalAsync(string filePath)
+    private async Task ExecuteInternalAsync (string filePath)
     {
+      OptionsStore.CurrentConfig.LinkedCommands = new List<LinkedCommand> (ServiceProvider.OptionsPage.LinkedCommands);
       await OptionsStore.SaveAsync (OptionsStore.CurrentConfig, filePath);
     }
   }
