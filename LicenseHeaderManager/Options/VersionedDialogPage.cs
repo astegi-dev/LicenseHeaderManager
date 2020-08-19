@@ -135,10 +135,10 @@ namespace LicenseHeaderManager.Options
 
     private TypeConverter GetPropertyConverterOrDefault (PropertyDescriptor propertyDescriptor)
     {
-      if (propertyDescriptor.Name == nameof(LanguagesPageModelOld.Languages))
+      if (propertyDescriptor.Name == nameof(LanguagesPageOld.Languages))
         return new LanguageConverter();
 
-      if (propertyDescriptor.Name == nameof(GeneralOptionsPageModelOld.LinkedCommands))
+      if (propertyDescriptor.Name == nameof(GeneralOptionsPageOld.LinkedCommands))
         return new LinkedCommandConverter();
 
       return propertyDescriptor.Converter;

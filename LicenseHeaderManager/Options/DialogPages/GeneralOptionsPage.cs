@@ -11,14 +11,58 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+using System;
+using System.Collections.Generic;
 using LicenseHeaderManager.Options.DialogPageControls;
 using LicenseHeaderManager.Options.Model;
 using System.Windows.Forms;
+using Core.Options;
 
 namespace LicenseHeaderManager.Options.DialogPages
 {
   public class GeneralOptionsPage : BaseOptionPage<GeneralOptionsPageModel>
   {
-    protected override IWin32Window Window => new WpfHost(new WpfOptions((IGeneralOptionsPageModel)Model));
+    public GeneralOptionsPage ()
+    {
+    }
+
+    public override void ResetSettings ()
+    {
+      ((IGeneralOptionsPageModel) Model).Reset();
+    }
+
+    protected override IWin32Window Window => new WpfHost (new WpfOptions ((IGeneralOptionsPageModel) Model));
+
+    protected override IEnumerable<UpdateStep> GetVersionUpdateSteps ()
+    {
+      yield return new UpdateStep (new Version (3, 0, 1), MigrateStorageLocation_3_0_1);
+    }
+
+    private void MigrateStorageLocation_3_0_1 ()
+    {
+      if (!System.Version.TryParse (Version, out var version) || version < new Version (3, 0, 0))
+      {
+        LoadRegistryValuesBefore_3_0_0();
+      }
+      else
+      {
+        var migratedOptionsPage = new GeneralOptionsPageModel();
+        LoadRegistryValuesBefore_3_0_0 (migratedOptionsPage);
+
+        OptionsFacade.CurrentOptions.InsertHeaderIntoNewFiles = ThreeWaySelectionForMigration (
+            OptionsFacade.CurrentOptions.InsertHeaderIntoNewFiles,
+            migratedOptionsPage.InsertHeaderIntoNewFiles,
+            VisualStudioOptions.c_defaultInsertHeaderIntoNewFiles);
+        OptionsFacade.CurrentOptions.UseRequiredKeywords = ThreeWaySelectionForMigration (
+            OptionsFacade.CurrentOptions.UseRequiredKeywords,
+            migratedOptionsPage.UseRequiredKeywords,
+            CoreOptions.c_defaultUseRequiredKeywords);
+        OptionsFacade.CurrentOptions.RequiredKeywords = ThreeWaySelectionForMigration (
+            OptionsFacade.CurrentOptions.RequiredKeywords,
+            migratedOptionsPage.RequiredKeywords,
+            CoreOptions.c_defaultRequiredKeywords);
+        OptionsFacade.CurrentOptions.LinkedCommands = migratedOptionsPage.LinkedCommands;
+      }
+    }
   }
 }

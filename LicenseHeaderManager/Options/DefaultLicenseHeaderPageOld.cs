@@ -27,9 +27,9 @@ namespace LicenseHeaderManager.Options
 {
   [ClassInterface (ClassInterfaceType.AutoDual)]
   [Guid ("E0E8C0E8-0E8E-4251-B885-1ABF58837366")]
-  public sealed class DefaultLicenseHeaderPageModelOld : VersionedDialogPage, IDefaultLicenseHeaderPageModel
+  public sealed class DefaultLicenseHeaderPageOld : VersionedDialogPage, IDefaultLicenseHeaderPageModel
   {
-    public DefaultLicenseHeaderPageModelOld ()
+    public DefaultLicenseHeaderPageOld ()
     {
       ResetSettings();
     }
@@ -91,7 +91,7 @@ namespace LicenseHeaderManager.Options
       }
       else
       {
-        var migratedDefaultLicenseHeaderPage = new DefaultLicenseHeaderPageModelOld();
+        var migratedDefaultLicenseHeaderPage = new DefaultLicenseHeaderPageOld();
         LoadRegistryValuesBefore_3_0_0 (migratedDefaultLicenseHeaderPage);
 
         DefaultLicenseHeaderFileText = ThreeWaySelectionForMigration (

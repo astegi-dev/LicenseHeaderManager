@@ -24,11 +24,11 @@ namespace LicenseHeaderManager.Options
   [LicenseHeaderManagerOptions]
   internal class VisualStudioOptions : IVisualStudioOptions
   {
-    private const bool c_defaultInsertHeaderIntoNewFiles = false;
+    public const bool c_defaultInsertHeaderIntoNewFiles = false;
 
-    // ReSharper disable once CollectionNeverUpdated.Local
-    private static readonly ObservableCollection<LinkedCommand> s_defaultLinkedCommands = new ObservableCollection<LinkedCommand>();
-    private ObservableCollection<LinkedCommand> _linkedCommands;
+    
+    public static readonly ObservableCollection<LinkedCommand> s_defaultLinkedCommands = new ObservableCollection<LinkedCommand>();
+    public ObservableCollection<LinkedCommand> _linkedCommands;
 
     public VisualStudioOptions ()
     {

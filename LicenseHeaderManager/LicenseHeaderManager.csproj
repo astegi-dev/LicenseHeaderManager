@@ -302,7 +302,7 @@
     <Compile Include="Options\DialogPageControls\WpfEditDefaultLicenseHeaderDialog.xaml.cs">
       <DependentUpon>WpfEditDefaultLicenseHeaderDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Options\DefaultLicenseHeaderPageModelOld.cs">
+    <Compile Include="Options\DefaultLicenseHeaderPageOld.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\VersionedDialogPage.cs">
@@ -320,10 +320,10 @@
       <DependentUpon>WpfLanguageDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\Converters\LanguageConverter.cs" />
-    <Compile Include="Options\GeneralOptionsPageModelOld.cs">
+    <Compile Include="Options\GeneralOptionsPageOld.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Options\LanguagesPageModelOld.cs">
+    <Compile Include="Options\LanguagesPageOld.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\DialogPageControls\WpfLanguages.xaml.cs">

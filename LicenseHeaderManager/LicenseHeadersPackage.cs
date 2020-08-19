@@ -314,7 +314,7 @@ namespace LicenseHeaderManager
     {
       //An item was added. Check if we should insert a header automatically.
       var page = GeneralOptionsPageModel;
-      if (page != null && page.InsertInNewFiles && item != null)
+      if (page != null && page.InsertHeaderIntoNewFiles && item != null)
       {
         //Normally the header should be inserted here, but that might interfere with the command
         //currently being executed, so we wait until it is finished.

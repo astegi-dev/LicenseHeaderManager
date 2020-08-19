@@ -28,7 +28,7 @@ namespace LicenseHeaderManager.Options
 {
   [ClassInterface (ClassInterfaceType.AutoDual)]
   [Guid ("EB6F9B18-D203-43E3-8033-35AD9BEFC70D")]
-  public class GeneralOptionsPageModelOld : VersionedDialogPage, IGeneralOptionsPageModel
+  public class GeneralOptionsPageOld : VersionedDialogPage, IGeneralOptionsPageModel
   {
     private const bool c_defaultInsertInNewFiles = false;
     private const bool c_defaultUseRequiredKeywords = true;
@@ -39,7 +39,12 @@ namespace LicenseHeaderManager.Options
 
     private ObservableCollection<LinkedCommand> _linkedCommands;
 
-    public GeneralOptionsPageModelOld ()
+    public GeneralOptionsPageOld ()
+    {
+      ResetSettings();
+    }
+
+    public void Reset ()
     {
       ResetSettings();
     }
@@ -69,9 +74,9 @@ namespace LicenseHeaderManager.Options
     }
 
     //serialized properties
-    public bool InsertInNewFiles { get; set; }
+    public bool InsertHeaderIntoNewFiles { get; set; }
 
-    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ObservableCollection<LinkedCommand> LinkedCommands
     {
       get => _linkedCommands;
@@ -80,16 +85,16 @@ namespace LicenseHeaderManager.Options
         if (_linkedCommands != null)
         {
           _linkedCommands.CollectionChanged -= OnLinkedCommandsChanged;
-          LinkedCommandsChanged?.Invoke (
+          LinkedCommandsChanged?.Invoke(
               _linkedCommands,
-              new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, _linkedCommands));
+              new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _linkedCommands));
         }
 
         _linkedCommands = value;
         if (_linkedCommands != null)
         {
           _linkedCommands.CollectionChanged += OnLinkedCommandsChanged;
-          LinkedCommandsChanged?.Invoke (value, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, _linkedCommands));
+          LinkedCommandsChanged?.Invoke(value, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _linkedCommands));
         }
       }
     }
@@ -99,14 +104,14 @@ namespace LicenseHeaderManager.Options
 
     public event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
 
-    private void OnLinkedCommandsChanged (object sender, NotifyCollectionChangedEventArgs e)
+    private void OnLinkedCommandsChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-      LinkedCommandsChanged?.Invoke (sender, e);
+      LinkedCommandsChanged?.Invoke(sender, e);
     }
 
     public sealed override void ResetSettings ()
     {
-      InsertInNewFiles = c_defaultInsertInNewFiles;
+      InsertHeaderIntoNewFiles = c_defaultInsertInNewFiles;
       UseRequiredKeywords = c_defaultUseRequiredKeywords;
       RequiredKeywords = c_defaultRequiredKeywords;
       LinkedCommands = _defaultLinkedCommands;
@@ -128,12 +133,12 @@ namespace LicenseHeaderManager.Options
       }
       else
       {
-        var migratedOptionsPage = new GeneralOptionsPageModelOld();
+        var migratedOptionsPage = new GeneralOptionsPageOld();
         LoadRegistryValuesBefore_3_0_0 (migratedOptionsPage);
 
-        InsertInNewFiles = ThreeWaySelectionForMigration (
-            InsertInNewFiles,
-            migratedOptionsPage.InsertInNewFiles,
+        InsertHeaderIntoNewFiles = ThreeWaySelectionForMigration (
+            InsertHeaderIntoNewFiles,
+            migratedOptionsPage.InsertHeaderIntoNewFiles,
             c_defaultInsertInNewFiles);
         UseRequiredKeywords = ThreeWaySelectionForMigration (
             UseRequiredKeywords,

@@ -15,8 +15,8 @@ namespace Core.Options
   [LicenseHeaderManagerOptions]
   public class CoreOptions : ICoreOptions
   {
-    private const bool c_defaultUseRequiredKeywords = true;
-    private const string c_defaultRequiredKeywords = "license, copyright, (c), ©";
+    public const bool c_defaultUseRequiredKeywords = true;
+    public const string c_defaultRequiredKeywords = "license, copyright, (c), ©";
     private readonly string _defaultDefaultLicenseHeaderFileText = GetDefaultLicenseHeader();
 
     private readonly ObservableCollection<Language> _defaultLanguages = new ObservableCollection<Language>

@@ -30,7 +30,7 @@ namespace LicenseHeaderManager.Options
 {
   [ClassInterface (ClassInterfaceType.AutoDual)]
   [Guid ("D1B5984C-1693-4F26-891E-0BA3BF5760B4")]
-  public class LanguagesPageModelOld : VersionedDialogPage, ILanguagesPageModel
+  public class LanguagesPageOld : VersionedDialogPage, ILanguagesPageModel
   {
     private readonly ObservableCollection<Language> _defaultLanguages = new ObservableCollection<Language>
                                                                         {
@@ -102,7 +102,7 @@ namespace LicenseHeaderManager.Options
 
     private readonly LanguageConverter _languageConverter = new LanguageConverter();
 
-    public LanguagesPageModelOld ()
+    public LanguagesPageOld ()
     {
       ResetSettings();
     }
@@ -290,7 +290,7 @@ namespace LicenseHeaderManager.Options
       }
       else
       {
-        var migratedLanguagesPage = new LanguagesPageModelOld();
+        var migratedLanguagesPage = new LanguagesPageOld();
         LoadRegistryValuesBefore_3_0_0 (migratedLanguagesPage);
 
         Languages = migratedLanguagesPage.Languages;

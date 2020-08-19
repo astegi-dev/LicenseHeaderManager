@@ -26,10 +26,12 @@ namespace LicenseHeaderManager.Options.Model
 
     ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
 
-    bool InsertInNewFiles { get; set; }
+    bool InsertHeaderIntoNewFiles { get; set; }
 
     Commands Commands { get; }
 
     event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
+
+    void Reset ();
   }
 }

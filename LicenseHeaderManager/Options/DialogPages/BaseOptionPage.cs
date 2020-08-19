@@ -123,7 +123,7 @@ namespace LicenseHeaderManager.Options.DialogPages
 
     #region migration to 3.0.1
 
-    protected void LoadRegistryValuesBefore_3_0_0(DialogPage dialogPage = null)
+    protected void LoadRegistryValuesBefore_3_0_0(BaseOptionModel<T> dialogPage = null)
     {
       using var key = GetOldRegistryKey();
       foreach (var property in GetVisibleProperties())
@@ -158,10 +158,10 @@ namespace LicenseHeaderManager.Options.DialogPages
 
     private TypeConverter GetPropertyConverterOrDefault(PropertyDescriptor propertyDescriptor)
     {
-      if (propertyDescriptor.Name == nameof(LanguagesPageModelOld.Languages))
+      if (propertyDescriptor.Name == nameof(LanguagesPageModel.Languages))
         return new LanguageConverter();
 
-      if (propertyDescriptor.Name == nameof(GeneralOptionsPageModelOld.LinkedCommands))
+      if (propertyDescriptor.Name == nameof(GeneralOptionsPageModel.LinkedCommands))
         return new LinkedCommandConverter();
 
       return propertyDescriptor.Converter;
