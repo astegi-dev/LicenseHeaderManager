@@ -11,14 +11,14 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System.Windows.Forms;
 using LicenseHeaderManager.Options.DialogPageControls;
 using LicenseHeaderManager.Options.Model;
+using System.Windows.Forms;
 
 namespace LicenseHeaderManager.Options.DialogPages
 {
   public class GeneralOptionsPage : BaseOptionPage<GeneralOptionsPageModel>
   {
-    protected override IWin32Window Window => new WpfHost(new WpfOptions((IGeneralOptionsPageModel)_model));
+    protected override IWin32Window Window => new WpfHost(new WpfOptions((IGeneralOptionsPageModel)Model));
   }
 }

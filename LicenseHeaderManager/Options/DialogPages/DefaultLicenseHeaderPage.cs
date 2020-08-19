@@ -19,6 +19,6 @@ namespace LicenseHeaderManager.Options.DialogPages
 {
   public class DefaultLicenseHeaderPage : BaseOptionPage<DefaultLicenseHeaderPageModel>
   {
-    protected override IWin32Window Window => new WpfHost(new WpfDefaultLicenseHeader((IDefaultLicenseHeaderPageModel)_model));
+    protected override IWin32Window Window => new WpfHost(new WpfDefaultLicenseHeader((IDefaultLicenseHeaderPageModel)Model));
   }
 }
