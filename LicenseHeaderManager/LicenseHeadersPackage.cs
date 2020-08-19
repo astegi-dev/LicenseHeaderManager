@@ -115,11 +115,11 @@ namespace LicenseHeaderManager
       ShowOptionPage (typeof (LanguagesPage));
     }
 
-    public IDefaultLicenseHeaderPage DefaultLicenseHeaderPage => (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));
+    public IDefaultLicenseHeaderPage DefaultLicenseHeaderPage => DefaultLicenseHeaderPageAsync.Instance;
 
-    public ILanguagesPage LanguagesPage => (LanguagesPage) GetDialogPage (typeof (LanguagesPage));
+    public ILanguagesPage LanguagesPage => LanguagesPageAsync.Instance;
 
-    public IGeneralOptionsPage GeneralOptionsPage => (GeneralOptionsPage) GetDialogPage (typeof (GeneralOptionsPage));
+    public IGeneralOptionsPage GeneralOptionsPage => GeneralOptionsPageAsync.Instance;
 
     public DTE2 Dte2 { get; private set; }
 
