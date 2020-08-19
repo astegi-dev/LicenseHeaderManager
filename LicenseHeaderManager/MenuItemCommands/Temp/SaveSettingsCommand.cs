@@ -98,14 +98,13 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
       if (dlg.ShowDialog() != true)
         return;
 
-      ExecuteInternalAsync (dlg.FileName).FireAndForget();
+      ExecuteInternalAsync (dlg.FileName, dlg.FileName + "_vs").FireAndForget();
     }
 
-    private async Task ExecuteInternalAsync (string filePath)
+    private async Task ExecuteInternalAsync (string coreFilePath, string visualStudioFilePath)
     {
-      await CoreOptions.SaveAsync (CoreOptions.CurrentConfig, filePath + "_core");
-      VisualStudioOptions.CurrentConfig.LinkedCommands = new List<LinkedCommand> (ServiceProvider.OptionsPage.LinkedCommands);
-      await VisualStudioOptions.SaveAsync (VisualStudioOptions.CurrentConfig, filePath);
+      OptionsFacade.CurrentOptions.LinkedCommands = new List<LinkedCommand> (ServiceProvider.OptionsPage.LinkedCommands);
+      await OptionsFacade.SaveAsync (OptionsFacade.CurrentOptions, coreFilePath, visualStudioFilePath);
     }
   }
 }

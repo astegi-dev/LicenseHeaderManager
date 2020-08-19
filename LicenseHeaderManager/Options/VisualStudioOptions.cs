@@ -11,17 +11,13 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+using Core.Options;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.IO;
 using System.Linq;
-using System.Text.Encodings.Web;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Core.Options;
 
 namespace LicenseHeaderManager.Options
 {
@@ -29,33 +25,27 @@ namespace LicenseHeaderManager.Options
   internal class VisualStudioOptions : IVisualStudioOptions
   {
     private const bool c_defaultInsertHeaderIntoNewFiles = false;
-    private static readonly ObservableCollection<LinkedCommand> _defaultLinkedCommands = new ObservableCollection<LinkedCommand>();
-    private ObservableCollection<LinkedCommand> _linkedCommands;
 
-    static VisualStudioOptions ()
-    {
-      CurrentConfig = new VisualStudioOptions (true);
-    }
+    // ReSharper disable once CollectionNeverUpdated.Local
+    private static readonly ObservableCollection<LinkedCommand> s_defaultLinkedCommands = new ObservableCollection<LinkedCommand>();
+    private ObservableCollection<LinkedCommand> _linkedCommands;
 
     public VisualStudioOptions ()
     {
-      SetDefaults();
+      SetDefaultValues();
     }
 
     public VisualStudioOptions (bool initializeWithDefaultValues)
     {
       if (initializeWithDefaultValues)
-        SetDefaults();
+        SetDefaultValues();
+      else
+        InitializeValues();
     }
-
-    /// <summary>
-    ///   Gets or sets the currently up-to-date configuration of the License Header Manager Extension.
-    /// </summary>
-    public static VisualStudioOptions CurrentConfig { get; set; }
 
     public bool InsertHeaderIntoNewFiles { get; set; }
 
-    public ICollection<LinkedCommand> LinkedCommands
+    public ObservableCollection<LinkedCommand> LinkedCommands
     {
       get => _linkedCommands;
       set
@@ -66,7 +56,7 @@ namespace LicenseHeaderManager.Options
           InvokeLinkedCommandsChanged (_linkedCommands, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, _linkedCommands));
         }
 
-        _linkedCommands = new ObservableCollection<LinkedCommand> (value);
+        _linkedCommands = value != null ? new ObservableCollection<LinkedCommand> (value) : null;
         if (_linkedCommands != null)
         {
           _linkedCommands.CollectionChanged += InvokeLinkedCommandsChanged;
@@ -80,7 +70,7 @@ namespace LicenseHeaderManager.Options
       var clonedObject = new VisualStudioOptions
                          {
                              InsertHeaderIntoNewFiles = InsertHeaderIntoNewFiles,
-                             LinkedCommands = LinkedCommands.Select (x => x.Clone()).ToList()
+                             LinkedCommands = new ObservableCollection<LinkedCommand> (LinkedCommands.Select (x => x.Clone()))
                          };
       return clonedObject;
     }
@@ -115,13 +105,22 @@ namespace LicenseHeaderManager.Options
     }
 
     /// <summary>
-    ///   Sets all public members of this <see cref="IVisualStudioOptions" /> instance to their default values.
+    ///   Sets all public members of this <see cref="IVisualStudioOptions" /> instance to pre-defined default values.
     /// </summary>
     /// <remarks>The default values are implementation-dependent.</remarks>
-    public void SetDefaults ()
+    private void SetDefaultValues ()
     {
       InsertHeaderIntoNewFiles = c_defaultInsertHeaderIntoNewFiles;
-      LinkedCommands = new ObservableCollection<LinkedCommand> (_defaultLinkedCommands);
+      LinkedCommands = new ObservableCollection<LinkedCommand> (s_defaultLinkedCommands);
+    }
+
+    /// <summary>
+    ///   Initializes all public members of this <see cref="IVisualStudioOptions" /> instance.
+    /// </summary>
+    /// <remarks>The default values are implementation-dependent.</remarks>
+    private void InitializeValues ()
+    {
+      LinkedCommands = new ObservableCollection<LinkedCommand> (s_defaultLinkedCommands);
     }
 
     protected virtual void InvokeLinkedCommandsChanged (object sender, NotifyCollectionChangedEventArgs e)

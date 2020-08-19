@@ -11,16 +11,14 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
-using System.Collections.Specialized;
-using System.ComponentModel.Design;
-using System.Linq;
-using System.Windows.Media;
 using Core.Options;
 using LicenseHeaderManager.Options;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.Win32;
+using System;
+using System.Collections.Specialized;
+using System.ComponentModel.Design;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemCommands.Temp
@@ -76,8 +74,14 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
+      OptionsFacade.CurrentOptions.LinkedCommandsChanged += CurrentOptions_OnLinkedCommandsChanged;
+
       var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
       Instance = new LoadSettingsCommand (package, commandService);
+    }
+
+    private static void CurrentOptions_OnLinkedCommandsChanged (object sender, NotifyCollectionChangedEventArgs e)
+    {
     }
 
     /// <summary>
@@ -91,6 +95,8 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
+      OptionsFacade.CurrentOptions.LinkedCommands.Add (new LinkedCommand());
+
       var dlg = new OpenFileDialog
                 {
                     Title = "Select config file to open...",
@@ -99,13 +105,12 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
       if (dlg.ShowDialog() != true)
         return;
 
-      ExecuteInternalAsync (dlg.FileName).FireAndForget();
+      ExecuteInternalAsync (dlg.FileName, dlg.FileName + "_vs").FireAndForget();
     }
 
-    private async Task ExecuteInternalAsync (string fileName)
+    private async Task ExecuteInternalAsync (string coreFilePath, string visualStudioFilePath)
     {
-      CoreOptions.CurrentConfig = await CoreOptions.LoadAsync (fileName + "_core");
-      VisualStudioOptions.CurrentConfig = await VisualStudioOptions.LoadAsync (fileName);
+      OptionsFacade.CurrentOptions = await OptionsFacade.LoadAsync (coreFilePath, visualStudioFilePath);
     }
   }
 }

@@ -260,7 +260,9 @@
     <Compile Include="MenuItemCommands\SolutionMenu\RemoveSolutionLicenseHeaderDefinitionFileCommand.cs" />
     <Compile Include="MenuItemCommands\Temp\LoadSettingsCommand.cs" />
     <Compile Include="MenuItemCommands\Temp\SaveSettingsCommand.cs" />
+    <Compile Include="Options\IOptionsFacade.cs" />
     <Compile Include="Options\IVisualStudioOptions.cs" />
+    <Compile Include="Options\OptionsFacade.cs" />
     <Compile Include="Options\VisualStudioOptions.cs" />
     <Compile Include="UpdateViewModels\BaseUpdateViewModel.cs" />
     <Compile Include="UpdateViewModels\FolderProjectUpdateViewModel.cs" />

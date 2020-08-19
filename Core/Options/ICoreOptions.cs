@@ -30,5 +30,11 @@ namespace Core.Options
     ///   languages for which the <see cref="Core.LicenseHeaderReplacer" /> is configured to use.
     /// </summary>
     ICollection<Language> Languages { get; set; }
+
+    /// <summary>
+    ///   Creates a deep copy of the current <see cref="ICoreOptions" /> instance.
+    /// </summary>
+    /// <returns></returns>
+    public ICoreOptions Clone ();
   }
 }

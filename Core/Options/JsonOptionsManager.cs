@@ -20,9 +20,10 @@ namespace Core.Options
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             Converters = { new JsonStringEnumConverter (JsonNamingPolicy.CamelCase, false) }
         };
-    
-    public static async Task<T> DeserializeAsync<T>(string filePath, JsonSerializerOptions serializerOptions = null) {
-      ValidateTypeParameter (typeof(T));
+
+    public static async Task<T> DeserializeAsync<T> (string filePath, JsonSerializerOptions serializerOptions = null)
+    {
+      ValidateTypeParameter (typeof (T));
 
       try
       {
@@ -50,9 +51,10 @@ namespace Core.Options
         throw new SerializationException ("An unspecified error occured while deserializing configuration", ex);
       }
     }
-	
-    public static async Task SerializeAsync<T> (T options, string filePath, JsonSerializerOptions serializerOptions = null) {
-      ValidateTypeParameter (typeof(T));
+
+    public static async Task SerializeAsync<T> (T options, string filePath, JsonSerializerOptions serializerOptions = null)
+    {
+      ValidateTypeParameter (typeof (T));
 
       try
       {
@@ -76,7 +78,7 @@ namespace Core.Options
     private static void ValidateTypeParameter (Type type)
     {
       if (!Attribute.IsDefined (type, typeof (LicenseHeaderManagerOptionsAttribute)))
-        throw new ArgumentException($"Type parameter {nameof(type)} must have attribute {nameof(LicenseHeaderManagerOptionsAttribute)}");
+        throw new ArgumentException ($"Type parameter {nameof(type)} must have attribute {nameof(LicenseHeaderManagerOptionsAttribute)}.");
     }
   }
 }

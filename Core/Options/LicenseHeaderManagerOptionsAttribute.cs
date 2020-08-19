@@ -2,7 +2,7 @@
 
 namespace Core.Options
 {
-  [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct)]  
+  [AttributeUsage (AttributeTargets.Class | AttributeTargets.Struct)]
   public class LicenseHeaderManagerOptionsAttribute : Attribute
   {
   }

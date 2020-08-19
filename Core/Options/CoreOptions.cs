@@ -87,40 +87,45 @@ namespace Core.Options
                                                                             }
                                                                         };
 
-    static CoreOptions ()
-    {
-      CurrentConfig = new CoreOptions(true);
-    }
-
     public CoreOptions ()
     {
-      SetDefaults();
+      SetDefaultValues();
     }
 
     public CoreOptions (bool initializeWithDefaultValues)
     {
       if (initializeWithDefaultValues)
-        SetDefaults();
+        SetDefaultValues();
+      else
+        InitializeValues();
     }
 
-    /// <summary>
-    ///   Gets or sets the currently up-to-date configuration of the License Header Manager Extension.
-    /// </summary>
-    public static CoreOptions CurrentConfig { get; set; }
     public bool UseRequiredKeywords { get; set; }
+
     public string RequiredKeywords { get; set; }
+
     public string DefaultLicenseHeaderFileText { get; set; }
+
     public ICollection<Language> Languages { get; set; }
 
     /// <summary>
-    ///   Sets all public members of this <see cref="ICoreOptions" /> instance to their default values.
+    ///   Sets all public members of this <see cref="ICoreOptions" /> instance to pre-configured default values.
     /// </summary>
     /// <remarks>The default values are implementation-dependent.</remarks>
-    public void SetDefaults ()
+    private void SetDefaultValues ()
     {
       UseRequiredKeywords = c_defaultUseRequiredKeywords;
       RequiredKeywords = c_defaultRequiredKeywords;
       DefaultLicenseHeaderFileText = _defaultDefaultLicenseHeaderFileText;
+      Languages = new ObservableCollection<Language> (_defaultLanguages);
+    }
+
+    /// <summary>
+    ///   Initializes all public members of this <see cref="ICoreOptions" /> instance.
+    /// </summary>
+    /// <remarks>The default values are implementation-dependent.</remarks>
+    private void InitializeValues ()
+    {
       Languages = new ObservableCollection<Language> (_defaultLanguages);
     }
 
