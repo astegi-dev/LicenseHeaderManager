@@ -28,6 +28,9 @@ namespace LicenseHeaderManager.Options
 
     private readonly VisualStudioOptions _visualStudioOptions;
 
+    public static string DefaultCoreOptionsPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\CoreOptions.json");
+    public static string DefaultVisualStudioOptionsPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\VisualStudioOptions.json");
+
     /// <summary>
     ///   Gets or sets the currently up-to-date configuration of the License Header Manager Extension, along
     ///   with the corresponding options for the Core..
@@ -97,10 +100,10 @@ namespace LicenseHeaderManager.Options
     /// <param name="options">The <see cref="OptionsFacade" /> instance to serialize.</param>
     /// <param name="coreOptionsFilePath">The path to which the <see cref="CoreOptions"/> should be serialized.</param>
     /// <param name="visualStudioOptionsFilePath">The path to which the <see cref="VisualStudioOptions"/> should be serialized.</param>
-    public static async Task SaveAsync (OptionsFacade options, string coreOptionsFilePath, string visualStudioOptionsFilePath)
+    public static async Task SaveAsync (OptionsFacade options, string coreOptionsFilePath = null, string visualStudioOptionsFilePath = null)
     {
-      await JsonOptionsManager.SerializeAsync (options._coreOptions, coreOptionsFilePath);
-      await JsonOptionsManager.SerializeAsync (options._visualStudioOptions, visualStudioOptionsFilePath);
+      await JsonOptionsManager.SerializeAsync (options._coreOptions, coreOptionsFilePath ?? DefaultCoreOptionsPath);
+      await JsonOptionsManager.SerializeAsync (options._visualStudioOptions, visualStudioOptionsFilePath ?? DefaultVisualStudioOptionsPath);
     }
 
     /// <summary>
@@ -120,10 +123,20 @@ namespace LicenseHeaderManager.Options
     ///   <paramref name="coreOptionsFilePath" />.
     ///   If there were errors upon deserialization, <see langword="null" /> is returned.
     /// </returns>
-    public static async Task<OptionsFacade> LoadAsync (string coreOptionsFilePath, string visualStudioOptionsFilePath)
+    public static async Task<OptionsFacade> LoadAsync (string coreOptionsFilePath = null, string visualStudioOptionsFilePath = null)
     {
-      var coreOptions = await JsonOptionsManager.DeserializeAsync<CoreOptions> (coreOptionsFilePath);
-      var visualStudioOptions = await JsonOptionsManager.DeserializeAsync<VisualStudioOptions> (visualStudioOptionsFilePath);
+      var corePath = coreOptionsFilePath ?? DefaultCoreOptionsPath;
+      var visualStudioPath = visualStudioOptionsFilePath ?? DefaultVisualStudioOptionsPath;
+
+      // if either of the option files is not found, create it with default options and save it before loading
+      if (!System.IO.File.Exists (corePath))
+        await CoreOptions.SaveAsync (new CoreOptions(), corePath);
+
+      if (!System.IO.File.Exists (visualStudioPath))
+        await VisualStudioOptions.SaveAsync (new VisualStudioOptions(), visualStudioPath);
+
+      var coreOptions = await JsonOptionsManager.DeserializeAsync<CoreOptions> (corePath);
+      var visualStudioOptions = await JsonOptionsManager.DeserializeAsync<VisualStudioOptions> (visualStudioPath);
 
       return new OptionsFacade (coreOptions, visualStudioOptions);
     }

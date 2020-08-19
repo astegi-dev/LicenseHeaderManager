@@ -104,7 +104,6 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
 
     private async Task ExecuteInternalAsync (string coreFilePath, string visualStudioFilePath)
     {
-      OptionsFacade.CurrentOptions.LinkedCommands = new ObservableCollection<LinkedCommand> (ServiceProvider.GeneralOptionsPage.LinkedCommands);
       await OptionsFacade.SaveAsync (OptionsFacade.CurrentOptions, coreFilePath, visualStudioFilePath);
     }
   }

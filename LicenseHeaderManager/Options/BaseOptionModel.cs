@@ -91,35 +91,22 @@ namespace LicenseHeaderManager.Options
     /// </summary>
     public virtual async System.Threading.Tasks.Task LoadAsync ()
     {
-      // TODO load from JSON via Facade
       ShellSettingsManager manager = await s_settingsManager.GetValueAsync();
       SettingsStore settingsStore = manager.GetReadOnlySettingsStore (SettingsScope.UserSettings);
 
       if (!settingsStore.CollectionExists (CollectionName))
-      {
         return;
-      }
 
-      //foreach (PropertyInfo property in GetOptionProperties())
-      //{
-      //  try
-      //  {
-      //    string serializedProp = settingsStore.GetString (CollectionName, property.Name);
-      //    object value = DeserializeValue (serializedProp, property.PropertyType);
-      //    property.SetValue (this, value);
-      //  }
-      //  catch (Exception ex)
-      //  {
-      //    System.Diagnostics.Debug.Write (ex);
-      //  }
-      foreach (PropertyInfo property in GetOptionProperties())
+      OptionsFacade.CurrentOptions = await OptionsFacade.LoadAsync();
+
+      foreach (var property in GetOptionProperties())
       {
-        if (typeof (IOptionsFacade).GetProperty (property.Name)?.PropertyType == property.PropertyType)
-        {
-          var facadeProperty = typeof (IOptionsFacade).GetProperty (property.Name);
-          if (facadeProperty != null)
-            property.SetValue (this, facadeProperty.GetValue (OptionsFacade.CurrentOptions));
-        }
+        if (typeof (IOptionsFacade).GetProperty (property.Name)?.PropertyType != property.PropertyType)
+          continue;
+
+        var facadeProperty = typeof (IOptionsFacade).GetProperty (property.Name);
+        if (facadeProperty != null)
+          property.SetValue (this, facadeProperty.GetValue (OptionsFacade.CurrentOptions));
       }
     }
 
@@ -136,25 +123,22 @@ namespace LicenseHeaderManager.Options
     /// </summary>
     public virtual async System.Threading.Tasks.Task SaveAsync ()
     {
-      // TODO load from JSON via Facade
       ShellSettingsManager manager = await s_settingsManager.GetValueAsync();
       WritableSettingsStore settingsStore = manager.GetWritableSettingsStore (SettingsScope.UserSettings);
 
       if (!settingsStore.CollectionExists (CollectionName))
-      {
         settingsStore.CreateCollection (CollectionName);
-      }
 
       foreach (PropertyInfo property in GetOptionProperties())
       {
-        //string output = SerializeValue (property.GetValue (this));
-        //settingsStore.SetString (CollectionName, property.Name, output);
-        if (typeof (IOptionsFacade).GetProperty (property.Name)?.PropertyType == property.PropertyType)
-        {
-          var facadeProperty = typeof (IOptionsFacade).GetProperty (property.Name);
-          facadeProperty?.SetValue (OptionsFacade.CurrentOptions, property.GetValue (this));
-        }
+        if (typeof (IOptionsFacade).GetProperty (property.Name)?.PropertyType != property.PropertyType)
+          continue;
+
+        var facadeProperty = typeof (IOptionsFacade).GetProperty (property.Name);
+        facadeProperty?.SetValue (OptionsFacade.CurrentOptions, property.GetValue (this));
       }
+
+      await OptionsFacade.SaveAsync (OptionsFacade.CurrentOptions);
 
       T liveModel = await GetLiveInstanceAsync();
 
