@@ -19,15 +19,17 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using LicenseHeaderManager.Options.DialogPageControls;
+using LicenseHeaderManager.Options.Model;
 using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.Options
 {
   [ClassInterface (ClassInterfaceType.AutoDual)]
   [Guid ("E0E8C0E8-0E8E-4251-B885-1ABF58837366")]
-  public sealed class DefaultLicenseHeaderPage : VersionedDialogPage, IDefaultLicenseHeaderPage
+  public sealed class DefaultLicenseHeaderPageModelOld : VersionedDialogPage, IDefaultLicenseHeaderPageModel
   {
-    public DefaultLicenseHeaderPage ()
+    public DefaultLicenseHeaderPageModelOld ()
     {
       ResetSettings();
     }
@@ -89,7 +91,7 @@ namespace LicenseHeaderManager.Options
       }
       else
       {
-        var migratedDefaultLicenseHeaderPage = new DefaultLicenseHeaderPage();
+        var migratedDefaultLicenseHeaderPage = new DefaultLicenseHeaderPageModelOld();
         LoadRegistryValuesBefore_3_0_0 (migratedDefaultLicenseHeaderPage);
 
         DefaultLicenseHeaderFileText = ThreeWaySelectionForMigration (

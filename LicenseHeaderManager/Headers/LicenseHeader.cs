@@ -16,6 +16,7 @@ using System.IO;
 using System.Text;
 using EnvDTE;
 using LicenseHeaderManager.Options;
+using LicenseHeaderManager.Options.Model;
 using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.Headers
@@ -66,12 +67,12 @@ namespace LicenseHeaderManager.Headers
       return Path.Combine (solutionDirectory, solutionFileName + Extension);
     }
 
-    public static bool ShowQuestionForAddingLicenseHeaderFile (Project activeProject, IDefaultLicenseHeaderPage page)
+    public static bool ShowQuestionForAddingLicenseHeaderFile (Project activeProject, IDefaultLicenseHeaderPageModel pageModel)
     {
       var message = string.Format (Resources.Error_NoHeaderDefinition, activeProject.Name).ReplaceNewLines();
       if (!MessageBoxHelper.AskYesNo (message, Resources.Error))
         return false;
-      var licenseHeaderDefinitionFile = AddHeaderDefinitionFile (activeProject, page);
+      var licenseHeaderDefinitionFile = AddHeaderDefinitionFile (activeProject, pageModel);
       licenseHeaderDefinitionFile.Open (Constants.vsViewKindCode).Activate();
       return true;
     }
@@ -79,13 +80,13 @@ namespace LicenseHeaderManager.Headers
     /// <summary>
     ///   Adds a new License Header Definition file to the active project.
     /// </summary>
-    public static ProjectItem AddHeaderDefinitionFile (Project activeProject, IDefaultLicenseHeaderPage page)
+    public static ProjectItem AddHeaderDefinitionFile (Project activeProject, IDefaultLicenseHeaderPageModel pageModel)
     {
       if (IsValidProject (activeProject))
         return null;
 
       var fileName = GetNewFullName (activeProject);
-      File.WriteAllText (fileName, page.DefaultLicenseHeaderFileText, Encoding.UTF8);
+      File.WriteAllText (fileName, pageModel.DefaultLicenseHeaderFileText, Encoding.UTF8);
       var newProjectItem = activeProject.ProjectItems.AddFromFile (fileName);
 
       if (newProjectItem == null)
@@ -107,13 +108,13 @@ namespace LicenseHeaderManager.Headers
     /// <summary>
     ///   Adds a new License Header Definition file to a folder
     /// </summary>
-    public static ProjectItem AddLicenseHeaderDefinitionFile (ProjectItem folder, IDefaultLicenseHeaderPage page)
+    public static ProjectItem AddLicenseHeaderDefinitionFile (ProjectItem folder, IDefaultLicenseHeaderPageModel pageModel)
     {
       if (folder == null || folder.Kind != Constants.vsProjectItemKindPhysicalFolder)
         return null;
 
       var fileName = GetNewFullName (folder.Properties.Item ("FullPath").Value.ToString());
-      File.WriteAllText (fileName, page.DefaultLicenseHeaderFileText, Encoding.UTF8);
+      File.WriteAllText (fileName, pageModel.DefaultLicenseHeaderFileText, Encoding.UTF8);
 
       var newProjectItem = folder.ProjectItems.AddFromFile (fileName);
 

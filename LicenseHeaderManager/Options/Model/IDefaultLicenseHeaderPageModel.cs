@@ -1,4 +1,4 @@
-﻿/* Copyright (c) rubicon IT GmbH
+/* Copyright (c) rubicon IT GmbH
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -12,41 +12,11 @@
  */
 
 using System;
-using System.Windows;
-using Core;
-using LicenseHeaderManager.Utils;
 
-namespace LicenseHeaderManager.Options
+namespace LicenseHeaderManager.Options.Model
 {
-  public partial class WpfLanguageDialog : Window
+  public interface IDefaultLicenseHeaderPageModel
   {
-    public WpfLanguageDialog ()
-    {
-      InitializeComponent();
-      skipExpression.ToolTip = LicenseHeaderManager.Resources.SkipExpressionHelp.ReplaceNewLines();
-    }
-
-    public new Language Language
-    {
-      get => DataContext as Language;
-      set => DataContext = value;
-    }
-
-    private void OkButton_Click (object sender, RoutedEventArgs e)
-    {
-      if (Language == null)
-        return;
-
-      if (Language.IsValid())
-      {
-        Language.NormalizeExtensions();
-        DialogResult = true;
-        Close();
-      }
-      else
-      {
-        MessageBoxHelper.ShowMessage (LicenseHeaderManager.Resources.Error_LanguageInvalid, LicenseHeaderManager.Resources.Error, true);
-      }
-    }
+    string DefaultLicenseHeaderFileText { get; set; }
   }
 }

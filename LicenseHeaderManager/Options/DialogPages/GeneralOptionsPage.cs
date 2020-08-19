@@ -11,28 +11,14 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
-using Core;
-using EnvDTE80;
-using LicenseHeaderManager.Options;
+using System.Windows.Forms;
+using LicenseHeaderManager.Options.DialogPageControls;
 using LicenseHeaderManager.Options.Model;
 
-namespace LicenseHeaderManager.Interfaces
+namespace LicenseHeaderManager.Options.DialogPages
 {
-  public interface ILicenseHeaderExtension
+  public class GeneralOptionsPage : BaseOptionPage<GeneralOptionsPageModelModel>
   {
-    LicenseHeaderReplacer LicenseHeaderReplacer { get; }
-
-    IDefaultLicenseHeaderPageModel DefaultLicenseHeaderPageModel { get; }
-
-    ILanguagesPageModel LanguagesPageModel { get; }
-
-    IGeneralOptionsPageModel GeneralOptionsPageModel { get; }
-
-    bool IsCalledByLinkedCommand { get; }
-
-    DTE2 Dte2 { get; }
-
-    void ShowLanguagesPage ();
+    protected override IWin32Window Window => new WpfHost(new WpfOptions((IGeneralOptionsPageModel)_model));
   }
 }

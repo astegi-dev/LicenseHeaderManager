@@ -1,4 +1,4 @@
-/* Copyright (c) rubicon IT GmbH
+﻿/* Copyright (c) rubicon IT GmbH
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -12,11 +12,35 @@
  */
 
 using System;
+using System.Windows;
+using System.Windows.Controls;
+using LicenseHeaderManager.Options.Model;
 
-namespace LicenseHeaderManager.Options
+namespace LicenseHeaderManager.Options.DialogPageControls
 {
-  public interface IDefaultLicenseHeaderPage
+  /// <summary>
+  ///   Interaction logic for WpfDefaultLicenseHeader.xaml
+  /// </summary>
+  public partial class WpfDefaultLicenseHeader : UserControl
   {
-    string DefaultLicenseHeaderFileText { get; set; }
+    private readonly IDefaultLicenseHeaderPageModel _pageModel;
+
+    public WpfDefaultLicenseHeader (IDefaultLicenseHeaderPageModel pageModel)
+        : this()
+    {
+      _pageModel = pageModel;
+      DataContext = _pageModel;
+    }
+
+    public WpfDefaultLicenseHeader ()
+    {
+      InitializeComponent();
+    }
+
+    private void EditButton_Click (object sender, RoutedEventArgs e)
+    {
+      var dialog = new WpfEditDefaultLicenseHeaderDialog (_pageModel);
+      dialog.ShowDialog();
+    }
   }
 }

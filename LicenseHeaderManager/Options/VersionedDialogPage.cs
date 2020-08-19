@@ -111,9 +111,7 @@ namespace LicenseHeaderManager.Options
         if (registryValue != null)
           try
           {
-            property.SetValue (
-                dialogPage ?? AutomationObject,
-                DeserializeValue (converter, registryValue));
+            property.SetValue (dialogPage ?? AutomationObject, DeserializeValue (converter, registryValue));
           }
           catch (Exception)
           {
@@ -137,10 +135,10 @@ namespace LicenseHeaderManager.Options
 
     private TypeConverter GetPropertyConverterOrDefault (PropertyDescriptor propertyDescriptor)
     {
-      if (propertyDescriptor.Name == nameof(LanguagesPage.Languages))
+      if (propertyDescriptor.Name == nameof(LanguagesPageModelOld.Languages))
         return new LanguageConverter();
 
-      if (propertyDescriptor.Name == nameof(GeneralOptionsPage.LinkedCommands))
+      if (propertyDescriptor.Name == nameof(GeneralOptionsPageModelOld.LinkedCommands))
         return new LinkedCommandConverter();
 
       return propertyDescriptor.Converter;

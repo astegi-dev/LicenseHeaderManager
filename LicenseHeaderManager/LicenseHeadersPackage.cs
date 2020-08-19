@@ -29,6 +29,8 @@ using LicenseHeaderManager.MenuItemCommands.ProjectItemMenu;
 using LicenseHeaderManager.MenuItemCommands.ProjectMenu;
 using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
 using LicenseHeaderManager.Options;
+using LicenseHeaderManager.Options.DialogPages;
+using LicenseHeaderManager.Options.Model;
 using LicenseHeaderManager.Utils;
 using Microsoft;
 using Microsoft.VisualStudio;
@@ -57,14 +59,11 @@ namespace LicenseHeaderManager
   // This attribute is needed to let the shell know that this package exposes some menus.
   [ProvideMenuResource ("Menus.ctmenu", 1)]
   [ProvideOptionPage (typeof (GeneralOptionsPage), c_licenseHeaders, c_general, 0, 0, true)]
-  [ProvideOptionPage (typeof (LanguagesPage), c_licenseHeaders, c_languages, 0, 0, true)]
   [ProvideOptionPage (typeof (DefaultLicenseHeaderPage), c_licenseHeaders, c_defaultLicenseHeader, 0, 0, true)]
+  [ProvideOptionPage (typeof (LanguagesPage), c_licenseHeaders, c_languages, 0, 0, true)]
   [ProvideProfile (typeof (GeneralOptionsPage), c_licenseHeaders, c_general, 0, 0, true)]
-  [ProvideProfile (typeof (LanguagesPage), c_licenseHeaders, c_languages, 0, 0, true)]
   [ProvideProfile (typeof (DefaultLicenseHeaderPage), c_licenseHeaders, c_defaultLicenseHeader, 0, 0, true)]
-  [ProvideOptionPage (typeof (OptionsPageProvider.General), c_licenseHeaders, c_general + "Async", 0, 0, true)]
-  [ProvideOptionPage (typeof (OptionsPageProvider.DefaultLicenseHeader), c_licenseHeaders, c_defaultLicenseHeader + "Async", 0, 0, true)]
-  [ProvideOptionPage (typeof (OptionsPageProvider.Languages), c_licenseHeaders, c_languages + "Async", 0, 0, true)]
+  [ProvideProfile (typeof (LanguagesPage), c_licenseHeaders, c_languages, 0, 0, true)]
   [ProvideAutoLoad (VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
   [Guid (GuidList.guidLicenseHeadersPkgString)]
   [ProvideMenuResource ("Menus.ctmenu", 1)]
@@ -103,10 +102,10 @@ namespace LicenseHeaderManager
     {
       get
       {
-        var keywords = GeneralOptionsPage.UseRequiredKeywords
-            ? GeneralOptionsPage.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
+        var keywords = GeneralOptionsPageModel.UseRequiredKeywords
+            ? GeneralOptionsPageModel.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
             : null;
-        return new LicenseHeaderReplacer (LanguagesPage.Languages, keywords);
+        return new LicenseHeaderReplacer (LanguagesPageModel.Languages, keywords);
       }
     }
 
@@ -115,11 +114,11 @@ namespace LicenseHeaderManager
       ShowOptionPage (typeof (LanguagesPage));
     }
 
-    public IDefaultLicenseHeaderPage DefaultLicenseHeaderPage => DefaultLicenseHeaderPageAsync.Instance;
+    public IDefaultLicenseHeaderPageModel DefaultLicenseHeaderPageModel => DefaultLicenseHeaderPageModelModel.Instance;
 
-    public ILanguagesPage LanguagesPage => LanguagesPageAsync.Instance;
+    public ILanguagesPageModel LanguagesPageModel => LanguagesPageModelModel.Instance;
 
-    public IGeneralOptionsPage GeneralOptionsPage => GeneralOptionsPageAsync.Instance;
+    public IGeneralOptionsPageModel GeneralOptionsPageModel => GeneralOptionsPageModelModel.Instance;
 
     public DTE2 Dte2 { get; private set; }
 
@@ -144,7 +143,7 @@ namespace LicenseHeaderManager
       await RemoveHeaderFromProjectItemCommand.InitializeAsync (this);
       await AddLicenseHeaderToAllFilesInSolutionCommand.InitializeAsync (this);
       await RemoveLicenseHeaderFromAllFilesInSolutionCommand.InitializeAsync (this);
-      await AddNewSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this, Dte2?.Solution, () => DefaultLicenseHeaderPage.DefaultLicenseHeaderFileText);
+      await AddNewSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this, Dte2?.Solution, () => DefaultLicenseHeaderPageModel.DefaultLicenseHeaderFileText);
       await OpenSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this);
       await RemoveSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this);
       await AddLicenseHeaderToAllFilesInProjectCommand.InitializeAsync (this);
@@ -184,7 +183,7 @@ namespace LicenseHeaderManager
       }
 
       //register event handlers for linked commands
-      var page = GeneralOptionsPage;
+      var page = GeneralOptionsPageModel;
       if (page != null)
       {
         foreach (var command in page.LinkedCommands)
@@ -314,7 +313,7 @@ namespace LicenseHeaderManager
     private void ItemAdded (ProjectItem item)
     {
       //An item was added. Check if we should insert a header automatically.
-      var page = GeneralOptionsPage;
+      var page = GeneralOptionsPageModel;
       if (page != null && page.InsertInNewFiles && item != null)
       {
         //Normally the header should be inserted here, but that might interfere with the command

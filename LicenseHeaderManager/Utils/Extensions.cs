@@ -69,7 +69,7 @@ namespace LicenseHeaderManager.Utils
             CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
             message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, extension));
 
-      if (calledByUser && LicenseHeader.ShowQuestionForAddingLicenseHeaderFile (item.ContainingProject, extension.DefaultLicenseHeaderPage))
+      if (calledByUser && LicenseHeader.ShowQuestionForAddingLicenseHeaderFile (item.ContainingProject, extension.DefaultLicenseHeaderPageModel))
         return await AddLicenseHeaderToItemAsync (item, extension, true);
 
       return new ReplacerResult<ReplacerError>();

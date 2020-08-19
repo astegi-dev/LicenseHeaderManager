@@ -80,7 +80,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      var page = serviceProvider.DefaultLicenseHeaderPage;
+      var page = serviceProvider.DefaultLicenseHeaderPageModel;
       var solutionItem = serviceProvider.GetSolutionExplorerItem();
       var project = solutionItem as Project;
       if (project == null)

@@ -13,23 +13,12 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using EnvDTE;
+using Core;
 
-namespace LicenseHeaderManager.Options
+namespace LicenseHeaderManager.Options.Model
 {
-  public interface IGeneralOptionsPage
+  public interface ILanguagesPageModel
   {
-    bool UseRequiredKeywords { get; set; }
-
-    string RequiredKeywords { get; set; }
-
-    ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
-
-    bool InsertInNewFiles { get; set; }
-
-    Commands Commands { get; }
-
-    event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
+    ObservableCollection<Language> Languages { get; set; }
   }
 }

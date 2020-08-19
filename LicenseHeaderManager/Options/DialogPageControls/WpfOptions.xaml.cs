@@ -15,39 +15,40 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using LicenseHeaderManager.Options.Model;
 
-namespace LicenseHeaderManager.Options
+namespace LicenseHeaderManager.Options.DialogPageControls
 {
   public partial class WpfOptions : UserControl
   {
-    public WpfOptions (IGeneralOptionsPage page)
+    public WpfOptions (IGeneralOptionsPageModel pageModel)
     {
       InitializeComponent();
 
-      DataContext = Page = page;
+      DataContext = PageModel = pageModel;
 
       Loaded += (s, e) =>
       {
-        grid.ItemsSource = page.LinkedCommands;
+        grid.ItemsSource = pageModel.LinkedCommands;
         EnableButtons();
       };
     }
 
-    public IGeneralOptionsPage Page { get; set; }
+    public IGeneralOptionsPageModel PageModel { get; set; }
 
     private void Add (object sender, RoutedEventArgs e)
     {
-      var dialog = new WpfCommandDialog (new LinkedCommand(), Page.Commands);
+      var dialog = new WpfCommandDialog (new LinkedCommand(), PageModel.Commands);
       var result = dialog.ShowDialog();
       if (result.HasValue && result.Value)
-        Page.LinkedCommands.Add (dialog.Command);
+        PageModel.LinkedCommands.Add (dialog.Command);
     }
 
     private void Remove (object sender, RoutedEventArgs e)
     {
       var command = grid.SelectedItem as LinkedCommand;
       if (command != null)
-        Page.LinkedCommands.Remove (command);
+        PageModel.LinkedCommands.Remove (command);
     }
 
     private void Edit (object sender, RoutedEventArgs e)
@@ -66,7 +67,7 @@ namespace LicenseHeaderManager.Options
       if (command == null)
         return;
 
-      var dialog = new WpfCommandDialog (command, Page.Commands);
+      var dialog = new WpfCommandDialog (command, PageModel.Commands);
       dialog.ShowDialog();
     }
 

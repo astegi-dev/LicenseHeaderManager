@@ -11,32 +11,14 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using EnvDTE;
-using EnvDTE80;
-using Microsoft.VisualStudio.Shell;
+using LicenseHeaderManager.Options.DialogPageControls;
+using System.Windows.Forms;
+using LicenseHeaderManager.Options.Model;
 
-namespace LicenseHeaderManager.Options
+namespace LicenseHeaderManager.Options.DialogPages
 {
-  public class GeneralOptionsPageAsync : BaseOptionModel<GeneralOptionsPageAsync>, IGeneralOptionsPage
+  public class DefaultLicenseHeaderPage : BaseOptionPage<DefaultLicenseHeaderPageModelModel>
   {
-    public bool UseRequiredKeywords { get; set; }
-
-    public string RequiredKeywords { get; set; }
-
-    public ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
-
-    public bool InsertInNewFiles { get; set; }
-
-    private DTE2 Dte => ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
-
-    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-    public Commands Commands => Dte.Commands;
-
-    // to be removed in future => is now in OptionsFacade
-    public event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
+    protected override IWin32Window Window => new WpfHost(new WpfDefaultLicenseHeader((IDefaultLicenseHeaderPageModel)_model));
   }
 }

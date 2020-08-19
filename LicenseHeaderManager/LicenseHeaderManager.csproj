@@ -258,18 +258,25 @@
     <Compile Include="MenuItemCommands\ProjectMenu\RemoveLicenseHeaderFromAllFilesInProjectCommand.cs" />
     <Compile Include="MenuItemCommands\SolutionMenu\RemoveLicenseHeaderFromAllFilesInSolutionCommand.cs" />
     <Compile Include="MenuItemCommands\SolutionMenu\RemoveSolutionLicenseHeaderDefinitionFileCommand.cs" />
-    <Compile Include="Options\BaseOptionModel.cs" />
-    <Compile Include="Options\BaseOptionPage.cs">
+    <Compile Include="Options\Model\BaseOptionPageModel.cs" />
+    <Compile Include="Options\DialogPages\BaseOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Options\Clothing.cs" />
-    <Compile Include="Options\DefaultLicenseHeaderPageAsync.cs" />
-    <Compile Include="Options\OptionsPageProvider.cs" />
-    <Compile Include="Options\GeneralOptionsPageAsync.cs" />
+    <Compile Include="Options\Model\DefaultLicenseHeaderPageModelModel.cs" />
+    <Compile Include="Options\DialogPages\DefaultLicenseHeaderPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\DialogPages\GeneralOptionsPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\DialogPages\LanguagesPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\Model\GeneralOptionsPageModelModel.cs" />
     <Compile Include="Options\IOptionsFacade.cs" />
     <Compile Include="Options\IVisualStudioOptions.cs" />
     <Compile Include="Options\OptionsFacade.cs" />
-    <Compile Include="Options\LanguagesPageAsync.cs" />
+    <Compile Include="Options\Model\LanguagesPageModelModel.cs" />
     <Compile Include="Options\VisualStudioOptions.cs" />
     <Compile Include="UpdateViewModels\BaseUpdateViewModel.cs" />
     <Compile Include="UpdateViewModels\FolderProjectUpdateViewModel.cs" />
@@ -289,13 +296,13 @@
     <Compile Include="Headers\LicenseHeader.cs" />
     <Compile Include="Interfaces\ILicenseHeaderExtension.cs" />
     <Compile Include="Interfaces\ILinkedFileFilter.cs" />
-    <Compile Include="Options\IDefaultLicenseHeaderPage.cs" />
-    <Compile Include="Options\ILanguagesPage.cs" />
-    <Compile Include="Options\IGeneralOptionsPage.cs" />
-    <Compile Include="Options\WpfEditDefaultLicenseHeaderDialog.xaml.cs">
+    <Compile Include="Options\Model\IDefaultLicenseHeaderPageModel.cs" />
+    <Compile Include="Options\Model\ILanguagesPageModel.cs" />
+    <Compile Include="Options\Model\IGeneralOptionsPageModel.cs" />
+    <Compile Include="Options\DialogPageControls\WpfEditDefaultLicenseHeaderDialog.xaml.cs">
       <DependentUpon>WpfEditDefaultLicenseHeaderDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Options\DefaultLicenseHeaderPage.cs">
+    <Compile Include="Options\DefaultLicenseHeaderPageModelOld.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\VersionedDialogPage.cs">
@@ -306,20 +313,20 @@
     <Compile Include="Options\Converters\ExtensionConverter.cs" />
     <Compile Include="Options\Converters\XmlTypeConverter.cs" />
     <Compile Include="Options\UpdateStep.cs" />
-    <Compile Include="Options\WpfDefaultLicenseHeader.xaml.cs">
+    <Compile Include="Options\DialogPageControls\WpfDefaultLicenseHeader.xaml.cs">
       <DependentUpon>WpfDefaultLicenseHeader.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Options\WpfLanguageDialog.xaml.cs">
+    <Compile Include="Options\DialogPageControls\WpfLanguageDialog.xaml.cs">
       <DependentUpon>WpfLanguageDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\Converters\LanguageConverter.cs" />
-    <Compile Include="Options\GeneralOptionsPage.cs">
+    <Compile Include="Options\GeneralOptionsPageModelOld.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Options\LanguagesPage.cs">
+    <Compile Include="Options\LanguagesPageModelOld.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Options\WpfLanguages.xaml.cs">
+    <Compile Include="Options\DialogPageControls\WpfLanguages.xaml.cs">
       <DependentUpon>WpfLanguages.xaml</DependentUpon>
     </Compile>
     <Compile Include="MenuItemCommands\Common\RemoveLicenseHeaderFromAllFilesInProjectHelper.cs" />
@@ -333,7 +340,7 @@
     <Compile Include="LicenseHeadersPackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
-    <Compile Include="Options\WpfOptions.xaml.cs">
+    <Compile Include="Options\DialogPageControls\WpfOptions.xaml.cs">
       <DependentUpon>WpfOptions.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\WpfHost.cs">
@@ -342,7 +349,7 @@
     <Compile Include="Options\WpfHost.Designer.cs">
       <DependentUpon>WpfHost.cs</DependentUpon>
     </Compile>
-    <Compile Include="Options\WpfCommandDialog.xaml.cs">
+    <Compile Include="Options\DialogPageControls\WpfCommandDialog.xaml.cs">
       <DependentUpon>WpfCommandDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="ResultObjects\AddLicenseHeaderToAllFilesResult.cs" />
@@ -399,27 +406,27 @@
     <None Include="Resources\Images.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Options\WpfEditDefaultLicenseHeaderDialog.xaml">
+    <Page Include="Options\DialogPageControls\WpfEditDefaultLicenseHeaderDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Options\WpfDefaultLicenseHeader.xaml">
+    <Page Include="Options\DialogPageControls\WpfDefaultLicenseHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Options\WpfLanguageDialog.xaml">
+    <Page Include="Options\DialogPageControls\WpfLanguageDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Options\WpfLanguages.xaml">
+    <Page Include="Options\DialogPageControls\WpfLanguages.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Options\WpfOptions.xaml">
+    <Page Include="Options\DialogPageControls\WpfOptions.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Options\WpfCommandDialog.xaml">
+    <Page Include="Options\DialogPageControls\WpfCommandDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

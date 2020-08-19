@@ -21,12 +21,14 @@ using System.Windows.Forms;
 using EnvDTE;
 using EnvDTE80;
 using LicenseHeaderManager.Options.Converters;
+using LicenseHeaderManager.Options.DialogPageControls;
+using LicenseHeaderManager.Options.Model;
 
 namespace LicenseHeaderManager.Options
 {
   [ClassInterface (ClassInterfaceType.AutoDual)]
   [Guid ("EB6F9B18-D203-43E3-8033-35AD9BEFC70D")]
-  public class GeneralOptionsPage : VersionedDialogPage, IGeneralOptionsPage
+  public class GeneralOptionsPageModelOld : VersionedDialogPage, IGeneralOptionsPageModel
   {
     private const bool c_defaultInsertInNewFiles = false;
     private const bool c_defaultUseRequiredKeywords = true;
@@ -37,7 +39,7 @@ namespace LicenseHeaderManager.Options
 
     private ObservableCollection<LinkedCommand> _linkedCommands;
 
-    public GeneralOptionsPage ()
+    public GeneralOptionsPageModelOld ()
     {
       ResetSettings();
     }
@@ -126,7 +128,7 @@ namespace LicenseHeaderManager.Options
       }
       else
       {
-        var migratedOptionsPage = new GeneralOptionsPage();
+        var migratedOptionsPage = new GeneralOptionsPageModelOld();
         LoadRegistryValuesBefore_3_0_0 (migratedOptionsPage);
 
         InsertInNewFiles = ThreeWaySelectionForMigration (

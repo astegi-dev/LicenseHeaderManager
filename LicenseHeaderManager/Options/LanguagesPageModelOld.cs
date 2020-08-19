@@ -22,13 +22,15 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Core;
 using LicenseHeaderManager.Options.Converters;
+using LicenseHeaderManager.Options.DialogPageControls;
+using LicenseHeaderManager.Options.Model;
 using LicenseHeaderManager.Utils;
 
 namespace LicenseHeaderManager.Options
 {
   [ClassInterface (ClassInterfaceType.AutoDual)]
   [Guid ("D1B5984C-1693-4F26-891E-0BA3BF5760B4")]
-  public class LanguagesPage : VersionedDialogPage, ILanguagesPage
+  public class LanguagesPageModelOld : VersionedDialogPage, ILanguagesPageModel
   {
     private readonly ObservableCollection<Language> _defaultLanguages = new ObservableCollection<Language>
                                                                         {
@@ -100,7 +102,7 @@ namespace LicenseHeaderManager.Options
 
     private readonly LanguageConverter _languageConverter = new LanguageConverter();
 
-    public LanguagesPage ()
+    public LanguagesPageModelOld ()
     {
       ResetSettings();
     }
@@ -288,7 +290,7 @@ namespace LicenseHeaderManager.Options
       }
       else
       {
-        var migratedLanguagesPage = new LanguagesPage();
+        var migratedLanguagesPage = new LanguagesPageModelOld();
         LoadRegistryValuesBefore_3_0_0 (migratedLanguagesPage);
 
         Languages = migratedLanguagesPage.Languages;

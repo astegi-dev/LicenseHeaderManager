@@ -12,32 +12,31 @@
  */
 
 using System;
-using System.Windows;
-using System.Windows.Controls;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using EnvDTE;
+using EnvDTE80;
+using Microsoft.VisualStudio.Shell;
 
-namespace LicenseHeaderManager.Options
+namespace LicenseHeaderManager.Options.Model
 {
-  /// <summary>
-  ///   Interaction logic for WpfDefaultLicenseHeaderDialog.xaml
-  /// </summary>
-  public partial class WpfEditDefaultLicenseHeaderDialog : Window
+  public class GeneralOptionsPageModelModel : BaseOptionModel<GeneralOptionsPageModelModel>, IGeneralOptionsPageModel
   {
-    public WpfEditDefaultLicenseHeaderDialog (IDefaultLicenseHeaderPage page)
-        : this()
-    {
-      DataContext = page;
-    }
+    public bool UseRequiredKeywords { get; set; }
 
-    public WpfEditDefaultLicenseHeaderDialog ()
-    {
-      InitializeComponent();
-    }
+    public string RequiredKeywords { get; set; }
 
-    private void OKButtonClick (object sender, RoutedEventArgs e)
-    {
-      var bindingExpression = defaultText.GetBindingExpression (TextBox.TextProperty);
-      bindingExpression?.UpdateSource();
-      DialogResult = true;
-    }
+    public ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
+
+    public bool InsertInNewFiles { get; set; }
+
+    private DTE2 Dte => ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
+
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public Commands Commands => Dte.Commands;
+
+    // to be removed in future => is now in OptionsFacade
+    public event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
   }
 }

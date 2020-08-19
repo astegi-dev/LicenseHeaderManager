@@ -1,4 +1,4 @@
-/* Copyright (c) rubicon IT GmbH
+﻿/* Copyright (c) rubicon IT GmbH
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -11,13 +11,12 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using Core;
-using System.Collections.ObjectModel;
+using System;
 
-namespace LicenseHeaderManager.Options
+namespace LicenseHeaderManager.Options.Model
 {
-  public interface ILanguagesPage
+  public class DefaultLicenseHeaderPageModelModel : BaseOptionModel<DefaultLicenseHeaderPageModelModel>, IDefaultLicenseHeaderPageModel
   {
-    ObservableCollection<Language> Languages { get; set; }
+    public string DefaultLicenseHeaderFileText { get; set; }
   }
 }

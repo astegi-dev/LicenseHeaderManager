@@ -11,35 +11,14 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
-using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Forms;
+using LicenseHeaderManager.Options.DialogPageControls;
+using LicenseHeaderManager.Options.Model;
 
-namespace LicenseHeaderManager.Options
+namespace LicenseHeaderManager.Options.DialogPages
 {
-  /// <summary>
-  ///   Interaction logic for WpfDefaultLicenseHeader.xaml
-  /// </summary>
-  public partial class WpfDefaultLicenseHeader : UserControl
+  public class LanguagesPage : BaseOptionPage<LanguagesPageModelModel>
   {
-    private readonly IDefaultLicenseHeaderPage _page;
-
-    public WpfDefaultLicenseHeader (IDefaultLicenseHeaderPage page)
-        : this()
-    {
-      _page = page;
-      DataContext = _page;
-    }
-
-    public WpfDefaultLicenseHeader ()
-    {
-      InitializeComponent();
-    }
-
-    private void EditButton_Click (object sender, RoutedEventArgs e)
-    {
-      var dialog = new WpfEditDefaultLicenseHeaderDialog (_page);
-      dialog.ShowDialog();
-    }
+    protected override IWin32Window Window => new WpfHost (new WpfLanguages ((ILanguagesPageModel) _model));
   }
 }

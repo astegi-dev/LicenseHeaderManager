@@ -14,6 +14,7 @@
 using System;
 using System.ComponentModel.Design;
 using LicenseHeaderManager.Options;
+using LicenseHeaderManager.Options.DialogPages;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 

@@ -22,7 +22,7 @@ using System.Windows.Forms;
 using EnvDTE;
 using Window = System.Windows.Window;
 
-namespace LicenseHeaderManager.Options
+namespace LicenseHeaderManager.Options.DialogPageControls
 {
   public partial class WpfCommandDialog : Window
   {

@@ -11,35 +11,14 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using Microsoft.VisualStudio.Shell;
+using System;
+using System.Collections.ObjectModel;
+using Core;
 
-namespace LicenseHeaderManager.Options
+namespace LicenseHeaderManager.Options.Model
 {
-  /// <summary>
-  /// A base class for a DialogPage to show in Tools -> Options.
-  /// </summary>
-  public class BaseOptionPage<T> : DialogPage
-      where T : BaseOptionModel<T>, new()
+  public class LanguagesPageModelModel : BaseOptionModel<LanguagesPageModelModel>, ILanguagesPageModel
   {
-    public readonly BaseOptionModel<T> _model;
-
-    public BaseOptionPage ()
-    {
-#pragma warning disable VSTHRD104 // Offer async methods
-      _model = ThreadHelper.JoinableTaskFactory.Run (BaseOptionModel<T>.CreateAsync);
-#pragma warning restore VSTHRD104 // Offer async methods
-    }
-
-    public override object AutomationObject => _model;
-
-    public override void LoadSettingsFromStorage ()
-    {
-      _model.Load();
-    }
-
-    public override void SaveSettingsToStorage ()
-    {
-      _model.Save();
-    }
+    public ObservableCollection<Language> Languages { get; set; }
   }
 }

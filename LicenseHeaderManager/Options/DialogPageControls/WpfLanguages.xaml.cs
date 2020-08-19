@@ -16,21 +16,22 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Core;
+using LicenseHeaderManager.Options.Model;
 
-namespace LicenseHeaderManager.Options
+namespace LicenseHeaderManager.Options.DialogPageControls
 {
   public partial class WpfLanguages : UserControl
   {
-    private readonly ILanguagesPage _page;
+    private readonly ILanguagesPageModel _pageModel;
 
-    public WpfLanguages (ILanguagesPage page)
+    public WpfLanguages (ILanguagesPageModel pageModel)
         : this()
     {
-      _page = page;
+      _pageModel = pageModel;
 
       Loaded += (s, e) =>
       {
-        grid.ItemsSource = _page.Languages;
+        grid.ItemsSource = _pageModel.Languages;
         EnableButtons();
       };
     }
@@ -46,14 +47,14 @@ namespace LicenseHeaderManager.Options
       dialog.Language = new Language();
       var result = dialog.ShowDialog();
       if (result.HasValue && result.Value)
-        _page.Languages.Add (dialog.Language);
+        _pageModel.Languages.Add (dialog.Language);
     }
 
     private void Remove (object sender, RoutedEventArgs e)
     {
       var language = grid.SelectedItem as Language;
       if (language != null)
-        _page.Languages.Remove (language);
+        _pageModel.Languages.Remove (language);
     }
 
     private void Edit (object sender, RoutedEventArgs e)
@@ -79,9 +80,9 @@ namespace LicenseHeaderManager.Options
       var result = dialog.ShowDialog();
       if (result.HasValue && result.Value)
       {
-        var index = _page.Languages.IndexOf (language);
-        _page.Languages.RemoveAt (index);
-        _page.Languages.Insert (index, copy);
+        var index = _pageModel.Languages.IndexOf (language);
+        _pageModel.Languages.RemoveAt (index);
+        _pageModel.Languages.Insert (index, copy);
       }
     }
 
