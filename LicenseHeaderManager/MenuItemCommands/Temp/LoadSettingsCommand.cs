@@ -74,14 +74,8 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
       // the UI thread.
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync (package.DisposalToken);
 
-      OptionsFacade.CurrentOptions.LinkedCommandsChanged += CurrentOptions_OnLinkedCommandsChanged;
-
       var commandService = await package.GetServiceAsync (typeof (IMenuCommandService)) as OleMenuCommandService;
       Instance = new LoadSettingsCommand (package, commandService);
-    }
-
-    private static void CurrentOptions_OnLinkedCommandsChanged (object sender, NotifyCollectionChangedEventArgs e)
-    {
     }
 
     /// <summary>

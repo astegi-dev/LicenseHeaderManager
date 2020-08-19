@@ -43,12 +43,14 @@ namespace LicenseHeaderManager.Options
     {
       _coreOptions = new CoreOptions();
       _visualStudioOptions = new VisualStudioOptions();
+      _visualStudioOptions.LinkedCommandsChanged += InvokeLinkedCommandsChanged;
     }
 
     private OptionsFacade (CoreOptions coreOptions, VisualStudioOptions visualStudioOptions)
     {
       _coreOptions = coreOptions;
       _visualStudioOptions = visualStudioOptions;
+      _visualStudioOptions.LinkedCommandsChanged += InvokeLinkedCommandsChanged;
     }
 
     public bool UseRequiredKeywords
@@ -84,25 +86,22 @@ namespace LicenseHeaderManager.Options
     public ICollection<LinkedCommand> LinkedCommands
     {
       get => _visualStudioOptions.LinkedCommands;
-      set
-      {
-        if (_visualStudioOptions.LinkedCommands != null)
-        {
-          _visualStudioOptions.LinkedCommands.CollectionChanged -= InvokeLinkedCommandsChanged;
-          InvokeLinkedCommandsChanged (
-              _visualStudioOptions.LinkedCommands,
-              new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, _visualStudioOptions.LinkedCommands));
-        }
-
-        _visualStudioOptions.LinkedCommands = new ObservableCollection<LinkedCommand> (value);
-        if (_visualStudioOptions.LinkedCommands != null)
-        {
-          _visualStudioOptions.LinkedCommands.CollectionChanged += InvokeLinkedCommandsChanged;
-          InvokeLinkedCommandsChanged (
-              _visualStudioOptions.LinkedCommands,
-              new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, _visualStudioOptions.LinkedCommands));
-        }
-      }
+      set =>
+          //if (_visualStudioOptions.LinkedCommands != null)
+          //{
+          //  _visualStudioOptions.LinkedCommandsChanged -= InvokeLinkedCommandsChanged;
+          //  InvokeLinkedCommandsChanged (
+          //      _visualStudioOptions.LinkedCommands,
+          //      new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, _visualStudioOptions.LinkedCommands));
+          //}
+          _visualStudioOptions.LinkedCommands = _visualStudioOptions.LinkedCommands != null ? new ObservableCollection<LinkedCommand> (value) : null;
+      //if (_visualStudioOptions.LinkedCommands != null)
+      //{
+      //  _visualStudioOptions.LinkedCommandsChanged += InvokeLinkedCommandsChanged;
+      //  InvokeLinkedCommandsChanged (
+      //      _visualStudioOptions.LinkedCommands,
+      //      new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, _visualStudioOptions.LinkedCommands));
+      //}
     }
 
     /// <summary>

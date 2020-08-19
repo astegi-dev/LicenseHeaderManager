@@ -56,7 +56,7 @@ namespace LicenseHeaderManager.Options
           InvokeLinkedCommandsChanged (_linkedCommands, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, _linkedCommands));
         }
 
-        _linkedCommands = value != null ? new ObservableCollection<LinkedCommand> (value) : null;
+        _linkedCommands = value;
         if (_linkedCommands != null)
         {
           _linkedCommands.CollectionChanged += InvokeLinkedCommandsChanged;
