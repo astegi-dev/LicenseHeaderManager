@@ -20,7 +20,7 @@ namespace LicenseHeaderManager.Options
 {
   public partial class WpfOptions : UserControl
   {
-    public WpfOptions (OptionsPage page)
+    public WpfOptions (IGeneralOptionsPage page)
     {
       InitializeComponent();
 
@@ -33,7 +33,7 @@ namespace LicenseHeaderManager.Options
       };
     }
 
-    public OptionsPage Page { get; set; }
+    public IGeneralOptionsPage Page { get; set; }
 
     private void Add (object sender, RoutedEventArgs e)
     {

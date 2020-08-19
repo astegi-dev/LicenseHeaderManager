@@ -23,7 +23,7 @@ namespace LicenseHeaderManager.Test
     [Test]
     public void TestLinkedCommandsChangedCalledWhenNewLinkedCommandSavedWithDefaultLinkedCommands ()
     {
-      var optionsPage = new OptionsPage();
+      var optionsPage = new GeneralOptionsPage();
       var wasCalled = false;
       optionsPage.LinkedCommandsChanged += (sender, args) => wasCalled = true;
 
@@ -35,7 +35,7 @@ namespace LicenseHeaderManager.Test
     [Test]
     public void TestLinkedCommandsChangedCalledWhenNewLinkedCommandSavedWithExistingLinkedCommands ()
     {
-      var optionsPage = new OptionsPage();
+      var optionsPage = new GeneralOptionsPage();
       var wasCalled = false;
       optionsPage.LinkedCommandsChanged += (sender, args) => wasCalled = true;
       const string emptySerializedLinkedCommands = "1*System.String*<LinkedCommands/>";

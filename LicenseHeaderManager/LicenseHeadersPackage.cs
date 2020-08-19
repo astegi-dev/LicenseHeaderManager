@@ -57,15 +57,17 @@ namespace LicenseHeaderManager
   [InstalledProductRegistration ("#110", "#112", Version, IconResourceID = 400)]
   // This attribute is needed to let the shell know that this package exposes some menus.
   [ProvideMenuResource ("Menus.ctmenu", 1)]
-  [ProvideOptionPage (typeof (OptionsPage), c_licenseHeaders, c_general, 0, 0, true)]
+  [ProvideOptionPage (typeof (GeneralOptionsPage), c_licenseHeaders, c_general, 0, 0, true)]
   [ProvideOptionPage (typeof (LanguagesPage), c_licenseHeaders, c_languages, 0, 0, true)]
   [ProvideOptionPage (typeof (DefaultLicenseHeaderPage), c_licenseHeaders, c_defaultLicenseHeader, 0, 0, true)]
-  [ProvideProfile (typeof (OptionsPage), c_licenseHeaders, c_general, 0, 0, true)]
+  [ProvideProfile (typeof (GeneralOptionsPage), c_licenseHeaders, c_general, 0, 0, true)]
   [ProvideProfile (typeof (LanguagesPage), c_licenseHeaders, c_languages, 0, 0, true)]
   [ProvideProfile (typeof (DefaultLicenseHeaderPage), c_licenseHeaders, c_defaultLicenseHeader, 0, 0, true)]
+  [ProvideOptionPage (typeof (OptionsPageProvider.General), c_licenseHeaders, c_general + "Async", 0, 0, true)]
+  [ProvideOptionPage (typeof (OptionsPageProvider.DefaultLicenseHeader), c_licenseHeaders, c_defaultLicenseHeader + "Async", 0, 0, true)]
+  [ProvideOptionPage (typeof (OptionsPageProvider.Languages), c_licenseHeaders, c_languages + "Async", 0, 0, true)]
   [ProvideAutoLoad (VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
   [Guid (GuidList.guidLicenseHeadersPkgString)]
-  [ProvideMenuResource ("Menus.ctmenu", 1)]
   [ProvideMenuResource ("Menus.ctmenu", 1)]
   public sealed class LicenseHeadersPackage : AsyncPackage, ILicenseHeaderExtension
   {
@@ -102,8 +104,8 @@ namespace LicenseHeaderManager
     {
       get
       {
-        var keywords = OptionsPage.UseRequiredKeywords
-            ? OptionsPage.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
+        var keywords = GeneralOptionsPage.UseRequiredKeywords
+            ? GeneralOptionsPage.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
             : null;
         return new LicenseHeaderReplacer (LanguagesPage.Languages, keywords);
       }
@@ -118,7 +120,7 @@ namespace LicenseHeaderManager
 
     public ILanguagesPage LanguagesPage => (LanguagesPage) GetDialogPage (typeof (LanguagesPage));
 
-    public IOptionsPage OptionsPage => (OptionsPage) GetDialogPage (typeof (OptionsPage));
+    public IGeneralOptionsPage GeneralOptionsPage => (GeneralOptionsPage) GetDialogPage (typeof (GeneralOptionsPage));
 
     public DTE2 Dte2 { get; private set; }
 
@@ -185,7 +187,7 @@ namespace LicenseHeaderManager
       }
 
       //register event handlers for linked commands
-      var page = OptionsPage;
+      var page = GeneralOptionsPage;
       if (page != null)
       {
         foreach (var command in page.LinkedCommands)
@@ -222,7 +224,7 @@ namespace LicenseHeaderManager
       var visible = false;
 
       if (ProjectItemInspection.IsPhysicalFile (item))
-        visible = LicenseHeaderReplacer.TryCreateDocument (new LicenseHeaderInput(item.FileNames[1], null, null), out _) == CreateDocumentResult.DocumentCreated;
+        visible = LicenseHeaderReplacer.TryCreateDocument (new LicenseHeaderInput (item.FileNames[1], null, null), out _) == CreateDocumentResult.DocumentCreated;
 
       return visible;
     }
@@ -315,7 +317,7 @@ namespace LicenseHeaderManager
     private void ItemAdded (ProjectItem item)
     {
       //An item was added. Check if we should insert a header automatically.
-      var page = OptionsPage;
+      var page = GeneralOptionsPage;
       if (page != null && page.InsertInNewFiles && item != null)
       {
         //Normally the header should be inserted here, but that might interfere with the command

@@ -11,27 +11,34 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
-using Core;
-using EnvDTE80;
-using LicenseHeaderManager.Options;
+using System.Windows.Forms;
+using Microsoft.VisualStudio.Shell;
 
-namespace LicenseHeaderManager.Interfaces
+namespace LicenseHeaderManager.Options
 {
-  public interface ILicenseHeaderExtension
+  /// <summary>
+  /// A provider for custom <see cref="DialogPage" /> implementations.
+  /// </summary>
+  public class OptionsPageProvider
   {
-    LicenseHeaderReplacer LicenseHeaderReplacer { get; }
+    public class General : BaseOptionPage<GeneralOptionsPageAsync>
+    {
+      protected override IWin32Window Window
+      {
+        get
+        {
+          var host = new WpfHost (new WpfOptions ((IGeneralOptionsPage) _model));
+          return host;
+        }
+      }
+    }
 
-    IDefaultLicenseHeaderPage DefaultLicenseHeaderPage { get; }
+    public class DefaultLicenseHeader : BaseOptionPage<DefaultLicenseHeaderPageAsync>
+    {
+    }
 
-    ILanguagesPage LanguagesPage { get; }
-
-    IGeneralOptionsPage GeneralOptionsPage { get; }
-
-    bool IsCalledByLinkedCommand { get; }
-
-    DTE2 Dte2 { get; }
-
-    void ShowLanguagesPage ();
+    public class Languages : BaseOptionPage<LanguagesPageAsync>
+    {
+    }
   }
 }

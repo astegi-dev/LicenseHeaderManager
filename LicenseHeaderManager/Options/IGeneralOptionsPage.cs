@@ -14,18 +14,21 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using EnvDTE;
 
 namespace LicenseHeaderManager.Options
 {
-  public interface IOptionsPage
+  public interface IGeneralOptionsPage
   {
-    bool UseRequiredKeywords { get; }
+    bool UseRequiredKeywords { get; set; }
 
-    string RequiredKeywords { get; }
+    string RequiredKeywords { get; set; }
 
     ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
 
     bool InsertInNewFiles { get; set; }
+
+    Commands Commands { get; }
 
     event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
   }

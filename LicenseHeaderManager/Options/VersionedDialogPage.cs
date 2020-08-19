@@ -140,7 +140,7 @@ namespace LicenseHeaderManager.Options
       if (propertyDescriptor.Name == nameof(LanguagesPage.Languages))
         return new LanguageConverter();
 
-      if (propertyDescriptor.Name == nameof(OptionsPage.LinkedCommands))
+      if (propertyDescriptor.Name == nameof(GeneralOptionsPage.LinkedCommands))
         return new LinkedCommandConverter();
 
       return propertyDescriptor.Converter;

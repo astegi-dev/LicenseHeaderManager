@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Core;
 using Core.Options;
@@ -40,10 +41,10 @@ namespace LicenseHeaderManager.Options
     string DefaultLicenseHeaderFileText { get; set; }
 
     /// <summary>
-    ///   Gets or sets a collection of <see cref="Core.Language" /> objects that represents the
+    ///   Gets or sets a list of <see cref="Core.Language" /> objects that represents the
     ///   languages for which the <see cref="Core.LicenseHeaderReplacer" /> is configured to use.
     /// </summary>
-    ICollection<Language> Languages { get; set; }
+    List<Language> Languages { get; set; }
 
     /// <summary>
     ///   Gets or sets whether license headers are automatically inserted into new files.
@@ -56,7 +57,7 @@ namespace LicenseHeaderManager.Options
     /// </summary>
     /// <remarks>Note that upon setter invocation, a copy of the supplied <see cref="ICollection{T}"/> is created. Hence, future updates to this
     /// initial collection are not reflected in this property.</remarks>
-    ICollection<LinkedCommand> LinkedCommands { get; set; }
+    ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
 
     /// <summary>
     /// Is triggered when the contents of the collection held by <see cref="LinkedCommands"/> has changed.

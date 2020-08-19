@@ -12,26 +12,37 @@
  */
 
 using System;
-using Core;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using EnvDTE;
 using EnvDTE80;
-using LicenseHeaderManager.Options;
+using Microsoft.VisualStudio.Shell;
 
-namespace LicenseHeaderManager.Interfaces
+namespace LicenseHeaderManager.Options
 {
-  public interface ILicenseHeaderExtension
+  public class GeneralOptionsPageAsync : BaseOptionModel<GeneralOptionsPageAsync>, IGeneralOptionsPage
   {
-    LicenseHeaderReplacer LicenseHeaderReplacer { get; }
+    [Category ("My category")]
+    [DisplayName ("Message box text")]
+    [Description ("Specifies the text to show in the message box")]
+    [DefaultValue ("My message")]
+    public string Message { get; set; } = "My message";
 
-    IDefaultLicenseHeaderPage DefaultLicenseHeaderPage { get; }
+    public bool UseRequiredKeywords { get; set; }
 
-    ILanguagesPage LanguagesPage { get; }
+    public string RequiredKeywords { get; set; }
 
-    IGeneralOptionsPage GeneralOptionsPage { get; }
+    public ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
 
-    bool IsCalledByLinkedCommand { get; }
+    public bool InsertInNewFiles { get; set; }
 
-    DTE2 Dte2 { get; }
+    private DTE2 Dte => ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
 
-    void ShowLanguagesPage ();
+    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
+    public Commands Commands => Dte.Commands;
+
+    // to be removed in future => is now in OptionsFacade
+    public event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
   }
 }

@@ -12,26 +12,31 @@
  */
 
 using System;
-using Core;
-using EnvDTE80;
-using LicenseHeaderManager.Options;
+using System.ComponentModel;
 
-namespace LicenseHeaderManager.Interfaces
+namespace LicenseHeaderManager.Options
 {
-  public interface ILicenseHeaderExtension
+  public class DefaultLicenseHeaderPageAsync : BaseOptionModel<DefaultLicenseHeaderPageAsync>
   {
-    LicenseHeaderReplacer LicenseHeaderReplacer { get; }
+    [Category("A category")]
+    [DisplayName("Show message")]
+    [Description("The description of the property")]
+    [DefaultValue(true)]
+    public bool ShowMessage { get; set; } = true;
 
-    IDefaultLicenseHeaderPage DefaultLicenseHeaderPage { get; }
+    [Category("Another category")]
+    [DisplayName("Favorite clothing")]
+    [Description("The description of the property")]
+    [DefaultValue(Clothing.Pants)]
+    [TypeConverter(typeof(EnumConverter))] // This will make use of enums more resilient
+    public Clothing ClothingChoice { get; set; } = Clothing.Pants;
 
-    ILanguagesPage LanguagesPage { get; }
+    [Category("My category")]
+    [DisplayName("This is a boolean")]
+    [Description("The description of the property")]
+    [DefaultValue(true)]
+    [Browsable(false)] // This will hide it from the Tools -> Options page, but still work like normal
+    public bool HiddenProperty { get; set; } = true;
 
-    IGeneralOptionsPage GeneralOptionsPage { get; }
-
-    bool IsCalledByLinkedCommand { get; }
-
-    DTE2 Dte2 { get; }
-
-    void ShowLanguagesPage ();
   }
 }

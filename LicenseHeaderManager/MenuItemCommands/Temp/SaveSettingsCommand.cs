@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Design;
 using Core.Options;
 using LicenseHeaderManager.Options;
@@ -103,7 +104,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Temp
 
     private async Task ExecuteInternalAsync (string coreFilePath, string visualStudioFilePath)
     {
-      OptionsFacade.CurrentOptions.LinkedCommands = new List<LinkedCommand> (ServiceProvider.OptionsPage.LinkedCommands);
+      OptionsFacade.CurrentOptions.LinkedCommands = new ObservableCollection<LinkedCommand> (ServiceProvider.GeneralOptionsPage.LinkedCommands);
       await OptionsFacade.SaveAsync (OptionsFacade.CurrentOptions, coreFilePath, visualStudioFilePath);
     }
   }

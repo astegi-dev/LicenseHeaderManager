@@ -260,9 +260,18 @@
     <Compile Include="MenuItemCommands\SolutionMenu\RemoveSolutionLicenseHeaderDefinitionFileCommand.cs" />
     <Compile Include="MenuItemCommands\Temp\LoadSettingsCommand.cs" />
     <Compile Include="MenuItemCommands\Temp\SaveSettingsCommand.cs" />
+    <Compile Include="Options\BaseOptionModel.cs" />
+    <Compile Include="Options\BaseOptionPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\Clothing.cs" />
+    <Compile Include="Options\DefaultLicenseHeaderPageAsync.cs" />
+    <Compile Include="Options\OptionsPageProvider.cs" />
+    <Compile Include="Options\GeneralOptionsPageAsync.cs" />
     <Compile Include="Options\IOptionsFacade.cs" />
     <Compile Include="Options\IVisualStudioOptions.cs" />
     <Compile Include="Options\OptionsFacade.cs" />
+    <Compile Include="Options\LanguagesPageAsync.cs" />
     <Compile Include="Options\VisualStudioOptions.cs" />
     <Compile Include="UpdateViewModels\BaseUpdateViewModel.cs" />
     <Compile Include="UpdateViewModels\FolderProjectUpdateViewModel.cs" />
@@ -284,7 +293,7 @@
     <Compile Include="Interfaces\ILinkedFileFilter.cs" />
     <Compile Include="Options\IDefaultLicenseHeaderPage.cs" />
     <Compile Include="Options\ILanguagesPage.cs" />
-    <Compile Include="Options\IOptionsPage.cs" />
+    <Compile Include="Options\IGeneralOptionsPage.cs" />
     <Compile Include="Options\WpfEditDefaultLicenseHeaderDialog.xaml.cs">
       <DependentUpon>WpfEditDefaultLicenseHeaderDialog.xaml</DependentUpon>
     </Compile>
@@ -306,7 +315,7 @@
       <DependentUpon>WpfLanguageDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\Converters\LanguageConverter.cs" />
-    <Compile Include="Options\OptionsPage.cs">
+    <Compile Include="Options\GeneralOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\LanguagesPage.cs">

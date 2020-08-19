@@ -71,7 +71,7 @@ namespace LicenseHeaderManager.Options
       set => _coreOptions.DefaultLicenseHeaderFileText = value;
     }
 
-    public ICollection<Language> Languages
+    public List<Language> Languages
     {
       get => _coreOptions.Languages;
       set => _coreOptions.Languages = value;
@@ -83,25 +83,10 @@ namespace LicenseHeaderManager.Options
       set => _visualStudioOptions.InsertHeaderIntoNewFiles = value;
     }
 
-    public ICollection<LinkedCommand> LinkedCommands
+    public ObservableCollection<LinkedCommand> LinkedCommands
     {
       get => _visualStudioOptions.LinkedCommands;
-      set =>
-          //if (_visualStudioOptions.LinkedCommands != null)
-          //{
-          //  _visualStudioOptions.LinkedCommandsChanged -= InvokeLinkedCommandsChanged;
-          //  InvokeLinkedCommandsChanged (
-          //      _visualStudioOptions.LinkedCommands,
-          //      new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, _visualStudioOptions.LinkedCommands));
-          //}
-          _visualStudioOptions.LinkedCommands = _visualStudioOptions.LinkedCommands != null ? new ObservableCollection<LinkedCommand> (value) : null;
-      //if (_visualStudioOptions.LinkedCommands != null)
-      //{
-      //  _visualStudioOptions.LinkedCommandsChanged += InvokeLinkedCommandsChanged;
-      //  InvokeLinkedCommandsChanged (
-      //      _visualStudioOptions.LinkedCommands,
-      //      new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, _visualStudioOptions.LinkedCommands));
-      //}
+      set => _visualStudioOptions.LinkedCommands = _visualStudioOptions.LinkedCommands != null ? new ObservableCollection<LinkedCommand> (value) : null;
     }
 
     /// <summary>

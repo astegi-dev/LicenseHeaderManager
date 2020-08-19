@@ -12,26 +12,13 @@
  */
 
 using System;
-using Core;
-using EnvDTE80;
-using LicenseHeaderManager.Options;
 
-namespace LicenseHeaderManager.Interfaces
+namespace LicenseHeaderManager.Options
 {
-  public interface ILicenseHeaderExtension
+  public enum Clothing
   {
-    LicenseHeaderReplacer LicenseHeaderReplacer { get; }
-
-    IDefaultLicenseHeaderPage DefaultLicenseHeaderPage { get; }
-
-    ILanguagesPage LanguagesPage { get; }
-
-    IGeneralOptionsPage GeneralOptionsPage { get; }
-
-    bool IsCalledByLinkedCommand { get; }
-
-    DTE2 Dte2 { get; }
-
-    void ShowLanguagesPage ();
+    Pants,
+    Sweater,
+    Shoes
   }
 }

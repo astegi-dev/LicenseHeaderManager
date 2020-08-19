@@ -26,7 +26,7 @@ namespace LicenseHeaderManager.Options
 {
   [ClassInterface (ClassInterfaceType.AutoDual)]
   [Guid ("EB6F9B18-D203-43E3-8033-35AD9BEFC70D")]
-  public class OptionsPage : VersionedDialogPage, IOptionsPage
+  public class GeneralOptionsPage : VersionedDialogPage, IGeneralOptionsPage
   {
     private const bool c_defaultInsertInNewFiles = false;
     private const bool c_defaultUseRequiredKeywords = true;
@@ -37,7 +37,7 @@ namespace LicenseHeaderManager.Options
 
     private ObservableCollection<LinkedCommand> _linkedCommands;
 
-    public OptionsPage ()
+    public GeneralOptionsPage ()
     {
       ResetSettings();
     }
@@ -126,7 +126,7 @@ namespace LicenseHeaderManager.Options
       }
       else
       {
-        var migratedOptionsPage = new OptionsPage();
+        var migratedOptionsPage = new GeneralOptionsPage();
         LoadRegistryValuesBefore_3_0_0 (migratedOptionsPage);
 
         InsertInNewFiles = ThreeWaySelectionForMigration (
