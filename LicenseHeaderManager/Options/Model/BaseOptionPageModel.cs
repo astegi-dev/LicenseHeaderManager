@@ -11,17 +11,12 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.Settings;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Settings;
-using Microsoft.VisualStudio.Threading;
 
 namespace LicenseHeaderManager.Options.Model
 {
@@ -32,10 +27,6 @@ namespace LicenseHeaderManager.Options.Model
       where T : BaseOptionModel<T>, new()
   {
     private static readonly AsyncLazy<T> s_liveModel = new AsyncLazy<T> (CreateAsync, ThreadHelper.JoinableTaskFactory);
-
-    private static readonly AsyncLazy<ShellSettingsManager> s_settingsManager = new AsyncLazy<ShellSettingsManager> (
-        GetSettingsManagerAsync,
-        ThreadHelper.JoinableTaskFactory);
 
     protected BaseOptionModel ()
     {
@@ -73,11 +64,6 @@ namespace LicenseHeaderManager.Options.Model
     }
 
     /// <summary>
-    /// The name of the options collection as stored in the registry.
-    /// </summary>
-    protected virtual string CollectionName { get; } = typeof (T).FullName;
-
-    /// <summary>
     /// Hydrates the properties from the registry.
     /// </summary>
     public virtual void Load ()
@@ -90,11 +76,11 @@ namespace LicenseHeaderManager.Options.Model
     /// </summary>
     public virtual async System.Threading.Tasks.Task LoadAsync ()
     {
-      ShellSettingsManager manager = await s_settingsManager.GetValueAsync();
-      SettingsStore settingsStore = manager.GetReadOnlySettingsStore (SettingsScope.UserSettings);
+      //ShellSettingsManager manager = await s_settingsManager.GetValueAsync();
+      //SettingsStore settingsStore = manager.GetReadOnlySettingsStore (SettingsScope.UserSettings);
 
-      if (!settingsStore.CollectionExists (CollectionName))
-        return;
+      //if (!settingsStore.CollectionExists (CollectionName))
+      //  return;
 
       OptionsFacade.CurrentOptions = await OptionsFacade.LoadAsync();
 
@@ -122,13 +108,13 @@ namespace LicenseHeaderManager.Options.Model
     /// </summary>
     public virtual async System.Threading.Tasks.Task SaveAsync ()
     {
-      ShellSettingsManager manager = await s_settingsManager.GetValueAsync();
-      WritableSettingsStore settingsStore = manager.GetWritableSettingsStore (SettingsScope.UserSettings);
+      //ShellSettingsManager manager = await s_settingsManager.GetValueAsync();
+      //WritableSettingsStore settingsStore = manager.GetWritableSettingsStore (SettingsScope.UserSettings);
 
-      if (!settingsStore.CollectionExists (CollectionName))
-        settingsStore.CreateCollection (CollectionName);
+      //if (!settingsStore.CollectionExists (CollectionName))
+      //  settingsStore.CreateCollection (CollectionName);
 
-      foreach (PropertyInfo property in GetOptionProperties())
+      foreach (var property in GetOptionProperties())
       {
         if (typeof (IOptionsFacade).GetProperty (property.Name)?.PropertyType != property.PropertyType)
           continue;
@@ -145,47 +131,6 @@ namespace LicenseHeaderManager.Options.Model
       {
         await liveModel.LoadAsync();
       }
-    }
-
-    /// <summary>
-    /// Serializes an object value to a string using the binary serializer.
-    /// </summary>
-    protected virtual string SerializeValue (object value)
-    {
-      using (var stream = new MemoryStream())
-      {
-        var formatter = new BinaryFormatter();
-        formatter.Serialize (stream, value);
-        stream.Flush();
-        return Convert.ToBase64String (stream.ToArray());
-      }
-    }
-
-    /// <summary>
-    /// Deserializes a string to an object using the binary serializer.
-    /// </summary>
-    protected virtual object DeserializeValue (string value, Type type)
-    {
-      byte[] b = Convert.FromBase64String (value);
-
-      using (var stream = new MemoryStream (b))
-      {
-        var formatter = new BinaryFormatter();
-        return formatter.Deserialize (stream);
-      }
-    }
-
-    private static async Task<ShellSettingsManager> GetSettingsManagerAsync ()
-    {
-#pragma warning disable VSTHRD010
-      // False-positive in Threading Analyzers. Bug tracked here https://github.com/Microsoft/vs-threading/issues/230
-      //var svc = await AsyncServiceProvider.GlobalProvider.GetServiceAsync (typeof (IServiceProvider)) as IServiceProvider;
-#pragma warning restore VSTHRD010
-
-      //Assumes.Present (svc);
-
-      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-      return new ShellSettingsManager (ServiceProvider.GlobalProvider);
     }
 
     private IEnumerable<PropertyInfo> GetOptionProperties ()

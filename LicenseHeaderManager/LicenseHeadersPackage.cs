@@ -114,11 +114,11 @@ namespace LicenseHeaderManager
       ShowOptionPage (typeof (LanguagesPage));
     }
 
-    public IDefaultLicenseHeaderPageModel DefaultLicenseHeaderPageModel => DefaultLicenseHeaderPageModelModel.Instance;
+    public IDefaultLicenseHeaderPageModel DefaultLicenseHeaderPageModel => Options.Model.DefaultLicenseHeaderPageModel.Instance;
 
-    public ILanguagesPageModel LanguagesPageModel => LanguagesPageModelModel.Instance;
+    public ILanguagesPageModel LanguagesPageModel => Options.Model.LanguagesPageModel.Instance;
 
-    public IGeneralOptionsPageModel GeneralOptionsPageModel => GeneralOptionsPageModelModel.Instance;
+    public IGeneralOptionsPageModel GeneralOptionsPageModel => Options.Model.GeneralOptionsPageModel.Instance;
 
     public DTE2 Dte2 { get; private set; }
 

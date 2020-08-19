@@ -13,30 +13,12 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using EnvDTE;
-using EnvDTE80;
-using Microsoft.VisualStudio.Shell;
+using Core;
 
 namespace LicenseHeaderManager.Options.Model
 {
-  public class GeneralOptionsPageModelModel : BaseOptionModel<GeneralOptionsPageModelModel>, IGeneralOptionsPageModel
+  public class LanguagesPageModel : BaseOptionModel<LanguagesPageModel>, ILanguagesPageModel
   {
-    public bool UseRequiredKeywords { get; set; }
-
-    public string RequiredKeywords { get; set; }
-
-    public ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
-
-    public bool InsertInNewFiles { get; set; }
-
-    private DTE2 Dte => ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
-
-    [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-    public Commands Commands => Dte.Commands;
-
-    // to be removed in future => is now in OptionsFacade
-    public event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
+    public ObservableCollection<Language> Languages { get; set; }
   }
 }

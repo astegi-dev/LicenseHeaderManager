@@ -17,7 +17,7 @@ using LicenseHeaderManager.Options.Model;
 
 namespace LicenseHeaderManager.Options.DialogPages
 {
-  public class LanguagesPage : BaseOptionPage<LanguagesPageModelModel>
+  public class LanguagesPage : BaseOptionPage<LanguagesPageModel>
   {
     protected override IWin32Window Window => new WpfHost (new WpfLanguages ((ILanguagesPageModel) _model));
   }

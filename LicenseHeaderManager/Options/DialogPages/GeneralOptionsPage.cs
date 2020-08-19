@@ -17,7 +17,7 @@ using LicenseHeaderManager.Options.Model;
 
 namespace LicenseHeaderManager.Options.DialogPages
 {
-  public class GeneralOptionsPage : BaseOptionPage<GeneralOptionsPageModelModel>
+  public class GeneralOptionsPage : BaseOptionPage<GeneralOptionsPageModel>
   {
     protected override IWin32Window Window => new WpfHost(new WpfOptions((IGeneralOptionsPageModel)_model));
   }

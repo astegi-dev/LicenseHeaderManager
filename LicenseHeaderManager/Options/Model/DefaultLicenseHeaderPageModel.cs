@@ -12,13 +12,11 @@
  */
 
 using System;
-using System.Collections.ObjectModel;
-using Core;
 
 namespace LicenseHeaderManager.Options.Model
 {
-  public class LanguagesPageModelModel : BaseOptionModel<LanguagesPageModelModel>, ILanguagesPageModel
+  public class DefaultLicenseHeaderPageModel : BaseOptionModel<DefaultLicenseHeaderPageModel>, IDefaultLicenseHeaderPageModel
   {
-    public ObservableCollection<Language> Languages { get; set; }
+    public string DefaultLicenseHeaderFileText { get; set; }
   }
 }
