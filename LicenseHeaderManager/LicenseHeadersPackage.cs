@@ -28,7 +28,6 @@ using LicenseHeaderManager.MenuItemCommands.FolderMenu;
 using LicenseHeaderManager.MenuItemCommands.ProjectItemMenu;
 using LicenseHeaderManager.MenuItemCommands.ProjectMenu;
 using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
-using LicenseHeaderManager.MenuItemCommands.Temp;
 using LicenseHeaderManager.Options;
 using LicenseHeaderManager.Utils;
 using Microsoft;
@@ -159,8 +158,6 @@ namespace LicenseHeaderManager
       await AddNewLicenseHeaderDefinitionFileToFolderCommand.InitializeAsync (this);
       await AddLicenseHeaderEditorAdvancedMenuCommand.InitializeAsync (this);
       await RemoveLicenseHeaderEditorAdvancedMenuCommand.InitializeAsync (this);
-      await SaveSettingsCommand.InitializeAsync (this);
-      await LoadSettingsCommand.InitializeAsync (this);
 
       //register ItemAdded event handler
       if (Dte2.Events is Events2 events)
