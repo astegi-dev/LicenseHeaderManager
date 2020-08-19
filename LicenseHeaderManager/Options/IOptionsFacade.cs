@@ -44,7 +44,7 @@ namespace LicenseHeaderManager.Options
     ///   Gets or sets a list of <see cref="Core.Language" /> objects that represents the
     ///   languages for which the <see cref="Core.LicenseHeaderReplacer" /> is configured to use.
     /// </summary>
-    List<Language> Languages { get; set; }
+    ObservableCollection<Language> Languages { get; set; }
 
     /// <summary>
     ///   Gets or sets whether license headers are automatically inserted into new files.

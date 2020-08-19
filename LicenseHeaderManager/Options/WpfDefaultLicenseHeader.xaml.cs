@@ -22,9 +22,9 @@ namespace LicenseHeaderManager.Options
   /// </summary>
   public partial class WpfDefaultLicenseHeader : UserControl
   {
-    private readonly DefaultLicenseHeaderPage _page;
+    private readonly IDefaultLicenseHeaderPage _page;
 
-    public WpfDefaultLicenseHeader (DefaultLicenseHeaderPage page)
+    public WpfDefaultLicenseHeader (IDefaultLicenseHeaderPage page)
         : this()
     {
       _page = page;

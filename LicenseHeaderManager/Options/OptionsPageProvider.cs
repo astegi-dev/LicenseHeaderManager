@@ -23,22 +23,23 @@ namespace LicenseHeaderManager.Options
   {
     public class General : BaseOptionPage<GeneralOptionsPageAsync>
     {
-      protected override IWin32Window Window
-      {
-        get
-        {
-          var host = new WpfHost (new WpfOptions ((IGeneralOptionsPage) _model));
-          return host;
-        }
-      }
+      protected override IWin32Window Window => new WpfHost (new WpfOptions ((IGeneralOptionsPage) _model));
     }
 
     public class DefaultLicenseHeader : BaseOptionPage<DefaultLicenseHeaderPageAsync>
     {
+      protected override IWin32Window Window => new WpfHost (new WpfDefaultLicenseHeader ((IDefaultLicenseHeaderPage) _model));
     }
 
     public class Languages : BaseOptionPage<LanguagesPageAsync>
     {
+      protected override IWin32Window Window
+      {
+        get {
+          var host = new WpfHost(new WpfLanguages((ILanguagesPage)_model));
+          return host;
+        }
+      }
     }
   }
 }

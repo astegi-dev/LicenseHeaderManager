@@ -85,7 +85,7 @@ namespace LicenseHeaderManager.Headers
         return null;
 
       var fileName = GetNewFullName (activeProject);
-      File.WriteAllText (fileName, page.LicenseHeaderFileText, Encoding.UTF8);
+      File.WriteAllText (fileName, page.DefaultLicenseHeaderFileText, Encoding.UTF8);
       var newProjectItem = activeProject.ProjectItems.AddFromFile (fileName);
 
       if (newProjectItem == null)
@@ -113,7 +113,7 @@ namespace LicenseHeaderManager.Headers
         return null;
 
       var fileName = GetNewFullName (folder.Properties.Item ("FullPath").Value.ToString());
-      File.WriteAllText (fileName, page.LicenseHeaderFileText, Encoding.UTF8);
+      File.WriteAllText (fileName, page.DefaultLicenseHeaderFileText, Encoding.UTF8);
 
       var newProjectItem = folder.ProjectItems.AddFromFile (fileName);
 

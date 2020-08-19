@@ -106,7 +106,7 @@ namespace Core.Options
 
     public string DefaultLicenseHeaderFileText { get; set; }
 
-    public List<Language> Languages { get; set; }
+    public ObservableCollection<Language> Languages { get; set; }
 
     /// <summary>
     ///   Sets all public members of this <see cref="ICoreOptions" /> instance to pre-configured default values.
@@ -117,7 +117,7 @@ namespace Core.Options
       UseRequiredKeywords = c_defaultUseRequiredKeywords;
       RequiredKeywords = c_defaultRequiredKeywords;
       DefaultLicenseHeaderFileText = _defaultDefaultLicenseHeaderFileText;
-      Languages = new List<Language> (_defaultLanguages);
+      Languages = new ObservableCollection<Language> (_defaultLanguages);
     }
 
     /// <summary>
@@ -126,7 +126,7 @@ namespace Core.Options
     /// <remarks>The default values are implementation-dependent.</remarks>
     private void InitializeValues ()
     {
-      Languages = new List<Language> (_defaultLanguages);
+      Languages = new ObservableCollection<Language> (_defaultLanguages);
     }
 
     public ICoreOptions Clone ()
@@ -136,7 +136,7 @@ namespace Core.Options
                              UseRequiredKeywords = UseRequiredKeywords,
                              RequiredKeywords = RequiredKeywords,
                              DefaultLicenseHeaderFileText = DefaultLicenseHeaderFileText,
-                             Languages = Languages.Select (x => x.Clone()).ToList()
+                             Languages = new ObservableCollection<Language> (Languages.Select (x => x.Clone()).ToList())
                          };
 
       return clonedObject;

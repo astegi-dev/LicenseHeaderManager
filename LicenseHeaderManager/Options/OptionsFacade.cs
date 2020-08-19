@@ -74,7 +74,7 @@ namespace LicenseHeaderManager.Options
       set => _coreOptions.DefaultLicenseHeaderFileText = value;
     }
 
-    public List<Language> Languages
+    public ObservableCollection<Language> Languages
     {
       get => _coreOptions.Languages;
       set => _coreOptions.Languages = value;
@@ -150,7 +150,7 @@ namespace LicenseHeaderManager.Options
                              UseRequiredKeywords = UseRequiredKeywords,
                              RequiredKeywords = RequiredKeywords,
                              DefaultLicenseHeaderFileText = DefaultLicenseHeaderFileText,
-                             Languages = Languages.Select (x => x.Clone()).ToList(),
+                             Languages = new ObservableCollection<Language>(Languages.Select (x => x.Clone())),
                              InsertHeaderIntoNewFiles = InsertHeaderIntoNewFiles,
                              LinkedCommands = new ObservableCollection<LinkedCommand> (LinkedCommands.Select (x => x.Clone()))
                          };

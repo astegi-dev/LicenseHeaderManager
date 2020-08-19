@@ -22,7 +22,7 @@ namespace LicenseHeaderManager.Options
   /// </summary>
   public partial class WpfEditDefaultLicenseHeaderDialog : Window
   {
-    public WpfEditDefaultLicenseHeaderDialog (DefaultLicenseHeaderPage page)
+    public WpfEditDefaultLicenseHeaderDialog (IDefaultLicenseHeaderPage page)
         : this()
     {
       DataContext = page;
@@ -36,7 +36,7 @@ namespace LicenseHeaderManager.Options
     private void OKButtonClick (object sender, RoutedEventArgs e)
     {
       var bindingExpression = defaultText.GetBindingExpression (TextBox.TextProperty);
-      bindingExpression.UpdateSource();
+      bindingExpression?.UpdateSource();
       DialogResult = true;
     }
   }

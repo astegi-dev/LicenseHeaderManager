@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace Core.Options
     ///   Gets or sets a collection of <see cref="Core.Language" /> objects that represents the
     ///   languages for which the <see cref="Core.LicenseHeaderReplacer" /> is configured to use.
     /// </summary>
-    List<Language> Languages { get; set; }
+    ObservableCollection<Language> Languages { get; set; }
 
     /// <summary>
     ///   Creates a deep copy of the current <see cref="ICoreOptions" /> instance.

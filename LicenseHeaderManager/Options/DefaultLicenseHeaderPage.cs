@@ -43,7 +43,7 @@ namespace LicenseHeaderManager.Options
       }
     }
 
-    public string LicenseHeaderFileText { get; set; }
+    public string DefaultLicenseHeaderFileText { get; set; }
 
     public override void ResetSettings ()
     {
@@ -54,7 +54,7 @@ namespace LicenseHeaderManager.Options
 
     private void InitializeFromResource ()
     {
-      LicenseHeaderFileText = GetDefaultLicenseHeader();
+      DefaultLicenseHeaderFileText = GetDefaultLicenseHeader();
     }
 
     private string GetDefaultLicenseHeader ()
@@ -74,7 +74,7 @@ namespace LicenseHeaderManager.Options
 
     private void InitializeFromResourceIfRequired ()
     {
-      if (string.IsNullOrEmpty (LicenseHeaderFileText))
+      if (string.IsNullOrEmpty (DefaultLicenseHeaderFileText))
       {
         InitializeFromResource();
         MessageBoxHelper.Show (Resources.Update_DefaultLicenseHeader_1_2_1.ReplaceNewLines(), Resources.Update);
@@ -92,9 +92,9 @@ namespace LicenseHeaderManager.Options
         var migratedDefaultLicenseHeaderPage = new DefaultLicenseHeaderPage();
         LoadRegistryValuesBefore_3_0_0 (migratedDefaultLicenseHeaderPage);
 
-        LicenseHeaderFileText = ThreeWaySelectionForMigration (
-            LicenseHeaderFileText,
-            migratedDefaultLicenseHeaderPage.LicenseHeaderFileText,
+        DefaultLicenseHeaderFileText = ThreeWaySelectionForMigration (
+            DefaultLicenseHeaderFileText,
+            migratedDefaultLicenseHeaderPage.DefaultLicenseHeaderFileText,
             GetDefaultLicenseHeader());
       }
     }
