@@ -125,7 +125,9 @@ namespace LicenseHeaderManager.Options.DialogPages
 
     protected void LoadRegistryValuesBefore_3_0_0(BaseOptionModel<T> dialogPage = null)
     {
-      using var key = GetOldRegistryKey();
+      //using var key = GetOldRegistryKey();
+      using var key = GetCurrentRegistryKey();
+
       foreach (var property in GetVisibleProperties())
       {
         var converter = GetPropertyConverterOrDefault(property);
@@ -148,6 +150,13 @@ namespace LicenseHeaderManager.Options.DialogPages
       var oldSettingsRegistryPath = $"DialogPage\\LicenseHeaderManager.Options.{GetType().Name}";
       var service = (AsyncPackage)GetService(typeof(AsyncPackage));
       return service?.UserRegistryRoot.OpenSubKey(oldSettingsRegistryPath);
+    }
+
+    private RegistryKey GetCurrentRegistryKey()
+    {
+      var oldSettingsRegistryPath = $"ApplicationPrivateSettings\\LicenseHeaderManager\\Options\\{GetType().Name}";
+      var service = (AsyncPackage)GetService(typeof(AsyncPackage));
+      return service?.UserRegistryRoot?.OpenSubKey(oldSettingsRegistryPath);
     }
 
     private IEnumerable<PropertyDescriptor> GetVisibleProperties()

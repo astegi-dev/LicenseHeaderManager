@@ -66,6 +66,32 @@ namespace LicenseHeaderManager.Options.DialogPages
       }
     }
 
+    private void MigrateStorageLocation_3_1_0()
+    {
+      if (!System.Version.TryParse(Version, out var version) || version < new Version(3, 0, 3))
+      {
+        //LoadRegistryValuesBefore_3_0_1();
+      }
+      else
+      {
+        var migratedOptionsPage = new GeneralOptionsPageModel();
+        LoadRegistryValuesBefore_3_0_0(migratedOptionsPage);
+
+        OptionsFacade.CurrentOptions.InsertHeaderIntoNewFiles = ThreeWaySelectionForMigration(
+            OptionsFacade.CurrentOptions.InsertHeaderIntoNewFiles,
+            migratedOptionsPage.InsertHeaderIntoNewFiles,
+            VisualStudioOptions.c_defaultInsertHeaderIntoNewFiles);
+        OptionsFacade.CurrentOptions.UseRequiredKeywords = ThreeWaySelectionForMigration(
+            OptionsFacade.CurrentOptions.UseRequiredKeywords,
+            migratedOptionsPage.UseRequiredKeywords,
+            CoreOptions.c_defaultUseRequiredKeywords);
+        OptionsFacade.CurrentOptions.RequiredKeywords = ThreeWaySelectionForMigration(
+            OptionsFacade.CurrentOptions.RequiredKeywords,
+            migratedOptionsPage.RequiredKeywords,
+            CoreOptions.c_defaultRequiredKeywords);
+        OptionsFacade.CurrentOptions.LinkedCommands = migratedOptionsPage.LinkedCommands;
+      }
+    }
     
   }
 }
