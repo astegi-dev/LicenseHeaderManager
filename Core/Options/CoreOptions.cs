@@ -17,9 +17,9 @@ namespace Core.Options
   {
     public const bool c_defaultUseRequiredKeywords = true;
     public const string c_defaultRequiredKeywords = "license, copyright, (c), ©";
-    private readonly string _defaultDefaultLicenseHeaderFileText = GetDefaultLicenseHeader();
+    public static readonly string _defaultDefaultLicenseHeaderFileText = GetDefaultLicenseHeader();
 
-    private readonly ObservableCollection<Language> _defaultLanguages = new ObservableCollection<Language>
+    public static readonly ObservableCollection<Language> _defaultLanguages = new ObservableCollection<Language>
                                                                         {
                                                                             new Language
                                                                             {

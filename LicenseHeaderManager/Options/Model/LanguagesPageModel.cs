@@ -14,11 +14,16 @@
 using System;
 using System.Collections.ObjectModel;
 using Core;
+using Core.Options;
 
 namespace LicenseHeaderManager.Options.Model
 {
   public class LanguagesPageModel : BaseOptionModel<LanguagesPageModel>, ILanguagesPageModel
   {
     public ObservableCollection<Language> Languages { get; set; }
+    public void Reset ()
+    {
+      Languages = CoreOptions._defaultLanguages;
+    }
   }
 }

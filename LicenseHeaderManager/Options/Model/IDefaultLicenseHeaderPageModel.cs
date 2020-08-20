@@ -18,5 +18,7 @@ namespace LicenseHeaderManager.Options.Model
   public interface IDefaultLicenseHeaderPageModel
   {
     string DefaultLicenseHeaderFileText { get; set; }
+
+    void Reset();
   }
 }

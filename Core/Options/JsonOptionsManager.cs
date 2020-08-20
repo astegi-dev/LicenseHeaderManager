@@ -58,6 +58,7 @@ namespace Core.Options
 
       try
       {
+        Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? throw new InvalidOperationException());
         using var stream = new FileStream (filePath, FileMode.Create, FileAccess.Write, FileShare.None);
         await JsonSerializer.SerializeAsync (stream, options, serializerOptions ?? SerializerDefaultOptions);
       }

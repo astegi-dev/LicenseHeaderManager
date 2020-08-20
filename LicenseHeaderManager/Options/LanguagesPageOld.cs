@@ -107,6 +107,11 @@ namespace LicenseHeaderManager.Options
       ResetSettings();
     }
 
+    public void Reset()
+    {
+      ResetSettings();
+    }
+
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Visible)]
     // ReSharper disable once UnusedMember.Global
     public string LanguagesSerialized
@@ -130,6 +135,7 @@ namespace LicenseHeaderManager.Options
 
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
     public ObservableCollection<Language> Languages { get; set; }
+
 
     public sealed override void ResetSettings ()
     {

@@ -20,5 +20,7 @@ namespace LicenseHeaderManager.Options.Model
   public interface ILanguagesPageModel
   {
     ObservableCollection<Language> Languages { get; set; }
+
+    void Reset();
   }
 }

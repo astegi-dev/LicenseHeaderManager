@@ -34,6 +34,11 @@ namespace LicenseHeaderManager.Options
       ResetSettings();
     }
 
+    public void Reset()
+    {
+      ResetSettings();
+    }
+
     [Browsable (false)]
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
     protected override IWin32Window Window

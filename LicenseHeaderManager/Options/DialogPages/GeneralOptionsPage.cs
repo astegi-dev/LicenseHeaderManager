@@ -36,6 +36,7 @@ namespace LicenseHeaderManager.Options.DialogPages
     protected override IEnumerable<UpdateStep> GetVersionUpdateSteps ()
     {
       yield return new UpdateStep (new Version (3, 0, 1), MigrateStorageLocation_3_0_1);
+      //yield return new UpdateStep (new Version (3, 1, 0), MigrateStorageLocation_3_1_0);
     }
 
     private void MigrateStorageLocation_3_0_1 ()
@@ -64,5 +65,7 @@ namespace LicenseHeaderManager.Options.DialogPages
         OptionsFacade.CurrentOptions.LinkedCommands = migratedOptionsPage.LinkedCommands;
       }
     }
+
+    
   }
 }

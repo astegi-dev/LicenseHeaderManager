@@ -12,11 +12,16 @@
  */
 
 using System;
+using Core.Options;
 
 namespace LicenseHeaderManager.Options.Model
 {
   public class DefaultLicenseHeaderPageModel : BaseOptionModel<DefaultLicenseHeaderPageModel>, IDefaultLicenseHeaderPageModel
   {
     public string DefaultLicenseHeaderFileText { get; set; }
+    public void Reset ()
+    {
+      DefaultLicenseHeaderFileText = CoreOptions._defaultDefaultLicenseHeaderFileText;
+    }
   }
 }
