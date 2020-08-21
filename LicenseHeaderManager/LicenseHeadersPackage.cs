@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Core;
@@ -32,6 +33,11 @@ using LicenseHeaderManager.Options;
 using LicenseHeaderManager.Options.DialogPages;
 using LicenseHeaderManager.Options.Model;
 using LicenseHeaderManager.Utils;
+using log4net;
+using log4net.Appender;
+using log4net.Config;
+using log4net.Core;
+using log4net.Layout;
 using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -76,6 +82,9 @@ namespace LicenseHeaderManager
     private const string c_general = "General";
     private const string c_languages = "Languages";
     private const string c_defaultLicenseHeader = "Default Header";
+
+    private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
+    private FileAppender _fileAppender;
 
     private Stack<ProjectItem> _addedItems;
     private CommandEvents _commandEvents;
@@ -137,6 +146,9 @@ namespace LicenseHeaderManager
 
       Dte2 = await GetServiceAsync (typeof (DTE)) as DTE2;
       Assumes.Present (Dte2);
+
+      CreateAndConfigureFileAppender (Path.GetFileNameWithoutExtension(Dte2.Solution.FullName));
+      s_log.Info("Logger has been initialized");
 
       _addedItems = new Stack<ProjectItem>();
 
@@ -349,6 +361,23 @@ namespace LicenseHeaderManager
       }
 
       _currentCommandEvents.AfterExecute -= FinishedAddingItem;
+    }
+
+    private void CreateAndConfigureFileAppender (string solutionName)
+    {
+      var logPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\logs");
+
+      _fileAppender?.Close();
+      _fileAppender = new FileAppender
+                      {
+                          Threshold = Level.Debug,
+                          AppendToFile = true,
+                          File = Path.Combine (logPath, $"LicenseHeaderManager_{solutionName}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.log"),
+                          Layout = new PatternLayout ("%date [%-5level] %logger: %message%newline")
+                      };
+
+      _fileAppender.ActivateOptions();
+      BasicConfigurator.Configure (_fileAppender);
     }
   }
 }
