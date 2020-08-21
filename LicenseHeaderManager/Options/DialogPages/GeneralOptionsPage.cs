@@ -36,7 +36,7 @@ namespace LicenseHeaderManager.Options.DialogPages
     protected override IEnumerable<UpdateStep> GetVersionUpdateSteps ()
     {
       yield return new UpdateStep (new Version (3, 0, 1), MigrateStorageLocation_3_0_1);
-      //yield return new UpdateStep (new Version (3, 1, 0), MigrateStorageLocation_3_1_0);
+      yield return new UpdateStep (new Version (3, 1, 0), MigrateStorageLocation_3_1_0);
     }
 
     private void MigrateStorageLocation_3_0_1 ()
@@ -70,12 +70,13 @@ namespace LicenseHeaderManager.Options.DialogPages
     {
       if (!System.Version.TryParse(Version, out var version) || version < new Version(3, 0, 3))
       {
-        //LoadRegistryValuesBefore_3_0_1();
+        LoadCurrentRegistryValues_3_0_3();
+        //DeleteCurrentRegistry();
       }
       else
       {
         var migratedOptionsPage = new GeneralOptionsPageModel();
-        LoadRegistryValuesBefore_3_0_0(migratedOptionsPage);
+        LoadCurrentRegistryValues_3_0_3(migratedOptionsPage);
 
         OptionsFacade.CurrentOptions.InsertHeaderIntoNewFiles = ThreeWaySelectionForMigration(
             OptionsFacade.CurrentOptions.InsertHeaderIntoNewFiles,
@@ -92,6 +93,5 @@ namespace LicenseHeaderManager.Options.DialogPages
         OptionsFacade.CurrentOptions.LinkedCommands = migratedOptionsPage.LinkedCommands;
       }
     }
-    
   }
 }

@@ -40,16 +40,16 @@ namespace LicenseHeaderManager.Options.DialogPages
     /// </summary>
     public string Version { get; set; }
 
-    public BaseOptionPage ()
+    public BaseOptionPage()
     {
 #pragma warning disable VSTHRD104 // Offer async methods
-      Model = ThreadHelper.JoinableTaskFactory.Run (BaseOptionModel<T>.CreateAsync);
+      Model = ThreadHelper.JoinableTaskFactory.Run(BaseOptionModel<T>.CreateAsync);
 #pragma warning restore VSTHRD104 // Offer async methods
     }
 
     public override object AutomationObject => Model;
 
-    public override void LoadSettingsFromStorage ()
+    public override void LoadSettingsFromStorage()
     {
       Model.Load();
 
@@ -88,7 +88,7 @@ namespace LicenseHeaderManager.Options.DialogPages
       }
     }
 
-    public override void SaveSettingsToStorage ()
+    public override void SaveSettingsToStorage()
     {
       Model.Save();
     }
@@ -110,28 +110,27 @@ namespace LicenseHeaderManager.Options.DialogPages
       return true;
     }
 
-    private Version GetParsedRegistryVersion ()
+    private Version GetParsedRegistryVersion()
     {
-      System.Version.TryParse (Version, out var result);
+      System.Version.TryParse(Version, out var result);
       return result;
     }
 
-    private Version GetCurrentlyInstalledVersion ()
+    private Version GetCurrentlyInstalledVersion()
     {
-      return System.Version.Parse (LicenseHeadersPackage.Version);
+      return System.Version.Parse(LicenseHeadersPackage.Version);
     }
 
     #region migration to 3.0.1
 
     protected void LoadRegistryValuesBefore_3_0_0(BaseOptionModel<T> dialogPage = null)
     {
-      //using var key = GetOldRegistryKey();
-      using var key = GetCurrentRegistryKey();
+      using var oldRegistryKey = GetRegistryKey($"DialogPage\\LicenseHeaderManager.Options.{GetType().Name}");
 
       foreach (var property in GetVisibleProperties())
       {
         var converter = GetPropertyConverterOrDefault(property);
-        var registryValue = GetRegistryValue(key, property.Name);
+        var registryValue = GetRegistryValue(oldRegistryKey, property.Name);
 
         if (registryValue != null)
           try
@@ -145,18 +144,40 @@ namespace LicenseHeaderManager.Options.DialogPages
       }
     }
 
-    private RegistryKey GetOldRegistryKey()
+    protected void LoadCurrentRegistryValues_3_0_3(BaseOptionModel<T> dialogPage = null)
     {
-      var oldSettingsRegistryPath = $"DialogPage\\LicenseHeaderManager.Options.{GetType().Name}";
-      var service = (AsyncPackage)GetService(typeof(AsyncPackage));
-      return service?.UserRegistryRoot.OpenSubKey(oldSettingsRegistryPath);
+      using var currentRegistryKey = GetRegistryKey($"ApplicationPrivateSettings\\LicenseHeaderManager\\Options\\{GetType().Name}");
+
+      foreach (var property in GetVisibleProperties())
+      {
+        var converter = GetPropertyConverterOrDefault(property);
+        var registryValue = GetRegistryValue(currentRegistryKey, property.Name);
+
+        if (registryValue != null)
+          try
+          {
+            property.SetValue(dialogPage ?? AutomationObject, DeserializeValue(converter, registryValue));
+          }
+          catch (Exception ex)
+          {
+            OutputWindowHandler.WriteMessage($"Could not restore registry value for {property.Name}: " + ex);
+          }
+      }
     }
 
-    private RegistryKey GetCurrentRegistryKey()
+    protected void DeleteCurrentRegistry()
     {
-      var oldSettingsRegistryPath = $"ApplicationPrivateSettings\\LicenseHeaderManager\\Options\\{GetType().Name}";
+      var currentSettingsRegistryPath = $"ApplicationPrivateSettings";
       var service = (AsyncPackage)GetService(typeof(AsyncPackage));
-      return service?.UserRegistryRoot?.OpenSubKey(oldSettingsRegistryPath);
+      var key = service?.UserRegistryRoot?.OpenSubKey(currentSettingsRegistryPath, true);
+      //key?.DeleteSubKeyTree("LicenseHeaderManager");
+    }
+
+    private RegistryKey GetRegistryKey(string path)
+    {
+      var oldSettingsRegistryPath = path;
+      var service = (AsyncPackage)GetService(typeof(AsyncPackage));
+      return service?.UserRegistryRoot.OpenSubKey(oldSettingsRegistryPath);
     }
 
     private IEnumerable<PropertyDescriptor> GetVisibleProperties()
@@ -183,7 +204,8 @@ namespace LicenseHeaderManager.Options.DialogPages
 
     private object DeserializeValue(TypeConverter converter, string value)
     {
-      return converter.ConvertFromInvariantString(value);
+      // TODO
+      return converter.ConvertFromInvariantString(value.Split('*')[2]);
     }
 
     protected U ThreeWaySelectionForMigration<U>(U currentValue, U migratedValue, U defaultValue)

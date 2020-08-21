@@ -70,7 +70,7 @@ namespace LicenseHeaderManager
   [ProvideMenuResource ("Menus.ctmenu", 1)]
   public sealed class LicenseHeadersPackage : AsyncPackage, ILicenseHeaderExtension
   {
-    public const string Version = "3.0.3";
+    public const string Version = "3.1.0";
 
     private const string c_licenseHeaders = "License Header Manager";
     private const string c_general = "General";
