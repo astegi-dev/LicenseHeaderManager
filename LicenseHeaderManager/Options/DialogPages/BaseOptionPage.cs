@@ -14,6 +14,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -256,7 +257,11 @@ namespace LicenseHeaderManager.Options.DialogPages
     private object DeserializeValue(TypeConverter converter, string value)
     {
       // TODO
-      return converter.ConvertFromInvariantString(value.Split('*')[2]);
+      if (converter.GetType() == typeof(LinkedCommandConverter))
+      {
+        return new ObservableCollection<LinkedCommand> ();
+      }
+      return value != null ? converter.ConvertFromInvariantString(value.Split('*')[2]) : null;
     }
 
     protected U ThreeWaySelectionForMigration<U>(U currentValue, U migratedValue, U defaultValue)
