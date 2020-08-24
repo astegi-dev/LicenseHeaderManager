@@ -270,7 +270,7 @@
     <Compile Include="Options\DialogPages\DefaultLicenseHeaderPage.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Options\DialogPages\GeneralOptionsPage.cs">
+    <Compile Include="Options\DialogPages\OptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\DialogPages\LanguagesPage.cs">

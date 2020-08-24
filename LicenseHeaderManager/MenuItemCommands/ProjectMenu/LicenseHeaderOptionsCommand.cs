@@ -86,7 +86,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      ServiceProvider.ShowOptionPage (typeof (GeneralOptionsPage));
+      ServiceProvider.ShowOptionPage (typeof (OptionsPage));
     }
   }
 }

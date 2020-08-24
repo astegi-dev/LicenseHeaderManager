@@ -22,10 +22,10 @@ using log4net;
 
 namespace LicenseHeaderManager.Options.DialogPages
 {
-  public class GeneralOptionsPage : BaseOptionPage<GeneralOptionsPageModel>
+  public class OptionsPage : BaseOptionPage<GeneralOptionsPageModel>
   {
     private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
-    public GeneralOptionsPage ()
+    public OptionsPage ()
     {
     }
 
@@ -76,7 +76,7 @@ namespace LicenseHeaderManager.Options.DialogPages
     private void MigrateStorageLocation_3_1_0()
     {
       s_log.Info ("Start migration to License Header Manager Version 3.1.0");
-      if (!System.Version.TryParse(Version, out var version) || version < new Version(3, 0, 3))
+      if (!System.Version.TryParse(Version, out var version) || version < new Version(3, 1, 0))
       {
         var logVersion = Version;
         if (Version == null)
