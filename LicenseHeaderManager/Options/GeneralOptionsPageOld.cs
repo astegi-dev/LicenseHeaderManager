@@ -74,7 +74,7 @@ namespace LicenseHeaderManager.Options
     }
 
     //serialized properties
-    public bool InsertHeaderIntoNewFiles { get; set; }
+    public bool InsertInNewFiles { get; set; }
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ObservableCollection<LinkedCommand> LinkedCommands
@@ -111,7 +111,7 @@ namespace LicenseHeaderManager.Options
 
     public sealed override void ResetSettings ()
     {
-      InsertHeaderIntoNewFiles = c_defaultInsertInNewFiles;
+      InsertInNewFiles = c_defaultInsertInNewFiles;
       UseRequiredKeywords = c_defaultUseRequiredKeywords;
       RequiredKeywords = c_defaultRequiredKeywords;
       LinkedCommands = _defaultLinkedCommands;
@@ -136,9 +136,9 @@ namespace LicenseHeaderManager.Options
         var migratedOptionsPage = new GeneralOptionsPageOld();
         LoadRegistryValuesBefore_3_0_0 (migratedOptionsPage);
 
-        InsertHeaderIntoNewFiles = ThreeWaySelectionForMigration (
-            InsertHeaderIntoNewFiles,
-            migratedOptionsPage.InsertHeaderIntoNewFiles,
+        InsertInNewFiles = ThreeWaySelectionForMigration (
+            InsertInNewFiles,
+            migratedOptionsPage.InsertInNewFiles,
             c_defaultInsertInNewFiles);
         UseRequiredKeywords = ThreeWaySelectionForMigration (
             UseRequiredKeywords,
@@ -153,5 +153,10 @@ namespace LicenseHeaderManager.Options
     }
 
     #endregion
+
+    private void InitializeComponent ()
+    {
+
+    }
   }
 }

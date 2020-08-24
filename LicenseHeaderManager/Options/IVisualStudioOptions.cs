@@ -24,7 +24,7 @@ namespace LicenseHeaderManager.Options
     /// <summary>
     ///   Gets or sets whether license headers are automatically inserted into new files.
     /// </summary>
-    bool InsertHeaderIntoNewFiles { get; set; }
+    bool InsertInNewFiles { get; set; }
 
     /// <summary>
     ///   Gets or sets commands provided by Visual Studio before or after which the "Add License Header" command should be

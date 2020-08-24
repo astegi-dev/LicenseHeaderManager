@@ -30,6 +30,7 @@ namespace LicenseHeaderManager.Options
 
     public static string DefaultCoreOptionsPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\CoreOptions.json");
     public static string DefaultVisualStudioOptionsPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\VisualStudioOptions.json");
+    public static string DefaultLogPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\logs_lhm");
 
     /// <summary>
     ///   Gets or sets the currently up-to-date configuration of the License Header Manager Extension, along
@@ -80,16 +81,23 @@ namespace LicenseHeaderManager.Options
       set => _coreOptions.Languages = value;
     }
 
-    public bool InsertHeaderIntoNewFiles
+    public bool InsertInNewFiles
     {
-      get => _visualStudioOptions.InsertHeaderIntoNewFiles;
-      set => _visualStudioOptions.InsertHeaderIntoNewFiles = value;
+      get => _visualStudioOptions.InsertInNewFiles;
+      set => _visualStudioOptions.InsertInNewFiles = value;
     }
 
     public ObservableCollection<LinkedCommand> LinkedCommands
     {
       get => _visualStudioOptions.LinkedCommands;
       set => _visualStudioOptions.LinkedCommands = _visualStudioOptions.LinkedCommands != null ? new ObservableCollection<LinkedCommand> (value) : null;
+    }
+
+    public string Version
+    {
+      get => _coreOptions.Version;
+      set => _coreOptions.Version = value;
+
     }
 
     /// <summary>
@@ -151,7 +159,7 @@ namespace LicenseHeaderManager.Options
                              RequiredKeywords = RequiredKeywords,
                              DefaultLicenseHeaderFileText = DefaultLicenseHeaderFileText,
                              Languages = new ObservableCollection<Language>(Languages.Select (x => x.Clone())),
-                             InsertHeaderIntoNewFiles = InsertHeaderIntoNewFiles,
+                             InsertInNewFiles = InsertInNewFiles,
                              LinkedCommands = new ObservableCollection<LinkedCommand> (LinkedCommands.Select (x => x.Clone()))
                          };
       return clonedObject;

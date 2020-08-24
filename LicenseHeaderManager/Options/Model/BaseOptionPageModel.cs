@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using log4net;
 
 namespace LicenseHeaderManager.Options.Model
 {
@@ -27,13 +28,14 @@ namespace LicenseHeaderManager.Options.Model
       where T : BaseOptionModel<T>, new()
   {
     private static readonly AsyncLazy<T> s_liveModel = new AsyncLazy<T> (CreateAsync, ThreadHelper.JoinableTaskFactory);
+    private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
 
     protected BaseOptionModel ()
     {
     }
 
     /// <summary>
-    /// A singleton instance of the options. MUST be called form UI thread only
+    /// A singleton instance of the options. MUST be called from UI thread only
     /// </summary>
     public static T Instance
     {
@@ -82,6 +84,7 @@ namespace LicenseHeaderManager.Options.Model
       //if (!settingsStore.CollectionExists (CollectionName))
       //  return;
 
+      s_log.Info("Load options from config file");
       OptionsFacade.CurrentOptions = await OptionsFacade.LoadAsync();
 
       foreach (var property in GetOptionProperties())
@@ -114,9 +117,10 @@ namespace LicenseHeaderManager.Options.Model
       //if (!settingsStore.CollectionExists (CollectionName))
       //  settingsStore.CreateCollection (CollectionName);
 
+      s_log.Info("Save options to config file");
       foreach (var property in GetOptionProperties())
       {
-        if (typeof (IOptionsFacade).GetProperty (property.Name)?.PropertyType != property.PropertyType)
+        if ((typeof (IOptionsFacade).GetProperty (property.Name)?.PropertyType != property.PropertyType))
           continue;
 
         var facadeProperty = typeof (IOptionsFacade).GetProperty (property.Name);

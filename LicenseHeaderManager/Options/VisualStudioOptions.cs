@@ -24,7 +24,7 @@ namespace LicenseHeaderManager.Options
   [LicenseHeaderManagerOptions]
   internal class VisualStudioOptions : IVisualStudioOptions
   {
-    public const bool c_defaultInsertHeaderIntoNewFiles = false;
+    public const bool c_defaultInsertInNewFiles = false;
 
     
     public static readonly ObservableCollection<LinkedCommand> s_defaultLinkedCommands = new ObservableCollection<LinkedCommand>();
@@ -43,7 +43,7 @@ namespace LicenseHeaderManager.Options
         InitializeValues();
     }
 
-    public bool InsertHeaderIntoNewFiles { get; set; }
+    public bool InsertInNewFiles { get; set; }
 
     public ObservableCollection<LinkedCommand> LinkedCommands
     {
@@ -69,7 +69,7 @@ namespace LicenseHeaderManager.Options
     {
       var clonedObject = new VisualStudioOptions
                          {
-                             InsertHeaderIntoNewFiles = InsertHeaderIntoNewFiles,
+                             InsertInNewFiles = InsertInNewFiles,
                              LinkedCommands = new ObservableCollection<LinkedCommand> (LinkedCommands.Select (x => x.Clone()))
                          };
       return clonedObject;
@@ -110,7 +110,7 @@ namespace LicenseHeaderManager.Options
     /// <remarks>The default values are implementation-dependent.</remarks>
     private void SetDefaultValues ()
     {
-      InsertHeaderIntoNewFiles = c_defaultInsertHeaderIntoNewFiles;
+      InsertInNewFiles = c_defaultInsertInNewFiles;
       LinkedCommands = new ObservableCollection<LinkedCommand> (s_defaultLinkedCommands);
     }
 

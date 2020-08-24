@@ -370,6 +370,9 @@
     <Compile Include="Utils\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Options\GeneralOptionsPageOld.resx">
+      <DependentUpon>GeneralOptionsPageOld.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

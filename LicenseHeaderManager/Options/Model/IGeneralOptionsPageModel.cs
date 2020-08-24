@@ -26,7 +26,7 @@ namespace LicenseHeaderManager.Options.Model
 
     ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
 
-    bool InsertHeaderIntoNewFiles { get; set; }
+    bool InsertInNewFiles { get; set; }
 
     Commands Commands { get; }
 

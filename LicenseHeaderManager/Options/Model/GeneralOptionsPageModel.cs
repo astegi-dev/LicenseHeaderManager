@@ -30,7 +30,7 @@ namespace LicenseHeaderManager.Options.Model
 
     public ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
 
-    public bool InsertHeaderIntoNewFiles { get; set; }
+    public bool InsertInNewFiles { get; set; }
 
     private DTE2 Dte => ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
 
@@ -45,7 +45,7 @@ namespace LicenseHeaderManager.Options.Model
       UseRequiredKeywords = CoreOptions.c_defaultUseRequiredKeywords;
       RequiredKeywords = CoreOptions.c_defaultRequiredKeywords;
       LinkedCommands = VisualStudioOptions.s_defaultLinkedCommands;
-      InsertHeaderIntoNewFiles = VisualStudioOptions.c_defaultInsertHeaderIntoNewFiles;
+      InsertInNewFiles = VisualStudioOptions.c_defaultInsertInNewFiles;
     }
   }
 }

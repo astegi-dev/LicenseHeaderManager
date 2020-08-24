@@ -108,6 +108,8 @@ namespace Core.Options
 
     public ObservableCollection<Language> Languages { get; set; }
 
+    public string Version { get; set; }
+
     /// <summary>
     ///   Sets all public members of this <see cref="ICoreOptions" /> instance to pre-configured default values.
     /// </summary>
