@@ -8,7 +8,7 @@ namespace LicenseHeaderManager.Options.DialogPages
 {
   public enum OptionsStoreMode
   {
-    RegistryStore,
+    RegistryStore_3_0_3,
     JsonStore
   }
 }

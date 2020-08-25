@@ -38,39 +38,7 @@ namespace LicenseHeaderManager.Options.DialogPages
 
     protected override IEnumerable<UpdateStep> GetVersionUpdateSteps ()
     {
-      //yield return new UpdateStep (new Version (3, 0, 1), MigrateStorageLocation_3_0_1);
       yield return new UpdateStep (new Version (3, 1, 0), MigrateStorageLocation_3_1_0);
-    }
-
-    private void MigrateStorageLocation_3_0_1 ()
-    {
-      s_log.Info ("Start migration to License Header Manager Version 3.0.1");
-      s_log.Info ($"Current version: {Version}");
-
-      if (!System.Version.TryParse (Version, out var version) || version < new Version (3, 0, 0))
-      {
-        LoadRegistryValuesBefore_3_0_0();
-      }
-      else
-      {
-        s_log.Info ("Migration to 3.0.1 with existing options page");
-        var migratedOptionsPage = new GeneralOptionsPageModel();
-        LoadRegistryValuesBefore_3_0_0 (migratedOptionsPage);
-
-        OptionsFacade.CurrentOptions.InsertInNewFiles = ThreeWaySelectionForMigration (
-            OptionsFacade.CurrentOptions.InsertInNewFiles,
-            migratedOptionsPage.InsertInNewFiles,
-            VisualStudioOptions.c_defaultInsertInNewFiles);
-        OptionsFacade.CurrentOptions.UseRequiredKeywords = ThreeWaySelectionForMigration (
-            OptionsFacade.CurrentOptions.UseRequiredKeywords,
-            migratedOptionsPage.UseRequiredKeywords,
-            CoreOptions.c_defaultUseRequiredKeywords);
-        OptionsFacade.CurrentOptions.RequiredKeywords = ThreeWaySelectionForMigration (
-            OptionsFacade.CurrentOptions.RequiredKeywords,
-            migratedOptionsPage.RequiredKeywords,
-            CoreOptions.c_defaultRequiredKeywords);
-        OptionsFacade.CurrentOptions.LinkedCommands = migratedOptionsPage.LinkedCommands;
-      }
     }
 
     private void MigrateStorageLocation_3_1_0()
@@ -78,12 +46,7 @@ namespace LicenseHeaderManager.Options.DialogPages
       s_log.Info ("Start migration to License Header Manager Version 3.1.0");
       if (!System.Version.TryParse(Version, out var version) || version < new Version(3, 1, 0))
       {
-        var logVersion = Version;
-        if (Version == null)
-        {
-          logVersion = "null";
-        }
-        s_log.Info ($"Current version: {logVersion}");
+        s_log.Info($"Current version: {Version}");
         LoadCurrentRegistryValues_3_0_3();
       }
       else

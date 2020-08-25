@@ -156,7 +156,7 @@ namespace LicenseHeaderManager
       await RemoveHeaderFromProjectItemCommand.InitializeAsync (this);
       await AddLicenseHeaderToAllFilesInSolutionCommand.InitializeAsync (this);
       await RemoveLicenseHeaderFromAllFilesInSolutionCommand.InitializeAsync (this);
-      await AddNewSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this, Dte2?.Solution, () => DefaultLicenseHeaderPageModel.DefaultLicenseHeaderFileText);
+      await AddNewSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this, Dte2?.Solution, () => DefaultLicenseHeaderPageModel.LicenseHeaderFileText);
       await OpenSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this);
       await RemoveSolutionLicenseHeaderDefinitionFileCommand.InitializeAsync (this);
       await AddLicenseHeaderToAllFilesInProjectCommand.InitializeAsync (this);

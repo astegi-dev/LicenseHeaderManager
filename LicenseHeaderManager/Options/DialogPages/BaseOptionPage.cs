@@ -45,7 +45,7 @@ namespace LicenseHeaderManager.Options.DialogPages
     /// </summary>
     public string Version { get; set; }
 
-    private static OptionsStoreMode s_optionsStoreMode = OptionsStoreMode.RegistryStore;
+    private static OptionsStoreMode s_optionsStoreMode = OptionsStoreMode.RegistryStore_3_0_3;
 
     public BaseOptionPage()
     {
@@ -67,10 +67,12 @@ namespace LicenseHeaderManager.Options.DialogPages
       //Could happen if you install a LicenseHeaderManager (LHM) version which is older than the ever installed highest version
       //Should only happen to developers of LHM, but could theoretically also happen if someone downgrades LHM.
 
-      s_log.Info($"Parsed Registry Version: {GetParsedRegistryVersion()}");
-      s_log.Info($"Currently Installed Version: {GetCurrentlyInstalledVersion()}");
+      var parsedRegistryVersion = GetParsedRegistryVersion();
+      var currentlyInstalledVersion = GetCurrentlyInstalledVersion();
+      s_log.Info($"Parsed Registry Version: {parsedRegistryVersion}");
+      s_log.Info($"Currently Installed Version: {currentlyInstalledVersion}");
 
-      if (GetParsedRegistryVersion() > GetCurrentlyInstalledVersion())
+      if (parsedRegistryVersion > currentlyInstalledVersion)
       {
         if (s_firstDialogPageLoaded)
         {
@@ -93,10 +95,10 @@ namespace LicenseHeaderManager.Options.DialogPages
         var saveRequired = false;
 
         foreach (var updateStep in GetVersionUpdateSteps())
-          saveRequired |= Update(updateStep);
+          saveRequired = saveRequired | Update(updateStep);
 
         if (Version != LicenseHeadersPackage.Version)
-          saveRequired |= Update(new UpdateStep(GetCurrentlyInstalledVersion()));
+          saveRequired |= Update(new UpdateStep(currentlyInstalledVersion));
 
         if (saveRequired)
           Model.Save();
@@ -116,13 +118,14 @@ namespace LicenseHeaderManager.Options.DialogPages
     private bool Update(UpdateStep updateStep)
     {
       var registryVersion = GetParsedRegistryVersion();
+      s_log.Info($"Registry version: {registryVersion}");
+      s_log.Info($"Target version: {updateStep.TargetVersion}");
       if (registryVersion >= updateStep.TargetVersion)
         return false;
 
       updateStep.ExecuteActions();
 
       Version = updateStep.TargetVersion.ToString();
-      //OptionsFacade.CurrentOptions.Version = Version;
       return true;
     }
 
@@ -131,8 +134,8 @@ namespace LicenseHeaderManager.Options.DialogPages
       s_log.Info($"Type name: {GetType().Name}");
       switch (s_optionsStoreMode)
       {
-        case OptionsStoreMode.RegistryStore:
-          var key = Registry.CurrentUser.OpenSubKey($"Software\\Microsoft\\VisualStudio\\16.0\\ApplicationPrivateSettings\\LicenseHeaderManager\\Options\\{GetType().Name}");
+        case OptionsStoreMode.RegistryStore_3_0_3:
+          var key = GetRegistryKey($"ApplicationPrivateSettings\\LicenseHeaderManager\\Options\\{GetType().Name}");
           if (key != null)
           {
             s_log.Info($"Retrieved registry version key: {key.Name}");
@@ -167,15 +170,18 @@ namespace LicenseHeaderManager.Options.DialogPages
 
       foreach (var property in GetVisibleProperties())
       {
+        if (property.Name == "Commands")
+          continue;
+
         var converter = GetPropertyConverterOrDefault(property);
         var registryValue = GetRegistryValue(currentRegistryKey, property.Name == "LinkedCommands" ? "LinkedCommandsSerialized" : property.Name);
         s_log.Info($"Property ({property.Name}, {registryValue}) read from registry");
-        s_log.Info($"Deserialized Value: {DeserializeValue(converter, registryValue)}");
 
         if (registryValue != null)
           try
           {
             property.SetValue(dialogPage ?? AutomationObject, DeserializeValue(converter, registryValue));
+            s_log.Info($"Deserialized Value: {DeserializeValue(converter, registryValue)}");
           }
           catch (Exception ex)
           {
@@ -188,34 +194,6 @@ namespace LicenseHeaderManager.Options.DialogPages
 
     #endregion
 
-    #region migration to 3.0.1
-
-    protected void LoadRegistryValuesBefore_3_0_0(BaseOptionModel<T> dialogPage = null)
-    {
-      //using var oldRegistryKey = GetRegistryKey($"DialogPage\\LicenseHeaderManager.Options.{GetType().Name}");
-      //s_log.Info($"Read settings from registry with key {oldRegistryKey.Name}");
-
-      //foreach (var property in GetVisibleProperties())
-      //{
-      //  var converter = GetPropertyConverterOrDefault(property);
-      //  var registryValue = GetRegistryValue(oldRegistryKey, property.Name);
-      //  s_log.Info ($"Property ({property.Name}, {registryValue}) read from registry");
-      //  s_log.Info ($"Deserialized Value: {DeserializeValue(converter, registryValue)}");
-
-      //  if (registryValue != null)
-      //    try
-      //    {
-      //      property.SetValue(dialogPage ?? AutomationObject, DeserializeValue(converter, registryValue));
-      //    }
-      //    catch (Exception ex)
-      //    {
-      //      OutputWindowHandler.WriteMessage($"Could not restore registry value for {property.Name}");
-      //      s_log.Info($"Could not restore registry value for {property.Name}", ex);
-      //    }
-      //}
-    }
-
-    #endregion
     private RegistryKey GetRegistryKey(string path)
     {
       s_log.Info("Get registry key");

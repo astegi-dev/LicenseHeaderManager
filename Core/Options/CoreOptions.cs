@@ -17,7 +17,7 @@ namespace Core.Options
   {
     public const bool c_defaultUseRequiredKeywords = true;
     public const string c_defaultRequiredKeywords = "license, copyright, (c), ©";
-    public static readonly string _defaultDefaultLicenseHeaderFileText = GetDefaultLicenseHeader();
+    public static readonly string _defaultLicenseHeaderFileText = GetDefaultLicenseHeader();
 
     public static readonly ObservableCollection<Language> _defaultLanguages = new ObservableCollection<Language>
                                                                         {
@@ -104,7 +104,7 @@ namespace Core.Options
 
     public string RequiredKeywords { get; set; }
 
-    public string DefaultLicenseHeaderFileText { get; set; }
+    public string LicenseHeaderFileText { get; set; }
 
     public ObservableCollection<Language> Languages { get; set; }
 
@@ -118,7 +118,7 @@ namespace Core.Options
     {
       UseRequiredKeywords = c_defaultUseRequiredKeywords;
       RequiredKeywords = c_defaultRequiredKeywords;
-      DefaultLicenseHeaderFileText = _defaultDefaultLicenseHeaderFileText;
+      LicenseHeaderFileText = _defaultLicenseHeaderFileText;
       Languages = new ObservableCollection<Language> (_defaultLanguages);
     }
 
@@ -137,7 +137,7 @@ namespace Core.Options
                          {
                              UseRequiredKeywords = UseRequiredKeywords,
                              RequiredKeywords = RequiredKeywords,
-                             DefaultLicenseHeaderFileText = DefaultLicenseHeaderFileText,
+                             LicenseHeaderFileText = LicenseHeaderFileText,
                              Languages = new ObservableCollection<Language> (Languages.Select (x => x.Clone()).ToList())
                          };
 

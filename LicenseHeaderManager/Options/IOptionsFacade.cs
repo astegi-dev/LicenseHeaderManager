@@ -38,7 +38,7 @@ namespace LicenseHeaderManager.Options
     /// <summary>
     ///   Gets or sets the text for new license header definition files.
     /// </summary>
-    string DefaultLicenseHeaderFileText { get; set; }
+    string LicenseHeaderFileText { get; set; }
 
     /// <summary>
     ///   Gets or sets a list of <see cref="Core.Language" /> objects that represents the
