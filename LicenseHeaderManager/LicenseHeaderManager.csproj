@@ -262,6 +262,7 @@
     <Compile Include="MenuItemCommands\ProjectMenu\RemoveLicenseHeaderFromAllFilesInProjectCommand.cs" />
     <Compile Include="MenuItemCommands\SolutionMenu\RemoveLicenseHeaderFromAllFilesInSolutionCommand.cs" />
     <Compile Include="MenuItemCommands\SolutionMenu\RemoveSolutionLicenseHeaderDefinitionFileCommand.cs" />
+    <Compile Include="Options\DialogPages\OptionsStoreMode.cs" />
     <Compile Include="Options\Model\BaseOptionPageModel.cs" />
     <Compile Include="Options\DialogPages\BaseOptionPage.cs">
       <SubType>Component</SubType>

@@ -184,9 +184,9 @@ namespace LicenseHeaderManager
         {
           _websiteItemEvents = events.GetObject ("WebSiteItemsEvents") as ProjectItemsEvents;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-          //TODO Add log statement as soon as we have added logging.
+          s_log.Error("No WebSite component is installed on the machine: ", ex);
           //This probably only throws an exception if no WebSite component is installed on the machine.
           //If no WebSite component is installed, they are probably not using a WebSite Project and therefore dont need that feature.
         }
@@ -220,6 +220,9 @@ namespace LicenseHeaderManager
         _commandEvents = Dte2.Events.CommandEvents;
         _commandEvents.BeforeExecute += BeforeAnyCommandExecuted;
       }
+
+      // migrate options from registry to config file
+      await MigrateOptionsAsync();
     }
 
     public bool SolutionHeaderDefinitionExists ()
@@ -378,6 +381,18 @@ namespace LicenseHeaderManager
 
       _fileAppender.ActivateOptions();
       BasicConfigurator.Configure (_fileAppender);
+    }
+
+    private async Task MigrateOptionsAsync ()
+    {
+      var optionsPage = (OptionsPage)GetDialogPage(typeof(OptionsPage));
+      var defaultLicenseHeaderPage = (DefaultLicenseHeaderPage)GetDialogPage(typeof(DefaultLicenseHeaderPage));
+      var languagesPage = (LanguagesPage)GetDialogPage(typeof(LanguagesPage));
+      optionsPage.MigrateOptions();
+      defaultLicenseHeaderPage.MigrateOptions();
+      languagesPage.MigrateOptions();
+      OptionsFacade.CurrentOptions.Version = Version;
+      await OptionsFacade.SaveAsync (OptionsFacade.CurrentOptions);
     }
   }
 }
