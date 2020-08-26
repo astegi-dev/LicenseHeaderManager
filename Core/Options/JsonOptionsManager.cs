@@ -48,7 +48,7 @@ namespace Core.Options
       }
       catch (Exception ex)
       {
-        throw new SerializationException ("An unspecified error occured while deserializing configuration", ex);
+        throw new SerializationException ("An unspecified error occurred while deserializing configuration", ex);
       }
     }
 
@@ -58,7 +58,7 @@ namespace Core.Options
 
       try
       {
-        Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? throw new InvalidOperationException());
+        Directory.CreateDirectory(Path.GetDirectoryName(filePath) ?? throw new ArgumentException(@"Must be valid filepath", nameof(filePath)));
         using var stream = new FileStream (filePath, FileMode.Create, FileAccess.Write, FileShare.None);
         await JsonSerializer.SerializeAsync (stream, options, serializerOptions ?? SerializerDefaultOptions);
       }
@@ -72,7 +72,7 @@ namespace Core.Options
       }
       catch (Exception ex)
       {
-        throw new SerializationException ("An unspecified error occured while serializing configuration", ex);
+        throw new SerializationException ("An unspecified error occurred while serializing configuration", ex);
       }
     }
 

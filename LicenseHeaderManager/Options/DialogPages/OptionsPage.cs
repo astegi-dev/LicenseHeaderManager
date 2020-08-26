@@ -25,9 +25,6 @@ namespace LicenseHeaderManager.Options.DialogPages
   public class OptionsPage : BaseOptionPage<GeneralOptionsPageModel>
   {
     private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
-    public OptionsPage ()
-    {
-    }
 
     public override void ResetSettings ()
     {

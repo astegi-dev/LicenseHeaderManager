@@ -307,12 +307,6 @@
     <Compile Include="Options\DialogPageControls\WpfEditDefaultLicenseHeaderDialog.xaml.cs">
       <DependentUpon>WpfEditDefaultLicenseHeaderDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Options\DefaultLicenseHeaderPageOld.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\VersionedDialogPage.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Options\LinkedCommand.cs" />
     <Compile Include="Options\Converters\LinkedCommandConverter.cs" />
     <Compile Include="Options\Converters\ExtensionConverter.cs" />
@@ -325,12 +319,6 @@
       <DependentUpon>WpfLanguageDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Options\Converters\LanguageConverter.cs" />
-    <Compile Include="Options\GeneralOptionsPageOld.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Options\LanguagesPageOld.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Options\DialogPageControls\WpfLanguages.xaml.cs">
       <DependentUpon>WpfLanguages.xaml</DependentUpon>
     </Compile>
@@ -372,9 +360,6 @@
     <Compile Include="Utils\Extensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Options\GeneralOptionsPageOld.resx">
-      <DependentUpon>GeneralOptionsPageOld.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

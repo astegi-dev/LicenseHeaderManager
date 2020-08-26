@@ -12,7 +12,10 @@
  */
 
 using System;
+using System.Collections.ObjectModel;
 using LicenseHeaderManager.Options;
+using LicenseHeaderManager.Options.Converters;
+using LicenseHeaderManager.Options.Model;
 using NUnit.Framework;
 
 namespace LicenseHeaderManager.Test
@@ -23,7 +26,7 @@ namespace LicenseHeaderManager.Test
     [Test]
     public void TestLinkedCommandsChangedCalledWhenNewLinkedCommandSavedWithDefaultLinkedCommands ()
     {
-      var optionsPage = new GeneralOptionsPageOld();
+      var optionsPage = new GeneralOptionsPageModel();
       var wasCalled = false;
       optionsPage.LinkedCommandsChanged += (sender, args) => wasCalled = true;
 
@@ -35,11 +38,12 @@ namespace LicenseHeaderManager.Test
     [Test]
     public void TestLinkedCommandsChangedCalledWhenNewLinkedCommandSavedWithExistingLinkedCommands ()
     {
-      var optionsPage = new GeneralOptionsPageOld();
+      var optionsPage = new GeneralOptionsPageModel();
       var wasCalled = false;
       optionsPage.LinkedCommandsChanged += (sender, args) => wasCalled = true;
       const string emptySerializedLinkedCommands = "1*System.String*<LinkedCommands/>";
-      optionsPage.LinkedCommandsSerialized = emptySerializedLinkedCommands;
+      var converter = new LinkedCommandConverter();
+      optionsPage.LinkedCommands = new ObservableCollection<LinkedCommand> (converter.FromXml(emptySerializedLinkedCommands));
 
       optionsPage.LinkedCommands.Add (new LinkedCommand());
 

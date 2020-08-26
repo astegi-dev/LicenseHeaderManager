@@ -95,7 +95,7 @@ namespace LicenseHeaderManager.Options.DialogPages
         var saveRequired = false;
 
         foreach (var updateStep in GetVersionUpdateSteps())
-          saveRequired = saveRequired | Update(updateStep);
+          saveRequired |= Update(updateStep);
 
         if (Version != LicenseHeadersPackage.Version)
           saveRequired |= Update(new UpdateStep(currentlyInstalledVersion));
@@ -173,21 +173,30 @@ namespace LicenseHeaderManager.Options.DialogPages
         if (property.Name == "Commands")
           continue;
 
-        var converter = GetPropertyConverterOrDefault(property);
-        var registryValue = GetRegistryValue(currentRegistryKey, property.Name == "LinkedCommands" ? "LinkedCommandsSerialized" : property.Name);
-        s_log.Info($"Property ({property.Name}, {registryValue}) read from registry");
+        var propertyName = property.Name switch
+        {
+            "LinkedCommands" => "LinkedCommandsSerialized",
+            "Languages" => "LanguagesSerialized",
+            _ => property.Name
+        };
 
-        if (registryValue != null)
-          try
-          {
-            property.SetValue(dialogPage ?? AutomationObject, DeserializeValue(converter, registryValue));
-            s_log.Info($"Deserialized Value: {DeserializeValue(converter, registryValue)}");
-          }
-          catch (Exception ex)
-          {
-            OutputWindowHandler.WriteMessage($"Could not restore registry value for {property.Name}");
-            s_log.Info($"Could not restore registry value for {property.Name}", ex);
-          }
+        var converter = GetPropertyConverterOrDefault(property);
+        var registryValue = GetRegistryValue(currentRegistryKey, propertyName);
+        s_log.Info($"Property ({propertyName}, {registryValue}) read from registry");
+
+        if (registryValue == null)
+          continue;
+
+        try
+        {
+          property.SetValue(dialogPage ?? AutomationObject, DeserializeValue(converter, registryValue));
+          s_log.Info($"Deserialized Value: {DeserializeValue(converter, registryValue)}");
+        }
+        catch (Exception ex)
+        {
+          OutputWindowHandler.WriteMessage($"Could not restore registry value for {propertyName}");
+          s_log.Info($"Could not restore registry value for {propertyName}", ex);
+        }
       }
       s_optionsStoreMode = OptionsStoreMode.JsonStore;
     }
@@ -236,12 +245,11 @@ namespace LicenseHeaderManager.Options.DialogPages
 
     private object DeserializeValue(TypeConverter converter, string value)
     {
-      // TODO
-      if (converter.GetType() == typeof(LinkedCommandConverter))
-      {
-        return new ObservableCollection<LinkedCommand>();
-      }
-      return value != null ? converter.ConvertFromInvariantString(value.Split('*')[2]) : null;
+      if (value == null)
+        return null;
+
+      var actualValue = string.Join("", value.Split('*').Skip(2));
+      return converter.ConvertFromInvariantString(actualValue);
     }
 
     protected U ThreeWaySelectionForMigration<U>(U currentValue, U migratedValue, U defaultValue)
