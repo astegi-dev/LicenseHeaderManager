@@ -12,41 +12,42 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using log4net.Appender;
+using log4net.Core;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
 
-namespace LicenseHeaderManager
+namespace LicenseHeaderManager.Utils
 {
-  internal static class OutputWindowHandler
+  class OutputPaneAppender : AppenderSkeleton
   {
-    private static IVsOutputWindow _outputWindow;
+    private readonly IVsOutputWindowPane _licenseHeaderManagerPane;
 
-    private static Guid _customGuid;
-
-    public static void Initialize (IVsOutputWindow outputWindow)
+    public OutputPaneAppender(IVsOutputWindow outputPane, Level threshold)
     {
-      _outputWindow = outputWindow;
-      _customGuid = new Guid (GuidList.guidVisualStudioOutputWindow);
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      Threshold = threshold;
+      outputPane.GetPane(ref Guids.guidOutputPaneAppender, out _licenseHeaderManagerPane);
     }
 
-    public static void WriteMessage (string message)
+    protected override void Append(LoggingEvent loggingEvent)
     {
-      var customPane = GetOutputWindow();
-
-      if (customPane == null)
-      {
-        _outputWindow.CreatePane (ref _customGuid, Resources.LicenseHeaderManagerName, 1, 1);
-        customPane = GetOutputWindow();
-      }
-
-      customPane.OutputString (message + Environment.NewLine);
-      customPane.Activate(); // Brings this pane into view
+      LogMessageAsync(loggingEvent).FireAndForget();
     }
 
-    private static IVsOutputWindowPane GetOutputWindow ()
+    private async Task LogMessageAsync(LoggingEvent loggingEvent)
     {
-      IVsOutputWindowPane customPane;
-      _outputWindow.GetPane (ref _customGuid, out customPane);
-      return customPane;
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+      _licenseHeaderManagerPane.OutputStringThreadSafe(
+          $"{loggingEvent.TimeStamp:yyyy-MM-dd HH:mm:ss,fff} [{loggingEvent.Level}] {loggingEvent.LoggerName}: {loggingEvent.RenderedMessage}\n");
+      if (loggingEvent.ExceptionObject != null)
+        _licenseHeaderManagerPane.OutputStringThreadSafe(loggingEvent.GetExceptionString() + "\n");
     }
   }
 }

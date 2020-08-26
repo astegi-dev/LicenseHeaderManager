@@ -13,36 +13,34 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using EnvDTE;
 using EnvDTE80;
+using log4net;
 
 namespace LicenseHeaderManager.Utils
 {
   public static class CommandUtility
   {
+    private static readonly ILog s_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
     public static bool TryExecuteCommand (string command, DTE2 dte)
     {
-      if (dte.Commands.Cast<Command>().Any (dtecommand => dtecommand.Name == command))
+      if (dte.Commands.Cast<Command>().All (dtecommand => dtecommand.Name != command))
+        return false;
+
+      try
       {
-        try
-        {
-          dte.ExecuteCommand (command);
-          OutputWindowHandler.WriteMessage ($"Command '{command}' successfully executed");
-        }
-        catch (COMException e)
-        {
-          if (command == "ReSharper_Suspend")
-            OutputWindowHandler.WriteMessage ($"Command '{command} failed. Maybe ReSharper is already suspended? \n " + e);
-          else
-            OutputWindowHandler.WriteMessage ($"Command '{command}' failed. \n " + e); //Command may be found but cannot be executed
-          return false;
-        }
-
-        return true;
+        dte.ExecuteCommand (command);
+        s_log.Info($"Command '{command}' successfully executed.");
       }
-
-      return false;
+      catch (COMException ex)
+      {
+        s_log.Error (command == "ReSharper_Suspend" ? $"Command '{command}' failed. Maybe ReSharper is already suspended?" : $"Command '{command}' failed.", ex);
+        return false;
+      }
+      return true;
     }
 
     public static void ExecuteCommand (string command, DTE2 dte)
@@ -50,14 +48,11 @@ namespace LicenseHeaderManager.Utils
       try
       {
         dte.ExecuteCommand (command);
-        OutputWindowHandler.WriteMessage ($"Command '{command}' successfully executed");
+        s_log.Info($"Command '{command}' successfully executed.");
       }
-      catch (COMException e)
+      catch (COMException ex)
       {
-        if (command == "ReSharper_Resume")
-          OutputWindowHandler.WriteMessage ($"Command '{command}' failed. Maybe ReSharper is not suspended at all? \n " + e);
-        else
-          OutputWindowHandler.WriteMessage ($"Command '{command}' failed. \n " + e); //Command may be found but cannot be executed
+        s_log.Error (command == "ReSharper_Resume" ? $"Command '{command}' failed. Maybe ReSharper is already suspended at all?" : $"Command '{command}' failed.", ex);
       }
     }
   }

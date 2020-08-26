@@ -193,7 +193,6 @@ namespace LicenseHeaderManager.Options.DialogPages
         }
         catch (Exception ex)
         {
-          OutputWindowHandler.WriteMessage($"Could not restore registry value for {propertyName}");
           s_log.Error($"Could not restore registry value for {propertyName}", ex);
         }
       }

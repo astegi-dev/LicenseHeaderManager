@@ -18,13 +18,11 @@ using System;
 
 namespace LicenseHeaderManager
 {
-  internal static class GuidList
+  internal static class Guids
   {
     public const string guidLicenseHeadersPkgString = "4c570677-8476-4d33-bd0c-da36c89287c8";
-    public const string guidLicenseHeadersCmdSetString = "88ce72ac-651d-4441-be9c-dc74c2dc44b6";
     public const string guidItemTypePhysicalFile = "6bb5f8ee-4483-11d3-8bcf-00c04f8ec28c";
-    public const string guidVisualStudioOutputWindow = "0F44E2D1-F5FA-4d2d-AB30-22BE8ECD9789";
 
-    public static readonly Guid guidLicenseHeadersCmdSet = new Guid (guidLicenseHeadersCmdSetString);
+    public static Guid guidOutputPaneAppender = new Guid ("f5fb81c5-39f2-4c51-bbfd-9b5d83c13e1c");
   }
 }

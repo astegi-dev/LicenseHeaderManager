@@ -13,77 +13,71 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using EnvDTE;
+using log4net;
 
 namespace LicenseHeaderManager.Utils
 {
   public static class ProjectItemParentFinder
   {
-    public static object GetProjectItemParent (ProjectItem projectItem)
-    {
-      if (IsEndlessRecursion (projectItem))
-        return GetProjectItemParentViaReflection (projectItem);
+    private static readonly ILog s_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-      return GetParent (projectItem);
+    public static object GetProjectItemParent(ProjectItem projectItem)
+    {
+      if (IsEndlessRecursion(projectItem))
+        return GetProjectItemParentViaReflection(projectItem);
+
+      return GetParent(projectItem);
     }
 
     //Some custom project types return the current item instead of the parent which lead to an endless recursion.
-    private static bool IsEndlessRecursion (ProjectItem projectItem)
+    private static bool IsEndlessRecursion(ProjectItem projectItem)
     {
-      var projectItemPath = GetPath (projectItem);
-      var projectItemParent = GetParent (projectItem) as ProjectItem;
+      var projectItemPath = GetPath(projectItem);
+      var projectItemParent = GetParent(projectItem) as ProjectItem;
 
       //ProjectItemParent is no ProjectItem --> 100% no endless recursion
       if (projectItemParent == null)
         return false;
 
-      var parentProjectItemPath = GetPath (projectItemParent);
+      var parentProjectItemPath = GetPath(projectItemParent);
 
       //If both paths are empty it is impossible to say if we are in an endless recursion
-      if (string.IsNullOrEmpty (projectItemPath) && string.IsNullOrEmpty (parentProjectItemPath))
+      if (string.IsNullOrEmpty(projectItemPath) && string.IsNullOrEmpty(parentProjectItemPath))
         return false;
 
       //If the Paths are the same, we are in an endless recursion (projectItem.Parent == projectItem)
       return projectItemPath == parentProjectItemPath;
     }
 
-    private static object GetProjectItemParentViaReflection (ProjectItem projectItem)
+    private static object GetProjectItemParentViaReflection(ProjectItem projectItem)
     {
       try
       {
         object projectItemParentViaReflection;
 
-        if (TryGetProjectItemParentViaReflection (projectItem, out projectItemParentViaReflection))
+        if (TryGetProjectItemParentViaReflection(projectItem, out projectItemParentViaReflection))
           return projectItemParentViaReflection;
       }
-      catch (Exception exception)
+      catch (Exception ex)
       {
         //We catch everything as a multitude of Exceptions can be thrown if the projectItem.Object is not structured as we assume
-        OutputWindowHandler.WriteMessage (
-            string.Format (
-                "Exception got thrown when searching for the LicenseHeaderFile on ProjectItem of Type '{0}' with the name '{1}'. " + "Exception: {2}",
-                projectItem.GetType().FullName,
-                projectItem.Name,
-                exception));
+        s_log.Error($"Exception got thrown when searching for the LicenseHeaderFile on ProjectItem of Type '{projectItem.GetType().FullName}' with the name '{projectItem.Name}'. ", ex);
       }
 
-      OutputWindowHandler.WriteMessage (
-          string.Format (
-              "Could not find .licenseheaderfile for {0}." +
-              "This is probably due to a custom project type." +
-              "Please report the issue and include the type of your project in the description.",
-              projectItem.Name));
-
+      s_log.Info($"Could not find .licenseheaderfile for {projectItem.Name}." + "This is probably due to a custom project type."
+                                                                              + "Please report the issue and include the type of your project in the description.");
       return null;
     }
 
-    private static bool TryGetProjectItemParentViaReflection (ProjectItem projectItem, out object projectItemParentViaReflection)
+    private static bool TryGetProjectItemParentViaReflection(ProjectItem projectItem, out object projectItemParentViaReflection)
     {
       if (projectItem.Object != null)
       {
-        var parentProperty = projectItem.Object.GetType().GetProperty ("Parent").GetValue (projectItem.Object, null);
-        var parentUrl = parentProperty.GetType().GetProperty ("Url").GetValue (parentProperty, null) as string;
-        var projectItemParent = projectItem.DTE.Solution.FindProjectItem (parentUrl);
+        var parentProperty = projectItem.Object.GetType().GetProperty("Parent").GetValue(projectItem.Object, null);
+        var parentUrl = parentProperty.GetType().GetProperty("Url").GetValue(parentProperty, null) as string;
+        var projectItemParent = projectItem.DTE.Solution.FindProjectItem(parentUrl);
 
         //If the ProjectItemParent could not be found by "FindProjectItem" this means we are probably a Folder at TopLevel 
         //and only the ContainingProject is above us.
@@ -109,18 +103,18 @@ namespace LicenseHeaderManager.Utils
       return false;
     }
 
-    private static string GetPath (ProjectItem projectItem)
+    private static string GetPath(ProjectItem projectItem)
     {
       if (projectItem.Properties == null)
         return string.Empty;
 
-      var fullPathProperty = projectItem.Properties.Cast<Property>().FirstOrDefault (property => property.Name == "FullPath");
+      var fullPathProperty = projectItem.Properties.Cast<Property>().FirstOrDefault(property => property.Name == "FullPath");
       if (fullPathProperty != null && fullPathProperty.Value != null)
         return fullPathProperty.Value.ToString();
       return string.Empty;
     }
 
-    private static object GetParent (ProjectItem projectItem)
+    private static object GetParent(ProjectItem projectItem)
     {
       return projectItem.Collection.Parent;
     }

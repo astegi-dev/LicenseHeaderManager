@@ -72,7 +72,7 @@ namespace LicenseHeaderManager
   [ProvideProfile (typeof (DefaultLicenseHeaderPage), c_licenseHeaders, c_defaultLicenseHeader, 0, 0, true)]
   [ProvideProfile (typeof (LanguagesPage), c_licenseHeaders, c_languages, 0, 0, true)]
   [ProvideAutoLoad (VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
-  [Guid (GuidList.guidLicenseHeadersPkgString)]
+  [Guid (Guids.guidLicenseHeadersPkgString)]
   [ProvideMenuResource ("Menus.ctmenu", 1)]
   public sealed class LicenseHeadersPackage : AsyncPackage, ILicenseHeaderExtension
   {
@@ -85,6 +85,7 @@ namespace LicenseHeaderManager
 
     private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
     private FileAppender _fileAppender;
+    private IVsOutputWindow _outputPane;
 
     private Stack<ProjectItem> _addedItems;
     private CommandEvents _commandEvents;
@@ -95,6 +96,7 @@ namespace LicenseHeaderManager
 
     private ProjectItemsEvents _projectItemEvents;
     private ProjectItemsEvents _websiteItemEvents;
+    private OutputPaneAppender _outputPaneAppender;
 
     /// <summary>
     ///   Default constructor of the package.
@@ -142,12 +144,12 @@ namespace LicenseHeaderManager
     {
       await base.InitializeAsync (cancellationToken, progress);
       await JoinableTaskFactory.SwitchToMainThreadAsync (cancellationToken);
-      OutputWindowHandler.Initialize (await GetServiceAsync (typeof (SVsOutputWindow)) as IVsOutputWindow);
-
+      
       Dte2 = await GetServiceAsync (typeof (DTE)) as DTE2;
       Assumes.Present (Dte2);
 
       CreateAndConfigureFileAppender (Path.GetFileNameWithoutExtension(Dte2.Solution.FullName));
+      await CreateAndConfigureOutputPaneAppenderAsync();
       s_log.Info("Logger has been initialized");
 
       _addedItems = new Stack<ProjectItem>();
@@ -389,6 +391,25 @@ namespace LicenseHeaderManager
 
       _fileAppender.ActivateOptions();
       BasicConfigurator.Configure (_fileAppender);
+    }
+
+    private async Task CreateAndConfigureOutputPaneAppenderAsync()
+    {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+      _outputPane = await GetServiceAsync(typeof(SVsOutputWindow)) as IVsOutputWindow;
+      Assumes.Present(_outputPane);
+
+      if (_outputPane == null)
+      {
+        s_log.Error("Unable to add output pane log appender (output pane not available)");
+        return;
+      }
+
+      _outputPane.CreatePane(ref Guids.guidOutputPaneAppender, "LicenseHeaderManager", 1, 1);
+      _outputPaneAppender = new OutputPaneAppender(_outputPane, Level.Info);
+      _outputPaneAppender.ActivateOptions();
+
+      BasicConfigurator.Configure(_outputPaneAppender);
     }
 
     private async Task MigrateOptionsAsync ()

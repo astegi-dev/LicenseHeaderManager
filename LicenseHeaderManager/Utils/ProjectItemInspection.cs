@@ -23,7 +23,7 @@ namespace LicenseHeaderManager.Utils
     public static bool IsPhysicalFile (ProjectItem projectItem)
     {
       return projectItem.Kind == Constants.vsProjectItemKindPhysicalFile ||
-             projectItem.Kind == "{" + GuidList.guidItemTypePhysicalFile + "}";
+             projectItem.Kind == "{" + Guids.guidItemTypePhysicalFile + "}";
     }
 
     public static bool IsLicenseHeader (ProjectItem projectItem)

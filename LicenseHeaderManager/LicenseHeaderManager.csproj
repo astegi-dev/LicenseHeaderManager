@@ -290,10 +290,10 @@
     </Compile>
     <Compile Include="UpdateViews\IntToMaximumConverter.cs" />
     <Compile Include="Utils\CoreHelpers.cs" />
+    <Compile Include="Utils\OutputPaneAppender.cs" />
     <Compile Include="Utils\ProjectItemParentFinder.cs" />
     <Compile Include="MenuItemCommands\Common\ExistingLicenseHeaderDefinitionFileAdder.cs" />
     <Compile Include="Headers\NewLineConst.cs" />
-    <Compile Include="OutputWindowHandler.cs" />
     <Compile Include="MenuItemCommands\Common\AddLicenseHeaderToAllFilesInProjectHelper.cs" />
     <Compile Include="MenuItemButtonHandler\Helpers\AddLicenseHeaderToAllFilesInSolutionHelper.cs" />
     <Compile Include="Guids.cs" />

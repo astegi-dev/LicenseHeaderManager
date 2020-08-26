@@ -13,6 +13,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
@@ -20,6 +21,7 @@ using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.UpdateViews;
 using LicenseHeaderManager.Utils;
+using log4net;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
@@ -30,6 +32,8 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
     private readonly MenuItemButtonHandlerHelper _handler;
     private CancellationTokenSource _cancellationTokenSource;
     private FolderProjectUpdateDialog _dialog;
+
+    private static readonly ILog s_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
     public FolderProjectMenuItemButtonHandler (MenuItemButtonOperation mode, MenuItemButtonLevel level, MenuItemButtonHandlerHelper handler)
     {
@@ -67,11 +71,11 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
         await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
         _dialog.Close();
       }
-      catch (Exception exception)
+      catch (Exception ex)
       {
         MessageBoxHelper.ShowMessage (
-            $"The operation '{handler.Description}' failed with the exception '{exception.Message}'. See Visual Studio Output Window for Details.");
-        OutputWindowHandler.WriteMessage (exception.ToString());
+            $"The operation '{handler.Description}' failed with the exception '{ex.Message}'. See Visual Studio Output Window for Details.");
+        s_log.Error($"The operation '{handler.Description}' failed", ex);
       }
 
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
