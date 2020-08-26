@@ -15,11 +15,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.UpdateViewModels;
+using log4net;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
@@ -27,6 +30,8 @@ namespace LicenseHeaderManager.Utils
 {
   internal static class CoreHelpers
   {
+    private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
+
     public static async Task OnProgressReportedAsync (ReplacerProgressReport progress, BaseUpdateViewModel baseUpdateViewModel, string projectName)
     {
       if (baseUpdateViewModel == null)
@@ -46,33 +51,9 @@ namespace LicenseHeaderManager.Utils
         solutionUpdateViewModel.CurrentProject = projectName;
     }
 
-    /// <summary>
-    ///   Is executed when the Core reports that the license header definition file to be used on a specific file contains
-    ///   content that is not recognized as comments for the respective language.
-    /// </summary>
-    /// <param name="message">Specific message reported by core.</param>
-    /// <returns>True if the license header should still be inserted, otherwise false.</returns>
-    public static bool NonCommentLicenseHeaderDefinitionInquiry (string message)
+    public static IProgress<ReplacerProgressReport> CreateProgress (BaseUpdateViewModel viewModel, string projectName)
     {
-      return MessageBoxHelper.AskYesNo (message, Resources.Warning, true);
-    }
-
-    /// <summary>
-    ///   Is executed when the Core reports that for given files (i. e. languages), no license header definition(s) could be
-    ///   found.
-    /// </summary>
-    /// <param name="message">
-    ///   Specific message reported by core, contains number of files for which no license header
-    ///   definition could be found.
-    /// </param>
-    /// <param name="licenseHeaderExtension">
-    ///   An Instance of <see cref="ILicenseHeaderExtension" /> used to display the languages page, which might
-    ///   be used to add the languages for which no definitions were found to the configuration.
-    /// </param>
-    public static void NoLicenseHeaderDefinitionFound (string message, ILicenseHeaderExtension licenseHeaderExtension)
-    {
-      if (MessageBoxHelper.AskYesNo (message, Resources.Error))
-        licenseHeaderExtension.ShowLanguagesPage();
+      return new Progress<ReplacerProgressReport> (report => OnProgressReportedAsync (report, viewModel, projectName).FireAndForget());
     }
 
     public static ICollection<LicenseHeaderInput> GetFilesToProcess (
@@ -110,16 +91,77 @@ namespace LicenseHeaderManager.Utils
       return files;
     }
 
-    public static void HandleResult (ReplacerResult<ReplacerError> result)
+    public static async Task HandleResultAsync (ReplacerResult<ReplacerError> result, ILicenseHeaderExtension extension)
     {
-      if (!result.IsSuccess)
-        MessageBoxHelper.ShowError ($"Error: {result.Error.Description}");
+      if (result.IsSuccess)
+        return;
+
+      var error = result.Error;
+      switch (error.Type)
+      {
+        case ErrorType.NonCommentText:
+          error.Input.IgnoreNonCommentText = true;
+          if (MessageBoxHelper.AskYesNo (error.Description, Resources.Warning, true))
+            await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (error.Input, error.CalledByUser);
+          return;
+
+        case ErrorType.LanguageNotFound:
+          if (MessageBoxHelper.AskYesNo (error.Description, Resources.Error))
+            extension.ShowLanguagesPage();
+          return;
+      }
+
+      MessageBoxHelper.ShowError ($"An unexpected error has occurred: {error.Description}");
+      s_log.Error ($"File '{error.Input.DocumentPath}' failed: {error.Description}");
     }
 
-    public static void HandleResult (ReplacerResult<IEnumerable<ReplacerError>> result)
+    public static async Task HandleResultAsync (
+        ReplacerResult<IEnumerable<ReplacerError>> result,
+        LicenseHeaderReplacer replacer,
+        BaseUpdateViewModel viewModel,
+        string projectName,
+        CancellationToken cancellationToken)
     {
-      if (!result.IsSuccess)
-        MessageBoxHelper.ShowError ($"Encountered errors in {result.Error.Count()} files");
+      if (result.IsSuccess)
+        return;
+
+
+      // collect NonCommentText-errors and ask if license header should still be inserted
+      var errors = result.Error.ToList();
+      var nonCommentTextErrorsByExtension = errors.Where (x => x.Type == ErrorType.NonCommentText).GroupBy (x => Path.GetExtension (x.Input.DocumentPath));
+
+      var inputIgnoringNonCommentText = new List<LicenseHeaderInput>();
+      foreach (var extension in nonCommentTextErrorsByExtension)
+      {
+        var message = string.Format (Resources.Warning_InvalidLicenseHeader, extension.Key).ReplaceNewLines();
+        if (!MessageBoxHelper.AskYesNo (message, Resources.Warning, true))
+          continue;
+
+        foreach (var failedFile in extension)
+        {
+          failedFile.Input.IgnoreNonCommentText = true;
+          inputIgnoringNonCommentText.Add (failedFile.Input);
+        }
+      }
+
+      // collect other errors and the ones that occurred while "force-inserting" headers with non-comment-text
+      var overallErrors = errors.Where (x => x.Type != ErrorType.NonCommentText).ToList();
+      if (inputIgnoringNonCommentText.Count > 0)
+      {
+        viewModel.FileCountCurrentProject = inputIgnoringNonCommentText.Count;
+        var resultIgnoringNonCommentText = await replacer.RemoveOrReplaceHeader (inputIgnoringNonCommentText, CreateProgress (viewModel, projectName), cancellationToken);
+
+        if (!resultIgnoringNonCommentText.IsSuccess)
+          overallErrors.AddRange (resultIgnoringNonCommentText.Error);
+      }
+
+      // display all errors collected from "first attempt" and "force-insertion"
+      if (overallErrors.Count == 0)
+        return;
+
+      MessageBoxHelper.ShowError ($"{overallErrors.Count} unexpected errors have occurred. See output window or log file for more details");
+      foreach (var otherError in overallErrors)
+        s_log.Error ($"File '{otherError.Input.DocumentPath}' failed: {otherError.Description}");
     }
   }
 }

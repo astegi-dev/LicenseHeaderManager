@@ -66,11 +66,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     private async Task RemoveOrReplaceHeaderAndHandleResultAsync (ICollection<LicenseHeaderInput> replacerInput, string projectName = null)
     {
-      var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (
-          replacerInput,
-          new Progress<ReplacerProgressReport> (report => CoreHelpers.OnProgressReportedAsync (report, _baseUpdateViewModel, projectName).FireAndForget()),
-          _cancellationToken);
-      CoreHelpers.HandleResult (result);
+      replacerInput.IgnoreNonCommentText();
+      var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.CreateProgress (_baseUpdateViewModel, projectName), _cancellationToken);
+      await CoreHelpers.HandleResultAsync (result, _licenseHeaderReplacer, _baseUpdateViewModel, projectName, _cancellationToken);
     }
   }
 }

@@ -60,21 +60,7 @@ namespace Core
     ///   Specifies whether the command was called by the user (as opposed to automatically by a
     ///   linked command or by ItemAdded)
     /// </param>
-    /// <param name="nonCommentTextInquiry">
-    ///   Determines whether license headers should be inserted even if they contain non-comment text for the respective
-    ///   language.
-    ///   Is supplied with a <see cref="string" /> argument that represents a specific message describing the issue. If null,
-    ///   license headers are inserted.
-    /// </param>
-    /// <param name="commentDefinitionNotFoundAction">
-    ///   Is executed if there there is no license header definition configured for the language of a specific file.
-    ///   If null, no action is executed in this case.
-    /// </param>
-    public async Task<ReplacerResult<ReplacerError>> RemoveOrReplaceHeader (
-        LicenseHeaderInput licenseHeaderInput,
-        bool calledByUser,
-        Func<string, bool> nonCommentTextInquiry = null,
-        Action<string> commentDefinitionNotFoundAction = null)
+    public async Task<ReplacerResult<ReplacerError>> RemoveOrReplaceHeader (LicenseHeaderInput licenseHeaderInput, bool calledByUser)
     {
       var returnObject = new ReplacerResult<ReplacerError>();
       try
@@ -84,16 +70,11 @@ namespace Core
         switch (result)
         {
           case CreateDocumentResult.DocumentCreated:
-            if (!await document.ValidateHeader())
+            if (!await document.ValidateHeader() && !licenseHeaderInput.IgnoreNonCommentText)
             {
               var message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
-              var addDespiteNonCommentText = nonCommentTextInquiry?.Invoke (message) ?? true;
-              if (!addDespiteNonCommentText)
-              {
-                message = $"Execution of {nameof(RemoveOrReplaceHeader)} was cancelled by caller";
-                returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput.DocumentPath, ErrorType.NonCommentText, message));
-                break;
-              }
+              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, calledByUser, ErrorType.NonCommentText, message));
+              break;
             }
 
             try
@@ -103,7 +84,7 @@ namespace Core
             catch (ParseException)
             {
               var message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
-              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput.DocumentPath, ErrorType.ParsingError, message));
+              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, calledByUser, ErrorType.ParsingError, message));
             }
 
             break;
@@ -112,11 +93,8 @@ namespace Core
             {
               var message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
 
-              // TODO test with project with .snk file (e.g. DependDB.Util): works, but window closes immediately after showing
-              if (commentDefinitionNotFoundAction != null)
-                commentDefinitionNotFoundAction (message);
-              else
-                returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput.DocumentPath, ErrorType.LanguageNotFound, message));
+              // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing
+              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, true, ErrorType.LanguageNotFound, message));
             }
 
             break;
@@ -126,7 +104,7 @@ namespace Core
             if (calledByUser)
             {
               var message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
-              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput.DocumentPath, ErrorType.NoHeaderFound, message));
+              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, true, ErrorType.NoHeaderFound, message));
             }
 
             break;
@@ -135,7 +113,7 @@ namespace Core
       catch (ArgumentException ex)
       {
         var message = $"{ex.Message} {licenseHeaderInput.DocumentPath}";
-        returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput.DocumentPath, ErrorType.Miscellaneous, message));
+        returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, calledByUser, ErrorType.Miscellaneous, message));
       }
 
       return returnObject;
@@ -163,7 +141,6 @@ namespace Core
 
     private async Task RemoveOrReplaceHeaderForOneFile (
         LicenseHeaderInput licenseHeaderInput,
-        Func<string, bool> nonCommentTextInquiry,
         IProgress<ReplacerProgressReport> progress,
         CancellationToken cancellationToken,
         ConcurrentQueue<ReplacerError> errors)
@@ -176,21 +153,12 @@ namespace Core
       }
 
       string message;
-      var replace = true;
-
-      if (!await document.ValidateHeader())
+      if (!await document.ValidateHeader() && !licenseHeaderInput.IgnoreNonCommentText)
       {
         var extension = Path.GetExtension (licenseHeaderInput.DocumentPath);
-        if (!_extensionsWithInvalidHeaders.TryGetValue (extension, out replace))
-        {
-          message = string.Format (Resources.Warning_InvalidLicenseHeader, extension).ReplaceNewLines();
-          replace = nonCommentTextInquiry?.Invoke (message) ?? true;
-          _extensionsWithInvalidHeaders[extension] = replace;
-        }
-      }
+        message = string.Format (Resources.Warning_InvalidLicenseHeader, extension).ReplaceNewLines();
+        errors.Enqueue (new ReplacerError (licenseHeaderInput, ErrorType.NonCommentText, message));
 
-      if (!replace)
-      {
         cancellationToken.ThrowIfCancellationRequested();
         await ReportProgress (progress, cancellationToken);
         return;
@@ -204,7 +172,7 @@ namespace Core
       catch (ParseException)
       {
         message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
-        errors.Enqueue (new ReplacerError (licenseHeaderInput.DocumentPath, ErrorType.ParsingError, message));
+        errors.Enqueue (new ReplacerError (licenseHeaderInput, ErrorType.ParsingError, message));
       }
 
       await ReportProgress (progress, cancellationToken);
@@ -213,8 +181,7 @@ namespace Core
     public async Task<ReplacerResult<IEnumerable<ReplacerError>>> RemoveOrReplaceHeader (
         ICollection<LicenseHeaderInput> licenseHeaders,
         IProgress<ReplacerProgressReport> progress,
-        CancellationToken cancellationToken,
-        Func<string, bool> nonCommentTextInquiry = null)
+        CancellationToken cancellationToken)
     {
       var errorList = new ConcurrentQueue<ReplacerError>();
       ResetProgress (licenseHeaders.Count);
@@ -229,7 +196,7 @@ namespace Core
                 {
                   try
                   {
-                    return RemoveOrReplaceHeaderForOneFile (licenseHeaderInput, nonCommentTextInquiry, progress, cancellationToken, errorList);
+                    return RemoveOrReplaceHeaderForOneFile (licenseHeaderInput, progress, cancellationToken, errorList);
                   }
                   finally
                   {
@@ -253,7 +220,7 @@ namespace Core
     ///   Tries to open a given project item as a Document which can be used to add or remove headers.
     /// </summary>
     /// <param name="documentPath">The project item.</param>
-    /// <param name="document">The document which was created or null if an error occured (see return value).</param>
+    /// <param name="document">The document which was created or null if an error occurred (see return value).</param>
     /// <param name="additionalProperties"></param>
     /// <param name="headers">
     ///   A dictionary of headers using the file extension as key and the header as value or null if

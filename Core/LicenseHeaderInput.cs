@@ -26,6 +26,19 @@ namespace Core
       DocumentPath = documentPath;
       Headers = headers;
       AdditionalProperties = additionalProperties;
+      IgnoreNonCommentText = false;
+    }
+
+    public LicenseHeaderInput (
+        string documentPath,
+        IDictionary<string, string[]> headers,
+        IEnumerable<AdditionalProperty> additionalProperties,
+        bool ignoreNonCommentText)
+    {
+      DocumentPath = documentPath;
+      Headers = headers;
+      AdditionalProperties = additionalProperties;
+      IgnoreNonCommentText = ignoreNonCommentText;
     }
 
     public string DocumentPath { get; }
@@ -33,5 +46,10 @@ namespace Core
     public IDictionary<string, string[]> Headers { get; }
 
     public IEnumerable<AdditionalProperty> AdditionalProperties { get; }
+
+    /// <summary>
+    /// Specifies whether license headers should be inserted into a file even if the license header definition contains non-comment text.
+    /// </summary>
+    public bool IgnoreNonCommentText { get; set; }
   }
 }

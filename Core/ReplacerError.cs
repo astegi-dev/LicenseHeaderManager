@@ -17,17 +17,31 @@ namespace Core
 {
   public class ReplacerError
   {
-    public ReplacerError (string documentPath, ErrorType type, string description)
+    public ReplacerError (LicenseHeaderInput input, bool calledByUser, ErrorType type, string description)
     {
-      DocumentPath = documentPath;
+      Input = input;
+      CalledByUser = calledByUser;
       Type = type;
       Description = description;
     }
 
-    public string DocumentPath { get; }
+    public ReplacerError (LicenseHeaderInput input, ErrorType type, string description)
+    {
+      Input = input;
+      CalledByUser = false;
+      Type = type;
+      Description = description;
+    }
 
     public ErrorType Type { get; }
 
     public string Description { get; }
+
+    /// <summary>
+    /// Gets the <see cref="LicenseHeaderInput"/> instance the <see cref="LicenseHeaderReplacer"/> was invoked with.
+    /// </summary>
+    public LicenseHeaderInput Input { get; }
+
+    public bool CalledByUser { get; }
   }
 }

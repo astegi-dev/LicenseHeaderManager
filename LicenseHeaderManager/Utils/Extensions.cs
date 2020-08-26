@@ -14,11 +14,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
+using log4net;
 using Microsoft.VisualStudio.Shell;
 using LicenseHeader = LicenseHeaderManager.Headers.LicenseHeader;
 using Task = System.Threading.Tasks.Task;
@@ -27,6 +29,20 @@ namespace LicenseHeaderManager.Utils
 {
   internal static class Extensions
   {
+    private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
+
+    /// <summary>
+    /// Sets the <see cref="LicenseHeaderInput.IgnoreNonCommentText"/> property to <see langword="true" /> for all element of the enumerable.
+    /// </summary>
+    /// <param name="inputs">The <see cref="IEnumerable{T}"/> whose generic type parameter is <see cref="LicenseHeaderInput"/> whose items should be mutated.</param>
+    /// <remarks>This operation might be useful if the license header input represented by <paramref name="inputs"/> is used only for remove operations. In that case,
+    /// no confirmations regarding non-comment text are needed.</remarks>
+    public static void IgnoreNonCommentText (this IEnumerable<LicenseHeaderInput> inputs)
+    {
+      foreach (var licenseHeaderInput in inputs)
+        licenseHeaderInput.IgnoreNonCommentText = true;
+    }
+
     /// <summary>
     ///   Replaces occurrences of "\n" in a string by new line characters.
     /// </summary>
@@ -63,11 +79,11 @@ namespace LicenseHeaderManager.Utils
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
       if (headers != null)
+      {
         return await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
             new LicenseHeaderInput (item.FileNames[1], headers, item.GetAdditionalProperties()),
-            calledByUser,
-            CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
-            message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, extension));
+            calledByUser);
+      }
 
       if (calledByUser && LicenseHeader.ShowQuestionForAddingLicenseHeaderFile (item.ContainingProject, extension.DefaultLicenseHeaderPageModel))
         return await AddLicenseHeaderToItemAsync (item, extension, true);
@@ -96,8 +112,8 @@ namespace LicenseHeaderManager.Utils
         }
         catch (Exception ex)
         {
-          // TODO logging (in general) + log exception stack trace
-          MessageBoxHelper.ShowError ($"Task failed: {ex.Message}", Resources.TaskFailed);
+          MessageBoxHelper.ShowError ($"Asynchronous Task failed: {ex.Message}\nSee output pane or log file for more details.", Resources.TaskFailed);
+          s_log.Error ("Asynchronous Task failed", ex);
         }
       }
     }

@@ -116,7 +116,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
         return;
 
       var result = await item.AddLicenseHeaderToItemAsync (ServiceProvider, !ServiceProvider.IsCalledByLinkedCommand);
-      CoreHelpers.HandleResult (result);
+      await CoreHelpers.HandleResultAsync (result, ServiceProvider);
     }
   }
 }
