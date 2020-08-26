@@ -86,7 +86,7 @@
     <Compile Include="DocumentHeader.cs" />
     <Compile Include="DocumentHeaderProperties.cs" />
     <Compile Include="DocumentHeaderProperty.cs" />
-    <Compile Include="ErrorType.cs" />
+    <Compile Include="ReplacerErrorType.cs" />
     <Compile Include="ICommentParser.cs" />
     <Compile Include="Language.cs" />
     <Compile Include="LicenseHeader.cs" />

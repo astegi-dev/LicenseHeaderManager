@@ -17,7 +17,7 @@ namespace Core
 {
   public class ReplacerError
   {
-    public ReplacerError (LicenseHeaderInput input, bool calledByUser, ErrorType type, string description)
+    public ReplacerError (LicenseHeaderInput input, bool calledByUser, ReplacerErrorType type, string description)
     {
       Input = input;
       CalledByUser = calledByUser;
@@ -25,7 +25,7 @@ namespace Core
       Description = description;
     }
 
-    public ReplacerError (LicenseHeaderInput input, ErrorType type, string description)
+    public ReplacerError (LicenseHeaderInput input, ReplacerErrorType type, string description)
     {
       Input = input;
       CalledByUser = false;
@@ -33,7 +33,7 @@ namespace Core
       Description = description;
     }
 
-    public ErrorType Type { get; }
+    public ReplacerErrorType Type { get; }
 
     public string Description { get; }
 

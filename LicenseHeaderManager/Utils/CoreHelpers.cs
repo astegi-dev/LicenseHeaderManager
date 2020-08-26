@@ -99,13 +99,13 @@ namespace LicenseHeaderManager.Utils
       var error = result.Error;
       switch (error.Type)
       {
-        case ErrorType.NonCommentText:
+        case ReplacerErrorType.NonCommentText:
           error.Input.IgnoreNonCommentText = true;
           if (MessageBoxHelper.AskYesNo (error.Description, Resources.Warning, true))
             await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (error.Input, error.CalledByUser);
           return;
 
-        case ErrorType.LanguageNotFound:
+        case ReplacerErrorType.LanguageNotFound:
           if (MessageBoxHelper.AskYesNo (error.Description, Resources.Error))
             extension.ShowLanguagesPage();
           return;
@@ -128,7 +128,7 @@ namespace LicenseHeaderManager.Utils
 
       // collect NonCommentText-errors and ask if license header should still be inserted
       var errors = result.Error.ToList();
-      var nonCommentTextErrorsByExtension = errors.Where (x => x.Type == ErrorType.NonCommentText).GroupBy (x => Path.GetExtension (x.Input.DocumentPath));
+      var nonCommentTextErrorsByExtension = errors.Where (x => x.Type == ReplacerErrorType.NonCommentText).GroupBy (x => Path.GetExtension (x.Input.DocumentPath));
 
       var inputIgnoringNonCommentText = new List<LicenseHeaderInput>();
       foreach (var extension in nonCommentTextErrorsByExtension)
@@ -145,7 +145,7 @@ namespace LicenseHeaderManager.Utils
       }
 
       // collect other errors and the ones that occurred while "force-inserting" headers with non-comment-text
-      var overallErrors = errors.Where (x => x.Type != ErrorType.NonCommentText).ToList();
+      var overallErrors = errors.Where (x => x.Type != ReplacerErrorType.NonCommentText).ToList();
       if (inputIgnoringNonCommentText.Count > 0)
       {
         viewModel.FileCountCurrentProject = inputIgnoringNonCommentText.Count;

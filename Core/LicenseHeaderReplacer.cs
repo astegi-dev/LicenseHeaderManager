@@ -73,7 +73,7 @@ namespace Core
             if (!await document.ValidateHeader() && !licenseHeaderInput.IgnoreNonCommentText)
             {
               var message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
-              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, calledByUser, ErrorType.NonCommentText, message));
+              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, calledByUser, ReplacerErrorType.NonCommentText, message));
               break;
             }
 
@@ -84,7 +84,7 @@ namespace Core
             catch (ParseException)
             {
               var message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
-              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, calledByUser, ErrorType.ParsingError, message));
+              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, calledByUser, ReplacerErrorType.ParsingError, message));
             }
 
             break;
@@ -94,7 +94,7 @@ namespace Core
               var message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
 
               // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing
-              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, true, ErrorType.LanguageNotFound, message));
+              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, true, ReplacerErrorType.LanguageNotFound, message));
             }
 
             break;
@@ -104,7 +104,7 @@ namespace Core
             if (calledByUser)
             {
               var message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
-              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, true, ErrorType.NoHeaderFound, message));
+              returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, true, ReplacerErrorType.NoHeaderFound, message));
             }
 
             break;
@@ -113,7 +113,7 @@ namespace Core
       catch (ArgumentException ex)
       {
         var message = $"{ex.Message} {licenseHeaderInput.DocumentPath}";
-        returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, calledByUser, ErrorType.Miscellaneous, message));
+        returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, calledByUser, ReplacerErrorType.Miscellaneous, message));
       }
 
       return returnObject;
@@ -157,7 +157,7 @@ namespace Core
       {
         var extension = Path.GetExtension (licenseHeaderInput.DocumentPath);
         message = string.Format (Resources.Warning_InvalidLicenseHeader, extension).ReplaceNewLines();
-        errors.Enqueue (new ReplacerError (licenseHeaderInput, ErrorType.NonCommentText, message));
+        errors.Enqueue (new ReplacerError (licenseHeaderInput, ReplacerErrorType.NonCommentText, message));
 
         cancellationToken.ThrowIfCancellationRequested();
         await ReportProgress (progress, cancellationToken);
@@ -172,7 +172,7 @@ namespace Core
       catch (ParseException)
       {
         message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
-        errors.Enqueue (new ReplacerError (licenseHeaderInput, ErrorType.ParsingError, message));
+        errors.Enqueue (new ReplacerError (licenseHeaderInput, ReplacerErrorType.ParsingError, message));
       }
 
       await ReportProgress (progress, cancellationToken);

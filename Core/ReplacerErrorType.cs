@@ -15,7 +15,7 @@ using System;
 
 namespace Core
 {
-  public enum ErrorType
+  public enum ReplacerErrorType
   {
     /// <summary>
     ///   Specifies that the license header definition file contains text that is not configured as comment for the file's
