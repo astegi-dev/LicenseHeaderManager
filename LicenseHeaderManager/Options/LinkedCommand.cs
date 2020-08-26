@@ -41,11 +41,11 @@ namespace LicenseHeaderManager.Options
       get => _name;
       set
       {
-        if (value != _name)
-        {
-          _name = value;
-          OnPropertyChanged (nameof(Name));
-        }
+        if (value == _name)
+          return;
+
+        _name = value;
+        OnPropertyChanged(nameof(Name));
       }
     }
 
@@ -54,31 +54,31 @@ namespace LicenseHeaderManager.Options
       get => _executionTime;
       set
       {
-        if (value != _executionTime)
-        {
-          _executionTime = value;
-          OnPropertyChanged (nameof(ExecutionTime));
-        }
+        if (value == _executionTime)
+          return;
+
+        _executionTime = value;
+        OnPropertyChanged(nameof(ExecutionTime));
       }
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    private void OnPropertyChanged (string propertyName)
+    private void OnPropertyChanged(string propertyName)
     {
-      PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (propertyName));
+      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public LinkedCommand Clone ()
+    public LinkedCommand Clone()
     {
       return new LinkedCommand
-             {
-                 Name = Name,
-                 ExecutionTime = ExecutionTime,
-                 Events = Events,
-                 Guid = Guid,
-                 Id = Id
-             };
+      {
+        Name = Name,
+        ExecutionTime = ExecutionTime,
+        Events = Events,
+        Guid = Guid,
+        Id = Id
+      };
     }
   }
 }

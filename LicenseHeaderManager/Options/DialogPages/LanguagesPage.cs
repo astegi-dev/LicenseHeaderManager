@@ -51,12 +51,12 @@ namespace LicenseHeaderManager.Options.DialogPages
     {
       var updated = false;
 
-      //add SkipExpression for XML-based languages to replicate the previous hardcoded skipping of XML declarations
+      // Add SkipExpression for XML-based languages to replicate the previous hardcoded skipping of XML declarations
       UpdateLanguages (
           new[] { ".htm", ".html", ".xhtml", ".xml", ".resx" },
           l => updated |= UpdateIfNullOrEmpty (l, lang => lang.SkipExpression, @"(<\?xml(.|\s)*?\?>)?(\s*<!DOCTYPE(.|\s)*?>)?(\n|\r\n|\r)"));
 
-      //add SkipExpression for JavaScript
+      // Add SkipExpression for JavaScript
       UpdateLanguages (
           new[] { ".js" },
           l => updated |= UpdateIfNullOrEmpty (l, lang => lang.SkipExpression, "/// *<reference.*/>"));
@@ -69,7 +69,7 @@ namespace LicenseHeaderManager.Options.DialogPages
     {
       var updated = false;
 
-      //add regions for CS files
+      // Add regions for CS files
       UpdateLanguages (
           new[] { ".cs", ".designer.cs", ".xaml.cs", "aspx.cs", "ascx.cs" },
           l =>
@@ -78,18 +78,18 @@ namespace LicenseHeaderManager.Options.DialogPages
             updated |= UpdateIfNullOrEmpty (l, lang => lang.EndRegion, "#endregion");
           });
 
-      //add regions for VB files
+      // Add regions for VB files
       UpdateLanguages (
           new[] { ".vb", ".designer.vb", ".xaml.vb" },
           l =>
           {
             updated |= UpdateIfNullOrEmpty (l, lang => lang.BeginRegion, "#Region");
 
-            if (string.IsNullOrEmpty (l.EndRegion) || l.EndRegion == "End Region")
-            {
-              l.EndRegion = "#End Region";
-              updated = true;
-            }
+            if (!string.IsNullOrEmpty (l.EndRegion) && l.EndRegion != "End Region")
+              return;
+
+            l.EndRegion = "#End Region";
+            updated = true;
           });
 
       if (updated)
@@ -104,11 +104,11 @@ namespace LicenseHeaderManager.Options.DialogPages
           new[] { ".htm", ".html", ".xhtml", ".xml", ".resx" },
           l =>
           {
-            if (l.SkipExpression == @"(<\?xml(.|\s)*?\?>)?(\s*<!DOCTYPE(.|\s)*?>)?(\n|\r\n|\r)")
-            {
-              l.SkipExpression = @"(<\?xml(.|\s)*?\?>)?(\s*<!DOCTYPE(.|\s)*?>)?( |\t)*(\n|\r\n|\r)?";
-              updated = true;
-            }
+            if (l.SkipExpression != @"(<\?xml(.|\s)*?\?>)?(\s*<!DOCTYPE(.|\s)*?>)?(\n|\r\n|\r)")
+              return;
+
+            l.SkipExpression = @"(<\?xml(.|\s)*?\?>)?(\s*<!DOCTYPE(.|\s)*?>)?( |\t)*(\n|\r\n|\r)?";
+            updated = true;
           });
 
       // SkipExpression for JS-based languages was suboptimal, it didn't work for nearly empty files 
@@ -116,11 +116,11 @@ namespace LicenseHeaderManager.Options.DialogPages
           new[] { ".js" },
           l =>
           {
-            if (l.SkipExpression == @"/// *<reference.*/>")
-            {
-              l.SkipExpression = @"/// *<reference.*/>( |\t)*(\n|\r\n|\r)?";
-              updated = true;
-            }
+            if (l.SkipExpression != @"/// *<reference.*/>")
+              return;
+
+            l.SkipExpression = @"/// *<reference.*/>( |\t)*(\n|\r\n|\r)?";
+            updated = true;
           });
 
       if (updated)
@@ -128,7 +128,7 @@ namespace LicenseHeaderManager.Options.DialogPages
     }
     private void AddXmlXsd_1_3_2 ()
     {
-      //Add a default rule for config/xsd
+      // Add a default rule for config/xsd
       var added = false;
 
       added |= AddExtensionToExistingExtension (".xml", ".config");
@@ -210,13 +210,11 @@ namespace LicenseHeaderManager.Options.DialogPages
         return true;
       }
 
-      if (!language.Extensions.Any (ExtensionExists))
-      {
-        OptionsFacade.CurrentOptions.Languages.Add (language);
-        return true;
-      }
+      if (language.Extensions.Any (ExtensionExists))
+        return false;
 
-      return false;
+      OptionsFacade.CurrentOptions.Languages.Add (language);
+      return true;
     }
 
     private bool AddExtensionToExistingExtension (string existingExtension, string newExtension)
@@ -232,13 +230,11 @@ namespace LicenseHeaderManager.Options.DialogPages
     {
       var property = (PropertyInfo) ((MemberExpression) propertyAccessExpression.Body).Member;
 
-      if (string.IsNullOrEmpty ((string) property.GetValue (l, null)))
-      {
-        property.SetValue (l, value, null);
-        return true;
-      }
+      if (!string.IsNullOrEmpty ((string) property.GetValue (l, null)))
+        return false;
 
-      return false;
+      property.SetValue (l, value, null);
+      return true;
     }
 
     private void UpdateLanguages (IEnumerable<string> extensions, Action<Language> updateAction)
@@ -253,14 +249,12 @@ namespace LicenseHeaderManager.Options.DialogPages
 
     private bool AddLanguageIfNotExistent (string extension, Language language)
     {
-      //We just want to check if our extension is already added as extension somewhere and add it as new Language if not
-      if (!ExtensionExists (extension))
-      {
-        OptionsFacade.CurrentOptions.Languages.Add (language);
-        return true;
-      }
+      // We just want to check if our extension is already added as extension somewhere and add it as new Language if not
+      if (ExtensionExists (extension))
+        return false;
 
-      return false;
+      OptionsFacade.CurrentOptions.Languages.Add (language);
+      return true;
     }
 
     private bool ExtensionExists (string extension)
@@ -270,10 +264,10 @@ namespace LicenseHeaderManager.Options.DialogPages
 
     private void MigrateStorageLocation_3_1_0()
     {
-      s_log.Info ("Start migration to License Header Manager Version 3.1.0");
+      s_log.Info ($"Start migration to License Header Manager Version 3.1.0 for page {GetType().Name}");
       if (!System.Version.TryParse(Version, out var version) || version < new Version(3, 1, 0))
       {
-        s_log.Info($"Current version: {Version}");
+        s_log.Debug($"Current version: {Version}");
         LoadCurrentRegistryValues_3_0_3();
       }
       else

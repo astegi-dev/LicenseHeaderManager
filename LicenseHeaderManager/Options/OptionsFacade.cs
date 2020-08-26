@@ -28,13 +28,13 @@ namespace LicenseHeaderManager.Options
 
     private readonly VisualStudioOptions _visualStudioOptions;
 
-    public static string DefaultCoreOptionsPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\CoreOptions.json");
-    public static string DefaultVisualStudioOptionsPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\VisualStudioOptions.json");
-    public static string DefaultLogPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\logs_lhm");
+    public static readonly string DefaultCoreOptionsPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\CoreOptions.json");
+    public static readonly string DefaultVisualStudioOptionsPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\VisualStudioOptions.json");
+    public static readonly string DefaultLogPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\logs_lhm");
 
     /// <summary>
     ///   Gets or sets the currently up-to-date configuration of the License Header Manager Extension, along
-    ///   with the corresponding options for the Core..
+    ///   with the corresponding options for the Core.
     /// </summary>
     public static OptionsFacade CurrentOptions { get; set; }
 
@@ -97,7 +97,6 @@ namespace LicenseHeaderManager.Options
     {
       get => _coreOptions.Version;
       set => _coreOptions.Version = value;
-
     }
 
     /// <summary>

@@ -186,9 +186,9 @@ namespace LicenseHeaderManager
         }
         catch (Exception ex)
         {
-          s_log.Error("No WebSite component is installed on the machine: ", ex);
           //This probably only throws an exception if no WebSite component is installed on the machine.
-          //If no WebSite component is installed, they are probably not using a WebSite Project and therefore dont need that feature.
+          //If no WebSite component is installed, they are probably not using a WebSite Project and therefore don't need that feature.
+          s_log.Error("No WebSite component is installed on the machine: ", ex);
         }
 
         if (_websiteItemEvents != null)
@@ -211,6 +211,8 @@ namespace LicenseHeaderManager
             case ExecutionTime.After:
               command.Events.AfterExecute += AfterLinkedCommandExecuted;
               break;
+            default:
+              throw new ArgumentOutOfRangeException();
           }
         }
 
@@ -246,9 +248,7 @@ namespace LicenseHeaderManager
       try
       {
         var activeDocument = Dte2.ActiveDocument;
-        if (activeDocument == null)
-          return null;
-        return activeDocument.ProjectItem;
+        return activeDocument?.ProjectItem;
       }
       catch (ArgumentException)
       {
@@ -291,6 +291,7 @@ namespace LicenseHeaderManager
         return;
 
       if (e.OldItems != null)
+      {
         foreach (LinkedCommand command in e.OldItems)
           switch (command.ExecutionTime)
           {
@@ -300,9 +301,13 @@ namespace LicenseHeaderManager
             case ExecutionTime.After:
               command.Events.AfterExecute -= AfterLinkedCommandExecuted;
               break;
+            default:
+              throw new ArgumentOutOfRangeException();
           }
+      }
 
       if (e.NewItems != null)
+      {
         foreach (LinkedCommand command in e.NewItems)
         {
           command.Events = Dte2.Events.CommandEvents[command.Guid, command.Id];
@@ -315,8 +320,11 @@ namespace LicenseHeaderManager
             case ExecutionTime.After:
               command.Events.AfterExecute += AfterLinkedCommandExecuted;
               break;
+            default:
+              throw new ArgumentOutOfRangeException();
           }
         }
+      }
     }
 
     private void BeforeAnyCommandExecuted (string guid, int id, object customIn, object customOut, ref bool cancelDefault)
@@ -330,14 +338,14 @@ namespace LicenseHeaderManager
     {
       //An item was added. Check if we should insert a header automatically.
       var page = GeneralOptionsPageModel;
-      if (page != null && page.InsertInNewFiles && item != null)
-      {
-        //Normally the header should be inserted here, but that might interfere with the command
-        //currently being executed, so we wait until it is finished.
-        _currentCommandEvents = Dte2.Events.CommandEvents[_currentCommandGuid, _currentCommandId];
-        _currentCommandEvents.AfterExecute += FinishedAddingItem;
-        _addedItems.Push (item);
-      }
+      if (page == null || !page.InsertInNewFiles || item == null)
+        return;
+
+      //Normally the header should be inserted here, but that might interfere with the command
+      //currently being executed, so we wait until it is finished.
+      _currentCommandEvents = Dte2.Events.CommandEvents[_currentCommandGuid, _currentCommandId];
+      _currentCommandEvents.AfterExecute += FinishedAddingItem;
+      _addedItems.Push (item);
     }
 
     private void FinishedAddingItem (string guid, int id, object customIn, object customOut)

@@ -78,12 +78,6 @@ namespace LicenseHeaderManager.Options.Model
     /// </summary>
     public virtual async System.Threading.Tasks.Task LoadAsync ()
     {
-      //ShellSettingsManager manager = await s_settingsManager.GetValueAsync();
-      //SettingsStore settingsStore = manager.GetReadOnlySettingsStore (SettingsScope.UserSettings);
-
-      //if (!settingsStore.CollectionExists (CollectionName))
-      //  return;
-
       s_log.Info("Load options from config file");
       OptionsFacade.CurrentOptions = await OptionsFacade.LoadAsync();
 
@@ -111,12 +105,6 @@ namespace LicenseHeaderManager.Options.Model
     /// </summary>
     public virtual async System.Threading.Tasks.Task SaveAsync ()
     {
-      //ShellSettingsManager manager = await s_settingsManager.GetValueAsync();
-      //WritableSettingsStore settingsStore = manager.GetWritableSettingsStore (SettingsScope.UserSettings);
-
-      //if (!settingsStore.CollectionExists (CollectionName))
-      //  settingsStore.CreateCollection (CollectionName);
-
       s_log.Info("Save options to config file");
       foreach (var property in GetOptionProperties())
       {
@@ -139,9 +127,7 @@ namespace LicenseHeaderManager.Options.Model
 
     private IEnumerable<PropertyInfo> GetOptionProperties ()
     {
-      return GetType()
-          .GetProperties()
-          .Where (p => p.PropertyType.IsSerializable && p.PropertyType.IsPublic);
+      return GetType().GetProperties().Where (p => p.PropertyType.IsSerializable && p.PropertyType.IsPublic);
     }
   }
 }

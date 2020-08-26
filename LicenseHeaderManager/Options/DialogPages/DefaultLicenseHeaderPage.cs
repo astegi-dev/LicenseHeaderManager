@@ -44,10 +44,10 @@ namespace LicenseHeaderManager.Options.DialogPages
 
     private void MigrateStorageLocation_3_1_0()
     {
-      s_log.Info("Start migration to License Header Manager Version 3.1.0");
+      s_log.Info($"Start migration to License Header Manager Version 3.1.0 for page {GetType().Name}");
       if (!System.Version.TryParse(Version, out var version) || version < new Version(3, 1, 0))
       {
-        s_log.Info($"Current version: {Version}");
+        s_log.Debug($"Current version: {Version}");
         LoadCurrentRegistryValues_3_0_3();
       }
       else
@@ -60,8 +60,6 @@ namespace LicenseHeaderManager.Options.DialogPages
             OptionsFacade.CurrentOptions.LicenseHeaderFileText,
             migratedDefaultLicenseHeaderTextPage.LicenseHeaderFileText,
             CoreOptions._defaultLicenseHeaderFileText);
-
-        //OptionsFacade.CurrentOptions.LicenseHeaderFileText = migratedDefaultLicenseHeaderTextPage.LicenseHeaderFileText;
       }
     }
   }

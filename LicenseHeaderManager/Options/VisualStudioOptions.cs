@@ -26,7 +26,6 @@ namespace LicenseHeaderManager.Options
   {
     public const bool c_defaultInsertInNewFiles = false;
 
-    
     public static readonly ObservableCollection<LinkedCommand> s_defaultLinkedCommands = new ObservableCollection<LinkedCommand>();
     public ObservableCollection<LinkedCommand> _linkedCommands;
 
@@ -57,11 +56,11 @@ namespace LicenseHeaderManager.Options
         }
 
         _linkedCommands = value;
-        if (_linkedCommands != null)
-        {
-          _linkedCommands.CollectionChanged += InvokeLinkedCommandsChanged;
-          InvokeLinkedCommandsChanged (_linkedCommands, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, _linkedCommands));
-        }
+        if (_linkedCommands == null)
+          return;
+
+        _linkedCommands.CollectionChanged += InvokeLinkedCommandsChanged;
+        InvokeLinkedCommandsChanged (_linkedCommands, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, _linkedCommands));
       }
     }
 
