@@ -64,7 +64,7 @@ namespace LicenseHeaderManager.Utils
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
       if (headers != null)
         return await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new LicenseHeaderInput (item.Document.FullName, headers, item.GetAdditionalProperties()),
+            new LicenseHeaderInput (item.FileNames[1], headers, item.GetAdditionalProperties()),
             calledByUser,
             CoreHelpers.NonCommentLicenseHeaderDefinitionInquiry,
             message => CoreHelpers.NoLicenseHeaderDefinitionFound (message, extension));

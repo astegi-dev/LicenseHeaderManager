@@ -104,7 +104,7 @@ namespace LicenseHeaderManager.MenuItemCommands.EditorMenu
       if (item == null)
         return;
 
-      ExecuteInternalAsync (item.Document.FullName).FireAndForget();
+      ExecuteInternalAsync (item.FileNames[1]).FireAndForget();
     }
 
     private async Task ExecuteInternalAsync (string path)
