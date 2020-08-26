@@ -93,7 +93,7 @@ namespace Core
             {
               var message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
 
-              // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing
+              // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
               returnObject = new ReplacerResult<ReplacerError> (new ReplacerError (licenseHeaderInput, true, ReplacerErrorType.LanguageNotFound, message));
             }
 

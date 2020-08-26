@@ -244,7 +244,7 @@ namespace LicenseHeaderManager.Options.DialogPages
       if (value == null)
         return null;
 
-      var actualValue = string.Join("", value.Split('*').Skip(2));
+      var actualValue = string.Join("*", value.Split('*').Skip(2));
       return converter.ConvertFromInvariantString(actualValue);
     }
 
