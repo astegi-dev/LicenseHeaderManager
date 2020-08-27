@@ -73,7 +73,7 @@ namespace Core
     public async Task<string> ReplaceHeaderIfNecessaryContent (CancellationToken cancellationToken)
     {
       if (_licenseHeaderInput.InputMode != LicenseHeaderInputMode.Content)
-        throw new InvalidOperationException($"LicenseHeaderInput Mode must be {nameof(LicenseHeaderInputMode.Content)}");
+        throw new InvalidOperationException ($"LicenseHeaderInput Mode must be {nameof(LicenseHeaderInputMode.Content)}");
 
       await ReplaceHeaderIfNecessary (cancellationToken);
       return _documentTextCache;
@@ -82,7 +82,7 @@ namespace Core
     public async Task ReplaceHeaderIfNecessaryPath (CancellationToken cancellationToken)
     {
       if (_licenseHeaderInput.InputMode != LicenseHeaderInputMode.FilePath)
-        throw new InvalidOperationException($"LicenseHeaderInput Mode must be {nameof(LicenseHeaderInputMode.FilePath)}");
+        throw new InvalidOperationException ($"LicenseHeaderInput Mode must be {nameof(LicenseHeaderInputMode.FilePath)}");
 
       await ReplaceHeaderIfNecessary (cancellationToken);
     }
@@ -145,10 +145,11 @@ namespace Core
         _documentTextCache = contentInput.DocumentContent;
         return;
       }
-      
 
-      using var reader = new StreamReader (_licenseHeaderInput.DocumentPath, Encoding.UTF8);
-      _documentTextCache = await reader.ReadToEndAsync();
+      using (var reader = new StreamReader (_licenseHeaderInput.DocumentPath, Encoding.UTF8))
+      {
+        _documentTextCache = await reader.ReadToEndAsync();
+      }
     }
 
     private async Task<string> GetExistingHeader ()
@@ -190,9 +191,9 @@ namespace Core
     {
       if (!string.IsNullOrEmpty (header))
       {
-        var newContent = (await GetText ()).Substring (header.Length);
+        var newContent = (await GetText()).Substring (header.Length);
         await WriteContentAsync (newContent);
-      } 
+      }
     }
 
     private async Task WriteContentAsync (string content)
@@ -204,7 +205,7 @@ namespace Core
           await writer.WriteAsync (content);
         }
 
-        await RefreshText (); 
+        await RefreshText();
       }
       else
       {
