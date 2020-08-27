@@ -21,7 +21,7 @@ using NUnit.Framework;
 namespace LicenseHeaderManager.Test
 {
   [TestFixture]
-  public class OptionsPageTest
+  public class OptionsPageModelTest
   {
     [Test]
     public void TestLinkedCommandsChangedCalledWhenNewLinkedCommandSavedWithDefaultLinkedCommands ()
@@ -29,7 +29,6 @@ namespace LicenseHeaderManager.Test
       var optionsPage = new GeneralOptionsPageModel();
       var wasCalled = false;
       optionsPage.LinkedCommandsChanged += (sender, args) => wasCalled = true;
-
       optionsPage.LinkedCommands.Add (new LinkedCommand());
 
       Assert.That (wasCalled, Is.True);
@@ -43,9 +42,8 @@ namespace LicenseHeaderManager.Test
       optionsPage.LinkedCommandsChanged += (sender, args) => wasCalled = true;
       const string emptySerializedLinkedCommands = "1*System.String*<LinkedCommands/>";
       var converter = new LinkedCommandConverter();
-      optionsPage.LinkedCommands = new ObservableCollection<LinkedCommand> (converter.FromXml(emptySerializedLinkedCommands));
+      optionsPage.LinkedCommands = new ObservableCollection<LinkedCommand> (converter.FromXml (emptySerializedLinkedCommands)) { new LinkedCommand() };
 
-      optionsPage.LinkedCommands.Add (new LinkedCommand());
 
       Assert.That (wasCalled, Is.True);
     }

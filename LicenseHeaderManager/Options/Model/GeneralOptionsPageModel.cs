@@ -24,20 +24,44 @@ namespace LicenseHeaderManager.Options.Model
 {
   public class GeneralOptionsPageModel : BaseOptionModel<GeneralOptionsPageModel>, IGeneralOptionsPageModel
   {
+    private ObservableCollection<LinkedCommand> _linkedCommands;
+
+    public GeneralOptionsPageModel ()
+    {
+      LinkedCommands = new ObservableCollection<LinkedCommand>();
+    }
+
     public bool UseRequiredKeywords { get; set; }
 
     public string RequiredKeywords { get; set; }
 
-    public ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
+    public ObservableCollection<LinkedCommand> LinkedCommands
+    {
+      get => _linkedCommands;
+      set
+      {
+        if (_linkedCommands != null)
+        {
+          _linkedCommands.CollectionChanged -= InvokeLinkedCommandsChanged;
+          InvokeLinkedCommandsChanged (_linkedCommands, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Remove, _linkedCommands));
+        }
+
+        _linkedCommands = value;
+        if (_linkedCommands == null)
+          return;
+
+        _linkedCommands.CollectionChanged += InvokeLinkedCommandsChanged;
+        InvokeLinkedCommandsChanged (_linkedCommands, new NotifyCollectionChangedEventArgs (NotifyCollectionChangedAction.Add, _linkedCommands));
+      }
+    }
 
     public bool InsertInNewFiles { get; set; }
 
-    private DTE2 Dte => ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2;
+    private DTE2 Dte => ServiceProvider.GlobalProvider.GetService (typeof (DTE)) as DTE2;
 
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
     public Commands Commands => Dte.Commands;
 
-    // to be removed in future => is now in OptionsFacade
     public event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
 
     public void Reset ()
@@ -47,5 +71,11 @@ namespace LicenseHeaderManager.Options.Model
       LinkedCommands = VisualStudioOptions.s_defaultLinkedCommands;
       InsertInNewFiles = VisualStudioOptions.c_defaultInsertInNewFiles;
     }
+
+    protected virtual void InvokeLinkedCommandsChanged (object sender, NotifyCollectionChangedEventArgs e)
+    {
+      LinkedCommandsChanged?.Invoke (sender, e);
+    }
+
   }
 }
