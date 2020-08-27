@@ -56,20 +56,20 @@ namespace LicenseHeaderManager.Utils
       return new Progress<ReplacerProgressReport> (report => OnProgressReportedAsync (report, viewModel, projectName).FireAndForget());
     }
 
-    public static ICollection<LicenseHeaderInput> GetFilesToProcess (
+    public static ICollection<LicenseHeaderPathInput> GetFilesToProcess (
         ProjectItem item,
         IDictionary<string, string[]> headers,
         out int countSubLicenseHeaders,
         bool searchForLicenseHeaders = true)
     {
-      var files = new List<LicenseHeaderInput>();
+      var files = new List<LicenseHeaderPathInput>();
       countSubLicenseHeaders = 0;
 
       if (item.ProjectItems == null)
         return files;
 
       if (item.FileCount == 1 && File.Exists (item.FileNames[1]))
-        files.Add (new LicenseHeaderInput (item.FileNames[1], headers, item.GetAdditionalProperties()));
+        files.Add (new LicenseHeaderPathInput (item.FileNames[1], headers, item.GetAdditionalProperties()));
 
       var childHeaders = headers;
       if (searchForLicenseHeaders)
@@ -130,7 +130,7 @@ namespace LicenseHeaderManager.Utils
       var errors = result.Error.ToList();
       var nonCommentTextErrorsByExtension = errors.Where (x => x.Type == ReplacerErrorType.NonCommentText).GroupBy (x => Path.GetExtension (x.Input.DocumentPath));
 
-      var inputIgnoringNonCommentText = new List<LicenseHeaderInput>();
+      var inputIgnoringNonCommentText = new List<LicenseHeaderPathInput>();
       foreach (var extension in nonCommentTextErrorsByExtension)
       {
         var message = string.Format (Resources.Warning_InvalidLicenseHeader, extension.Key).ReplaceNewLines();

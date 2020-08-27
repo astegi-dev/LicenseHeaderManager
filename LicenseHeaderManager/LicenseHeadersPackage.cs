@@ -240,7 +240,7 @@ namespace LicenseHeaderManager
       var visible = false;
 
       if (ProjectItemInspection.IsPhysicalFile (item))
-        visible = LicenseHeaderReplacer.TryCreateDocument (new LicenseHeaderInput (item.FileNames[1], null, null), out _) == CreateDocumentResult.DocumentCreated;
+        visible = LicenseHeaderReplacer.TryCreateDocument (new LicenseHeaderPathInput (item.FileNames[1], null, null), out _) == CreateDocumentResult.DocumentCreated;
 
       return visible;
     }
@@ -366,7 +366,7 @@ namespace LicenseHeaderManager
           continue;
 
         var result = await LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new LicenseHeaderInput (item.FileNames[1], headers, item.GetAdditionalProperties()),
+            new LicenseHeaderPathInput (item.FileNames[1], headers, item.GetAdditionalProperties()),
             false);
         await CoreHelpers.HandleResultAsync (result, this);
       }

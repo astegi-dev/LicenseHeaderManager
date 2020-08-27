@@ -38,7 +38,7 @@ namespace LicenseHeaderManager.Utils
       {
         var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (projectItem);
         var result = await _licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new LicenseHeaderInput (projectItem.FileNames[1], headers, projectItem.GetAdditionalProperties()),
+            new LicenseHeaderPathInput (projectItem.FileNames[1], headers, projectItem.GetAdditionalProperties()),
             true);
         await CoreHelpers.HandleResultAsync (result, _licenseHeaderExtension);
       }

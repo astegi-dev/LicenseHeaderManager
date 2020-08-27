@@ -32,12 +32,12 @@ namespace LicenseHeaderManager.Utils
     private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
 
     /// <summary>
-    /// Sets the <see cref="LicenseHeaderInput.IgnoreNonCommentText"/> property to <see langword="true" /> for all element of the enumerable.
+    /// Sets the <see cref="LicenseHeaderPathInput.IgnoreNonCommentText"/> property to <see langword="true" /> for all element of the enumerable.
     /// </summary>
-    /// <param name="inputs">The <see cref="IEnumerable{T}"/> whose generic type parameter is <see cref="LicenseHeaderInput"/> whose items should be mutated.</param>
+    /// <param name="inputs">The <see cref="IEnumerable{T}"/> whose generic type parameter is <see cref="LicenseHeaderPathInput"/> whose items should be mutated.</param>
     /// <remarks>This operation might be useful if the license header input represented by <paramref name="inputs"/> is used only for remove operations. In that case,
     /// no confirmations regarding non-comment text are needed.</remarks>
-    public static void IgnoreNonCommentText (this IEnumerable<LicenseHeaderInput> inputs)
+    public static void IgnoreNonCommentText (this IEnumerable<LicenseHeaderPathInput> inputs)
     {
       foreach (var licenseHeaderInput in inputs)
         licenseHeaderInput.IgnoreNonCommentText = true;
@@ -81,7 +81,7 @@ namespace LicenseHeaderManager.Utils
       if (headers != null)
       {
         return await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new LicenseHeaderInput (item.FileNames[1], headers, item.GetAdditionalProperties()),
+            new LicenseHeaderPathInput (item.FileNames[1], headers, item.GetAdditionalProperties()),
             calledByUser);
       }
 

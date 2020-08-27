@@ -12,42 +12,33 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Core
 {
-  public class ReplacerResult<TSuccess, TError> : ReplacerResult<TError>
+  public class LicenseHeaderPathInput : LicenseHeaderInput
   {
-    public ReplacerResult (TError error) : base(error)
+    public LicenseHeaderPathInput (
+        string documentPath,
+        IDictionary<string, string[]> headers,
+        IEnumerable<AdditionalProperty> additionalProperties = null)
+        : base(headers, additionalProperties, documentPath)
     {
-      Success = default;
+      Extension = Path.GetExtension (DocumentPath);
     }
 
-    public ReplacerResult (TSuccess success)
+    public LicenseHeaderPathInput (
+        string documentPath,
+        IDictionary<string, string[]> headers,
+        IEnumerable<AdditionalProperty> additionalProperties,
+        bool ignoreNonCommentText)
+        : base(headers, additionalProperties, ignoreNonCommentText, documentPath)
     {
-      IsSuccess = true;
-      Error = default;
-      Success = success;
+      Extension = Path.GetExtension (DocumentPath);
     }
 
-    public TSuccess Success { get; }
-  }
-
-  public class ReplacerResult<TError>
-  {
-    public ReplacerResult ()
-    {
-      IsSuccess = true;
-      Error = default;
-    }
-
-    public ReplacerResult (TError error)
-    {
-      Error = error;
-      IsSuccess = false;
-    }
-
-    public bool IsSuccess { get; protected set; }
-
-    public TError Error { get; protected set; }
+    public override string Extension { get; }
+    public override LicenseHeaderInputMode InputMode => LicenseHeaderInputMode.FilePath;
   }
 }

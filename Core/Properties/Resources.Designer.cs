@@ -215,6 +215,15 @@ namespace Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The header definition for the extension {0} is null or empty\n .
+        /// </summary>
+        internal static string Error_HeaderNullOrEmpty {
+            get {
+                return ResourceManager.GetString("Error_HeaderNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occured while parsing the file {0}.\nMake sure the comment syntax is correct..
         /// </summary>
         internal static string Error_InvalidLicenseHeader {

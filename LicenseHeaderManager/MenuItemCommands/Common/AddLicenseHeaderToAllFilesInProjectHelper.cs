@@ -44,7 +44,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     {
       var project = projectOrProjectItem as Project;
       var projectItem = projectOrProjectItem as ProjectItem;
-      var replacerInput = new List<LicenseHeaderInput>();
+      var replacerInput = new List<LicenseHeaderPathInput>();
 
       var countSubLicenseHeadersFound = 0;
       IDictionary<string, string[]> headers;

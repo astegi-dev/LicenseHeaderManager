@@ -187,6 +187,9 @@
   <data name="Error_NoHeaderFound" xml:space="preserve">
     <value>This extension currently has no header defined in the license header definition file\n </value>
   </data>
+  <data name="Error_HeaderNullOrEmpty" xml:space="preserve">
+    <value>The header definition for the extension {0} is null or empty\n </value>
+  </data>
   <data name="Error_NoLicenseHeaderFile" xml:space="preserve">
     <value>The project has no license header file.</value>
   </data>

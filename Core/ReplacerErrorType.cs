@@ -41,6 +41,11 @@ namespace Core
     /// <summary>
     ///   An unspecified error occured.
     /// </summary>
-    Miscellaneous
+    Miscellaneous,
+
+    /// <summary>
+    /// Specifies that the header definition for the file's language is null or empty.
+    /// </summary>
+    EmptyHeader
   }
 }

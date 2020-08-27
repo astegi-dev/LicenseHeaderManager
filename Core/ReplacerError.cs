@@ -38,7 +38,7 @@ namespace Core
     public string Description { get; }
 
     /// <summary>
-    /// Gets the <see cref="LicenseHeaderInput"/> instance the <see cref="LicenseHeaderReplacer"/> was invoked with.
+    /// Gets the <see cref="LicenseHeaderPathInput"/> instance the <see cref="LicenseHeaderReplacer"/> was invoked with.
     /// </summary>
     public LicenseHeaderInput Input { get; }
 

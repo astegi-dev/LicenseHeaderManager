@@ -24,9 +24,9 @@ namespace Core
 {
   public class Document
   {
+    private readonly LicenseHeaderInput _licenseHeaderInput;
     private readonly IEnumerable<AdditionalProperty> _additionalProperties;
     private readonly CommentParser _commentParser;
-    private readonly string _documentFilePath;
     private readonly string[] _headerLines;
     private readonly IEnumerable<string> _keywords;
     private readonly Language _language;
@@ -35,13 +35,13 @@ namespace Core
     private string _lineEndingInDocumentCache;
 
     public Document (
-        string documentFilePath,
+        LicenseHeaderInput licenseHeaderInput,
         Language language,
         string[] headerLines,
         IEnumerable<AdditionalProperty> additionalProperties = null,
         IEnumerable<string> keywords = null)
     {
-      _documentFilePath = documentFilePath;
+      _licenseHeaderInput = licenseHeaderInput;
       _additionalProperties = additionalProperties;
       _keywords = keywords;
       _language = language;
@@ -55,7 +55,7 @@ namespace Core
         return _headerCache;
 
       var headerText = await CreateHeaderText (_headerLines);
-      _headerCache = new DocumentHeader (_documentFilePath, headerText, new DocumentHeaderProperties (_additionalProperties));
+      _headerCache = new DocumentHeader (_licenseHeaderInput.DocumentPath, headerText, new DocumentHeaderProperties (_additionalProperties));
       return _headerCache;
     }
 
@@ -70,7 +70,24 @@ namespace Core
       return (await GetHeader()).IsEmpty || LicenseHeader.Validate ((await GetHeader()).Text, _commentParser);
     }
 
-    public async Task ReplaceHeaderIfNecessary (CancellationToken cancellationToken)
+    public async Task<string> ReplaceHeaderIfNecessaryContent (CancellationToken cancellationToken)
+    {
+      if (_licenseHeaderInput.InputMode != LicenseHeaderInputMode.Content)
+        throw new InvalidOperationException($"LicenseHeaderInput Mode must be {nameof(LicenseHeaderInputMode.Content)}");
+
+      await ReplaceHeaderIfNecessary (cancellationToken);
+      return _documentTextCache;
+    }
+
+    public async Task ReplaceHeaderIfNecessaryPath (CancellationToken cancellationToken)
+    {
+      if (_licenseHeaderInput.InputMode != LicenseHeaderInputMode.FilePath)
+        throw new InvalidOperationException($"LicenseHeaderInput Mode must be {nameof(LicenseHeaderInputMode.FilePath)}");
+
+      await ReplaceHeaderIfNecessary (cancellationToken);
+    }
+
+    private async Task ReplaceHeaderIfNecessary (CancellationToken cancellationToken)
     {
       var skippedText = await SkipText();
       if (!string.IsNullOrEmpty (skippedText))
@@ -123,7 +140,13 @@ namespace Core
 
     private async Task RefreshText ()
     {
-      using var reader = new StreamReader (_documentFilePath, Encoding.UTF8);
+      if (_licenseHeaderInput.InputMode == LicenseHeaderInputMode.Content && _licenseHeaderInput is LicenseHeaderContentInput contentInput)
+      {
+        _documentTextCache = contentInput.DocumentContent;
+        return;
+      }
+      
+      using var reader = new StreamReader (_licenseHeaderInput.DocumentPath, Encoding.UTF8);
       _documentTextCache = await reader.ReadToEndAsync();
     }
 
@@ -158,12 +181,7 @@ namespace Core
       {
         var sb = new StringBuilder();
         var newContent = sb.Append (header).Append (await GetText()).ToString();
-        using (var writer = new StreamWriter (_documentFilePath, false, Encoding.UTF8))
-        {
-          await writer.WriteAsync (newContent);
-        }
-
-        await RefreshText();
+        await WriteContentAsync (newContent);
       }
     }
 
@@ -171,13 +189,23 @@ namespace Core
     {
       if (!string.IsNullOrEmpty (header))
       {
-        var newContent = (await GetText()).Substring (header.Length);
-        using (var writer = new StreamWriter (_documentFilePath, false, Encoding.UTF8))
-        {
-          await writer.WriteAsync (newContent);
-        }
+        var newContent = (await GetText ()).Substring (header.Length);
+        await WriteContentAsync (newContent);
+      } 
+    }
 
-        await RefreshText();
+    private async Task WriteContentAsync (string content)
+    {
+      if (_licenseHeaderInput.InputMode == LicenseHeaderInputMode.FilePath)
+      {
+        using var writer = new StreamWriter (_licenseHeaderInput.DocumentPath, false, Encoding.UTF8);
+        await writer.WriteAsync (content);
+
+        await RefreshText (); 
+      }
+      else
+      {
+        _documentTextCache = content;
       }
     }
   }

@@ -52,6 +52,65 @@ namespace Core
       _extensionsWithInvalidHeaders.Clear();
     }
 
+    public async Task<ReplacerResult<string, ReplacerError>> RemoveOrReplaceHeader (LicenseHeaderContentInput licenseHeaderInput, bool calledByUser)
+    {
+      try
+      {
+        var result = TryCreateDocument (licenseHeaderInput, out var document);
+
+        string message;
+        switch (result)
+        {
+          case CreateDocumentResult.DocumentCreated:
+            if (!await document.ValidateHeader() && !licenseHeaderInput.IgnoreNonCommentText)
+            {
+              message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
+              return new ReplacerResult<string, ReplacerError> (new ReplacerError (licenseHeaderInput, calledByUser, ReplacerErrorType.NonCommentText, message));
+            }
+
+            try
+            {
+              var newContent = await document.ReplaceHeaderIfNecessaryContent (new CancellationToken());
+              return new ReplacerResult<string, ReplacerError>(newContent);
+            }
+            catch (ParseException)
+            {
+              message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
+              return new ReplacerResult<string, ReplacerError> (new ReplacerError (licenseHeaderInput, calledByUser, ReplacerErrorType.ParsingError, message));
+            }
+
+          case CreateDocumentResult.LanguageNotFound:
+            if (calledByUser)
+            {
+              message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
+
+              // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
+              return new ReplacerResult<string, ReplacerError> (new ReplacerError (licenseHeaderInput, true, ReplacerErrorType.LanguageNotFound, message));
+            }
+
+            break;
+          case CreateDocumentResult.EmptyHeader:
+            message = string.Format (Resources.Error_HeaderNullOrEmpty, licenseHeaderInput.Extension);
+            return new ReplacerResult<string, ReplacerError>(new ReplacerError (licenseHeaderInput, calledByUser, ReplacerErrorType.EmptyHeader, message));
+          case CreateDocumentResult.NoHeaderFound:
+            if (calledByUser)
+            {
+              message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
+              return new ReplacerResult<string, ReplacerError> (new ReplacerError (licenseHeaderInput, true, ReplacerErrorType.NoHeaderFound, message));
+            }
+
+            break;
+        }
+      }
+      catch (ArgumentException ex)
+      {
+        var message = $"{ex.Message} {licenseHeaderInput.DocumentPath}";
+        return new ReplacerResult<string, ReplacerError> (new ReplacerError (licenseHeaderInput, calledByUser, ReplacerErrorType.Miscellaneous, message));
+      }
+
+      return new ReplacerResult<string, ReplacerError>(new ReplacerError (licenseHeaderInput, ReplacerErrorType.Miscellaneous, "An unexpected Error occurred"));
+    }
+
     /// <summary>
     ///   Removes or replaces the header of a given project item.
     /// </summary>
@@ -60,7 +119,7 @@ namespace Core
     ///   Specifies whether the command was called by the user (as opposed to automatically by a
     ///   linked command or by ItemAdded)
     /// </param>
-    public async Task<ReplacerResult<ReplacerError>> RemoveOrReplaceHeader (LicenseHeaderInput licenseHeaderInput, bool calledByUser)
+    public async Task<ReplacerResult<ReplacerError>> RemoveOrReplaceHeader (LicenseHeaderPathInput licenseHeaderInput, bool calledByUser)
     {
       var returnObject = new ReplacerResult<ReplacerError>();
       try
@@ -79,7 +138,7 @@ namespace Core
 
             try
             {
-              await document.ReplaceHeaderIfNecessary (new CancellationToken());
+              await document.ReplaceHeaderIfNecessaryPath (new CancellationToken());
             }
             catch (ParseException)
             {
@@ -140,7 +199,7 @@ namespace Core
     }
 
     private async Task RemoveOrReplaceHeaderForOneFile (
-        LicenseHeaderInput licenseHeaderInput,
+        LicenseHeaderPathInput licenseHeaderInput,
         IProgress<ReplacerProgressReport> progress,
         CancellationToken cancellationToken,
         ConcurrentQueue<ReplacerError> errors)
@@ -167,7 +226,7 @@ namespace Core
       try
       {
         cancellationToken.ThrowIfCancellationRequested();
-        await document.ReplaceHeaderIfNecessary (cancellationToken);
+        await document.ReplaceHeaderIfNecessaryPath (cancellationToken);
       }
       catch (ParseException)
       {
@@ -179,7 +238,7 @@ namespace Core
     }
 
     public async Task<ReplacerResult<IEnumerable<ReplacerError>>> RemoveOrReplaceHeader (
-        ICollection<LicenseHeaderInput> licenseHeaders,
+        ICollection<LicenseHeaderPathInput> licenseHeaders,
         IProgress<ReplacerProgressReport> progress,
         CancellationToken cancellationToken)
     {
@@ -211,11 +270,6 @@ namespace Core
       return errorList.Count == 0 ? new ReplacerResult<IEnumerable<ReplacerError>>() : new ReplacerResult<IEnumerable<ReplacerError>> (errorList);
     }
 
-    public static bool IsLicenseHeader (string documentPath)
-    {
-      return Path.GetExtension (documentPath) == LicenseHeader.Extension;
-    }
-
     /// <summary>
     ///   Tries to open a given project item as a Document which can be used to add or remove headers.
     /// </summary>
@@ -231,10 +285,10 @@ namespace Core
     {
       document = null;
 
-      if (IsLicenseHeader (licenseHeaderInput.DocumentPath))
+      if (licenseHeaderInput.Extension == LicenseHeader.Extension)
         return CreateDocumentResult.LicenseHeaderDocument;
 
-      var language = _languages.FirstOrDefault (x => x.Extensions.Any (y => licenseHeaderInput.DocumentPath.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
+      var language = _languages.FirstOrDefault (x => x.Extensions.Any (y => licenseHeaderInput.Extension.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
 
       if (language == null)
         return CreateDocumentResult.LanguageNotFound;
@@ -244,7 +298,7 @@ namespace Core
       {
         var extension = licenseHeaderInput.Headers.Keys
             .OrderByDescending (x => x.Length)
-            .FirstOrDefault (x => licenseHeaderInput.DocumentPath.EndsWith (x, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault (x => licenseHeaderInput.Extension.EndsWith (x, StringComparison.OrdinalIgnoreCase));
 
         if (extension == null)
           return CreateDocumentResult.NoHeaderFound;
@@ -255,7 +309,7 @@ namespace Core
           return CreateDocumentResult.EmptyHeader;
       }
 
-      document = new Document (licenseHeaderInput.DocumentPath, language, header, licenseHeaderInput.AdditionalProperties, _keywords);
+      document = new Document (licenseHeaderInput, language, header, licenseHeaderInput.AdditionalProperties, _keywords);
 
       return CreateDocumentResult.DocumentCreated;
     }
