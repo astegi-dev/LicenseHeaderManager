@@ -13,7 +13,6 @@ namespace Core
         : base(headers, additionalProperties, documentPath)
     {
       DocumentContent = documentContent;
-      Extension = extension;
     }
 
     public LicenseHeaderContentInput (
@@ -26,12 +25,9 @@ namespace Core
         : base(headers, additionalProperties, ignoreNonCommentText, documentPath)
     {
       DocumentContent = documentContent;
-      Extension = extension;
     }
 
     public string DocumentContent { get; }
-
-    public override string Extension { get; }
 
     public override LicenseHeaderInputMode InputMode => LicenseHeaderInputMode.Content;
   }

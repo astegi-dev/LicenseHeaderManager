@@ -146,6 +146,7 @@ namespace Core
         return;
       }
       
+
       using var reader = new StreamReader (_licenseHeaderInput.DocumentPath, Encoding.UTF8);
       _documentTextCache = await reader.ReadToEndAsync();
     }
@@ -198,8 +199,10 @@ namespace Core
     {
       if (_licenseHeaderInput.InputMode == LicenseHeaderInputMode.FilePath)
       {
-        using var writer = new StreamWriter (_licenseHeaderInput.DocumentPath, false, Encoding.UTF8);
-        await writer.WriteAsync (content);
+        using (var writer = new StreamWriter (_licenseHeaderInput.DocumentPath, false, Encoding.UTF8))
+        {
+          await writer.WriteAsync (content);
+        }
 
         await RefreshText (); 
       }

@@ -71,10 +71,10 @@ namespace LicenseHeaderManager.Utils
       return new AdditionalProperty (token, canCreateValue() ? createValue() : token);
     }
 
-    public static async Task<ReplacerResult<ReplacerError>> AddLicenseHeaderToItemAsync (this ProjectItem item, ILicenseHeaderExtension extension, bool calledByUser)
+    public static async Task<ReplacerResult<ReplacerError<LicenseHeaderPathInput>>> AddLicenseHeaderToItemAsync (this ProjectItem item, ILicenseHeaderExtension extension, bool calledByUser)
     {
       if (item == null || ProjectItemInspection.IsLicenseHeader (item))
-        return new ReplacerResult<ReplacerError>();
+        return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>>();
 
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
@@ -88,7 +88,7 @@ namespace LicenseHeaderManager.Utils
       if (calledByUser && LicenseHeader.ShowQuestionForAddingLicenseHeaderFile (item.ContainingProject, extension.DefaultLicenseHeaderPageModel))
         return await AddLicenseHeaderToItemAsync (item, extension, true);
 
-      return new ReplacerResult<ReplacerError>();
+      return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>>();
     }
 
     public static void FireAndForget (this Task task)

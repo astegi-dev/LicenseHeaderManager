@@ -115,6 +115,7 @@
     <Compile Include="ReplacerError.cs" />
     <Compile Include="ReplacerProgressReport.cs" />
     <Compile Include="ReplacerResult.cs" />
+    <Compile Include="ReplacerSuccess.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="UserInfo.cs" />
   </ItemGroup>

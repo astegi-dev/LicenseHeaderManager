@@ -15,9 +15,9 @@ using System;
 
 namespace Core
 {
-  public class ReplacerError
+  public class ReplacerError<TInput> where TInput : LicenseHeaderInput
   {
-    public ReplacerError (LicenseHeaderInput input, bool calledByUser, ReplacerErrorType type, string description)
+    public ReplacerError (TInput input, bool calledByUser, ReplacerErrorType type, string description)
     {
       Input = input;
       CalledByUser = calledByUser;
@@ -25,7 +25,7 @@ namespace Core
       Description = description;
     }
 
-    public ReplacerError (LicenseHeaderInput input, ReplacerErrorType type, string description)
+    public ReplacerError (TInput input, ReplacerErrorType type, string description)
     {
       Input = input;
       CalledByUser = false;
@@ -40,7 +40,7 @@ namespace Core
     /// <summary>
     /// Gets the <see cref="LicenseHeaderPathInput"/> instance the <see cref="LicenseHeaderReplacer"/> was invoked with.
     /// </summary>
-    public LicenseHeaderInput Input { get; }
+    public TInput Input { get; }
 
     public bool CalledByUser { get; }
   }

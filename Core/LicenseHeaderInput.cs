@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 
 namespace Core
 {
@@ -10,6 +11,7 @@ namespace Core
       AdditionalProperties = additionalProperties;
       IgnoreNonCommentText = ignoreNonCommentText;
       DocumentPath = documentPath;
+      Extension = Path.GetExtension (DocumentPath);
     }
 
     protected LicenseHeaderInput (IDictionary<string, string[]> headers, IEnumerable<AdditionalProperty> additionalProperties, string documentPath)
@@ -18,6 +20,7 @@ namespace Core
       AdditionalProperties = additionalProperties;
       IgnoreNonCommentText = false;
       DocumentPath = documentPath;
+      Extension = Path.GetExtension (DocumentPath);
     }
 
     public IDictionary<string, string[]> Headers { get; }
@@ -31,7 +34,7 @@ namespace Core
 
     public string DocumentPath { get; }
 
-    public abstract string Extension { get; }
+    public string Extension { get; }
 
     public abstract LicenseHeaderInputMode InputMode { get; }
   }

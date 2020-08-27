@@ -25,7 +25,6 @@ namespace Core
         IEnumerable<AdditionalProperty> additionalProperties = null)
         : base(headers, additionalProperties, documentPath)
     {
-      Extension = Path.GetExtension (DocumentPath);
     }
 
     public LicenseHeaderPathInput (
@@ -35,10 +34,8 @@ namespace Core
         bool ignoreNonCommentText)
         : base(headers, additionalProperties, ignoreNonCommentText, documentPath)
     {
-      Extension = Path.GetExtension (DocumentPath);
     }
 
-    public override string Extension { get; }
     public override LicenseHeaderInputMode InputMode => LicenseHeaderInputMode.FilePath;
   }
 }

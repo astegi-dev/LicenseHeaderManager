@@ -91,7 +91,7 @@ namespace LicenseHeaderManager.Utils
       return files;
     }
 
-    public static async Task HandleResultAsync (ReplacerResult<ReplacerError> result, ILicenseHeaderExtension extension)
+    public static async Task HandleResultAsync (ReplacerResult<ReplacerError<LicenseHeaderPathInput>> result, ILicenseHeaderExtension extension)
     {
       if (result.IsSuccess)
         return;
@@ -116,7 +116,7 @@ namespace LicenseHeaderManager.Utils
     }
 
     public static async Task HandleResultAsync (
-        ReplacerResult<IEnumerable<ReplacerError>> result,
+        ReplacerResult<IEnumerable<ReplacerError<LicenseHeaderPathInput>>> result,
         LicenseHeaderReplacer replacer,
         BaseUpdateViewModel viewModel,
         string projectName,
