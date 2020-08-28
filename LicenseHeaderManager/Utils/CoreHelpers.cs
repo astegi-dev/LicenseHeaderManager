@@ -91,10 +91,17 @@ namespace LicenseHeaderManager.Utils
       return files;
     }
 
-    public static async Task HandleResultAsync (ReplacerResult<ReplacerError<LicenseHeaderPathInput>> result, ILicenseHeaderExtension extension)
+    public static async Task HandleResultAsync (ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> result, ILicenseHeaderExtension extension)
     {
       if (result.IsSuccess)
+      {
+        if (result.Success.FilePath.TrySetContent (extension.Dte2.Solution, result.Success.NewContent))
+          return;
+
+        MessageBoxHelper.ShowError ($"Updating license header for file {result.Success.FilePath} failed.");
+        s_log.Error($"Updating license header for file {result.Success.FilePath} failed.");
         return;
+      }
 
       var error = result.Error;
       switch (error.Type)

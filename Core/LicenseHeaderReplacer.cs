@@ -97,7 +97,7 @@ namespace Core
       return CreateDocumentResult.DocumentCreated;
     }
 
-    public async Task<ReplacerResult<string, ReplacerError<LicenseHeaderContentInput>>> RemoveOrReplaceHeader (
+    public async Task<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>> RemoveOrReplaceHeader (
         LicenseHeaderContentInput licenseHeaderInput,
         bool calledByUser)
     {
@@ -112,19 +112,19 @@ namespace Core
             if (!await document.ValidateHeader() && !licenseHeaderInput.IgnoreNonCommentText)
             {
               message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
-              return new ReplacerResult<string, ReplacerError<LicenseHeaderContentInput>> (
+              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
                   new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.NonCommentText, message));
             }
 
             try
             {
               var newContent = await document.ReplaceHeaderIfNecessaryContent (new CancellationToken());
-              return new ReplacerResult<string, ReplacerError<LicenseHeaderContentInput>> (newContent);
+              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (new ReplacerSuccess(licenseHeaderInput.DocumentPath, newContent));
             }
             catch (ParseException)
             {
               message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
-              return new ReplacerResult<string, ReplacerError<LicenseHeaderContentInput>> (
+              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
                   new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.ParsingError, message));
             }
 
@@ -134,20 +134,20 @@ namespace Core
               message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
 
               // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
-              return new ReplacerResult<string, ReplacerError<LicenseHeaderContentInput>> (
+              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
                   new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, true, ReplacerErrorType.LanguageNotFound, message));
             }
 
             break;
           case CreateDocumentResult.EmptyHeader:
             message = string.Format (Resources.Error_HeaderNullOrEmpty, licenseHeaderInput.Extension);
-            return new ReplacerResult<string, ReplacerError<LicenseHeaderContentInput>> (
+            return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
                 new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.EmptyHeader, message));
           case CreateDocumentResult.NoHeaderFound:
             if (calledByUser)
             {
               message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
-              return new ReplacerResult<string, ReplacerError<LicenseHeaderContentInput>> (
+              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
                   new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, true, ReplacerErrorType.NoHeaderFound, message));
             }
 
@@ -157,11 +157,11 @@ namespace Core
       catch (ArgumentException ex)
       {
         var message = $"{ex.Message} {licenseHeaderInput.DocumentPath}";
-        return new ReplacerResult<string, ReplacerError<LicenseHeaderContentInput>> (
+        return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
             new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.Miscellaneous, message));
       }
 
-      return new ReplacerResult<string, ReplacerError<LicenseHeaderContentInput>> (
+      return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
           new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, ReplacerErrorType.Miscellaneous, "An unexpected Error occurred"));
     }
 

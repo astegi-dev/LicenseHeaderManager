@@ -6,7 +6,6 @@ namespace Core
   {
     public LicenseHeaderContentInput (
         string documentContent,
-        string extension,
         string documentPath,
         IDictionary<string, string[]> headers,
         IEnumerable<AdditionalProperty> additionalProperties = null)
@@ -17,7 +16,6 @@ namespace Core
 
     public LicenseHeaderContentInput (
         string documentContent,
-        string extension,
         string documentPath,
         IDictionary<string, string[]> headers,
         IEnumerable<AdditionalProperty> additionalProperties,

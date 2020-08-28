@@ -14,6 +14,7 @@
 using System;
 using System.ComponentModel.Design;
 using Core;
+using EnvDTE;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
@@ -104,12 +105,12 @@ namespace LicenseHeaderManager.MenuItemCommands.EditorMenu
       if (item == null)
         return;
 
-      ExecuteInternalAsync (item.FileNames[1]).FireAndForget();
+      ExecuteInternalAsync (item).FireAndForget();
     }
 
-    private async Task ExecuteInternalAsync (string path)
+    private async Task ExecuteInternalAsync (ProjectItem item)
     {
-      var result = await ServiceProvider.LicenseHeaderReplacer.RemoveOrReplaceHeader (new LicenseHeaderPathInput (path, null), true);
+      var result = await ServiceProvider.LicenseHeaderReplacer.RemoveOrReplaceHeader (new LicenseHeaderContentInput (item.GetContent(), item.FileNames[1], null), true);
       await CoreHelpers.HandleResultAsync (result, ServiceProvider);
     }
   }

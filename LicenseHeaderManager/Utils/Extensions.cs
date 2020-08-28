@@ -71,24 +71,47 @@ namespace LicenseHeaderManager.Utils
       return new AdditionalProperty (token, canCreateValue() ? createValue() : token);
     }
 
-    public static async Task<ReplacerResult<ReplacerError<LicenseHeaderPathInput>>> AddLicenseHeaderToItemAsync (this ProjectItem item, ILicenseHeaderExtension extension, bool calledByUser)
+    public static async Task<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>> AddLicenseHeaderToItemAsync (this ProjectItem item, ILicenseHeaderExtension extension, bool calledByUser)
     {
       if (item == null || ProjectItemInspection.IsLicenseHeader (item))
-        return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>>();
+        return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(new ReplacerSuccess("", ""));
 
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
       if (headers != null)
       {
         return await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new LicenseHeaderPathInput (item.FileNames[1], headers, item.GetAdditionalProperties()),
+            new LicenseHeaderContentInput (item.GetContent(), item.FileNames[1], headers, item.GetAdditionalProperties()),
             calledByUser);
       }
 
       if (calledByUser && LicenseHeader.ShowQuestionForAddingLicenseHeaderFile (item.ContainingProject, extension.DefaultLicenseHeaderPageModel))
         return await AddLicenseHeaderToItemAsync (item, extension, true);
 
-      return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>>();
+      return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(new ReplacerSuccess("", ""));
+    }
+
+    public static string GetContent(this ProjectItem item)
+    {
+      if (!(item.Document.Object("TextDocument") is TextDocument textDocument))
+        return null;
+
+      return textDocument.CreateEditPoint (textDocument.StartPoint).GetText (textDocument.EndPoint);
+    }
+
+    public static bool TrySetContent(this string itemPath, Solution solution, string content)
+    {
+      var item = solution.FindProjectItem (itemPath);
+      if (item == null)
+        return false;
+
+      if (!(item.Document.Object("TextDocument") is TextDocument textDocument))
+        return false;
+
+      textDocument.CreateEditPoint (textDocument.StartPoint).Delete (textDocument.EndPoint);
+      textDocument.CreateEditPoint (textDocument.StartPoint).Insert (content);
+
+      return true;
     }
 
     public static void FireAndForget (this Task task)

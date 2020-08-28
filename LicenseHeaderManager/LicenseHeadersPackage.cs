@@ -366,7 +366,7 @@ namespace LicenseHeaderManager
           continue;
 
         var result = await LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new LicenseHeaderPathInput (item.FileNames[1], headers, item.GetAdditionalProperties()),
+            new LicenseHeaderContentInput (item.GetContent(), item.FileNames[1], headers, item.GetAdditionalProperties()),
             false);
         await CoreHelpers.HandleResultAsync (result, this);
       }
