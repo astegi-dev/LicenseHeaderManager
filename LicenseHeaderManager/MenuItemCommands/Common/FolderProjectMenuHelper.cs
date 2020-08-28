@@ -62,7 +62,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       var obj = serviceProvider.GetSolutionExplorerItem();
       var addLicenseHeaderToAllFilesCommand = new AddLicenseHeaderToAllFilesInProjectHelper (
           cancellationToken,
-          serviceProvider.LicenseHeaderReplacer,
+          serviceProvider,
           folderProjectUpdateViewModel);
 
       var addLicenseHeaderToAllFilesResult = await addLicenseHeaderToAllFilesCommand.ExecuteAsync (obj);

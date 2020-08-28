@@ -34,8 +34,8 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
     {
       MenuItemButtonHandlerHelper helper = mode switch
       {
-          MenuItemButtonOperation.Add => new AddLicenseHeaderToAllFilesInSolutionHelper (licenseHeadersPackage.LicenseHeaderReplacer),
-          MenuItemButtonOperation.Remove => new RemoveLicenseHeaderFromAllFilesInSolutionHelper (licenseHeadersPackage.LicenseHeaderReplacer),
+          MenuItemButtonOperation.Add => new AddLicenseHeaderToAllFilesInSolutionHelper (licenseHeadersPackage),
+          MenuItemButtonOperation.Remove => new RemoveLicenseHeaderFromAllFilesInSolutionHelper (licenseHeadersPackage),
           _ => throw new ArgumentOutOfRangeException (nameof(mode), mode, null)
       };
 

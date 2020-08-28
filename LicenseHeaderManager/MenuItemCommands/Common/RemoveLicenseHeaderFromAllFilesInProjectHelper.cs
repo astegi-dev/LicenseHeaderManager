@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core;
 using EnvDTE;
+using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
 
@@ -26,15 +27,15 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
   {
     private readonly BaseUpdateViewModel _baseUpdateViewModel;
     private readonly CancellationToken _cancellationToken;
-    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
+    private readonly ILicenseHeaderExtension _licenseHeaderExtension;
 
     public RemoveLicenseHeaderFromAllFilesInProjectHelper (
         CancellationToken cancellationToken,
-        LicenseHeaderReplacer licenseHeaderReplacer,
+        ILicenseHeaderExtension licenseHeaderExtension,
         BaseUpdateViewModel baseUpdateViewModel)
     {
       _cancellationToken = cancellationToken;
-      _licenseHeaderReplacer = licenseHeaderReplacer;
+      _licenseHeaderExtension = licenseHeaderExtension;
       _baseUpdateViewModel = baseUpdateViewModel;
     }
 
@@ -44,9 +45,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       {
         case Project project:
         {
-          _licenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
+          _licenseHeaderExtension.LicenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
 
-          var replacerInput = new List<LicenseHeaderPathInput>();
+          var replacerInput = new List<LicenseHeaderContentInput>();
           foreach (ProjectItem item in project.ProjectItems)
             replacerInput.AddRange (CoreHelpers.GetFilesToProcess (item, null, out _, false));
 
@@ -56,7 +57,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         }
         case ProjectItem item:
         {
-          _licenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
+          _licenseHeaderExtension.LicenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
           await RemoveOrReplaceHeaderAndHandleResultAsync (CoreHelpers.GetFilesToProcess (item, null, out _, false));
 
           break;
@@ -64,11 +65,11 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       }
     }
 
-    private async Task RemoveOrReplaceHeaderAndHandleResultAsync (ICollection<LicenseHeaderPathInput> replacerInput, string projectName = null)
+    private async Task RemoveOrReplaceHeaderAndHandleResultAsync (ICollection<LicenseHeaderContentInput> replacerInput, string projectName = null)
     {
       replacerInput.IgnoreNonCommentText();
-      var result = await _licenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.CreateProgress (_baseUpdateViewModel, projectName), _cancellationToken);
-      await CoreHelpers.HandleResultAsync (result, _licenseHeaderReplacer, _baseUpdateViewModel, projectName, _cancellationToken);
+      var result = await _licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.CreateProgress (_baseUpdateViewModel, projectName), _cancellationToken);
+      await CoreHelpers.HandleResultAsync (result, _licenseHeaderExtension, _baseUpdateViewModel, projectName, _cancellationToken);
     }
   }
 }

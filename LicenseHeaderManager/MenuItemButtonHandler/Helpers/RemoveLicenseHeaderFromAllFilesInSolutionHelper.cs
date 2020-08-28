@@ -15,6 +15,7 @@ using System;
 using System.Threading;
 using Core;
 using EnvDTE;
+using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
@@ -27,11 +28,11 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
   public class RemoveLicenseHeaderFromAllFilesInSolutionHelper : MenuItemButtonHandlerHelper
   {
     private const string c_commandName = "Remove LicenseHeader from all files in Solution";
-    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
+    private readonly ILicenseHeaderExtension _licenseHeaderExtension;
 
-    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (LicenseHeaderReplacer licenseHeaderReplacer)
+    public RemoveLicenseHeaderFromAllFilesInSolutionHelper (ILicenseHeaderExtension licenseHeaderExtension)
     {
-      _licenseHeaderReplacer = licenseHeaderReplacer;
+      _licenseHeaderExtension = licenseHeaderExtension;
     }
 
     public override string Description => c_commandName;
@@ -54,7 +55,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
 
       updateViewModel.ProcessedProjectCount = 0;
       updateViewModel.ProjectCount = projectsInSolution.Count;
-      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (cancellationToken, _licenseHeaderReplacer, updateViewModel);
+      var removeAllLicenseHeadersCommand = new RemoveLicenseHeaderFromAllFilesInProjectHelper (cancellationToken, _licenseHeaderExtension, updateViewModel);
 
       foreach (var project in projectsInSolution)
       {

@@ -13,8 +13,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Core;
 using EnvDTE;
@@ -29,7 +31,7 @@ namespace LicenseHeaderManager.Utils
 {
   internal static class Extensions
   {
-    private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog s_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
     /// <summary>
     /// Sets the <see cref="LicenseHeaderPathInput.IgnoreNonCommentText"/> property to <see langword="true" /> for all element of the enumerable.
@@ -37,7 +39,7 @@ namespace LicenseHeaderManager.Utils
     /// <param name="inputs">The <see cref="IEnumerable{T}"/> whose generic type parameter is <see cref="LicenseHeaderPathInput"/> whose items should be mutated.</param>
     /// <remarks>This operation might be useful if the license header input represented by <paramref name="inputs"/> is used only for remove operations. In that case,
     /// no confirmations regarding non-comment text are needed.</remarks>
-    public static void IgnoreNonCommentText (this IEnumerable<LicenseHeaderPathInput> inputs)
+    public static void IgnoreNonCommentText(this IEnumerable<LicenseHeaderContentInput> inputs)
     {
       foreach (var licenseHeaderInput in inputs)
         licenseHeaderInput.IgnoreNonCommentText = true;
@@ -47,12 +49,12 @@ namespace LicenseHeaderManager.Utils
     ///   Replaces occurrences of "\n" in a string by new line characters.
     /// </summary>
     /// <returns>A <see cref="string" /> where all occurrences of "\n" have been replaced by new line characters</returns>
-    public static string ReplaceNewLines (this string input)
+    public static string ReplaceNewLines(this string input)
     {
-      return input.Replace (@"\n", "\n");
+      return input.Replace(@"\n", "\n");
     }
 
-    public static IEnumerable<AdditionalProperty> GetAdditionalProperties (this ProjectItem item)
+    public static IEnumerable<AdditionalProperty> GetAdditionalProperties(this ProjectItem item)
     {
       // ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -66,77 +68,108 @@ namespace LicenseHeaderManager.Utils
              };
     }
 
-    private static AdditionalProperty CreateAdditionalProperty (string token, Func<bool> canCreateValue, Func<string> createValue)
+    private static AdditionalProperty CreateAdditionalProperty(string token, Func<bool> canCreateValue, Func<string> createValue)
     {
-      return new AdditionalProperty (token, canCreateValue() ? createValue() : token);
+      return new AdditionalProperty(token, canCreateValue() ? createValue() : token);
     }
 
-    public static async Task<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>> AddLicenseHeaderToItemAsync (this ProjectItem item, ILicenseHeaderExtension extension, bool calledByUser)
+    public static async Task<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>> AddLicenseHeaderToItemAsync(this ProjectItem item, ILicenseHeaderExtension extension, bool calledByUser)
     {
-      if (item == null || ProjectItemInspection.IsLicenseHeader (item))
-        return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(new ReplacerSuccess("", ""));
+      var fallbackResult = new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (new ReplacerSuccess ("", ""));
+
+      if (item == null || ProjectItemInspection.IsLicenseHeader(item))
+        return fallbackResult;
 
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-      var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
+      var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem(item);
       if (headers != null)
       {
-        return await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new LicenseHeaderContentInput (item.GetContent(), item.FileNames[1], headers, item.GetAdditionalProperties()),
-            calledByUser);
+        var content = item.GetContent();
+        return content != null
+            ? await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader(
+                new LicenseHeaderContentInput(content, item.FileNames[1], headers, item.GetAdditionalProperties()),
+                calledByUser)
+            : fallbackResult;
       }
 
-      if (calledByUser && LicenseHeader.ShowQuestionForAddingLicenseHeaderFile (item.ContainingProject, extension.DefaultLicenseHeaderPageModel))
-        return await AddLicenseHeaderToItemAsync (item, extension, true);
+      if (calledByUser && LicenseHeader.ShowQuestionForAddingLicenseHeaderFile(item.ContainingProject, extension.DefaultLicenseHeaderPageModel))
+        return await AddLicenseHeaderToItemAsync(item, extension, true);
 
-      return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(new ReplacerSuccess("", ""));
+      return fallbackResult;
     }
 
     public static string GetContent(this ProjectItem item)
     {
+      if (!item.IsOpen[Constants.vsViewKindTextView])
+      {
+        if (!TryOpenDocument(item))
+        {
+          return null;
+        }
+      }
+
+      s_log.Info($"{item.Name}: {item.IsOpen[Constants.vsViewKindTextView]}");
       if (!(item.Document.Object("TextDocument") is TextDocument textDocument))
         return null;
 
-      return textDocument.CreateEditPoint (textDocument.StartPoint).GetText (textDocument.EndPoint);
+      return textDocument.CreateEditPoint(textDocument.StartPoint).GetText(textDocument.EndPoint);
+    }
+
+    private static bool TryOpenDocument(ProjectItem item)
+    {
+      try
+      {
+        item.Open(Constants.vsViewKindTextView);
+        return true;
+      }
+      catch (COMException ex)
+      {
+        return false;
+      }
+      catch (IOException ex)
+      {
+        return false;
+      }
     }
 
     public static bool TrySetContent(this string itemPath, Solution solution, string content)
     {
-      var item = solution.FindProjectItem (itemPath);
+      var item = solution.FindProjectItem(itemPath);
       if (item == null)
         return false;
 
       if (!(item.Document.Object("TextDocument") is TextDocument textDocument))
         return false;
 
-      textDocument.CreateEditPoint (textDocument.StartPoint).Delete (textDocument.EndPoint);
-      textDocument.CreateEditPoint (textDocument.StartPoint).Insert (content);
+      textDocument.CreateEditPoint(textDocument.StartPoint).Delete(textDocument.EndPoint);
+      textDocument.CreateEditPoint(textDocument.StartPoint).Insert(content);
 
       return true;
     }
 
-    public static void FireAndForget (this Task task)
+    public static void FireAndForget(this Task task)
     {
       // note: this code is inspired by a tweet from Ben Adams: https://twitter.com/ben_a_adams/status/1045060828700037125
       // Only care about tasks that may fault (not completed) or are faulted,
       // so fast-path for SuccessfullyCompleted and Canceled tasks.
       if (!task.IsCompleted || task.IsFaulted)
-          // use "_" (Discard operation) to remove the warning IDE0058: Because this call is not awaited, execution of the current method continues before the call is completed
-          // https://docs.microsoft.com/en-us/dotnet/csharp/discards#a-standalone-discard
-        _ = ForgetAwaited (task);
+        // use "_" (Discard operation) to remove the warning IDE0058: Because this call is not awaited, execution of the current method continues before the call is completed
+        // https://docs.microsoft.com/en-us/dotnet/csharp/discards#a-standalone-discard
+        _ = ForgetAwaited(task);
 
       // Allocate the async/await state machine only when needed for performance reason.
       // More info about the state machine: https://blogs.msdn.microsoft.com/seteplia/2017/11/30/dissecting-the-async-methods-in-c/
-      static async Task ForgetAwaited (Task task)
+      static async Task ForgetAwaited(Task task)
       {
         try
         {
           // No need to resume on the original SynchronizationContext, so use ConfigureAwait(false)
-          await task.ConfigureAwait (false);
+          await task.ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-          MessageBoxHelper.ShowError ($"Asynchronous Task failed: {ex.Message}\nSee output pane or log file for more details.", Resources.TaskFailed);
-          s_log.Error ("Asynchronous Task failed", ex);
+          MessageBoxHelper.ShowError($"Asynchronous Task failed: {ex.Message}\nSee output pane or log file for more details.", Resources.TaskFailed);
+          s_log.Error("Asynchronous Task failed", ex);
         }
       }
     }

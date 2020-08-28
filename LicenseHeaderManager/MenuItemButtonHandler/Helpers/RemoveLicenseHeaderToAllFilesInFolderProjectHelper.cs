@@ -51,7 +51,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
 
       var obj = ((LicenseHeadersPackage) _licenseHeaderExtension).GetSolutionExplorerItem();
       var removeAllLicenseHeadersCommand =
-          new RemoveLicenseHeaderFromAllFilesInProjectHelper (cancellationToken, _licenseHeaderExtension.LicenseHeaderReplacer, viewModel);
+          new RemoveLicenseHeaderFromAllFilesInProjectHelper (cancellationToken, _licenseHeaderExtension, viewModel);
 
       await removeAllLicenseHeadersCommand.ExecuteAsync (obj);
     }

@@ -361,12 +361,16 @@ namespace LicenseHeaderManager
       while (_addedItems.Count > 0)
       {
         var item = _addedItems.Pop();
+        var content = item.GetContent();
+        if (content == null)
+          continue;
+
         var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
         if (headers == null)
           continue;
 
         var result = await LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new LicenseHeaderContentInput (item.GetContent(), item.FileNames[1], headers, item.GetAdditionalProperties()),
+            new LicenseHeaderContentInput (content, item.FileNames[1], headers, item.GetAdditionalProperties()),
             false);
         await CoreHelpers.HandleResultAsync (result, this);
       }

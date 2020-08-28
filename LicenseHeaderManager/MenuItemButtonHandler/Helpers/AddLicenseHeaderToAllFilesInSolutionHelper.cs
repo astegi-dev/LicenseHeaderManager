@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
+using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.MenuItemCommands.Common;
 using LicenseHeaderManager.MenuItemCommands.SolutionMenu;
 using LicenseHeaderManager.UpdateViewModels;
@@ -33,11 +34,11 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
   {
     private const string c_commandName = "Add LicenseHeader to all files in Solution";
     private const int MaxProjectsWithoutDefinitionFileShownInMessage = 5;
-    private readonly LicenseHeaderReplacer _licenseHeaderReplacer;
+    private readonly ILicenseHeaderExtension _licenseHeaderExtension;
 
-    public AddLicenseHeaderToAllFilesInSolutionHelper (LicenseHeaderReplacer licenseHeaderReplacer)
+    public AddLicenseHeaderToAllFilesInSolutionHelper (ILicenseHeaderExtension licenseHeaderExtension)
     {
-      _licenseHeaderReplacer = licenseHeaderReplacer;
+      _licenseHeaderExtension = licenseHeaderExtension;
     }
 
     public override string Description => c_commandName;
@@ -131,7 +132,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
     {
       viewModel.ProcessedProjectCount = 0;
       viewModel.ProjectCount = projectsInSolution.Count;
-      var addAllLicenseHeadersCommand = new AddLicenseHeaderToAllFilesInProjectHelper (cancellationToken, _licenseHeaderReplacer, viewModel);
+      var addAllLicenseHeadersCommand = new AddLicenseHeaderToAllFilesInProjectHelper (cancellationToken, _licenseHeaderExtension, viewModel);
 
       foreach (var project in projectsInSolution)
       {
