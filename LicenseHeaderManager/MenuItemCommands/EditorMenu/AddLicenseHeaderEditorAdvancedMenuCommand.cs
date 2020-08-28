@@ -110,8 +110,7 @@ namespace LicenseHeaderManager.MenuItemCommands.EditorMenu
     private async Task ExecuteInternalAsync ()
     {
       var item = ServiceProvider.GetActiveProjectItem();
-      var result = await item.AddLicenseHeaderToItemAsync (ServiceProvider, !ServiceProvider.IsCalledByLinkedCommand);
-      await CoreHelpers.HandleResultAsync (result, ServiceProvider);
+      await item.AddLicenseHeaderToItemAsync (ServiceProvider, !ServiceProvider.IsCalledByLinkedCommand);
     }
   }
 }

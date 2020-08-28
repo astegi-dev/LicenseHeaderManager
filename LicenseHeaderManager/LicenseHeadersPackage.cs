@@ -361,7 +361,7 @@ namespace LicenseHeaderManager
       while (_addedItems.Count > 0)
       {
         var item = _addedItems.Pop();
-        var content = item.GetContent();
+        var content = item.GetContent(out var wasAlreadyOpen);
         if (content == null)
           continue;
 
@@ -372,7 +372,7 @@ namespace LicenseHeaderManager
         var result = await LicenseHeaderReplacer.RemoveOrReplaceHeader (
             new LicenseHeaderContentInput (content, item.FileNames[1], headers, item.GetAdditionalProperties()),
             false);
-        await CoreHelpers.HandleResultAsync (result, this);
+        await CoreHelpers.HandleResultAsync (result, this, wasAlreadyOpen);
       }
 
       _currentCommandEvents.AfterExecute -= FinishedAddingItem;

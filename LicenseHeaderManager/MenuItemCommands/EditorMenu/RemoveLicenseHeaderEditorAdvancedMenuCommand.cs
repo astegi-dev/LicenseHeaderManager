@@ -110,12 +110,12 @@ namespace LicenseHeaderManager.MenuItemCommands.EditorMenu
 
     private async Task ExecuteInternalAsync (ProjectItem item)
     {
-      var content = item.GetContent();
+      var content = item.GetContent(out var wasAlreadyOpen);
       if (content == null)
         return;
 
       var result = await ServiceProvider.LicenseHeaderReplacer.RemoveOrReplaceHeader (new LicenseHeaderContentInput (content, item.FileNames[1], null), true);
-      await CoreHelpers.HandleResultAsync (result, ServiceProvider);
+      await CoreHelpers.HandleResultAsync (result, ServiceProvider, wasAlreadyOpen);
     }
   }
 }

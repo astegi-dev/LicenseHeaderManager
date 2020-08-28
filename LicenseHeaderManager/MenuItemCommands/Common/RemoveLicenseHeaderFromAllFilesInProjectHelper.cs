@@ -48,28 +48,34 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           _licenseHeaderExtension.LicenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
 
           var replacerInput = new List<LicenseHeaderContentInput>();
+          var fileOpenedStatus = new Dictionary<string, bool>();
           foreach (ProjectItem item in project.ProjectItems)
-            replacerInput.AddRange (CoreHelpers.GetFilesToProcess (item, null, out _, false));
+          {
+            replacerInput.AddRange (CoreHelpers.GetFilesToProcess (item, null, out _, out var subFileOpenedStatus, false));
+            foreach (var status in subFileOpenedStatus)
+              fileOpenedStatus[status.Key] = status.Value;
+          }
 
-          await RemoveOrReplaceHeaderAndHandleResultAsync (replacerInput, project.Name);
+          await RemoveOrReplaceHeaderAndHandleResultAsync (replacerInput, fileOpenedStatus, project.Name);
 
           break;
         }
         case ProjectItem item:
         {
           _licenseHeaderExtension.LicenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
-          await RemoveOrReplaceHeaderAndHandleResultAsync (CoreHelpers.GetFilesToProcess (item, null, out _, false));
+          var handlerInput = CoreHelpers.GetFilesToProcess (item, null, out _, out var subFileOpenedStatus, false);
+          await RemoveOrReplaceHeaderAndHandleResultAsync (handlerInput, subFileOpenedStatus);
 
           break;
         }
       }
     }
 
-    private async Task RemoveOrReplaceHeaderAndHandleResultAsync (ICollection<LicenseHeaderContentInput> replacerInput, string projectName = null)
+    private async Task RemoveOrReplaceHeaderAndHandleResultAsync (ICollection<LicenseHeaderContentInput> replacerInput, IDictionary<string, bool> fileOpenedStatus, string projectName = null)
     {
       replacerInput.IgnoreNonCommentText();
       var result = await _licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.CreateProgress (_baseUpdateViewModel, projectName), _cancellationToken);
-      await CoreHelpers.HandleResultAsync (result, _licenseHeaderExtension, _baseUpdateViewModel, projectName, _cancellationToken);
+      await CoreHelpers.HandleResultAsync (result, _licenseHeaderExtension, _baseUpdateViewModel, projectName, fileOpenedStatus, _cancellationToken);
     }
   }
 }

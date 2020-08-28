@@ -112,11 +112,11 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
 
     private async Task ExecuteInternalAsync (ProjectItem item)
     {
-      var replacerInput = CoreHelpers.GetFilesToProcess (item, null, out _, false);
+      var replacerInput = CoreHelpers.GetFilesToProcess (item, null, out _, out var fileOpenedStatus, false);
       replacerInput.IgnoreNonCommentText();
 
       var result = await ServiceProvider.LicenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, new Progress<ReplacerProgressReport>(), new CancellationToken());
-      await CoreHelpers.HandleResultAsync (result, ServiceProvider, default, default, new CancellationToken());
+      await CoreHelpers.HandleResultAsync (result, ServiceProvider, default, default, fileOpenedStatus, new CancellationToken());
     }
   }
 }

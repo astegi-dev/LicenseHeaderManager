@@ -115,8 +115,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
       if (item == null || !ProjectItemInspection.IsPhysicalFile (item) || ProjectItemInspection.IsLicenseHeader (item))
         return;
 
-      var result = await item.AddLicenseHeaderToItemAsync (ServiceProvider, !ServiceProvider.IsCalledByLinkedCommand);
-      await CoreHelpers.HandleResultAsync (result, ServiceProvider);
+      await item.AddLicenseHeaderToItemAsync (ServiceProvider, !ServiceProvider.IsCalledByLinkedCommand);
     }
   }
 }

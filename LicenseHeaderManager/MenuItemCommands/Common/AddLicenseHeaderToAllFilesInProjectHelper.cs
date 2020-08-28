@@ -57,6 +57,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       _licenseHeaderExtension.LicenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
       ProjectItems projectItems;
 
+      var fileOpenedStatus = new Dictionary<string, bool>();
       if (project != null)
       {
         headers = LicenseHeaderFinder.GetHeaderDefinitionForProjectWithFallback (project);
@@ -69,18 +70,27 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       }
 
       foreach (ProjectItem item in projectItems)
+      {
         if (ProjectItemInspection.IsPhysicalFile (item) && ProjectItemInspection.IsLink (item))
         {
           linkedItems.Add (item);
         }
         else
         {
-          replacerInput.AddRange (CoreHelpers.GetFilesToProcess (item, headers, out var subLicenseHeaders));
+          var inputFiles = CoreHelpers.GetFilesToProcess (item, headers, out var subLicenseHeaders, out var subFileOpenedStatus);
+          replacerInput.AddRange (inputFiles);
+          foreach (var status in subFileOpenedStatus)
+            fileOpenedStatus[status.Key] = status.Value;
+
           countSubLicenseHeadersFound = subLicenseHeaders;
         }
+      }
 
-      var result = await _licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.CreateProgress (_baseUpdateViewModel, project?.Name), _cancellationToken);
-      await CoreHelpers.HandleResultAsync (result, _licenseHeaderExtension, _baseUpdateViewModel, project?.Name, _cancellationToken);
+      var result = await _licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
+          replacerInput,
+          CoreHelpers.CreateProgress (_baseUpdateViewModel, project?.Name),
+          _cancellationToken);
+      await CoreHelpers.HandleResultAsync (result, _licenseHeaderExtension, _baseUpdateViewModel, project?.Name, fileOpenedStatus, _cancellationToken);
 
       return new AddLicenseHeaderToAllFilesResult (countSubLicenseHeadersFound, headers == null, linkedItems);
     }

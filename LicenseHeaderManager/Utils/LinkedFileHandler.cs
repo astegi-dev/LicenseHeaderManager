@@ -36,7 +36,7 @@ namespace LicenseHeaderManager.Utils
     {
       foreach (var projectItem in linkedFileFilter.ToBeProgressed)
       {
-        var content = projectItem.GetContent();
+        var content = projectItem.GetContent(out var wasAlreadyOpen);
         if (content == null)
           continue;
 
@@ -44,7 +44,7 @@ namespace LicenseHeaderManager.Utils
         var result = await _licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
             new LicenseHeaderContentInput (content, projectItem.FileNames[1], headers, projectItem.GetAdditionalProperties()),
             true);
-        await CoreHelpers.HandleResultAsync (result, _licenseHeaderExtension);
+        await CoreHelpers.HandleResultAsync (result, _licenseHeaderExtension, wasAlreadyOpen);
       }
 
       if (linkedFileFilter.NoLicenseHeaderFile.Any() || linkedFileFilter.NotInSolution.Any())
