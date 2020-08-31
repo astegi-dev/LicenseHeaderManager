@@ -107,6 +107,7 @@ namespace LicenseHeaderManager
     /// </summary>
     public LicenseHeadersPackage ()
     {
+      Instance = this;
       _addedItems = new Stack<ProjectItem>();
     }
 
@@ -126,6 +127,8 @@ namespace LicenseHeaderManager
       ShowOptionPage (typeof (LanguagesPage));
     }
 
+    public static ILicenseHeaderExtension Instance { get; private set; }
+
     public IDefaultLicenseHeaderPageModel DefaultLicenseHeaderPageModel => Options.Model.DefaultLicenseHeaderPageModel.Instance;
 
     public ILanguagesPageModel LanguagesPageModel => Options.Model.LanguagesPageModel.Instance;
@@ -144,13 +147,13 @@ namespace LicenseHeaderManager
     {
       await base.InitializeAsync (cancellationToken, progress);
       await JoinableTaskFactory.SwitchToMainThreadAsync (cancellationToken);
-      
+
       Dte2 = await GetServiceAsync (typeof (DTE)) as DTE2;
       Assumes.Present (Dte2);
 
-      CreateAndConfigureFileAppender (Path.GetFileNameWithoutExtension(Dte2.Solution.FullName));
+      CreateAndConfigureFileAppender (Path.GetFileNameWithoutExtension (Dte2.Solution.FullName));
       await CreateAndConfigureOutputPaneAppenderAsync();
-      s_log.Info("Logger has been initialized");
+      s_log.Info ("Logger has been initialized");
 
       _addedItems = new Stack<ProjectItem>();
 
@@ -190,7 +193,7 @@ namespace LicenseHeaderManager
         {
           //This probably only throws an exception if no WebSite component is installed on the machine.
           //If no WebSite component is installed, they are probably not using a WebSite Project and therefore don't need that feature.
-          s_log.Error("No WebSite component is installed on the machine: ", ex);
+          s_log.Error ("No WebSite component is installed on the machine: ", ex);
         }
 
         if (_websiteItemEvents != null)
@@ -361,7 +364,7 @@ namespace LicenseHeaderManager
       while (_addedItems.Count > 0)
       {
         var item = _addedItems.Pop();
-        var content = item.GetContent(out var wasAlreadyOpen);
+        var content = item.GetContent (out var wasAlreadyOpen, this);
         if (content == null)
           continue;
 
@@ -395,30 +398,30 @@ namespace LicenseHeaderManager
       BasicConfigurator.Configure (_fileAppender);
     }
 
-    private async Task CreateAndConfigureOutputPaneAppenderAsync()
+    private async Task CreateAndConfigureOutputPaneAppenderAsync ()
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-      _outputPane = await GetServiceAsync(typeof(SVsOutputWindow)) as IVsOutputWindow;
-      Assumes.Present(_outputPane);
+      _outputPane = await GetServiceAsync (typeof (SVsOutputWindow)) as IVsOutputWindow;
+      Assumes.Present (_outputPane);
 
       if (_outputPane == null)
       {
-        s_log.Error("Unable to add output pane log appender (output pane not available)");
+        s_log.Error ("Unable to add output pane log appender (output pane not available)");
         return;
       }
 
-      _outputPane.CreatePane(ref Guids.guidOutputPaneAppender, "LicenseHeaderManager", 1, 1);
-      _outputPaneAppender = new OutputPaneAppender(_outputPane, Level.Info);
+      _outputPane.CreatePane (ref Guids.guidOutputPaneAppender, "LicenseHeaderManager", 1, 1);
+      _outputPaneAppender = new OutputPaneAppender (_outputPane, Level.Info);
       _outputPaneAppender.ActivateOptions();
 
-      BasicConfigurator.Configure(_outputPaneAppender);
+      BasicConfigurator.Configure (_outputPaneAppender);
     }
 
     private async Task MigrateOptionsAsync ()
     {
-      var optionsPage = (OptionsPage)GetDialogPage(typeof(OptionsPage));
-      var defaultLicenseHeaderPage = (DefaultLicenseHeaderPage)GetDialogPage(typeof(DefaultLicenseHeaderPage));
-      var languagesPage = (LanguagesPage)GetDialogPage(typeof(LanguagesPage));
+      var optionsPage = (OptionsPage) GetDialogPage (typeof (OptionsPage));
+      var defaultLicenseHeaderPage = (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));
+      var languagesPage = (LanguagesPage) GetDialogPage (typeof (LanguagesPage));
       optionsPage.MigrateOptions();
       defaultLicenseHeaderPage.MigrateOptions();
       languagesPage.MigrateOptions();

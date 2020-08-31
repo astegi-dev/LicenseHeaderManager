@@ -36,7 +36,7 @@ namespace LicenseHeaderManager.Utils
     {
       foreach (var projectItem in linkedFileFilter.ToBeProgressed)
       {
-        var content = projectItem.GetContent(out var wasAlreadyOpen);
+        var content = projectItem.GetContent(out var wasAlreadyOpen, _licenseHeaderExtension);
         if (content == null)
           continue;
 

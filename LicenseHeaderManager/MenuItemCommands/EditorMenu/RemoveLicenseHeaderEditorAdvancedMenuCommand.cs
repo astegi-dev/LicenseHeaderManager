@@ -110,7 +110,7 @@ namespace LicenseHeaderManager.MenuItemCommands.EditorMenu
 
     private async Task ExecuteInternalAsync (ProjectItem item)
     {
-      var content = item.GetContent(out var wasAlreadyOpen);
+      var content = item.GetContent(out var wasAlreadyOpen, ServiceProvider);
       if (content == null)
         return;
 

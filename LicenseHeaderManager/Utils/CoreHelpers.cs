@@ -73,7 +73,7 @@ namespace LicenseHeaderManager.Utils
 
       if (item.FileCount == 1 && File.Exists (item.FileNames[1]))
       {
-        var content = item.GetContent(out var wasAlreadyOpen);
+        var content = item.GetContent(out var wasAlreadyOpen, LicenseHeadersPackage.Instance);
         if (content != null)
         {
           files.Add (new LicenseHeaderContentInput (content, item.FileNames[1], headers, item.GetAdditionalProperties()));
@@ -112,7 +112,7 @@ namespace LicenseHeaderManager.Utils
     {
       if (result.IsSuccess)
       {
-        if (!File.Exists (result.Success.FilePath) || result.Success.FilePath.TrySetContent (extension.Dte2.Solution, result.Success.NewContent, isOpen))
+        if (!File.Exists (result.Success.FilePath) || result.Success.FilePath.TrySetContent (extension.Dte2.Solution, result.Success.NewContent, isOpen, extension))
           return;
 
         MessageBoxHelper.ShowError ($"Updating license header for file {result.Success.FilePath} failed.");

@@ -53,6 +53,11 @@ namespace Core
       _extensionsWithInvalidHeaders.Clear();
     }
 
+    public Language GetLanguageFromExtension (string extension)
+    {
+      return _languages.FirstOrDefault (x => x.Extensions.Any (y => extension.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
+    }
+
     /// <summary>
     ///   Tries to open a given project item as a Document which can be used to add or remove headers.
     /// </summary>
@@ -71,8 +76,7 @@ namespace Core
       if (licenseHeaderInput.Extension == LicenseHeader.Extension)
         return CreateDocumentResult.LicenseHeaderDocument;
 
-      var language = _languages.FirstOrDefault (x => x.Extensions.Any (y => licenseHeaderInput.Extension.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
-
+      var language = GetLanguageFromExtension (licenseHeaderInput.Extension);
       if (language == null)
         return CreateDocumentResult.LanguageNotFound;
 
@@ -119,7 +123,7 @@ namespace Core
             try
             {
               var newContent = await document.ReplaceHeaderIfNecessaryContent (new CancellationToken());
-              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (new ReplacerSuccess(licenseHeaderInput.DocumentPath, newContent));
+              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (new ReplacerSuccess (licenseHeaderInput.DocumentPath, newContent));
             }
             catch (ParseException)
             {
@@ -131,14 +135,14 @@ namespace Core
           case CreateDocumentResult.LanguageNotFound:
             //if ()
             //{
-              message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
+            message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
 
-              // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
-              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-                  new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.LanguageNotFound, message));
-            //}
+            // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
+            return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
+                new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.LanguageNotFound, message));
+          //}
 
-            //break;
+          //break;
           case CreateDocumentResult.EmptyHeader:
             message = string.Format (Resources.Error_HeaderNullOrEmpty, licenseHeaderInput.Extension);
             return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
@@ -146,12 +150,12 @@ namespace Core
           case CreateDocumentResult.NoHeaderFound:
             //if (calledByUser)
             //{
-              message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
-              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-                  new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.NoHeaderFound, message));
-            //}
+            message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
+            return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
+                new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.NoHeaderFound, message));
+          //}
 
-            //break;
+          //break;
         }
       }
       catch (ArgumentException ex)

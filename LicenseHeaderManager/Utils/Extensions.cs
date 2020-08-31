@@ -85,14 +85,14 @@ namespace LicenseHeaderManager.Utils
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
       if (headers != null) // TODO get rid of nested if (get content a view lines above)
       {
-        var content = item.GetContent(out var wasAlreadyOpen);
+        var content = item.GetContent (out var wasAlreadyOpen, extension);
         if (content == null)
           return;
 
         var result = await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
             new LicenseHeaderContentInput (content, item.FileNames[1], headers, item.GetAdditionalProperties()),
             calledByUser);
-        await CoreHelpers.HandleResultAsync(result, extension, wasAlreadyOpen);
+        await CoreHelpers.HandleResultAsync (result, extension, wasAlreadyOpen);
         return;
       }
 
@@ -100,12 +100,20 @@ namespace LicenseHeaderManager.Utils
         await AddLicenseHeaderToItemAsync (item, extension, true);
     }
 
-    public static string GetContent (this ProjectItem item, out bool wasAlreadyOpen)
+    public static string GetContent (this ProjectItem item, out bool wasAlreadyOpen, ILicenseHeaderExtension extension)
     {
       wasAlreadyOpen = item.IsOpen();
 
-      if (!wasAlreadyOpen && !TryOpenDocument(item))
+      if (!wasAlreadyOpen && !TryOpenDocument (item, extension))
         return null;
+
+      // Referring to the comment in the TryOpenDocument method: files with unknown extensions that were precautiously not opened are still fed as input to the
+      // Core - with empty content, though, as the Core will return ReplacerErrorType.LanguageNotFound anyway (i. e. content is not relevant, only the extension)
+      // (returning false from TryOpenDocument or null from this method would mean skipping the file entirely, which we do not want since we want to be able to
+      // react to a ReplacerErrorType.LanguageNotFound)
+      var languageForExtension = extension.LicenseHeaderReplacer.GetLanguageFromExtension (Path.GetExtension (item.FileNames[1]));
+      if (languageForExtension == null)
+        return "";
 
       if (!(item.Document.Object ("TextDocument") is TextDocument textDocument))
         return null;
@@ -121,21 +129,28 @@ namespace LicenseHeaderManager.Utils
       }
       else
       {
-        item.Document.Close(vsSaveChanges.vsSaveChangesYes);
+        item.Document.Close (vsSaveChanges.vsSaveChangesYes);
       }
 
       return content;
     }
 
-    public static bool IsOpen(this ProjectItem item)
+    public static bool IsOpen (this ProjectItem item)
     {
       return item.IsOpen[Constants.vsViewKindTextView];
     }
 
-    private static bool TryOpenDocument (ProjectItem item)
+    private static bool TryOpenDocument (ProjectItem item, ILicenseHeaderExtension extension)
     {
       try
       {
+        // Opening files potentially having non-text content (.png, .snk) might result in a Visual Studio error "Some bytes have been replaced with the
+        // Unicode substitution character while loading file ...". In order to avoid this, files with unknown extensions are not opened. However, in order
+        // to keep such files eligible as Core input, still return true
+        var languageForExtension = extension.LicenseHeaderReplacer.GetLanguageFromExtension (Path.GetExtension (item.FileNames[1]));
+        if (languageForExtension == null)
+          return true;
+
         item.Open (Constants.vsViewKindTextView);
         return true;
       }
@@ -149,13 +164,13 @@ namespace LicenseHeaderManager.Utils
       }
     }
 
-    public static bool TrySetContent (this string itemPath, Solution solution, string content, bool wasOpen)
+    public static bool TrySetContent (this string itemPath, Solution solution, string content, bool wasOpen, ILicenseHeaderExtension extension)
     {
       var item = solution.FindProjectItem (itemPath);
       if (item == null)
         return false;
 
-      if (!wasOpen && !TryOpenDocument(item))
+      if (!wasOpen && !TryOpenDocument (item, extension))
         return false;
 
       if (!(item.Document.Object ("TextDocument") is TextDocument textDocument))
