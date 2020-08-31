@@ -199,6 +199,9 @@ namespace LicenseHeaderManager
           _websiteItemEvents.ItemAdded += ItemAdded;
       }
 
+      // migrate options from registry to config file
+      await MigrateOptionsAsync();
+
       //register event handlers for linked commands
       var page = GeneralOptionsPageModel;
       if (page != null)
@@ -226,9 +229,6 @@ namespace LicenseHeaderManager
         _commandEvents = Dte2.Events.CommandEvents;
         _commandEvents.BeforeExecute += BeforeAnyCommandExecuted;
       }
-
-      // migrate options from registry to config file
-      await MigrateOptionsAsync();
     }
 
     public bool SolutionHeaderDefinitionExists ()
@@ -430,7 +430,7 @@ namespace LicenseHeaderManager
       }
       else
       {
-        await OptionsFacade.LoadAsync ();
+        OptionsFacade.CurrentOptions = await OptionsFacade.LoadAsync ();
       }
       
       OptionsFacade.CurrentOptions.Version = Version;
