@@ -42,7 +42,6 @@ using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.Win32;
 using LicenseHeader = LicenseHeaderManager.Headers.LicenseHeader;
 using Task = System.Threading.Tasks.Task;
 
@@ -60,7 +59,7 @@ namespace LicenseHeaderManager
   // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
   // a package.
   [PackageRegistration (UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-  // This attribute is used to register the informations needed to show the this package
+  // This attribute is used to register the information needed to show the this package
   // in the Help/About dialog of Visual Studio.
   [InstalledProductRegistration ("#110", "#112", Version, IconResourceID = 400)]
   // This attribute is needed to let the shell know that this package exposes some menus.

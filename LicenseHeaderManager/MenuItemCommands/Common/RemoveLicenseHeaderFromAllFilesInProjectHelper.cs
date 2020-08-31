@@ -14,12 +14,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
@@ -41,6 +42,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     public async Task ExecuteAsync (object projectOrProjectItem)
     {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       switch (projectOrProjectItem)
       {
         case Project project:

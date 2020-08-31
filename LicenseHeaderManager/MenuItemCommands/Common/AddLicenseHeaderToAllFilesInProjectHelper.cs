@@ -22,6 +22,7 @@ using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.ResultObjects;
 using LicenseHeaderManager.UpdateViewModels;
 using LicenseHeaderManager.Utils;
+using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.MenuItemCommands.Common
 {
@@ -43,6 +44,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     public async Task<AddLicenseHeaderToAllFilesResult> ExecuteAsync (object projectOrProjectItem)
     {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var project = projectOrProjectItem as Project;
       var projectItem = projectOrProjectItem as ProjectItem;
       var replacerInput = new List<LicenseHeaderContentInput>();
