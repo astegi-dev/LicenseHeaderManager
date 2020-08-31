@@ -17,7 +17,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
@@ -172,6 +171,11 @@ namespace LicenseHeaderManager.Utils
 
       if (!wasOpen && !TryOpenDocument (item, extension))
         return false;
+
+      // returning false from this method would signify an error, which we do not want since this circumstance is expected to occur with unknown file extensions
+      var languageForExtension = extension.LicenseHeaderReplacer.GetLanguageFromExtension (Path.GetExtension (item.FileNames[1]));
+      if (languageForExtension == null)
+        return true;
 
       if (!(item.Document.Object ("TextDocument") is TextDocument textDocument))
         return false;

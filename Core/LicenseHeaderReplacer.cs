@@ -133,29 +133,20 @@ namespace Core
             }
 
           case CreateDocumentResult.LanguageNotFound:
-            //if ()
-            //{
             message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
 
             // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
             return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
                 new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.LanguageNotFound, message));
-          //}
 
-          //break;
           case CreateDocumentResult.EmptyHeader:
             message = string.Format (Resources.Error_HeaderNullOrEmpty, licenseHeaderInput.Extension);
             return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
                 new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.EmptyHeader, message));
           case CreateDocumentResult.NoHeaderFound:
-            //if (calledByUser)
-            //{
             message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
             return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
                 new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.NoHeaderFound, message));
-          //}
-
-          //break;
         }
       }
       catch (ArgumentException ex)
@@ -243,7 +234,7 @@ namespace Core
 
     public async Task<IEnumerable<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>>> RemoveOrReplaceHeader (
         ICollection<LicenseHeaderContentInput> licenseHeaders,
-        IProgress<ReplacerProgressReport> progress,
+        IProgress<ReplacerProgressContentReport> progress,
         CancellationToken cancellationToken)
     {
       var results = new List<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>>();
@@ -320,13 +311,13 @@ namespace Core
 
     private async Task<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>> RemoveOrReplaceHeaderForOneFile (
         LicenseHeaderContentInput licenseHeaderInput,
-        IProgress<ReplacerProgressReport> progress,
+        IProgress<ReplacerProgressContentReport> progress,
         CancellationToken cancellationToken)
     {
       cancellationToken.ThrowIfCancellationRequested();
       if (TryCreateDocument (licenseHeaderInput, out var document) != CreateDocumentResult.DocumentCreated)
       {
-        await ReportProgress (progress, cancellationToken);
+        await ReportProgress (progress, cancellationToken, licenseHeaderInput.DocumentPath, licenseHeaderInput.DocumentContent);
         return null;
       }
 
@@ -334,7 +325,7 @@ namespace Core
       if (!await document.ValidateHeader() && !licenseHeaderInput.IgnoreNonCommentText)
       {
         cancellationToken.ThrowIfCancellationRequested();
-        await ReportProgress (progress, cancellationToken);
+        await ReportProgress (progress, cancellationToken, licenseHeaderInput.DocumentPath, licenseHeaderInput.DocumentContent);
 
         var extension = Path.GetExtension (licenseHeaderInput.DocumentPath);
         message = string.Format (Resources.Warning_InvalidLicenseHeader, extension).ReplaceNewLines();
@@ -346,7 +337,7 @@ namespace Core
       {
         cancellationToken.ThrowIfCancellationRequested();
         var newContent = await document.ReplaceHeaderIfNecessaryContent (cancellationToken);
-        await ReportProgress (progress, cancellationToken);
+        await ReportProgress (progress, cancellationToken, licenseHeaderInput.DocumentPath, newContent);
         return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (new ReplacerSuccess (licenseHeaderInput.DocumentPath, newContent));
       }
       catch (ParseException)
@@ -409,6 +400,20 @@ namespace Core
       {
         _processedFileCount++;
         progress.Report (new ReplacerProgressReport (_totalFileCount, _processedFileCount));
+      }
+      finally
+      {
+        _progressReportSemaphore.Release();
+      }
+    }
+
+    private async Task ReportProgress (IProgress<ReplacerProgressContentReport> progress, CancellationToken cancellationToken, string filePath, string newContent)
+    {
+      await _progressReportSemaphore.WaitAsync (cancellationToken);
+      try
+      {
+        _processedFileCount++;
+        progress.Report (new ReplacerProgressContentReport (_totalFileCount, _processedFileCount, filePath, newContent));
       }
       finally
       {

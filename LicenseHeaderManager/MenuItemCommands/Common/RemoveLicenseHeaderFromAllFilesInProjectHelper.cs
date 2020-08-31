@@ -71,10 +71,16 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       }
     }
 
-    private async Task RemoveOrReplaceHeaderAndHandleResultAsync (ICollection<LicenseHeaderContentInput> replacerInput, IDictionary<string, bool> fileOpenedStatus, string projectName = null)
+    private async Task RemoveOrReplaceHeaderAndHandleResultAsync (
+        ICollection<LicenseHeaderContentInput> replacerInput,
+        IDictionary<string, bool> fileOpenedStatus,
+        string projectName = null)
     {
       replacerInput.IgnoreNonCommentText();
-      var result = await _licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (replacerInput, CoreHelpers.CreateProgress (_baseUpdateViewModel, projectName), _cancellationToken);
+      var result = await _licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
+          replacerInput,
+          CoreHelpers.CreateProgress (_baseUpdateViewModel, projectName, fileOpenedStatus, _cancellationToken),
+          _cancellationToken);
       await CoreHelpers.HandleResultAsync (result, _licenseHeaderExtension, _baseUpdateViewModel, projectName, fileOpenedStatus, _cancellationToken);
     }
   }

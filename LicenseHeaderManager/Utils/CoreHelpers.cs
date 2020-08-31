@@ -23,7 +23,6 @@ using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.UpdateViewModels;
 using log4net;
-using log4net.Filter;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
@@ -33,13 +32,28 @@ namespace LicenseHeaderManager.Utils
   {
     private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
 
-    public static async Task OnProgressReportedAsync (ReplacerProgressReport progress, BaseUpdateViewModel baseUpdateViewModel, string projectName)
+    private static async Task OnProgressReportedAsync (
+        ReplacerProgressContentReport progress,
+        BaseUpdateViewModel baseUpdateViewModel,
+        string projectName,
+        IDictionary<string, bool> fileOpenedStatus,
+        CancellationToken cancellationToken)
     {
       if (baseUpdateViewModel == null)
         return;
 
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       baseUpdateViewModel.FileCountCurrentProject = progress.TotalFileCount;
+
+      if (!cancellationToken.IsCancellationRequested)
+      {
+        var result = new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
+            new ReplacerSuccess (progress.ProcessedFilePath, progress.ProcessFileNewContent));
+        if (fileOpenedStatus.TryGetValue (progress.ProcessedFilePath, out var wasOpen))
+          await HandleResultAsync (result, LicenseHeadersPackage.Instance, wasOpen);
+        else
+          await HandleResultAsync (result, LicenseHeadersPackage.Instance, false);
+      }
 
       // IProgress relies on SynchronizationContext. Thus, in the current architecture, OnProgressReportAsync callbacks are not always guaranteed to be executed
       // in the same order as they are reported from the Core (especially if reports happen at the same time). Countering that, the ProgressBar value is updated
@@ -52,9 +66,9 @@ namespace LicenseHeaderManager.Utils
         solutionUpdateViewModel.CurrentProject = projectName;
     }
 
-    public static IProgress<ReplacerProgressReport> CreateProgress (BaseUpdateViewModel viewModel, string projectName)
+    public static IProgress<ReplacerProgressContentReport> CreateProgress (BaseUpdateViewModel viewModel, string projectName, IDictionary<string, bool> fileOpenedStatus, CancellationToken cancellationToken)
     {
-      return new Progress<ReplacerProgressReport> (report => OnProgressReportedAsync (report, viewModel, projectName).FireAndForget());
+      return new Progress<ReplacerProgressContentReport> (report => OnProgressReportedAsync (report, viewModel, projectName, fileOpenedStatus, cancellationToken).FireAndForget());
     }
 
     public static ICollection<LicenseHeaderContentInput> GetFilesToProcess (
@@ -73,7 +87,7 @@ namespace LicenseHeaderManager.Utils
 
       if (item.FileCount == 1 && File.Exists (item.FileNames[1]))
       {
-        var content = item.GetContent(out var wasAlreadyOpen, LicenseHeadersPackage.Instance);
+        var content = item.GetContent (out var wasAlreadyOpen, LicenseHeadersPackage.Instance);
         if (content != null)
         {
           files.Add (new LicenseHeaderContentInput (content, item.FileNames[1], headers, item.GetAdditionalProperties()));
@@ -93,8 +107,8 @@ namespace LicenseHeaderManager.Utils
 
       foreach (ProjectItem child in item.ProjectItems)
       {
-        var subFiles = GetFilesToProcess (child, childHeaders, out var subLicenseHeaders, out var subFileOpenedStatus,  searchForLicenseHeaders);
-        
+        var subFiles = GetFilesToProcess (child, childHeaders, out var subLicenseHeaders, out var subFileOpenedStatus, searchForLicenseHeaders);
+
         files.AddRange (subFiles);
         foreach (var status in subFileOpenedStatus)
           fileOpenedStatus[status.Key] = status.Value;
@@ -151,22 +165,7 @@ namespace LicenseHeaderManager.Utils
         CancellationToken cancellationToken)
     {
       // collect NonCommentText-errors and ask if license header should still be inserted
-      var errors = new List<ReplacerError<LicenseHeaderContentInput>>();
-
-      foreach (var replacerResult in result)
-      {
-        if (replacerResult.IsSuccess)
-        {
-          if (fileOpenedStatus.TryGetValue (replacerResult.Success.FilePath, out var wasOpen))
-            await HandleResultAsync (replacerResult, licenseHeaderExtension, wasOpen);
-          else
-            await HandleResultAsync (replacerResult, licenseHeaderExtension, false);
-        }
-        else
-        {
-          errors.Add (replacerResult.Error);
-        }
-      }
+      var errors = result.Where (replacerResult => !replacerResult.IsSuccess).Select (replacerResult => replacerResult.Error).ToList();
 
       var nonCommentTextErrorsByExtension = errors.Where (x => x.Type == ReplacerErrorType.NonCommentText).GroupBy (x => Path.GetExtension (x.Input.DocumentPath));
 
@@ -191,24 +190,10 @@ namespace LicenseHeaderManager.Utils
         viewModel.FileCountCurrentProject = inputIgnoringNonCommentText.Count;
         var resultIgnoringNonCommentText = await licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
             inputIgnoringNonCommentText,
-            CreateProgress (viewModel, projectName),
+            CreateProgress (viewModel, projectName, fileOpenedStatus, cancellationToken),
             cancellationToken);
 
-        foreach (var replacerResult in resultIgnoringNonCommentText)
-        {
-          // TODO code duplication (foreach at method entry point)
-          if (replacerResult.IsSuccess)
-          {
-            if (fileOpenedStatus.TryGetValue (replacerResult.Success.FilePath, out var wasOpen))
-              await HandleResultAsync (replacerResult, licenseHeaderExtension, wasOpen);
-            else
-              await HandleResultAsync (replacerResult, licenseHeaderExtension, false);
-          }
-          else
-          {
-            overallErrors.Add (replacerResult.Error);
-          }
-        }
+        overallErrors.AddRange (resultIgnoringNonCommentText.Where (replacerResult => !replacerResult.IsSuccess).Select (replacerResult => replacerResult.Error));
       }
 
       // display all errors collected from "first attempt" and "force-insertion"

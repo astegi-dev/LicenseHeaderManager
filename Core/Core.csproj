@@ -113,6 +113,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ReplacerError.cs" />
+    <Compile Include="ReplacerProgressContentReport.cs" />
     <Compile Include="ReplacerProgressReport.cs" />
     <Compile Include="ReplacerResult.cs" />
     <Compile Include="ReplacerSuccess.cs" />

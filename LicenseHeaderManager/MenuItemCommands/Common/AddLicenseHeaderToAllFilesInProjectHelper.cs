@@ -88,7 +88,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
       var result = await _licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
           replacerInput,
-          CoreHelpers.CreateProgress (_baseUpdateViewModel, project?.Name),
+          CoreHelpers.CreateProgress (_baseUpdateViewModel, project?.Name, fileOpenedStatus, _cancellationToken),
           _cancellationToken);
       await CoreHelpers.HandleResultAsync (result, _licenseHeaderExtension, _baseUpdateViewModel, project?.Name, fileOpenedStatus, _cancellationToken);
 
