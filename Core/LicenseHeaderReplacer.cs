@@ -16,7 +16,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Properties;
@@ -175,12 +174,13 @@ namespace Core
       {
         var result = TryCreateDocument (licenseHeaderInput, out var document);
 
+        string message;
         switch (result)
         {
           case CreateDocumentResult.DocumentCreated:
             if (!await document.ValidateHeader() && !licenseHeaderInput.IgnoreNonCommentText)
             {
-              var message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
+              message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
               returnObject = new ReplacerResult<ReplacerError<LicenseHeaderPathInput>> (
                   new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.NonCommentText, message));
               break;
@@ -192,32 +192,26 @@ namespace Core
             }
             catch (ParseException)
             {
-              var message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
+              message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
               returnObject = new ReplacerResult<ReplacerError<LicenseHeaderPathInput>> (
                   new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.ParsingError, message));
             }
 
             break;
           case CreateDocumentResult.LanguageNotFound:
-            if (calledByUser)
-            {
-              var message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
+            message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
 
               // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
               returnObject = new ReplacerResult<ReplacerError<LicenseHeaderPathInput>> (
-                  new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, true, ReplacerErrorType.LanguageNotFound, message));
-            }
+                  new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.LanguageNotFound, message));
 
             break;
           case CreateDocumentResult.EmptyHeader:
             break;
           case CreateDocumentResult.NoHeaderFound:
-            if (calledByUser)
-            {
-              var message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
-              returnObject = new ReplacerResult<ReplacerError<LicenseHeaderPathInput>> (
-                  new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, true, ReplacerErrorType.NoHeaderFound, message));
-            }
+            message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
+            returnObject = new ReplacerResult<ReplacerError<LicenseHeaderPathInput>> (
+                new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.NoHeaderFound, message));
 
             break;
         }

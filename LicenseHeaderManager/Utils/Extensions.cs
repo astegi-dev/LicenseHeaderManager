@@ -120,16 +120,7 @@ namespace LicenseHeaderManager.Utils
       var wasSaved = item.Document.Saved;
       var content = textDocument.CreateEditPoint (textDocument.StartPoint).GetText (textDocument.EndPoint);
 
-      if (wasAlreadyOpen)
-      {
-        // if document had no unsaved changes before, it should not have any now (analogously for when it did have unsaved changes)
-        if (wasSaved)
-          item.Document.Save();
-      }
-      else
-      {
-        item.Document.Close (vsSaveChanges.vsSaveChangesYes);
-      }
+      SaveAndCloseIfNecessary (item, wasAlreadyOpen, wasSaved);
 
       return content;
     }
@@ -185,6 +176,13 @@ namespace LicenseHeaderManager.Utils
       textDocument.CreateEditPoint (textDocument.StartPoint).Delete (textDocument.EndPoint);
       textDocument.CreateEditPoint (textDocument.StartPoint).Insert (content);
 
+      SaveAndCloseIfNecessary (item, wasOpen, wasSaved);
+
+      return true;
+    }
+
+    private static void SaveAndCloseIfNecessary (ProjectItem item, bool wasOpen, bool wasSaved)
+    {
       if (wasOpen)
       {
         // if document had no unsaved changes before, it should not have any now (analogously for when it did have unsaved changes)
@@ -195,8 +193,6 @@ namespace LicenseHeaderManager.Utils
       {
         item.Document.Close (vsSaveChanges.vsSaveChangesYes);
       }
-
-      return true;
     }
 
     public static void FireAndForget (this Task task)
