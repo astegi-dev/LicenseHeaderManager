@@ -120,6 +120,9 @@ namespace LicenseHeaderManager.Utils
         return;
       }
 
+      if (!result.Error.CalledByUser)
+        return;
+
       var error = result.Error;
       switch (error.Type)
       {

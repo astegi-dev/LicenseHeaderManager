@@ -110,7 +110,21 @@ namespace LicenseHeaderManager.Utils
       if (!(item.Document.Object ("TextDocument") is TextDocument textDocument))
         return null;
 
-      return textDocument.CreateEditPoint (textDocument.StartPoint).GetText (textDocument.EndPoint);
+      var wasSaved = item.Document.Saved;
+      var content = textDocument.CreateEditPoint (textDocument.StartPoint).GetText (textDocument.EndPoint);
+
+      if (wasAlreadyOpen)
+      {
+        // if document had no unsaved changes before, it should not have any now (analogously for when it did have unsaved changes)
+        if (wasSaved)
+          item.Document.Save();
+      }
+      else
+      {
+        item.Document.Close(vsSaveChanges.vsSaveChangesYes);
+      }
+
+      return content;
     }
 
     public static bool IsOpen(this ProjectItem item)
@@ -139,6 +153,9 @@ namespace LicenseHeaderManager.Utils
     {
       var item = solution.FindProjectItem (itemPath);
       if (item == null)
+        return false;
+
+      if (!wasOpen && !TryOpenDocument(item))
         return false;
 
       if (!(item.Document.Object ("TextDocument") is TextDocument textDocument))

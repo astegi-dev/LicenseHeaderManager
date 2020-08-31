@@ -129,29 +129,29 @@ namespace Core
             }
 
           case CreateDocumentResult.LanguageNotFound:
-            if (calledByUser)
-            {
+            //if ()
+            //{
               message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
 
               // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
               return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-                  new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, true, ReplacerErrorType.LanguageNotFound, message));
-            }
+                  new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.LanguageNotFound, message));
+            //}
 
-            break;
+            //break;
           case CreateDocumentResult.EmptyHeader:
             message = string.Format (Resources.Error_HeaderNullOrEmpty, licenseHeaderInput.Extension);
             return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
                 new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.EmptyHeader, message));
           case CreateDocumentResult.NoHeaderFound:
-            if (calledByUser)
-            {
+            //if (calledByUser)
+            //{
               message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
               return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-                  new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, true, ReplacerErrorType.NoHeaderFound, message));
-            }
+                  new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.NoHeaderFound, message));
+            //}
 
-            break;
+            //break;
         }
       }
       catch (ArgumentException ex)
