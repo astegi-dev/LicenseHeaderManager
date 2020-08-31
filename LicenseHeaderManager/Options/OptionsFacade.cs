@@ -11,14 +11,13 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using Core;
-using Core.Options;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
+using Core;
+using Core.Options;
 
 namespace LicenseHeaderManager.Options
 {
@@ -28,9 +27,9 @@ namespace LicenseHeaderManager.Options
 
     private readonly VisualStudioOptions _visualStudioOptions;
 
-    public static readonly string DefaultCoreOptionsPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\CoreOptions.json");
-    public static readonly string DefaultVisualStudioOptionsPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\VisualStudioOptions.json");
-    public static readonly string DefaultLogPath = Environment.ExpandEnvironmentVariables (@"%APPDATA%\rubicon\LicenseHeaderManager\logs_lhm");
+    public static readonly string DefaultCoreOptionsPath = Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\CoreOptions.json");
+    public static readonly string DefaultVisualStudioOptionsPath = Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\VisualStudioOptions.json");
+    public static readonly string DefaultLogPath = Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\logs_lhm");
 
     /// <summary>
     ///   Gets or sets the currently up-to-date configuration of the License Header Manager Extension, along

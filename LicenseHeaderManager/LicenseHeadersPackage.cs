@@ -418,12 +418,21 @@ namespace LicenseHeaderManager
 
     private async Task MigrateOptionsAsync ()
     {
-      var optionsPage = (OptionsPage) GetDialogPage (typeof (OptionsPage));
-      var defaultLicenseHeaderPage = (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));
-      var languagesPage = (LanguagesPage) GetDialogPage (typeof (LanguagesPage));
-      optionsPage.MigrateOptions();
-      defaultLicenseHeaderPage.MigrateOptions();
-      languagesPage.MigrateOptions();
+      if (!File.Exists (OptionsFacade.DefaultCoreOptionsPath) || !File.Exists(OptionsFacade.DefaultVisualStudioOptionsPath))
+      {
+        var optionsPage = (OptionsPage) GetDialogPage (typeof (OptionsPage));
+        var defaultLicenseHeaderPage = (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));
+        var languagesPage = (LanguagesPage) GetDialogPage (typeof (LanguagesPage));
+
+        optionsPage.MigrateOptions();
+        defaultLicenseHeaderPage.MigrateOptions();
+        languagesPage.MigrateOptions();
+      }
+      else
+      {
+        await OptionsFacade.LoadAsync ();
+      }
+      
       OptionsFacade.CurrentOptions.Version = Version;
       await OptionsFacade.SaveAsync (OptionsFacade.CurrentOptions);
     }
