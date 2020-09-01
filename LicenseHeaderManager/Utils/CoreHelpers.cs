@@ -40,12 +40,8 @@ namespace LicenseHeaderManager.Utils
         IDictionary<string, bool> fileOpenedStatus,
         CancellationToken cancellationToken)
     {
-      if (baseUpdateViewModel == null)
-        return;
-
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-      baseUpdateViewModel.FileCountCurrentProject = progress.TotalFileCount;
-
+      
       if (!cancellationToken.IsCancellationRequested)
       {
         var result = new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
@@ -55,6 +51,11 @@ namespace LicenseHeaderManager.Utils
         else
           await HandleResultAsync (result, LicenseHeadersPackage.Instance, false, false);
       }
+
+      if (baseUpdateViewModel == null)
+        return;
+
+      baseUpdateViewModel.FileCountCurrentProject = progress.TotalFileCount;
 
       // IProgress relies on SynchronizationContext. Thus, in the current architecture, OnProgressReportAsync callbacks are not always guaranteed to be executed
       // in the same order as they are reported from the Core (especially if reports happen at the same time). Countering that, the ProgressBar value is updated
