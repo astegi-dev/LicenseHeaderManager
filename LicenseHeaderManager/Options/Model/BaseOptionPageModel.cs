@@ -83,10 +83,10 @@ namespace LicenseHeaderManager.Options.Model
 
       foreach (var property in GetOptionProperties())
       {
-        if (typeof (IOptionsFacade).GetProperty (property.Name)?.PropertyType != property.PropertyType)
+        if (typeof (OptionsFacade).GetProperty (property.Name)?.PropertyType != property.PropertyType)
           continue;
 
-        var facadeProperty = typeof (IOptionsFacade).GetProperty (property.Name);
+        var facadeProperty = typeof (OptionsFacade).GetProperty (property.Name);
         if (facadeProperty != null)
           property.SetValue (this, facadeProperty.GetValue (OptionsFacade.CurrentOptions));
       }
@@ -108,10 +108,10 @@ namespace LicenseHeaderManager.Options.Model
       s_log.Info("Save options to config file");
       foreach (var property in GetOptionProperties())
       {
-        if ((typeof (IOptionsFacade).GetProperty (property.Name)?.PropertyType != property.PropertyType))
+        if ((typeof (OptionsFacade).GetProperty (property.Name)?.PropertyType != property.PropertyType))
           continue;
 
-        var facadeProperty = typeof (IOptionsFacade).GetProperty (property.Name);
+        var facadeProperty = typeof (OptionsFacade).GetProperty (property.Name);
         facadeProperty?.SetValue (OptionsFacade.CurrentOptions, property.GetValue (this));
       }
 

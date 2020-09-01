@@ -22,7 +22,7 @@ using System.Threading.Tasks;
 namespace LicenseHeaderManager.Options
 {
   [LicenseHeaderManagerOptions]
-  internal class VisualStudioOptions : IVisualStudioOptions
+  internal class VisualStudioOptions
   {
     public const bool c_defaultInsertInNewFiles = false;
 
@@ -42,9 +42,9 @@ namespace LicenseHeaderManager.Options
         InitializeValues();
     }
 
-    public bool InsertInNewFiles { get; set; }
+    public virtual bool InsertInNewFiles { get; set; }
 
-    public ObservableCollection<LinkedCommand> LinkedCommands
+    public virtual ObservableCollection<LinkedCommand> LinkedCommands
     {
       get => _linkedCommands;
       set
@@ -64,7 +64,7 @@ namespace LicenseHeaderManager.Options
       }
     }
 
-    public IVisualStudioOptions Clone ()
+    public virtual VisualStudioOptions Clone ()
     {
       var clonedObject = new VisualStudioOptions
                          {
@@ -74,7 +74,7 @@ namespace LicenseHeaderManager.Options
       return clonedObject;
     }
 
-    public event EventHandler<NotifyCollectionChangedEventArgs> LinkedCommandsChanged;
+    public virtual event EventHandler<NotifyCollectionChangedEventArgs> LinkedCommandsChanged;
 
     /// <summary>
     ///   Serializes an <see cref="IVisualStudioOptions" /> instance to a file in the file system.

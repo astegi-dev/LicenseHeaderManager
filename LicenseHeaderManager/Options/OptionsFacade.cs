@@ -21,7 +21,7 @@ using Core.Options;
 
 namespace LicenseHeaderManager.Options
 {
-  public class OptionsFacade : IOptionsFacade
+  public class OptionsFacade
   {
     private readonly CoreOptions _coreOptions;
 
@@ -56,43 +56,43 @@ namespace LicenseHeaderManager.Options
       _visualStudioOptions.LinkedCommandsChanged += InvokeLinkedCommandsChanged;
     }
 
-    public bool UseRequiredKeywords
+    public virtual bool UseRequiredKeywords
     {
       get => _coreOptions.UseRequiredKeywords;
       set => _coreOptions.UseRequiredKeywords = value;
     }
 
-    public string RequiredKeywords
+    public virtual string RequiredKeywords
     {
       get => _coreOptions.RequiredKeywords;
       set => _coreOptions.RequiredKeywords = value;
     }
 
-    public string LicenseHeaderFileText
+    public virtual string LicenseHeaderFileText
     {
       get => _coreOptions.LicenseHeaderFileText;
       set => _coreOptions.LicenseHeaderFileText = value;
     }
 
-    public ObservableCollection<Language> Languages
+    public virtual ObservableCollection<Language> Languages
     {
       get => _coreOptions.Languages;
       set => _coreOptions.Languages = value;
     }
 
-    public bool InsertInNewFiles
+    public virtual bool InsertInNewFiles
     {
       get => _visualStudioOptions.InsertInNewFiles;
       set => _visualStudioOptions.InsertInNewFiles = value;
     }
 
-    public ObservableCollection<LinkedCommand> LinkedCommands
+    public virtual ObservableCollection<LinkedCommand> LinkedCommands
     {
       get => _visualStudioOptions.LinkedCommands;
       set => _visualStudioOptions.LinkedCommands = _visualStudioOptions.LinkedCommands != null ? new ObservableCollection<LinkedCommand> (value) : null;
     }
 
-    public string Version
+    public virtual string Version
     {
       get => _coreOptions.Version;
       set => _coreOptions.Version = value;
@@ -141,15 +141,15 @@ namespace LicenseHeaderManager.Options
       if (!System.IO.File.Exists (visualStudioPath))
         await VisualStudioOptions.SaveAsync (new VisualStudioOptions(), visualStudioPath);
 
-      var coreOptions = await JsonOptionsManager.DeserializeAsync<CoreOptions> (corePath);
-      var visualStudioOptions = await JsonOptionsManager.DeserializeAsync<VisualStudioOptions> (visualStudioPath);
+      var coreOptions = await CoreOptions.LoadAsync (corePath);
+      var visualStudioOptions = await VisualStudioOptions.LoadAsync (visualStudioPath);
 
       return new OptionsFacade (coreOptions, visualStudioOptions);
     }
 
-    public event EventHandler<NotifyCollectionChangedEventArgs> LinkedCommandsChanged;
+    public virtual event EventHandler<NotifyCollectionChangedEventArgs> LinkedCommandsChanged;
 
-    public IOptionsFacade Clone ()
+    public virtual OptionsFacade Clone ()
     {
       var clonedObject = new OptionsFacade
                          {

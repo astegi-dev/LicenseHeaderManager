@@ -100,7 +100,6 @@
     <Compile Include="NewLineConst.cs" />
     <Compile Include="NewLineManager.cs" />
     <Compile Include="Options\CoreOptions.cs" />
-    <Compile Include="Options\ICoreOptions.cs" />
     <Compile Include="Options\JsonOptionsManager.cs" />
     <Compile Include="Options\LicenseHeaderManagerOptionsAttribute.cs" />
     <Compile Include="ParseException.cs" />

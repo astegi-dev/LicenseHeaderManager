@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Core.Options
 {
   [LicenseHeaderManagerOptions]
-  public class CoreOptions : ICoreOptions
+  public class CoreOptions
   {
     public const bool c_defaultUseRequiredKeywords = true;
     public const string c_defaultRequiredKeywords = "license, copyright, (c), ©";
@@ -100,15 +100,15 @@ namespace Core.Options
         InitializeValues();
     }
 
-    public bool UseRequiredKeywords { get; set; }
+    public virtual bool UseRequiredKeywords { get; set; }
 
-    public string RequiredKeywords { get; set; }
+    public virtual string RequiredKeywords { get; set; }
 
-    public string LicenseHeaderFileText { get; set; }
+    public virtual string LicenseHeaderFileText { get; set; }
 
-    public ObservableCollection<Language> Languages { get; set; }
+    public virtual ObservableCollection<Language> Languages { get; set; }
 
-    public string Version { get; set; }
+    public virtual string Version { get; set; }
 
     /// <summary>
     ///   Sets all public members of this <see cref="ICoreOptions" /> instance to pre-configured default values.
@@ -131,7 +131,7 @@ namespace Core.Options
       Languages = new ObservableCollection<Language> (_defaultLanguages);
     }
 
-    public ICoreOptions Clone ()
+    public virtual CoreOptions Clone ()
     {
       var clonedObject = new CoreOptions
                          {
@@ -173,7 +173,7 @@ namespace Core.Options
 
     private static string GetDefaultLicenseHeader ()
     {
-      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream (typeof (ICoreOptions), "default.licenseheader");
+      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream (typeof (CoreOptions), "default.licenseheader");
       if (resource == null)
         return string.Empty;
 
