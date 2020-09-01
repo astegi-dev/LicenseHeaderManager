@@ -18,9 +18,6 @@ namespace Core
   public enum CreateDocumentResult
   {
     DocumentCreated,
-    NoPhysicalFile,
-    NoTextDocument,
-    LinkedFile,
     LanguageNotFound,
     NoHeaderFound,
     LicenseHeaderDocument,

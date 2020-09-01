@@ -133,6 +133,9 @@
   <data name="Error_HeaderNullOrEmpty" xml:space="preserve">
     <value>The header definition for the extension {0} is null or empty\n </value>
   </data>
+  <data name="Error_LicenseHeaderDefinition_InvalidTarget" xml:space="preserve">
+    <value>You must not insert license headers into the license header definition file (extension: {0})</value>
+  </data>
   <data name="UserInfo_LookupFailure_FileNotFoundException_Information" xml:space="preserve">
     <value>FileNotFoundException caught while trying to lookup the display name with 'UserPrincipal.Current.DisplayName'. \nThis is likely caused by an Windows 10 update and can be fixed by updating the registry. \nSee https://git.io/vza4O for more information.</value>
   </data>

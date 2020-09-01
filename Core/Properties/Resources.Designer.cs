@@ -98,6 +98,15 @@ namespace Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You must not insert license headers into the license header definition file (extension: {0}).
+        /// </summary>
+        internal static string Error_LicenseHeaderDefinition_InvalidTarget {
+            get {
+                return ResourceManager.GetString("Error_LicenseHeaderDefinition_InvalidTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This extension currently has no header defined in the license header definition file\n .
         /// </summary>
         internal static string Error_NoHeaderFound {
