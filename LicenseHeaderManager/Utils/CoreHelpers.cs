@@ -151,6 +151,7 @@ namespace LicenseHeaderManager.Utils
           return;
 
         case ReplacerErrorType.LanguageNotFound:
+          // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
           if (MessageBoxHelper.AskYesNo (error.Description, Resources.Error))
             extension.ShowLanguagesPage();
           return;
