@@ -89,9 +89,8 @@ namespace LicenseHeaderManager.Utils
           return;
 
         var result = await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
-            new LicenseHeaderContentInput (content, item.FileNames[1], headers, item.GetAdditionalProperties()),
-            calledByUser);
-        await CoreHelpers.HandleResultAsync (result, extension, wasAlreadyOpen);
+            new LicenseHeaderContentInput (content, item.FileNames[1], headers, item.GetAdditionalProperties()));
+        await CoreHelpers.HandleResultAsync (result, extension, wasAlreadyOpen, calledByUser);
         return;
       }
 

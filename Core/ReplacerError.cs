@@ -17,18 +17,9 @@ namespace Core
 {
   public class ReplacerError<TInput> where TInput : LicenseHeaderInput
   {
-    public ReplacerError (TInput input, bool calledByUser, ReplacerErrorType type, string description)
-    {
-      Input = input;
-      CalledByUser = calledByUser;
-      Type = type;
-      Description = description;
-    }
-
     public ReplacerError (TInput input, ReplacerErrorType type, string description)
     {
       Input = input;
-      CalledByUser = false;
       Type = type;
       Description = description;
     }
@@ -41,7 +32,5 @@ namespace Core
     /// Gets the <see cref="LicenseHeaderPathInput"/> instance the <see cref="LicenseHeaderReplacer"/> was invoked with.
     /// </summary>
     public TInput Input { get; }
-
-    public bool CalledByUser { get; }
   }
 }

@@ -51,9 +51,9 @@ namespace LicenseHeaderManager.Utils
         var result = new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
             new ReplacerSuccess (progress.ProcessedFilePath, progress.ProcessFileNewContent));
         if (fileOpenedStatus.TryGetValue (progress.ProcessedFilePath, out var wasOpen))
-          await HandleResultAsync (result, LicenseHeadersPackage.Instance, wasOpen);
+          await HandleResultAsync (result, LicenseHeadersPackage.Instance, wasOpen, false);
         else
-          await HandleResultAsync (result, LicenseHeadersPackage.Instance, false);
+          await HandleResultAsync (result, LicenseHeadersPackage.Instance, false, false);
       }
 
       // IProgress relies on SynchronizationContext. Thus, in the current architecture, OnProgressReportAsync callbacks are not always guaranteed to be executed
@@ -123,7 +123,8 @@ namespace LicenseHeaderManager.Utils
     public static async Task HandleResultAsync (
         ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> result,
         ILicenseHeaderExtension extension,
-        bool isOpen)
+        bool isOpen,
+        bool calledByUser)
     {
       if (result.IsSuccess)
       {
@@ -135,16 +136,17 @@ namespace LicenseHeaderManager.Utils
         return;
       }
 
-      if (!result.Error.CalledByUser)
+      if (!calledByUser)
         return;
 
+      // TODO check for error after core call ignoring non comment text
       var error = result.Error;
       switch (error.Type)
       {
         case ReplacerErrorType.NonCommentText:
           error.Input.IgnoreNonCommentText = true;
           if (MessageBoxHelper.AskYesNo (error.Description, Resources.Warning, true))
-            await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (error.Input, error.CalledByUser);
+            await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (error.Input);
           return;
 
         case ReplacerErrorType.LanguageNotFound:

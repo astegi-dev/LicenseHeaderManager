@@ -38,23 +38,23 @@ namespace Core
     private int _processedFileCount;
     private int _totalFileCount;
 
-    public LicenseHeaderReplacer (IEnumerable<Language> languages, IEnumerable<string> keywords, int maxSimultaneousTasks = 15)
+    public LicenseHeaderReplacer(IEnumerable<Language> languages, IEnumerable<string> keywords, int maxSimultaneousTasks = 15)
     {
       _languages = languages;
       _keywords = keywords;
 
-      _progressReportSemaphore = new SemaphoreSlim (1, 1);
-      _taskStartSemaphore = new SemaphoreSlim (maxSimultaneousTasks, maxSimultaneousTasks);
+      _progressReportSemaphore = new SemaphoreSlim(1, 1);
+      _taskStartSemaphore = new SemaphoreSlim(maxSimultaneousTasks, maxSimultaneousTasks);
     }
 
-    public void ResetExtensionsWithInvalidHeaders ()
+    public void ResetExtensionsWithInvalidHeaders()
     {
       _extensionsWithInvalidHeaders.Clear();
     }
 
-    public Language GetLanguageFromExtension (string extension)
+    public Language GetLanguageFromExtension(string extension)
     {
-      return _languages.FirstOrDefault (x => x.Extensions.Any (y => extension.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
+      return _languages.FirstOrDefault(x => x.Extensions.Any(y => extension.EndsWith(y, StringComparison.OrdinalIgnoreCase)));
     }
 
     /// <summary>
@@ -68,14 +68,14 @@ namespace Core
     ///   headers should only be removed.
     /// </param>
     /// <returns>A value indicating the result of the operation. Document will be null unless DocumentCreated is returned.</returns>
-    public CreateDocumentResult TryCreateDocument (LicenseHeaderInput licenseHeaderInput, out Document document)
+    public CreateDocumentResult TryCreateDocument(LicenseHeaderInput licenseHeaderInput, out Document document)
     {
       document = null;
 
       if (licenseHeaderInput.Extension == LicenseHeader.Extension)
         return CreateDocumentResult.LicenseHeaderDocument;
 
-      var language = GetLanguageFromExtension (licenseHeaderInput.Extension);
+      var language = GetLanguageFromExtension(licenseHeaderInput.Extension);
       if (language == null)
         return CreateDocumentResult.LanguageNotFound;
 
@@ -83,30 +83,29 @@ namespace Core
       if (licenseHeaderInput.Headers != null)
       {
         var extension = licenseHeaderInput.Headers.Keys
-            .OrderByDescending (x => x.Length)
-            .FirstOrDefault (x => licenseHeaderInput.Extension.EndsWith (x, StringComparison.OrdinalIgnoreCase));
+            .OrderByDescending(x => x.Length)
+            .FirstOrDefault(x => licenseHeaderInput.Extension.EndsWith(x, StringComparison.OrdinalIgnoreCase));
 
         if (extension == null)
           return CreateDocumentResult.NoHeaderFound;
 
         header = licenseHeaderInput.Headers[extension];
 
-        if (header.All (string.IsNullOrEmpty))
+        if (header.All(string.IsNullOrEmpty))
           return CreateDocumentResult.EmptyHeader;
       }
 
-      document = new Document (licenseHeaderInput, language, header, licenseHeaderInput.AdditionalProperties, _keywords);
+      document = new Document(licenseHeaderInput, language, header, licenseHeaderInput.AdditionalProperties, _keywords);
 
       return CreateDocumentResult.DocumentCreated;
     }
 
-    public async Task<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>> RemoveOrReplaceHeader (
-        LicenseHeaderContentInput licenseHeaderInput,
-        bool calledByUser)
+    public async Task<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>> RemoveOrReplaceHeader(
+        LicenseHeaderContentInput licenseHeaderInput)
     {
       try
       {
-        var result = TryCreateDocument (licenseHeaderInput, out var document);
+        var result = TryCreateDocument(licenseHeaderInput, out var document);
 
         string message;
         switch (result)
@@ -114,44 +113,44 @@ namespace Core
           case CreateDocumentResult.DocumentCreated:
             if (!await document.ValidateHeader() && !licenseHeaderInput.IgnoreNonCommentText)
             {
-              message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
-              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-                  new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.NonCommentText, message));
+              message = string.Format(Resources.Warning_InvalidLicenseHeader, Path.GetExtension(licenseHeaderInput.DocumentPath)).ReplaceNewLines();
+              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(
+                  new ReplacerError<LicenseHeaderContentInput>(licenseHeaderInput, ReplacerErrorType.NonCommentText, message));
             }
 
             try
             {
-              var newContent = await document.ReplaceHeaderIfNecessaryContent (new CancellationToken());
-              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (new ReplacerSuccess (licenseHeaderInput.DocumentPath, newContent));
+              var newContent = await document.ReplaceHeaderIfNecessaryContent(new CancellationToken());
+              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(new ReplacerSuccess(licenseHeaderInput.DocumentPath, newContent));
             }
             catch (ParseException)
             {
-              message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
-              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-                  new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.ParsingError, message));
+              message = string.Format(Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
+              return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(
+                  new ReplacerError<LicenseHeaderContentInput>(licenseHeaderInput, ReplacerErrorType.ParsingError, message));
             }
 
           case CreateDocumentResult.LanguageNotFound:
-            message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
+            message = string.Format(Resources.Error_LanguageNotFound, Path.GetExtension(licenseHeaderInput.DocumentPath)).ReplaceNewLines();
 
             // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
-            return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-                new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.LanguageNotFound, message));
+            return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(
+                new ReplacerError<LicenseHeaderContentInput>(licenseHeaderInput, ReplacerErrorType.LanguageNotFound, message));
 
           case CreateDocumentResult.EmptyHeader:
-            message = string.Format (Resources.Error_HeaderNullOrEmpty, licenseHeaderInput.Extension);
-            return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-                new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.EmptyHeader, message));
-         
+            message = string.Format(Resources.Error_HeaderNullOrEmpty, licenseHeaderInput.Extension);
+            return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(
+                new ReplacerError<LicenseHeaderContentInput>(licenseHeaderInput, ReplacerErrorType.EmptyHeader, message));
+
           case CreateDocumentResult.NoHeaderFound:
-            message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
-            return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-                new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.NoHeaderFound, message));
+            message = string.Format(Resources.Error_NoHeaderFound).ReplaceNewLines();
+            return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(
+                new ReplacerError<LicenseHeaderContentInput>(licenseHeaderInput, ReplacerErrorType.NoHeaderFound, message));
 
           case CreateDocumentResult.LicenseHeaderDocument:
             message = string.Format(LicenseHeader.Extension).ReplaceNewLines();
-            return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput >>(
-                new ReplacerError<LicenseHeaderContentInput>(licenseHeaderInput, calledByUser, ReplacerErrorType.Miscellaneous, message));
+            return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(
+                new ReplacerError<LicenseHeaderContentInput>(licenseHeaderInput, ReplacerErrorType.Miscellaneous, message));
 
           default:
             throw new ArgumentOutOfRangeException();
@@ -160,8 +159,8 @@ namespace Core
       catch (ArgumentException ex)
       {
         var message = $"{ex.Message} {licenseHeaderInput.DocumentPath}";
-        return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-            new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.Miscellaneous, message));
+        return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(
+            new ReplacerError<LicenseHeaderContentInput>(licenseHeaderInput, ReplacerErrorType.Miscellaneous, message));
       }
     }
 
@@ -173,11 +172,11 @@ namespace Core
     ///   Specifies whether the command was called by the user (as opposed to automatically by a
     ///   linked command or by ItemAdded)
     /// </param>
-    public async Task<ReplacerResult<ReplacerError<LicenseHeaderPathInput>>> RemoveOrReplaceHeader (LicenseHeaderPathInput licenseHeaderInput, bool calledByUser)
+    public async Task<ReplacerResult<ReplacerError<LicenseHeaderPathInput>>> RemoveOrReplaceHeader(LicenseHeaderPathInput licenseHeaderInput)
     {
       try
       {
-        var result = TryCreateDocument (licenseHeaderInput, out var document);
+        var result = TryCreateDocument(licenseHeaderInput, out var document);
 
         string message;
         switch (result)
@@ -185,44 +184,44 @@ namespace Core
           case CreateDocumentResult.DocumentCreated:
             if (!await document.ValidateHeader() && !licenseHeaderInput.IgnoreNonCommentText)
             {
-              message = string.Format (Resources.Warning_InvalidLicenseHeader, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
-              return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>> (
-                  new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.NonCommentText, message));
+              message = string.Format(Resources.Warning_InvalidLicenseHeader, Path.GetExtension(licenseHeaderInput.DocumentPath)).ReplaceNewLines();
+              return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>>(
+                  new ReplacerError<LicenseHeaderPathInput>(licenseHeaderInput, ReplacerErrorType.NonCommentText, message));
             }
 
             try
             {
-              await document.ReplaceHeaderIfNecessaryPath (new CancellationToken());
+              await document.ReplaceHeaderIfNecessaryPath(new CancellationToken());
               return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>>();
             }
             catch (ParseException)
             {
-              message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
-              return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>> (
-                  new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.ParsingError, message));
+              message = string.Format(Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
+              return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>>(
+                  new ReplacerError<LicenseHeaderPathInput>(licenseHeaderInput,  ReplacerErrorType.ParsingError, message));
             }
 
           case CreateDocumentResult.LanguageNotFound:
-            message = string.Format (Resources.Error_LanguageNotFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
+            message = string.Format(Resources.Error_LanguageNotFound, Path.GetExtension(licenseHeaderInput.DocumentPath)).ReplaceNewLines();
 
-              // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
-              return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>> (
-                  new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.LanguageNotFound, message));
+            // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
+            return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>>(
+                new ReplacerError<LicenseHeaderPathInput>(licenseHeaderInput, ReplacerErrorType.LanguageNotFound, message));
 
           case CreateDocumentResult.EmptyHeader:
             message = string.Format(Resources.Error_HeaderNullOrEmpty, licenseHeaderInput.Extension);
             return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderPathInput>>(
-                new ReplacerError<LicenseHeaderPathInput>(licenseHeaderInput, calledByUser, ReplacerErrorType.EmptyHeader, message));
-          
+                new ReplacerError<LicenseHeaderPathInput>(licenseHeaderInput, ReplacerErrorType.EmptyHeader, message));
+
           case CreateDocumentResult.NoHeaderFound:
-            message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
-            return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>> (
-                new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.NoHeaderFound, message));
+            message = string.Format(Resources.Error_NoHeaderFound).ReplaceNewLines();
+            return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>>(
+                new ReplacerError<LicenseHeaderPathInput>(licenseHeaderInput, ReplacerErrorType.NoHeaderFound, message));
 
           case CreateDocumentResult.LicenseHeaderDocument:
             message = string.Format(LicenseHeader.Extension).ReplaceNewLines();
             return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>>(
-                new ReplacerError<LicenseHeaderPathInput>(licenseHeaderInput, calledByUser, ReplacerErrorType.Miscellaneous, message));
+                new ReplacerError<LicenseHeaderPathInput>(licenseHeaderInput, ReplacerErrorType.Miscellaneous, message));
 
           default:
             throw new ArgumentOutOfRangeException();
@@ -231,30 +230,30 @@ namespace Core
       catch (ArgumentException ex)
       {
         var message = $"{ex.Message} {licenseHeaderInput.DocumentPath}";
-        return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>> (
-            new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, calledByUser, ReplacerErrorType.Miscellaneous, message));
+        return new ReplacerResult<ReplacerError<LicenseHeaderPathInput>>(
+            new ReplacerError<LicenseHeaderPathInput>(licenseHeaderInput, ReplacerErrorType.Miscellaneous, message));
       }
     }
 
-    public async Task<IEnumerable<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>>> RemoveOrReplaceHeader (
+    public async Task<IEnumerable<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>>> RemoveOrReplaceHeader(
         ICollection<LicenseHeaderContentInput> licenseHeaders,
         IProgress<ReplacerProgressContentReport> progress,
         CancellationToken cancellationToken)
     {
       var results = new List<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>>();
-      ResetProgress (licenseHeaders.Count);
+      ResetProgress(licenseHeaders.Count);
 
       var tasks = new List<Task<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>>>();
       foreach (var licenseHeaderInput in licenseHeaders)
       {
-        await _taskStartSemaphore.WaitAsync (cancellationToken);
-        tasks.Add (
-            Task.Run (
+        await _taskStartSemaphore.WaitAsync(cancellationToken);
+        tasks.Add(
+            Task.Run(
                 () =>
                 {
                   try
                   {
-                    return RemoveOrReplaceHeaderForOneFile (licenseHeaderInput, progress, cancellationToken);
+                    return RemoveOrReplaceHeaderForOneFile(licenseHeaderInput, progress, cancellationToken);
                   }
                   finally
                   {
@@ -264,7 +263,7 @@ namespace Core
                 cancellationToken));
       }
 
-      await Task.WhenAll (tasks);
+      await Task.WhenAll(tasks);
 
       foreach (var replacerResultTask in tasks)
       {
@@ -272,31 +271,31 @@ namespace Core
         if (replacerResult == null)
           continue;
 
-        results.Add (replacerResult);
+        results.Add(replacerResult);
       }
 
       return results;
     }
 
-    public async Task<ReplacerResult<IEnumerable<ReplacerError<LicenseHeaderPathInput>>>> RemoveOrReplaceHeader (
+    public async Task<ReplacerResult<IEnumerable<ReplacerError<LicenseHeaderPathInput>>>> RemoveOrReplaceHeader(
         ICollection<LicenseHeaderPathInput> licenseHeaders,
         IProgress<ReplacerProgressReport> progress,
         CancellationToken cancellationToken)
     {
       var errorList = new ConcurrentQueue<ReplacerError<LicenseHeaderPathInput>>();
-      ResetProgress (licenseHeaders.Count);
+      ResetProgress(licenseHeaders.Count);
 
       var tasks = new List<Task>();
       foreach (var licenseHeaderInput in licenseHeaders)
       {
-        await _taskStartSemaphore.WaitAsync (cancellationToken);
-        tasks.Add (
-            Task.Run (
+        await _taskStartSemaphore.WaitAsync(cancellationToken);
+        tasks.Add(
+            Task.Run(
                 () =>
                 {
                   try
                   {
-                    return RemoveOrReplaceHeaderForOneFile (licenseHeaderInput, progress, cancellationToken, errorList);
+                    return RemoveOrReplaceHeaderForOneFile(licenseHeaderInput, progress, cancellationToken, errorList);
                   }
                   finally
                   {
@@ -306,22 +305,22 @@ namespace Core
                 cancellationToken));
       }
 
-      await Task.WhenAll (tasks);
+      await Task.WhenAll(tasks);
 
       return errorList.Count == 0
           ? new ReplacerResult<IEnumerable<ReplacerError<LicenseHeaderPathInput>>>()
-          : new ReplacerResult<IEnumerable<ReplacerError<LicenseHeaderPathInput>>> (errorList);
+          : new ReplacerResult<IEnumerable<ReplacerError<LicenseHeaderPathInput>>>(errorList);
     }
 
-    private async Task<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>> RemoveOrReplaceHeaderForOneFile (
+    private async Task<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>> RemoveOrReplaceHeaderForOneFile(
         LicenseHeaderContentInput licenseHeaderInput,
         IProgress<ReplacerProgressContentReport> progress,
         CancellationToken cancellationToken)
     {
       cancellationToken.ThrowIfCancellationRequested();
-      if (TryCreateDocument (licenseHeaderInput, out var document) != CreateDocumentResult.DocumentCreated)
+      if (TryCreateDocument(licenseHeaderInput, out var document) != CreateDocumentResult.DocumentCreated)
       {
-        await ReportProgress (progress, cancellationToken, licenseHeaderInput.DocumentPath, licenseHeaderInput.DocumentContent);
+        await ReportProgress(progress, cancellationToken, licenseHeaderInput.DocumentPath, licenseHeaderInput.DocumentContent);
         return null;
       }
 
@@ -329,81 +328,81 @@ namespace Core
       if (!await document.ValidateHeader() && !licenseHeaderInput.IgnoreNonCommentText)
       {
         cancellationToken.ThrowIfCancellationRequested();
-        await ReportProgress (progress, cancellationToken, licenseHeaderInput.DocumentPath, licenseHeaderInput.DocumentContent);
+        await ReportProgress(progress, cancellationToken, licenseHeaderInput.DocumentPath, licenseHeaderInput.DocumentContent);
 
-        var extension = Path.GetExtension (licenseHeaderInput.DocumentPath);
-        message = string.Format (Resources.Warning_InvalidLicenseHeader, extension).ReplaceNewLines();
-        return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-            new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, ReplacerErrorType.NonCommentText, message));
+        var extension = Path.GetExtension(licenseHeaderInput.DocumentPath);
+        message = string.Format(Resources.Warning_InvalidLicenseHeader, extension).ReplaceNewLines();
+        return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(
+            new ReplacerError<LicenseHeaderContentInput>(licenseHeaderInput, ReplacerErrorType.NonCommentText, message));
       }
 
       try
       {
         cancellationToken.ThrowIfCancellationRequested();
-        var newContent = await document.ReplaceHeaderIfNecessaryContent (cancellationToken);
-        await ReportProgress (progress, cancellationToken, licenseHeaderInput.DocumentPath, newContent);
-        return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (new ReplacerSuccess (licenseHeaderInput.DocumentPath, newContent));
+        var newContent = await document.ReplaceHeaderIfNecessaryContent(cancellationToken);
+        await ReportProgress(progress, cancellationToken, licenseHeaderInput.DocumentPath, newContent);
+        return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(new ReplacerSuccess(licenseHeaderInput.DocumentPath, newContent));
       }
       catch (ParseException)
       {
-        message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
-        return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-            new ReplacerError<LicenseHeaderContentInput> (licenseHeaderInput, ReplacerErrorType.ParsingError, message));
+        message = string.Format(Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
+        return new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(
+            new ReplacerError<LicenseHeaderContentInput>(licenseHeaderInput, ReplacerErrorType.ParsingError, message));
       }
     }
 
-    private async Task RemoveOrReplaceHeaderForOneFile (
+    private async Task RemoveOrReplaceHeaderForOneFile(
         LicenseHeaderPathInput licenseHeaderInput,
         IProgress<ReplacerProgressReport> progress,
         CancellationToken cancellationToken,
         ConcurrentQueue<ReplacerError<LicenseHeaderPathInput>> errors)
     {
       cancellationToken.ThrowIfCancellationRequested();
-      if (TryCreateDocument (licenseHeaderInput, out var document) != CreateDocumentResult.DocumentCreated)
+      if (TryCreateDocument(licenseHeaderInput, out var document) != CreateDocumentResult.DocumentCreated)
       {
-        await ReportProgress (progress, cancellationToken);
+        await ReportProgress(progress, cancellationToken);
         return;
       }
 
       string message;
       if (!await document.ValidateHeader() && !licenseHeaderInput.IgnoreNonCommentText)
       {
-        var extension = Path.GetExtension (licenseHeaderInput.DocumentPath);
-        message = string.Format (Resources.Warning_InvalidLicenseHeader, extension).ReplaceNewLines();
-        errors.Enqueue (new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, ReplacerErrorType.NonCommentText, message));
+        var extension = Path.GetExtension(licenseHeaderInput.DocumentPath);
+        message = string.Format(Resources.Warning_InvalidLicenseHeader, extension).ReplaceNewLines();
+        errors.Enqueue(new ReplacerError<LicenseHeaderPathInput>(licenseHeaderInput, ReplacerErrorType.NonCommentText, message));
 
         cancellationToken.ThrowIfCancellationRequested();
-        await ReportProgress (progress, cancellationToken);
+        await ReportProgress(progress, cancellationToken);
         return;
       }
 
       try
       {
         cancellationToken.ThrowIfCancellationRequested();
-        await document.ReplaceHeaderIfNecessaryPath (cancellationToken);
+        await document.ReplaceHeaderIfNecessaryPath(cancellationToken);
       }
       catch (ParseException)
       {
-        message = string.Format (Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
-        errors.Enqueue (new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, ReplacerErrorType.ParsingError, message));
+        message = string.Format(Resources.Error_InvalidLicenseHeader, licenseHeaderInput.DocumentPath).ReplaceNewLines();
+        errors.Enqueue(new ReplacerError<LicenseHeaderPathInput>(licenseHeaderInput, ReplacerErrorType.ParsingError, message));
       }
 
-      await ReportProgress (progress, cancellationToken);
+      await ReportProgress(progress, cancellationToken);
     }
 
-    private void ResetProgress (int totalFileCount)
+    private void ResetProgress(int totalFileCount)
     {
       _processedFileCount = 0;
       _totalFileCount = totalFileCount;
     }
 
-    private async Task ReportProgress (IProgress<ReplacerProgressReport> progress, CancellationToken cancellationToken)
+    private async Task ReportProgress(IProgress<ReplacerProgressReport> progress, CancellationToken cancellationToken)
     {
-      await _progressReportSemaphore.WaitAsync (cancellationToken);
+      await _progressReportSemaphore.WaitAsync(cancellationToken);
       try
       {
         _processedFileCount++;
-        progress.Report (new ReplacerProgressReport (_totalFileCount, _processedFileCount));
+        progress.Report(new ReplacerProgressReport(_totalFileCount, _processedFileCount));
       }
       finally
       {
@@ -411,13 +410,13 @@ namespace Core
       }
     }
 
-    private async Task ReportProgress (IProgress<ReplacerProgressContentReport> progress, CancellationToken cancellationToken, string filePath, string newContent)
+    private async Task ReportProgress(IProgress<ReplacerProgressContentReport> progress, CancellationToken cancellationToken, string filePath, string newContent)
     {
-      await _progressReportSemaphore.WaitAsync (cancellationToken);
+      await _progressReportSemaphore.WaitAsync(cancellationToken);
       try
       {
         _processedFileCount++;
-        progress.Report (new ReplacerProgressContentReport (_totalFileCount, _processedFileCount, filePath, newContent));
+        progress.Report(new ReplacerProgressContentReport(_totalFileCount, _processedFileCount, filePath, newContent));
       }
       finally
       {
