@@ -146,10 +146,8 @@ namespace Core
         return;
       }
 
-      using (var reader = new StreamReader (_licenseHeaderInput.DocumentPath, Encoding.UTF8))
-      {
-        _documentTextCache = await reader.ReadToEndAsync();
-      }
+      using var reader = new StreamReader (_licenseHeaderInput.DocumentPath, Encoding.UTF8);
+      _documentTextCache = await reader.ReadToEndAsync();
     }
 
     private async Task<string> GetExistingHeader ()

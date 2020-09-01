@@ -13,6 +13,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace Core.Tests
@@ -21,7 +22,7 @@ namespace Core.Tests
   internal class IntegrationTest
   {
     [Test]
-    public void test ()
+    public async Task Test ()
     {
       var languages = new List<Language>
                       {
@@ -39,9 +40,8 @@ namespace Core.Tests
 
       var replacer = new LicenseHeaderReplacer (languages, new[] { "1" });
 
-      var headers = new Dictionary<string, string[]>();
-      headers.Add (".cs", new[] { "// first line 1", "// second line", "// copyright" });
-      var res = replacer.RemoveOrReplaceHeader (new LicenseHeaderPathInput (@"C:\Users\gabriel.ratschiller\Desktop\TestFile.cs", headers));
+      var headers = new Dictionary<string, string[]> { { ".cs", new[] { "// first line 1", "// second line", "// copyright" } } };
+      await replacer.RemoveOrReplaceHeader (new LicenseHeaderPathInput (@"C:\Users\gabriel.ratschiller\Desktop\TestFile.cs", headers));
     }
   }
 }

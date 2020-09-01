@@ -111,7 +111,7 @@ namespace Core.Options
     public virtual string Version { get; set; }
 
     /// <summary>
-    ///   Sets all public members of this <see cref="ICoreOptions" /> instance to pre-configured default values.
+    ///   Sets all public members of this <see cref="CoreOptions" /> instance to pre-configured default values.
     /// </summary>
     /// <remarks>The default values are implementation-dependent.</remarks>
     private void SetDefaultValues ()
@@ -123,7 +123,7 @@ namespace Core.Options
     }
 
     /// <summary>
-    ///   Initializes all public members of this <see cref="ICoreOptions" /> instance.
+    ///   Initializes all public members of this <see cref="CoreOptions" /> instance.
     /// </summary>
     /// <remarks>The default values are implementation-dependent.</remarks>
     private void InitializeValues ()

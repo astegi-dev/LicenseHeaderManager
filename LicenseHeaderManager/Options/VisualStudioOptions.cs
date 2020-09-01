@@ -77,9 +77,9 @@ namespace LicenseHeaderManager.Options
     public virtual event EventHandler<NotifyCollectionChangedEventArgs> LinkedCommandsChanged;
 
     /// <summary>
-    ///   Serializes an <see cref="IVisualStudioOptions" /> instance to a file in the file system.
+    ///   Serializes an <see cref="VisualStudioOptions" /> instance to a file in the file system.
     /// </summary>
-    /// <param name="visualStudioOptions">The <see cref="IVisualStudioOptions" /> instance to serialize.</param>
+    /// <param name="visualStudioOptions">The <see cref="VisualStudioOptions" /> instance to serialize.</param>
     /// <param name="filePath">The path to which an options file should be persisted.</param>
     public static async Task SaveAsync (VisualStudioOptions visualStudioOptions, string filePath)
     {
@@ -87,14 +87,14 @@ namespace LicenseHeaderManager.Options
     }
 
     /// <summary>
-    ///   Deserializes an <see cref="IVisualStudioOptions" /> instance from a file in the file system.
+    ///   Deserializes an <see cref="VisualStudioOptions" /> instance from a file in the file system.
     /// </summary>
     /// <param name="filePath">
-    ///   The path to an options file from which a corresponding <see cref="IVisualStudioOptions" /> instance
+    ///   The path to an options file from which a corresponding <see cref="VisualStudioOptions" /> instance
     ///   should be constructed.
     /// </param>
     /// <returns>
-    ///   An <see cref="IVisualStudioOptions" /> instance that represents to configuration contained in the file specified by
+    ///   An <see cref="VisualStudioOptions" /> instance that represents to configuration contained in the file specified by
     ///   <paramref name="filePath" />.
     ///   If there were errors upon deserialization, <see langword="null" /> is returned.
     /// </returns>
@@ -104,7 +104,7 @@ namespace LicenseHeaderManager.Options
     }
 
     /// <summary>
-    ///   Sets all public members of this <see cref="IVisualStudioOptions" /> instance to pre-defined default values.
+    ///   Sets all public members of this <see cref="VisualStudioOptions" /> instance to pre-defined default values.
     /// </summary>
     /// <remarks>The default values are implementation-dependent.</remarks>
     private void SetDefaultValues ()
@@ -114,7 +114,7 @@ namespace LicenseHeaderManager.Options
     }
 
     /// <summary>
-    ///   Initializes all public members of this <see cref="IVisualStudioOptions" /> instance.
+    ///   Initializes all public members of this <see cref="VisualStudioOptions" /> instance.
     /// </summary>
     /// <remarks>The default values are implementation-dependent.</remarks>
     private void InitializeValues ()
