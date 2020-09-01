@@ -82,7 +82,7 @@ namespace LicenseHeaderManager.Utils
 
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (item);
-      if (headers != null) // TODO get rid of nested if (get content a view lines above)
+      if (headers != null)
       {
         var content = item.GetContent (out var wasAlreadyOpen, extension);
         if (content == null)

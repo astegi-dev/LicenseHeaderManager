@@ -31,9 +31,9 @@ namespace LicenseHeaderManager.Utils
 {
   internal static class CoreHelpers
   {
-    private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog s_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-    private static async Task OnProgressReportedAsync (
+    private static async Task OnProgressReportedAsync(
         ReplacerProgressContentReport progress,
         BaseUpdateViewModel baseUpdateViewModel,
         string projectName,
@@ -41,15 +41,15 @@ namespace LicenseHeaderManager.Utils
         CancellationToken cancellationToken)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-      
+
       if (!cancellationToken.IsCancellationRequested)
       {
-        var result = new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-            new ReplacerSuccess (progress.ProcessedFilePath, progress.ProcessFileNewContent));
-        if (fileOpenedStatus.TryGetValue (progress.ProcessedFilePath, out var wasOpen))
-          await HandleResultAsync (result, LicenseHeadersPackage.Instance, wasOpen, false);
+        var result = new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>(
+            new ReplacerSuccess(progress.ProcessedFilePath, progress.ProcessFileNewContent));
+        if (fileOpenedStatus.TryGetValue(progress.ProcessedFilePath, out var wasOpen))
+          await HandleResultAsync(result, LicenseHeadersPackage.Instance, wasOpen, false);
         else
-          await HandleResultAsync (result, LicenseHeadersPackage.Instance, false, false);
+          await HandleResultAsync(result, LicenseHeadersPackage.Instance, false, false);
       }
 
       if (baseUpdateViewModel == null)
@@ -68,12 +68,12 @@ namespace LicenseHeaderManager.Utils
         solutionUpdateViewModel.CurrentProject = projectName;
     }
 
-    public static IProgress<ReplacerProgressContentReport> CreateProgress (BaseUpdateViewModel viewModel, string projectName, IDictionary<string, bool> fileOpenedStatus, CancellationToken cancellationToken)
+    public static IProgress<ReplacerProgressContentReport> CreateProgress(BaseUpdateViewModel viewModel, string projectName, IDictionary<string, bool> fileOpenedStatus, CancellationToken cancellationToken)
     {
-      return new Progress<ReplacerProgressContentReport> (report => OnProgressReportedAsync (report, viewModel, projectName, fileOpenedStatus, cancellationToken).FireAndForget());
+      return new Progress<ReplacerProgressContentReport>(report => OnProgressReportedAsync(report, viewModel, projectName, fileOpenedStatus, cancellationToken).FireAndForget());
     }
 
-    public static ICollection<LicenseHeaderContentInput> GetFilesToProcess (
+    public static ICollection<LicenseHeaderContentInput> GetFilesToProcess(
         ProjectItem item,
         IDictionary<string, string[]> headers,
         out int countSubLicenseHeaders,
@@ -87,12 +87,12 @@ namespace LicenseHeaderManager.Utils
       if (item.ProjectItems == null)
         return files;
 
-      if (item.FileCount == 1 && File.Exists (item.FileNames[1]))
+      if (item.FileCount == 1 && File.Exists(item.FileNames[1]))
       {
-        var content = item.GetContent (out var wasAlreadyOpen, LicenseHeadersPackage.Instance);
+        var content = item.GetContent(out var wasAlreadyOpen, LicenseHeadersPackage.Instance);
         if (content != null)
         {
-          files.Add (new LicenseHeaderContentInput (content, item.FileNames[1], headers, item.GetAdditionalProperties()));
+          files.Add(new LicenseHeaderContentInput(content, item.FileNames[1], headers, item.GetAdditionalProperties()));
           fileOpenedStatus[item.FileNames[1]] = wasAlreadyOpen;
         }
       }
@@ -100,7 +100,7 @@ namespace LicenseHeaderManager.Utils
       var childHeaders = headers;
       if (searchForLicenseHeaders)
       {
-        childHeaders = LicenseHeaderFinder.SearchItemsDirectlyGetHeaderDefinition (item.ProjectItems);
+        childHeaders = LicenseHeaderFinder.SearchItemsDirectlyGetHeaderDefinition(item.ProjectItems);
         if (childHeaders != null)
           countSubLicenseHeaders++;
         else
@@ -109,9 +109,9 @@ namespace LicenseHeaderManager.Utils
 
       foreach (ProjectItem child in item.ProjectItems)
       {
-        var subFiles = GetFilesToProcess (child, childHeaders, out var subLicenseHeaders, out var subFileOpenedStatus, searchForLicenseHeaders);
+        var subFiles = GetFilesToProcess(child, childHeaders, out var subLicenseHeaders, out var subFileOpenedStatus, searchForLicenseHeaders);
 
-        files.AddRange (subFiles);
+        files.AddRange(subFiles);
         foreach (var status in subFileOpenedStatus)
           fileOpenedStatus[status.Key] = status.Value;
 
@@ -121,7 +121,7 @@ namespace LicenseHeaderManager.Utils
       return files;
     }
 
-    public static async Task HandleResultAsync (
+    public static async Task HandleResultAsync(
         ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> result,
         ILicenseHeaderExtension extension,
         bool isOpen,
@@ -129,39 +129,52 @@ namespace LicenseHeaderManager.Utils
     {
       if (result.IsSuccess)
       {
-        if (!File.Exists (result.Success.FilePath) || TrySetContent (result.Success.FilePath, extension.Dte2.Solution, result.Success.NewContent, isOpen, extension))
-          return;
-
-        MessageBoxHelper.ShowError ($"Updating license header for file {result.Success.FilePath} failed.");
-        s_log.Error ($"Updating license header for file {result.Success.FilePath} failed.");
+        ProcessSuccess(result.Success, extension, isOpen);
         return;
       }
 
       if (!calledByUser)
         return;
 
-      // TODO check for error after core call ignoring non comment text
       var error = result.Error;
       switch (error.Type)
       {
         case ReplacerErrorType.NonCommentText:
           error.Input.IgnoreNonCommentText = true;
-          if (MessageBoxHelper.AskYesNo (error.Description, Resources.Warning, true))
-            await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader (error.Input);
-          return;
+          if (!MessageBoxHelper.AskYesNo(error.Description, Resources.Warning, true))
+            return;
+
+          var resultIgnoringNonCommentText = await extension.LicenseHeaderReplacer.RemoveOrReplaceHeader(error.Input);
+          if (resultIgnoringNonCommentText.IsSuccess)
+          {
+            ProcessSuccess(resultIgnoringNonCommentText.Success, extension, isOpen);
+            return;
+          }
+
+          error = resultIgnoringNonCommentText.Error;
+          break;
 
         case ReplacerErrorType.LanguageNotFound:
-          // TODO test with project with .snk file (e.g. DependDB.Util)...last attempt: works, but window closes immediately after showing (threading issue)
-          if (MessageBoxHelper.AskYesNo (error.Description, Resources.Error))
+          // TODO possible threading issue: languages page is opened but window closes immediately after showing
+          if (MessageBoxHelper.AskYesNo(error.Description, Resources.Error))
             extension.ShowLanguagesPage();
           return;
       }
 
-      MessageBoxHelper.ShowError ($"An unexpected error has occurred: {error.Description}");
-      s_log.Error ($"File '{error.Input.DocumentPath}' failed: {error.Description}");
+      s_log.Error($"File '{error.Input.DocumentPath}' failed: {error.Description}");
+      MessageBoxHelper.ShowError($"An unexpected error has occurred: {error.Description}");
     }
 
-    public static async Task HandleResultAsync (
+    private static void ProcessSuccess(ReplacerSuccess replacerSuccess, ILicenseHeaderExtension extension, bool isOpen)
+    {
+      if (!File.Exists(replacerSuccess.FilePath) || TrySetContent(replacerSuccess.FilePath, extension.Dte2.Solution, replacerSuccess.NewContent, isOpen, extension))
+        return;
+
+      s_log.Error($"Updating license header for file {replacerSuccess.FilePath} failed.");
+      MessageBoxHelper.ShowError($"Updating license header for file {replacerSuccess.FilePath} failed.");
+    }
+
+    public static async Task HandleResultAsync(
         IEnumerable<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>> result,
         ILicenseHeaderExtension licenseHeaderExtension,
         BaseUpdateViewModel viewModel,
@@ -170,44 +183,44 @@ namespace LicenseHeaderManager.Utils
         CancellationToken cancellationToken)
     {
       // collect NonCommentText-errors and ask if license header should still be inserted
-      var errors = result.Where (replacerResult => !replacerResult.IsSuccess).Select (replacerResult => replacerResult.Error).ToList();
+      var errors = result.Where(replacerResult => !replacerResult.IsSuccess).Select(replacerResult => replacerResult.Error).ToList();
 
-      var nonCommentTextErrorsByExtension = errors.Where (x => x.Type == ReplacerErrorType.NonCommentText).GroupBy (x => Path.GetExtension (x.Input.DocumentPath));
+      var nonCommentTextErrorsByExtension = errors.Where(x => x.Type == ReplacerErrorType.NonCommentText).GroupBy(x => Path.GetExtension(x.Input.DocumentPath));
 
       var inputIgnoringNonCommentText = new List<LicenseHeaderContentInput>();
       foreach (var extension in nonCommentTextErrorsByExtension)
       {
-        var message = string.Format (Resources.Warning_InvalidLicenseHeader, extension.Key).ReplaceNewLines();
-        if (!MessageBoxHelper.AskYesNo (message, Resources.Warning, true))
+        var message = string.Format(Resources.Warning_InvalidLicenseHeader, extension.Key).ReplaceNewLines();
+        if (!MessageBoxHelper.AskYesNo(message, Resources.Warning, true))
           continue;
 
         foreach (var failedFile in extension)
         {
           failedFile.Input.IgnoreNonCommentText = true;
-          inputIgnoringNonCommentText.Add (failedFile.Input);
+          inputIgnoringNonCommentText.Add(failedFile.Input);
         }
       }
 
       // collect other errors and the ones that occurred while "force-inserting" headers with non-comment-text
-      var overallErrors = errors.Where (x => x.Type != ReplacerErrorType.NonCommentText).ToList();
+      var overallErrors = errors.Where(x => x.Type != ReplacerErrorType.NonCommentText).ToList();
       if (inputIgnoringNonCommentText.Count > 0)
       {
         viewModel.FileCountCurrentProject = inputIgnoringNonCommentText.Count;
-        var resultIgnoringNonCommentText = await licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader (
+        var resultIgnoringNonCommentText = await licenseHeaderExtension.LicenseHeaderReplacer.RemoveOrReplaceHeader(
             inputIgnoringNonCommentText,
-            CreateProgress (viewModel, projectName, fileOpenedStatus, cancellationToken),
+            CreateProgress(viewModel, projectName, fileOpenedStatus, cancellationToken),
             cancellationToken);
 
-        overallErrors.AddRange (resultIgnoringNonCommentText.Where (replacerResult => !replacerResult.IsSuccess).Select (replacerResult => replacerResult.Error));
+        overallErrors.AddRange(resultIgnoringNonCommentText.Where(replacerResult => !replacerResult.IsSuccess).Select(replacerResult => replacerResult.Error));
       }
 
       // display all errors collected from "first attempt" and "force-insertion"
       if (overallErrors.Count == 0)
         return;
 
-      MessageBoxHelper.ShowError ($"{overallErrors.Count} unexpected errors have occurred. See output window or log file for more details");
+      MessageBoxHelper.ShowError($"{overallErrors.Count} unexpected errors have occurred. See output window or log file for more details");
       foreach (var otherError in overallErrors)
-        s_log.Error ($"File '{otherError.Input.DocumentPath}' failed: {otherError.Description}");
+        s_log.Error($"File '{otherError.Input.DocumentPath}' failed: {otherError.Description}");
     }
 
     public static bool TrySetContent(string itemPath, Solution solution, string content, bool wasOpen, ILicenseHeaderExtension extension)
