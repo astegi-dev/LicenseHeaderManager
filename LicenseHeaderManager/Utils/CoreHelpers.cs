@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Threading;
 using Core;
 using EnvDTE;
@@ -126,7 +127,7 @@ namespace LicenseHeaderManager.Utils
     {
       if (result.IsSuccess)
       {
-        if (!File.Exists (result.Success.FilePath) || result.Success.FilePath.TrySetContent (extension.Dte2.Solution, result.Success.NewContent, isOpen, extension))
+        if (!File.Exists (result.Success.FilePath) || TrySetContent (result.Success.FilePath, extension.Dte2.Solution, result.Success.NewContent, isOpen, extension))
           return;
 
         MessageBoxHelper.ShowError ($"Updating license header for file {result.Success.FilePath} failed.");
@@ -203,6 +204,71 @@ namespace LicenseHeaderManager.Utils
       MessageBoxHelper.ShowError ($"{overallErrors.Count} unexpected errors have occurred. See output window or log file for more details");
       foreach (var otherError in overallErrors)
         s_log.Error ($"File '{otherError.Input.DocumentPath}' failed: {otherError.Description}");
+    }
+
+    public static bool TrySetContent(string itemPath, Solution solution, string content, bool wasOpen, ILicenseHeaderExtension extension)
+    {
+      var item = solution.FindProjectItem(itemPath);
+      if (item == null)
+        return false;
+
+      if (!wasOpen && !TryOpenDocument(item, extension))
+        return false;
+
+      // returning false from this method would signify an error, which we do not want since this circumstance is expected to occur with unknown file extensions
+      var languageForExtension = extension.LicenseHeaderReplacer.GetLanguageFromExtension(Path.GetExtension(item.FileNames[1]));
+      if (languageForExtension == null)
+        return true;
+
+      if (!(item.Document.Object("TextDocument") is TextDocument textDocument))
+        return false;
+
+      var wasSaved = item.Document.Saved;
+
+      textDocument.CreateEditPoint(textDocument.StartPoint).Delete(textDocument.EndPoint);
+      textDocument.CreateEditPoint(textDocument.StartPoint).Insert(content);
+
+      SaveAndCloseIfNecessary(item, wasOpen, wasSaved);
+
+      return true;
+    }
+
+    public static bool TryOpenDocument(ProjectItem item, ILicenseHeaderExtension extension)
+    {
+      try
+      {
+        // Opening files potentially having non-text content (.png, .snk) might result in a Visual Studio error "Some bytes have been replaced with the
+        // Unicode substitution character while loading file ...". In order to avoid this, files with unknown extensions are not opened. However, in order
+        // to keep such files eligible as Core input, still return true
+        var languageForExtension = extension.LicenseHeaderReplacer.GetLanguageFromExtension(Path.GetExtension(item.FileNames[1]));
+        if (languageForExtension == null)
+          return true;
+
+        item.Open(Constants.vsViewKindTextView);
+        return true;
+      }
+      catch (COMException)
+      {
+        return false;
+      }
+      catch (IOException)
+      {
+        return false;
+      }
+    }
+
+    public static void SaveAndCloseIfNecessary(ProjectItem item, bool wasOpen, bool wasSaved)
+    {
+      if (wasOpen)
+      {
+        // if document had no unsaved changes before, it should not have any now (analogously for when it did have unsaved changes)
+        if (wasSaved)
+          item.Document.Save();
+      }
+      else
+      {
+        item.Document.Close(vsSaveChanges.vsSaveChangesYes);
+      }
     }
   }
 }

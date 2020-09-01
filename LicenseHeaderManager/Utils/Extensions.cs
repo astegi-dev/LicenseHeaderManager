@@ -103,7 +103,7 @@ namespace LicenseHeaderManager.Utils
     {
       wasAlreadyOpen = item.IsOpen();
 
-      if (!wasAlreadyOpen && !TryOpenDocument (item, extension))
+      if (!wasAlreadyOpen && !CoreHelpers.TryOpenDocument (item, extension))
         return null;
 
       // Referring to the comment in the TryOpenDocument method: files with unknown extensions that were precautiously not opened are still fed as input to the
@@ -120,7 +120,7 @@ namespace LicenseHeaderManager.Utils
       var wasSaved = item.Document.Saved;
       var content = textDocument.CreateEditPoint (textDocument.StartPoint).GetText (textDocument.EndPoint);
 
-      SaveAndCloseIfNecessary (item, wasAlreadyOpen, wasSaved);
+      CoreHelpers.SaveAndCloseIfNecessary (item, wasAlreadyOpen, wasSaved);
 
       return content;
     }
@@ -128,71 +128,6 @@ namespace LicenseHeaderManager.Utils
     public static bool IsOpen (this ProjectItem item)
     {
       return item.IsOpen[Constants.vsViewKindTextView];
-    }
-
-    private static bool TryOpenDocument (ProjectItem item, ILicenseHeaderExtension extension)
-    {
-      try
-      {
-        // Opening files potentially having non-text content (.png, .snk) might result in a Visual Studio error "Some bytes have been replaced with the
-        // Unicode substitution character while loading file ...". In order to avoid this, files with unknown extensions are not opened. However, in order
-        // to keep such files eligible as Core input, still return true
-        var languageForExtension = extension.LicenseHeaderReplacer.GetLanguageFromExtension (Path.GetExtension (item.FileNames[1]));
-        if (languageForExtension == null)
-          return true;
-
-        item.Open (Constants.vsViewKindTextView);
-        return true;
-      }
-      catch (COMException)
-      {
-        return false;
-      }
-      catch (IOException)
-      {
-        return false;
-      }
-    }
-
-    public static bool TrySetContent (this string itemPath, Solution solution, string content, bool wasOpen, ILicenseHeaderExtension extension)
-    {
-      var item = solution.FindProjectItem (itemPath);
-      if (item == null)
-        return false;
-
-      if (!wasOpen && !TryOpenDocument (item, extension))
-        return false;
-
-      // returning false from this method would signify an error, which we do not want since this circumstance is expected to occur with unknown file extensions
-      var languageForExtension = extension.LicenseHeaderReplacer.GetLanguageFromExtension (Path.GetExtension (item.FileNames[1]));
-      if (languageForExtension == null)
-        return true;
-
-      if (!(item.Document.Object ("TextDocument") is TextDocument textDocument))
-        return false;
-
-      var wasSaved = item.Document.Saved;
-
-      textDocument.CreateEditPoint (textDocument.StartPoint).Delete (textDocument.EndPoint);
-      textDocument.CreateEditPoint (textDocument.StartPoint).Insert (content);
-
-      SaveAndCloseIfNecessary (item, wasOpen, wasSaved);
-
-      return true;
-    }
-
-    private static void SaveAndCloseIfNecessary (ProjectItem item, bool wasOpen, bool wasSaved)
-    {
-      if (wasOpen)
-      {
-        // if document had no unsaved changes before, it should not have any now (analogously for when it did have unsaved changes)
-        if (wasSaved)
-          item.Document.Save();
-      }
-      else
-      {
-        item.Document.Close (vsSaveChanges.vsSaveChangesYes);
-      }
     }
 
     public static void FireAndForget (this Task task)

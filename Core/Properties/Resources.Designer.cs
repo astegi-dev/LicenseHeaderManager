@@ -621,7 +621,7 @@ namespace Core.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The header definition for {0} files contains non-comment text.\nIf you insert this header, you will not be able to remove or replace the header automatically!\nDo you really want to add this header to the file?.
+        ///   Looks up a localized string similar to Extension: {0}\n\nThe header definition for {0} files contains non-comment text.\nIf you insert this header, you will not be able to remove or replace the header automatically!\n\nDo you really want to add this header to the file?.
         /// </summary>
         internal static string Warning_InvalidLicenseHeader {
             get {
