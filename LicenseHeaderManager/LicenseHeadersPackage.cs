@@ -126,6 +126,15 @@ namespace LicenseHeaderManager
       ShowOptionPage (typeof (LanguagesPage));
     }
 
+    public void ShowOptionsPage ()
+    {
+      ShowOptionPage (typeof (OptionsPage));
+    }
+
+    /// <summary>
+    /// Gets the <see cref="ILicenseHeaderExtension"/> instance that was created upon initializing the package.
+    /// </summary>
+    /// <remarks>The actual type of this property is <see cref="LicenseHeadersPackage"/>.</remarks>
     public static ILicenseHeaderExtension Instance { get; private set; }
 
     public IDefaultLicenseHeaderPageModel DefaultLicenseHeaderPageModel => Options.Model.DefaultLicenseHeaderPageModel.Instance;
@@ -150,7 +159,7 @@ namespace LicenseHeaderManager
       Dte2 = await GetServiceAsync (typeof (DTE)) as DTE2;
       Assumes.Present (Dte2);
 
-      CreateAndConfigureFileAppender (Path.GetFileNameWithoutExtension (Dte2.Solution.FullName));
+      CreateAndConfigureFileAppender (Path.GetFileNameWithoutExtension (Dte2?.Solution.FullName));
       await CreateAndConfigureOutputPaneAppenderAsync();
       s_log.Info ("Logger has been initialized");
 
@@ -176,7 +185,7 @@ namespace LicenseHeaderManager
       await RemoveLicenseHeaderEditorAdvancedMenuCommand.InitializeAsync (this);
 
       //register ItemAdded event handler
-      if (Dte2.Events is Events2 events)
+      if (Dte2?.Events is Events2 events)
       {
         _projectItemEvents = events.ProjectItemsEvents; //we need to keep a reference, otherwise the object is garbage collected and the event won't be fired
         _projectItemEvents.ItemAdded += ItemAdded;

@@ -49,7 +49,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-      var obj = ((LicenseHeadersPackage) _licenseHeaderExtension).GetSolutionExplorerItem();
+      var obj = _licenseHeaderExtension.GetSolutionExplorerItem();
       var removeAllLicenseHeadersCommand =
           new RemoveLicenseHeaderFromAllFilesInProjectHelper (cancellationToken, _licenseHeaderExtension, viewModel);
 

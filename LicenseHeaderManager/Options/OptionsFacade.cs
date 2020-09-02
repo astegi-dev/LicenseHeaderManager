@@ -27,19 +27,18 @@ namespace LicenseHeaderManager.Options
   /// </summary>
   /// <seealso cref="CoreOptions"/>
   /// <seealso cref="VisualStudioOptions"/>
-  public class OptionsFacade
+  public sealed class OptionsFacade
   {
     private readonly CoreOptions _coreOptions;
-
     private readonly VisualStudioOptions _visualStudioOptions;
 
-    public static readonly string DefaultCoreOptionsPath =
+    public static string DefaultCoreOptionsPath =>
         Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\CoreOptions.json");
 
-    public static readonly string DefaultVisualStudioOptionsPath =
+    public static string DefaultVisualStudioOptionsPath =>
         Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\VisualStudioOptions.json");
 
-    public static readonly string DefaultLogPath =
+    public static string DefaultLogPath =>
         Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\logs_lhm");
 
     /// <summary>

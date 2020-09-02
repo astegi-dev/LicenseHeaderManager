@@ -13,6 +13,7 @@
 
 using System;
 using System.ComponentModel.Design;
+using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.Options;
 using LicenseHeaderManager.Options.DialogPages;
 using Microsoft.VisualStudio.Shell;
@@ -28,12 +29,12 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
     /// <summary>
     ///   Command ID.
     /// </summary>
-    public const int CommandId = 4138;
+    private const int c_commandId = 4138;
 
     /// <summary>
     ///   Command menu group (command set GUID).
     /// </summary>
-    public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
+    private static readonly Guid s_commandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
     /// <summary>
     ///   Initializes a new instance of the <see cref="LicenseHeaderOptionsCommand" /> class.
@@ -43,10 +44,10 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
     /// <param name="commandService">Command service to add command to, not null.</param>
     private LicenseHeaderOptionsCommand (AsyncPackage package, OleMenuCommandService commandService)
     {
-      ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
+      ServiceProvider = (ILicenseHeaderExtension) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
-      var menuCommandID = new CommandID (CommandSet, CommandId);
+      var menuCommandID = new CommandID (s_commandSet, c_commandId);
       var menuItem = new OleMenuCommand (Execute, menuCommandID);
       commandService.AddCommand (menuItem);
     }
@@ -59,7 +60,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
     /// <summary>
     ///   Gets the service provider from the owner package.
     /// </summary>
-    private LicenseHeadersPackage ServiceProvider { get; }
+    private ILicenseHeaderExtension ServiceProvider { get; }
 
     /// <summary>
     ///   Initializes the singleton instance of the command.
@@ -86,7 +87,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectMenu
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
-      ServiceProvider.ShowOptionPage (typeof (OptionsPage));
+      ServiceProvider.ShowOptionsPage();
     }
   }
 }
