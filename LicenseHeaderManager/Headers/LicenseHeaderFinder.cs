@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using Core;
 using EnvDTE;
 using LicenseHeaderManager.Utils;
 
@@ -94,14 +95,13 @@ namespace LicenseHeaderManager.Headers
       var solutionDirectory = Path.GetDirectoryName (solution.FullName);
       var solutionFileName = Path.GetFileName (solution.FullName);
 
-      var solutionHeaderFilePath = Path.Combine (solutionDirectory, solutionFileName + LicenseHeader.Extension);
+      var solutionHeaderFilePath = Path.Combine (solutionDirectory, solutionFileName + LicenseHeaderReplacer.HeaderDefinitionExtension);
       if (File.Exists (solutionHeaderFilePath))
         return LoadHeaderDefinition (solutionHeaderFilePath);
 
       return null;
     }
 
-    #region Helper Methods
 
     /// <summary>
     ///   Returns the License header file that is directly attached to the project.
@@ -179,6 +179,7 @@ namespace LicenseHeaderManager.Headers
       return headers;
     }
 
+    // TODO better in core? 
     private static void AddHeaders (IDictionary<string, string[]> headers, string headerFilePath)
     {
       IEnumerable<string> extensions = null;
@@ -191,7 +192,7 @@ namespace LicenseHeaderManager.Headers
         while (!streamreader.EndOfStream)
         {
           var line = streamreader.ReadLine();
-          if (line.StartsWith (LicenseHeader.Keyword))
+          if (line.StartsWith (LicenseHeaderReplacer.ExtensionKeyword))
           {
             if (extensions != null)
             {
@@ -200,7 +201,7 @@ namespace LicenseHeaderManager.Headers
                 headers[extension] = array;
             }
 
-            extensions = line.Substring (LicenseHeader.Keyword.Length).Split (new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+            extensions = line.Substring (LicenseHeaderReplacer.ExtensionKeyword.Length).Split (new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select (LicenseHeader.AddDot);
             header.Clear();
           }
@@ -240,13 +241,12 @@ namespace LicenseHeaderManager.Headers
           {
           }
 
-          if (fileName != null && Path.GetExtension (fileName).ToLowerInvariant() == LicenseHeader.Extension)
+          if (fileName != null && Path.GetExtension (fileName).ToLowerInvariant() == LicenseHeaderReplacer.HeaderDefinitionExtension)
             return fileName;
         }
 
       return string.Empty;
     }
 
-    #endregion
   }
 }

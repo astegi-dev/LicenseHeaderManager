@@ -15,6 +15,10 @@ using System;
 
 namespace Core
 {
+  /// <summary>
+  ///   Identifies different types of errors that might occur while updating license headers.
+  /// </summary>
+  /// <seealso cref="LicenseHeaderReplacer" />
   public enum ReplacerErrorType
   {
     /// <summary>
@@ -29,7 +33,7 @@ namespace Core
     LanguageNotFound,
 
     /// <summary>
-    ///   Specifies that an error occured while parsing the license header that was found in the file.
+    ///   Specifies that an error occurred while parsing the license header that was found in the file.
     /// </summary>
     ParsingError,
 
@@ -39,12 +43,12 @@ namespace Core
     NoHeaderFound,
 
     /// <summary>
-    ///   An unspecified error occured.
+    ///   An unspecified error occurred.
     /// </summary>
     Miscellaneous,
 
     /// <summary>
-    /// Specifies that the header definition for the file's language is null or empty.
+    ///   Specifies that the header definition for the file's language is null or empty.
     /// </summary>
     EmptyHeader
   }

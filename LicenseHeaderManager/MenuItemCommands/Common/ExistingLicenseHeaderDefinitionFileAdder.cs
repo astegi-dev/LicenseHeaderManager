@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Utils;
@@ -62,9 +63,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
                           {
                               CheckFileExists = true,
                               CheckPathExists = true,
-                              DefaultExt = LicenseHeader.Extension,
+                              DefaultExt = LicenseHeaderReplacer.HeaderDefinitionExtension,
                               DereferenceLinks = true,
-                              Filter = "License Header Definitions|*" + LicenseHeader.Extension,
+                              Filter = "License Header Definitions|*" + LicenseHeaderReplacer.HeaderDefinitionExtension,
                               InitialDirectory = Path.GetDirectoryName (fileName)
                           };
       var result = dialog.ShowDialog();

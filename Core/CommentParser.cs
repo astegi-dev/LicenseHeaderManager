@@ -20,7 +20,7 @@ namespace Core
   /// <summary>
   ///   Detects a comment block at the beginning of a text block and returns it (if any).
   /// </summary>
-  public class CommentParser : ICommentParser
+  internal class CommentParser : ICommentParser
   {
     private int _position;
     private Stack<int> _regionStarts;
@@ -28,6 +28,20 @@ namespace Core
 
     private string _text;
 
+    /// <summary>
+    ///   Initializes a new <see cref="CommentParser" /> instance with a language-specific comment syntax.
+    /// </summary>
+    /// <param name="lineComment">The string denoting a comment for a single line.</param>
+    /// <param name="beginComment">The string denoting the start of a comment spanning multiple lines ("block comment").</param>
+    /// <param name="endComment">The string denoting the end of a comment spanning multiple lines ("block comment").</param>
+    /// <param name="beginRegion">
+    ///   The string representing the start of a (collapsible) region, if available in the given
+    ///   language, otherwise <see langword="null" />.
+    /// </param>
+    /// <param name="endRegion">
+    ///   The string representing the end of a (collapsible) region, if available in the given language,
+    ///   otherwise <see langword="null" />.
+    /// </param>
     public CommentParser (string lineComment, string beginComment, string endComment, string beginRegion, string endRegion)
     {
       Contract.Requires (string.IsNullOrWhiteSpace (beginComment) == string.IsNullOrWhiteSpace (endComment));
@@ -41,11 +55,15 @@ namespace Core
       EndRegion = string.IsNullOrEmpty (endRegion) ? null : endRegion;
     }
 
-    public string LineComment { get; }
-    public string BeginComment { get; }
-    public string EndComment { get; }
-    public string BeginRegion { get; }
-    public string EndRegion { get; }
+    private string LineComment { get; }
+
+    private string BeginComment { get; }
+
+    private string EndComment { get; }
+
+    private string BeginRegion { get; }
+
+    private string EndRegion { get; }
 
     public string Parse (string text)
     {
@@ -99,20 +117,17 @@ namespace Core
         return true;
 
       //if the header has already started and we're not in an open region, check if there was more than one NewLine
-      if (_started && _regionStarts.Count == 0)
-      {
-        var firstNewLine = NewLineManager.NextLineEndPositionInformation (_text, start, _position - start);
-        if (firstNewLine != null)
-        {
-          var afterFirstNewLine = firstNewLine.Index + firstNewLine.LineEndLength;
-          var nextNewLine = NewLineManager.NextLineEndPosition (_text, afterFirstNewLine, _position - afterFirstNewLine);
-          //more than one NewLine (= at least one empty line)
-          if (nextNewLine > 0)
-            return true;
-        }
-      }
+      if (!_started || _regionStarts.Count != 0)
+        return false;
 
-      return false;
+      var firstNewLine = NewLineManager.NextLineEndPositionInformation (_text, start, _position - start);
+      if (firstNewLine == null)
+        return false;
+
+      var afterFirstNewLine = firstNewLine.Index + firstNewLine.LineEndLength;
+      var nextNewLine = NewLineManager.NextLineEndPosition (_text, afterFirstNewLine, _position - afterFirstNewLine);
+      //more than one NewLine (= at least one empty line)
+      return nextNewLine > 0;
     }
 
     private bool HandleToken (string token)
@@ -136,7 +151,7 @@ namespace Core
       {
         SetStarted();
 
-        _position = _text.IndexOf (EndComment, _position - token.Length + BeginComment.Length);
+        _position = _text.IndexOf (EndComment, _position - token.Length + BeginComment.Length, StringComparison.Ordinal);
         if (_position < 0)
           throw new ParseException();
         _position += EndComment.Length;

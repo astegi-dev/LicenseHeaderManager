@@ -15,11 +15,29 @@ using System;
 
 namespace Core
 {
+  /// <summary>
+  ///   Represents an property that can be expanded while updating license headers.
+  /// </summary>
   internal class DocumentHeaderProperty
   {
     private readonly Predicate<DocumentHeader> _canCreateValue;
     private readonly Func<DocumentHeader, string> _createValue;
 
+    /// <summary>
+    ///   Initializes a new <see cref="DocumentHeaderProperty" /> instance.
+    /// </summary>
+    /// <param name="token">
+    ///   The token of the property. It represents the string that is replaced in a license header definition
+    ///   while update license headers.
+    /// </param>
+    /// <param name="canCreateValue">
+    ///   A predicate representing constraints that must be satisfied in order to create the value
+    ///   to replace <paramref name="token" /> with.
+    /// </param>
+    /// <param name="createValue">
+    ///   A func that provides the value to replace <paramref name="token" /> with, given that
+    ///   <paramref name="canCreateValue" /> is satisfied.
+    /// </param>
     public DocumentHeaderProperty (string token, Predicate<DocumentHeader> canCreateValue, Func<DocumentHeader, string> createValue)
     {
       Token = token;
@@ -27,13 +45,38 @@ namespace Core
       _createValue = createValue;
     }
 
+    /// <summary>
+    ///   The token of the property. It represents the string that is replaced in a license header definition while update
+    ///   license headers.
+    /// </summary>
     public string Token { get; }
 
+    /// <summary>
+    ///   A predicate representing constraints that must be satisfied in order to create the value to replace
+    ///   <see cref="Token" /> with.
+    /// </summary>
+    /// <param name="documentHeader">
+    ///   A <see cref="DocumentHeader" /> instance that might be necessary to evaluate determine the
+    ///   return value
+    /// </param>
+    /// <returns>
+    ///   Returns <see langword="true" /> if the value of this <see cref="DocumentHeaderProperty" /> can be created,
+    ///   otherwise <see langword="false" />.
+    /// </returns>
     public bool CanCreateValue (DocumentHeader documentHeader)
     {
       return _canCreateValue (documentHeader);
     }
 
+    /// <summary>
+    ///   A func that provides the value to replace <see cref="Token" /> with, given that <see cref="CanCreateValue" /> is
+    ///   satisfied.
+    /// </summary>
+    /// <param name="documentHeader">
+    ///   A <see cref="DocumentHeader" /> instance that might be necessary to evaluate determine the
+    ///   return value
+    /// </param>
+    /// <returns>Returns the value of this <see cref="DocumentHeaderProperty" />.</returns>
     public string CreateValue (DocumentHeader documentHeader)
     {
       return _createValue (documentHeader);

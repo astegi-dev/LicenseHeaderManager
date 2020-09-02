@@ -29,13 +29,13 @@ namespace Core
     internal static int CountOccurrence (this string inputString, string searchString)
     {
       if (inputString == null)
-        throw new ArgumentNullException ("inputString");
+        throw new ArgumentNullException (nameof(inputString));
       if (string.IsNullOrEmpty (searchString))
-        throw new ArgumentNullException ("searchString");
+        throw new ArgumentNullException (nameof(searchString));
 
       var idx = 0;
       var count = 0;
-      while ((idx = inputString.IndexOf (searchString, idx)) != -1)
+      while ((idx = inputString.IndexOf (searchString, idx, StringComparison.Ordinal)) != -1)
       {
         idx += searchString.Length;
         count++;

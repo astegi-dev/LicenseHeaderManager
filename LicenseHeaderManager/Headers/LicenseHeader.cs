@@ -14,6 +14,7 @@
 using System;
 using System.IO;
 using System.Text;
+using Core;
 using EnvDTE;
 using LicenseHeaderManager.Options;
 using LicenseHeaderManager.Options.Model;
@@ -23,8 +24,7 @@ namespace LicenseHeaderManager.Headers
 {
   public static class LicenseHeader
   {
-    public const string Keyword = "extensions:";
-    public const string Extension = ".licenseheader";
+    
 
     private static string GetNewFullName (Project project)
     {
@@ -52,10 +52,10 @@ namespace LicenseHeaderManager.Headers
       }
 
       var projectName = directory.Substring (directory.LastIndexOf ('\\') + 1);
-      var fileName = Path.Combine (directory, projectName) + Extension;
+      var fileName = Path.Combine (directory, projectName) + LicenseHeaderReplacer.HeaderDefinitionExtension;
 
       for (var i = 2; File.Exists (fileName); i++)
-        fileName = Path.Combine (directory, projectName) + i + Extension;
+        fileName = Path.Combine (directory, projectName) + i + LicenseHeaderReplacer.HeaderDefinitionExtension;
 
       return fileName;
     }
@@ -64,7 +64,7 @@ namespace LicenseHeaderManager.Headers
     {
       var solutionDirectory = Path.GetDirectoryName (solution.FullName);
       var solutionFileName = Path.GetFileName (solution.FullName);
-      return Path.Combine (solutionDirectory, solutionFileName + Extension);
+      return Path.Combine (solutionDirectory, solutionFileName + LicenseHeaderReplacer.HeaderDefinitionExtension);
     }
 
     public static bool ShowQuestionForAddingLicenseHeaderFile (Project activeProject, IDefaultLicenseHeaderPageModel pageModel)

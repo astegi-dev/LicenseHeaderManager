@@ -41,7 +41,8 @@ namespace Core.Tests
       var replacer = new LicenseHeaderReplacer (languages, new[] { "1" });
 
       var headers = new Dictionary<string, string[]> { { ".cs", new[] { "// first line 1", "// second line", "// copyright" } } };
-      await replacer.RemoveOrReplaceHeader (new LicenseHeaderPathInput (@"C:\Users\gabriel.ratschiller\Desktop\TestFile.cs", headers));
+      var result = await replacer.RemoveOrReplaceHeader (new LicenseHeaderPathInput (@"C:\Users\gabriel.ratschiller\Desktop\TestFile.cs", headers));
+      Assert.That (result, Is.Not.Null);
     }
   }
 }

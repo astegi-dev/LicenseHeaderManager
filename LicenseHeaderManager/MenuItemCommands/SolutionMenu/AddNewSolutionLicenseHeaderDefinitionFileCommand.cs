@@ -130,9 +130,8 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
       var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (solution);
-
-      // Add file
       var defaultLicenseHeaderFileText = _defaultHeaderDefinitionFunc();
+
       File.WriteAllText (solutionHeaderDefinitionFilePath, defaultLicenseHeaderFileText, Encoding.UTF8);
       solution.DTE.OpenFile (Constants.vsViewKindTextView, solutionHeaderDefinitionFilePath).Activate();
     }

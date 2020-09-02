@@ -12,13 +12,29 @@
  */
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Core
 {
-  public class NewLineConst
+  /// <summary>
+  ///   Contains new line constants.
+  /// </summary>
+  [SuppressMessage ("ReSharper", "InconsistentNaming", Justification = "For such special constants, different notations would be uncommon and maybe confusing")]
+  internal static class NewLineConst
   {
+    /// <summary>
+    ///   Carriage Return.
+    /// </summary>
     public const string CR = "\r";
+
+    /// <summary>
+    ///   Line feed.
+    /// </summary>
     public const string LF = "\n";
+
+    /// <summary>
+    ///   Carriage return, followed by line feed.
+    /// </summary>
     public const string CRLF = "\r\n";
   }
 }

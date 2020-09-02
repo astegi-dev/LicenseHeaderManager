@@ -242,7 +242,7 @@ namespace LicenseHeaderManager
       var visible = false;
 
       if (ProjectItemInspection.IsPhysicalFile (item))
-        visible = LicenseHeaderReplacer.TryCreateDocument (new LicenseHeaderPathInput (item.FileNames[1], null, null), out _) == CreateDocumentResult.DocumentCreated;
+        visible = LicenseHeaderReplacer.IsValidPathInput (item.FileNames[1]);
 
       return visible;
     }
@@ -417,7 +417,7 @@ namespace LicenseHeaderManager
 
     private async Task MigrateOptionsAsync ()
     {
-      if (!File.Exists (OptionsFacade.DefaultCoreOptionsPath) || !File.Exists(OptionsFacade.DefaultVisualStudioOptionsPath))
+      if (!File.Exists (OptionsFacade.DefaultCoreOptionsPath) || !File.Exists (OptionsFacade.DefaultVisualStudioOptionsPath))
       {
         var optionsPage = (OptionsPage) GetDialogPage (typeof (OptionsPage));
         var defaultLicenseHeaderPage = (DefaultLicenseHeaderPage) GetDialogPage (typeof (DefaultLicenseHeaderPage));
@@ -429,9 +429,9 @@ namespace LicenseHeaderManager
       }
       else
       {
-        OptionsFacade.CurrentOptions = await OptionsFacade.LoadAsync ();
+        OptionsFacade.CurrentOptions = await OptionsFacade.LoadAsync();
       }
-      
+
       OptionsFacade.CurrentOptions.Version = Version;
       await OptionsFacade.SaveAsync (OptionsFacade.CurrentOptions);
     }

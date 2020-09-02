@@ -47,8 +47,6 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       {
         case Project project:
         {
-          _licenseHeaderExtension.LicenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
-
           var replacerInput = new List<LicenseHeaderContentInput>();
           var fileOpenedStatus = new Dictionary<string, bool>();
           foreach (ProjectItem item in project.ProjectItems)
@@ -64,7 +62,6 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         }
         case ProjectItem item:
         {
-          _licenseHeaderExtension.LicenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
           var handlerInput = CoreHelpers.GetFilesToProcess (item, null, out _, out var subFileOpenedStatus, false);
           await RemoveOrReplaceHeaderAndHandleResultAsync (handlerInput, subFileOpenedStatus);
 

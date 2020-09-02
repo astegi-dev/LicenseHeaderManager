@@ -16,31 +16,34 @@ using System.IO;
 
 namespace Core
 {
-  public class PathUtility
+  /// <summary>
+  ///   Provides static helper function regarding file paths.
+  /// </summary>
+  internal static class PathUtility
   {
     private static string GetProperDirectoryCapitalization (DirectoryInfo dirInfo)
     {
       var parentDirInfo = dirInfo.Parent;
 
-      if (null == parentDirInfo)
-        return dirInfo.Root.FullName;
-
-      return Path.Combine (
-          GetProperDirectoryCapitalization (parentDirInfo),
-          parentDirInfo.GetDirectories (dirInfo.Name)[0].Name);
+      return null == parentDirInfo
+          ? dirInfo.Root.FullName
+          : Path.Combine (GetProperDirectoryCapitalization (parentDirInfo), parentDirInfo.GetDirectories (dirInfo.Name)[0].Name);
     }
 
+    /// <summary>
+    ///   Determines the correct capitalization of a file path based on a <see cref="FileInfo" /> object.
+    /// </summary>
+    /// <param name="fileInfo">The <see cref="FileInfo" /> object whose underlying filepath should be correctly capitalized.</param>
+    /// <returns>Returns the correct capitalization of the file path captured by <paramref name="fileInfo" />.</returns>
     public static string GetProperFilePathCapitalization (FileInfo fileInfo)
     {
       if (fileInfo == null)
-        throw new ArgumentNullException ("fileInfo");
+        throw new ArgumentNullException (nameof(fileInfo));
 
       var dirInfo = fileInfo.Directory;
 
       var properDirectory = GetProperDirectoryCapitalization (dirInfo);
-      return Path.Combine (
-          properDirectory,
-          dirInfo.GetFiles (fileInfo.Name)[0].Name);
+      return Path.Combine (properDirectory, dirInfo?.GetFiles (fileInfo.Name)[0].Name ?? string.Empty);
     }
   }
 }

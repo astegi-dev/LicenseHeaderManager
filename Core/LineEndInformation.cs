@@ -19,17 +19,32 @@ namespace Core
   ///   Class for summarizing the information about the line end, where is it (index) and what character is it (CR, LR,
   ///   CR+LF).
   /// </summary>
-  public class LineEndInformation
+  internal class LineEndInformation
   {
+    /// <summary>
+    ///   Initializes a new <see cref="LineEndInformation" /> instance.
+    /// </summary>
+    /// <param name="index">Index of occurrence.</param>
+    /// <param name="lineEnd">Line ending (CR, LR or CR+LF).</param>
     public LineEndInformation (int index, string lineEnd)
     {
       Index = index;
       LineEnd = lineEnd;
     }
 
+    /// <summary>
+    ///   Index of occurrence.
+    /// </summary>
     public int Index { get; }
-    public string LineEnd { get; }
 
+    /// <summary>
+    ///   Line ending (CR, LR or CR+LF).
+    /// </summary>
+    private string LineEnd { get; }
+
+    /// <summary>
+    ///   Length of the line ending this <see cref="LineEndInformation" /> was initialized with.
+    /// </summary>
     public int LineEndLength => LineEnd.Length;
   }
 }

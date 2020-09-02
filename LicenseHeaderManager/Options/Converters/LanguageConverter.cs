@@ -24,7 +24,7 @@ namespace LicenseHeaderManager.Options.Converters
   {
     private const string c_language = "Language";
     private const string c_languages = "Languages";
-    private const string c_extension = "Extension";
+    private const string c_extension = "HeaderDefinitionExtension";
     private const string c_extensions = "Extensions";
     private const string c_linecomment = "LineComment";
     private const string c_beginComment = "BeginComment";

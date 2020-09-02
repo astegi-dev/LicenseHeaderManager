@@ -19,7 +19,7 @@ namespace Core
   /// <summary>
   ///   Detects the most common line ending (CR, LF, CR+LF) in a string and provides functionality to replace line endings.
   /// </summary>
-  public class NewLineManager
+  internal static class NewLineManager
   {
     private static readonly string[] _allLineEndings = { NewLineConst.CR, NewLineConst.LF, NewLineConst.CRLF };
 
@@ -32,9 +32,9 @@ namespace Core
     public static string ReplaceAllLineEnds (string inputText, string newLineEnd)
     {
       if (inputText == null)
-        throw new ArgumentNullException ("inputText");
+        throw new ArgumentNullException (nameof(inputText));
       if (newLineEnd == null)
-        throw new ArgumentNullException ("newLineEnd");
+        throw new ArgumentNullException (nameof(newLineEnd));
 
       return inputText.Replace (NewLineConst.CRLF, NewLineConst.LF).Replace (NewLineConst.CR, NewLineConst.LF).Replace (NewLineConst.LF, newLineEnd);
     }
@@ -48,7 +48,7 @@ namespace Core
     public static int NextLineEndPosition (string inputText, int startIndex)
     {
       if (inputText == null)
-        throw new ArgumentNullException ("inputText");
+        throw new ArgumentNullException (nameof(inputText));
 
       return NextLineEndPosition (inputText, startIndex, inputText.Length - startIndex);
     }
@@ -63,39 +63,10 @@ namespace Core
     public static int NextLineEndPosition (string inputText, int startIndex, int count)
     {
       if (inputText == null)
-        throw new ArgumentNullException ("inputText");
+        throw new ArgumentNullException (nameof(inputText));
 
-      var lineEndInformations = NextLineEndPositionInformation (inputText, startIndex, count);
-      if (lineEndInformations == null)
-        return -1;
-      return lineEndInformations.Index;
-    }
-
-    /// <summary>
-    ///   Return the information about the nearest line ending
-    /// </summary>
-    /// <param name="inputText"></param>
-    /// <returns>Information about the line endings</returns>
-    public static LineEndInformation NextLineEndPositionInformation (string inputText)
-    {
-      if (inputText == null)
-        throw new ArgumentNullException ("inputText");
-
-      return NextLineEndPositionInformation (inputText, 0);
-    }
-
-    /// <summary>
-    ///   Return the information about the nearest line ending
-    /// </summary>
-    /// <param name="inputText">The parsed input text</param>
-    /// <param name="startIndex">The offset to begin the search</param>
-    /// <returns>Information about the line endings</returns>
-    public static LineEndInformation NextLineEndPositionInformation (string inputText, int startIndex)
-    {
-      if (inputText == null)
-        throw new ArgumentNullException ("inputText");
-
-      return NextLineEndPositionInformation (inputText, startIndex, inputText.Length - startIndex);
+      var lineEndInformation = NextLineEndPositionInformation (inputText, startIndex, count);
+      return lineEndInformation?.Index ?? -1;
     }
 
     /// <summary>
@@ -108,13 +79,13 @@ namespace Core
     public static LineEndInformation NextLineEndPositionInformation (string inputText, int startIndex, int count)
     {
       if (inputText == null)
-        throw new ArgumentNullException ("inputText");
+        throw new ArgumentNullException (nameof(inputText));
 
       var ends = new[]
                  {
-                     new LineEndInformation (inputText.IndexOf (NewLineConst.CR, startIndex, count), NewLineConst.CR),
-                     new LineEndInformation (inputText.IndexOf (NewLineConst.LF, startIndex, count), NewLineConst.LF),
-                     new LineEndInformation (inputText.IndexOf (NewLineConst.CRLF, startIndex, count), NewLineConst.CRLF)
+                     new LineEndInformation (inputText.IndexOf (NewLineConst.CR, startIndex, count, StringComparison.Ordinal), NewLineConst.CR),
+                     new LineEndInformation (inputText.IndexOf (NewLineConst.LF, startIndex, count, StringComparison.Ordinal), NewLineConst.LF),
+                     new LineEndInformation (inputText.IndexOf (NewLineConst.CRLF, startIndex, count, StringComparison.Ordinal), NewLineConst.CRLF)
                  };
 
       var nearestLineEnd = ends.Where (lineEnd => lineEnd.Index >= 0).OrderBy (x => x.Index).ThenByDescending (x => x.LineEndLength);
@@ -129,7 +100,7 @@ namespace Core
     public static string DetectMostFrequentLineEnd (string inputText)
     {
       if (inputText == null)
-        throw new ArgumentNullException ("inputText");
+        throw new ArgumentNullException (nameof(inputText));
 
       var lineEndStatistics = _allLineEndings.Select (
           le =>

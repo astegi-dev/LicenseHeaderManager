@@ -19,16 +19,8 @@ namespace LicenseHeaderManager.UpdateViewModels
 {
   public class RelayCommand : ICommand
   {
-    #region Fields
-
     private readonly Action<object> _execute;
     private readonly Predicate<object> _canExecute;
-
-    #endregion
-
-    // Fields 
-
-    #region Constructors
 
     public RelayCommand (Action<object> execute)
         : this (execute, null)
@@ -37,21 +29,16 @@ namespace LicenseHeaderManager.UpdateViewModels
 
     public RelayCommand (Action<object> execute, Predicate<object> canExecute)
     {
-      if (execute == null) throw new ArgumentNullException ("execute");
+      if (execute == null)
+        throw new ArgumentNullException (nameof(execute));
       _execute = execute;
       _canExecute = canExecute;
     }
 
-    #endregion
-
-    // Constructors 
-
-    #region ICommand Members
-
     [DebuggerStepThrough]
     public bool CanExecute (object parameter)
     {
-      return _canExecute == null ? true : _canExecute (parameter);
+      return _canExecute?.Invoke (parameter) ?? true;
     }
 
     public event EventHandler CanExecuteChanged
@@ -64,9 +51,5 @@ namespace LicenseHeaderManager.UpdateViewModels
     {
       _execute (parameter);
     }
-
-    #endregion
-
-    // ICommand Members 
   }
 }

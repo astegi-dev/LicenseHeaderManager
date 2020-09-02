@@ -15,8 +15,19 @@ using System;
 
 namespace Core
 {
+  /// <summary>
+  ///   Encapsulates information to be passed as argument to a <see cref="IProgress{T}" /> callback, specifically for when
+  ///   the <see cref="LicenseHeaderReplacer" /> was invoked with file contents.
+  /// </summary>
   public class ReplacerProgressContentReport : ReplacerProgressReport
   {
+    /// <summary>
+    ///   Initializes a new instance of the <see cref="ReplacerProgressReport" /> class.
+    /// </summary>
+    /// <param name="totalFileCount">The overall number of files that are to be updated.</param>
+    /// <param name="processedFileCount">The number of file that have already been processed.</param>
+    /// <param name="processedFilePath">The path of the file that has just been processed.</param>
+    /// <param name="processFileNewContent">The new content of the file that has just been processed.</param>
     public ReplacerProgressContentReport (int totalFileCount, int processedFileCount, string processedFilePath, string processFileNewContent)
         : base (totalFileCount, processedFileCount)
     {
@@ -25,12 +36,12 @@ namespace Core
     }
 
     /// <summary>
-    /// Gets the path of the file that has just been processed.
+    ///   Gets the path of the file that has just been processed.
     /// </summary>
     public string ProcessedFilePath { get; }
 
     /// <summary>
-    /// Gets the new content of the file that has just been processed.
+    ///   Gets the new content of the file that has just been processed.
     /// </summary>
     public string ProcessFileNewContent { get; }
   }

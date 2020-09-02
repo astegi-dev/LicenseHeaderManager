@@ -15,16 +15,45 @@ using System;
 
 namespace Core
 {
+  /// <summary>
+  ///   Represents an expandable property similar to <see cref="DocumentHeaderProperty" /> whose value has already been
+  ///   created.
+  /// </summary>
+  /// <remarks>
+  ///   This class may be utilized in order to pass additional properties to <see cref="LicenseHeaderReplacer" />
+  ///   which cannot be expanded by the Core itself.
+  /// </remarks>
+  /// <seealso cref="DocumentHeaderProperty" />
+  /// <seealso cref="LicenseHeaderReplacer" />
   public class AdditionalProperty
   {
+    /// <summary>
+    ///   Initializes a new <see cref="AdditionalProperty" /> instance.
+    /// </summary>
+    /// <param name="token">
+    ///   The token whose occurrences in a license header definition should be replaced by
+    ///   <paramref name="value" />. E. g.: "%CustomProperty%"
+    /// </param>
+    /// <param name="value">
+    ///   The value which should be used to replace the occurrences of <paramref name="token" /> in license
+    ///   header definitions. E. g.: "Custom Value"
+    /// </param>
     public AdditionalProperty (string token, string value)
     {
       Token = token;
       Value = value;
     }
 
+    /// <summary>
+    ///   The token whose occurrences in a license header definition should be replaced by <see cref="Token" />. E. g.:
+    ///   "%CustomProperty%"
+    /// </summary>
     public string Token { get; }
 
+    /// <summary>
+    ///   The value which should be used to replace the occurrences of <see cref="Token" /> in license header definitions. E.
+    ///   g.: "Custom Value"
+    /// </summary>
     public string Value { get; }
   }
 }

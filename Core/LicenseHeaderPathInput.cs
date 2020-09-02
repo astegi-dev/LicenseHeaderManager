@@ -13,29 +13,37 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace Core
 {
+  /// <summary>
+  ///   Encapsulates the information required for the <see cref="LicenseHeaderReplacer" /> when updating license headers
+  ///   based on the paths of input files.
+  /// </summary>
+  /// <seealso cref="LicenseHeaderReplacer" />
   public class LicenseHeaderPathInput : LicenseHeaderInput
   {
+    /// <summary>
+    ///   Initializes a new <see cref="LicenseHeaderContentInput" /> instance.
+    /// </summary>
+    /// <param name="documentPath">The path of the file whose headers are to be modified.</param>
+    /// <param name="headers">
+    ///   The header definitions of the file whose headers are to be modified. Keys are language
+    ///   extensions, values represent the definition for the respective language - one line per array index. Values should be
+    ///   null if headers should only be removed.
+    /// </param>
+    /// <param name="additionalProperties">
+    ///   Additional properties that cannot be expanded by the Core whose tokens should be
+    ///   replaced by their values.
+    /// </param>
     public LicenseHeaderPathInput (
         string documentPath,
         IDictionary<string, string[]> headers,
         IEnumerable<AdditionalProperty> additionalProperties = null)
-        : base(headers, additionalProperties, documentPath)
+        : base (headers, additionalProperties, documentPath)
     {
     }
 
-    public LicenseHeaderPathInput (
-        string documentPath,
-        IDictionary<string, string[]> headers,
-        IEnumerable<AdditionalProperty> additionalProperties,
-        bool ignoreNonCommentText)
-        : base(headers, additionalProperties, ignoreNonCommentText, documentPath)
-    {
-    }
-
-    public override LicenseHeaderInputMode InputMode => LicenseHeaderInputMode.FilePath;
+    internal override LicenseHeaderInputMode InputMode => LicenseHeaderInputMode.FilePath;
   }
 }

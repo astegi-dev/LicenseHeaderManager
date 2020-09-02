@@ -16,9 +16,13 @@ using Core.Properties;
 
 namespace Core
 {
+  /// <summary>
+  ///   An <see cref="Exception" /> used to denote errors while parsing comments.
+  /// </summary>
   [Serializable]
-  public class ParseException : Exception
+  internal class ParseException : Exception
   {
+    /// <inheritdoc />
     public ParseException ()
         : base (string.Format (Resources.Error_InvalidLicenseHeader, string.Empty))
     {

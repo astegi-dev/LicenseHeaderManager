@@ -80,8 +80,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdditionalProperty.cs" />
+    <Compile Include="AssemblyInfo.cs" />
     <Compile Include="CommentParser.cs" />
-    <Compile Include="CreateDocumentResult.cs" />
     <Compile Include="Document.cs" />
     <Compile Include="DocumentHeader.cs" />
     <Compile Include="DocumentHeaderProperties.cs" />
@@ -92,7 +92,6 @@
     <Compile Include="ReplacerErrorType.cs" />
     <Compile Include="ICommentParser.cs" />
     <Compile Include="Language.cs" />
-    <Compile Include="LicenseHeader.cs" />
     <Compile Include="LicenseHeaderPathInput.cs" />
     <Compile Include="LicenseHeaderPreparer.cs" />
     <Compile Include="LicenseHeaderReplacer.cs" />
@@ -131,7 +130,6 @@
     </None>
     <None Include="app.config" />
     <None Include="Key.snk" />
-    <EmbeddedResource Include="Options\default.licenseheader" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

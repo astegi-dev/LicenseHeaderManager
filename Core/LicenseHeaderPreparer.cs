@@ -15,19 +15,30 @@ using System;
 
 namespace Core
 {
-  public static class LicenseHeaderPreparer
+  /// <summary>
+  ///   Provides utility functions that manipulate a new license header text before effectively replacing the old one by it.
+  /// </summary>
+  internal static class LicenseHeaderPreparer
   {
+    /// <summary>
+    ///   Prepares an updated license header before effectively replacing the old one based on the following rules:
+    ///   <para>
+    ///     If there's a comment right at the beginning of the file, we need to add an empty line so that the comment
+    ///     doesn't become a part of the header.
+    ///   </para>
+    ///   <para>If there already exists an empty line we don't have to add another one.</para>
+    /// </summary>
+    /// <param name="headerText">The new header text.</param>
+    /// <param name="currentHeaderText">The old, already existing, header text.</param>
+    /// <param name="commentParser">An <see cref="ICommentParser" /> instance required for enforcing the described rules.</param>
+    /// <returns></returns>
     public static string Prepare (string headerText, string currentHeaderText, ICommentParser commentParser)
     {
       var lineEndingInDocument = NewLineManager.DetectMostFrequentLineEnd (headerText);
-
       var headerWithNewLine = NewLineManager.ReplaceAllLineEnds (headerText, lineEndingInDocument);
 
-      //If there's a comment right at the beginning of the file, we need to add an empty line so that the comment doesn't
-      //become a part of the header. If there already exists an empty line we dont have to add another one
-      if (!CurrentFileStartsWithNewLine (currentHeaderText, lineEndingInDocument) &&
-          !HeaderEndsWithNewline (headerWithNewLine, lineEndingInDocument) &&
-          CurrentFileContainsCommentOnTop (currentHeaderText, commentParser))
+      if (!CurrentFileStartsWithNewLine (currentHeaderText, lineEndingInDocument) && !HeaderEndsWithNewline (headerWithNewLine, lineEndingInDocument)
+                                                                                  && CurrentFileContainsCommentOnTop (currentHeaderText, commentParser))
         return headerWithNewLine + lineEndingInDocument;
 
       return headerWithNewLine;

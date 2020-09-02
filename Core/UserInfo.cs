@@ -13,7 +13,6 @@
 
 using System;
 using System.DirectoryServices.AccountManagement;
-using System.IO;
 using Core.Properties;
 
 namespace Core
@@ -22,14 +21,15 @@ namespace Core
   ///   Represents general information about the current user, e.g. login or display name.
   ///   Information about the current user is retrieved in static constructor.
   /// </summary>
-  public static class UserInfo
+  internal static class UserInfo
   {
-    #region Properties
+    private static readonly object s_nameLock = new object();
+    private static readonly object s_displayNameLock = new object();
+    private static string s_name;
 
-    private static readonly object NameLock = new object();
-    private static readonly object DisplayNameLock = new object();
-
-    private static string _name;
+    private static string _displayName = "";
+    private static DateTime _lastPropertyCall = DateTime.MinValue;
+    private static bool _lookupSuccessful;
 
     /// <summary>
     ///   Gets name (login) of the current user.
@@ -38,18 +38,14 @@ namespace Core
     {
       get
       {
-        lock (NameLock)
+        lock (s_nameLock)
         {
-          if (string.IsNullOrEmpty (_name))
-            _name = Environment.UserName;
-          return _name;
+          if (string.IsNullOrEmpty (s_name))
+            s_name = Environment.UserName;
+          return s_name;
         }
       }
     }
-
-    private static string _displayName = "";
-    private static DateTime _lastPropertyCall = DateTime.MinValue;
-    private static bool _lookupSuccessful;
 
     /// <summary>
     ///   Gets display name of the current user, e.g. "John Smith".
@@ -58,7 +54,7 @@ namespace Core
     {
       get
       {
-        lock (DisplayNameLock)
+        lock (s_displayNameLock)
         {
           if (!_lookupSuccessful && LastLookupAttemptTooOld())
             TryLookupNow();
@@ -82,19 +78,11 @@ namespace Core
         _displayName = UserPrincipal.Current.DisplayName;
         _lookupSuccessful = true;
       }
-      catch (Exception e)
+      catch (Exception)
       {
-        var OutputMessage = string.Format (Resources.UserInfo_LookupFailure_Information, e).ReplaceNewLines();
-
-        if (e is FileNotFoundException)
-          OutputMessage = string.Format (Resources.UserInfo_LookupFailure_FileNotFoundException_Information).ReplaceNewLines();
-
-        // OutputWindowHandler.WriteMessage(OutputMessage);
         _displayName = Resources.UserInfo_UnknownDisplayNameString;
         _lookupSuccessful = false;
       }
     }
-
-    #endregion
   }
 }

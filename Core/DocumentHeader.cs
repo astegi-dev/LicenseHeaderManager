@@ -18,25 +18,40 @@ using System.Text.RegularExpressions;
 
 namespace Core
 {
+  /// <summary>
+  ///   Represents the license header of a <see cref="Document" />.
+  /// </summary>
+  /// <seealso cref="Document" />
   internal class DocumentHeader
   {
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 
     public DocumentHeader (string documentFilePath, string text, IEnumerable<DocumentHeaderProperty> properties)
     {
-      if (documentFilePath == null) throw new ArgumentNullException ("document");
-      if (properties == null) throw new ArgumentNullException ("properties");
+      if (documentFilePath == null) throw new ArgumentNullException (nameof(documentFilePath));
+      if (properties == null) throw new ArgumentNullException (nameof(properties));
 
       _properties = properties;
 
       FileInfo = CreateFileInfo (documentFilePath);
-      Text = CreateText (text);
+      Text = ExpandProperties (text);
     }
 
+    /// <summary>
+    ///   Gets a value denoting the header represented by this <see cref="DocumentHeader" /> is non-existing, i. e. if the
+    ///   <see cref="Text" /> property is null.
+    /// </summary>
     public bool IsEmpty => Text == null;
 
+    /// <summary>
+    ///   Gets the <see cref="FileInfo" /> object associated with the file this <see cref="DocumentHeader" /> refers to.
+    /// </summary>
     public FileInfo FileInfo { get; }
 
+    /// <summary>
+    ///   Gets the effective text denoting the license header text represented by this <see cref="DocumentHeader" /> instance,
+    ///   with expandable properties having been replaced.
+    /// </summary>
     public string Text { get; }
 
     private FileInfo CreateFileInfo (string pathToDocument)
@@ -44,7 +59,16 @@ namespace Core
       return File.Exists (pathToDocument) ? new FileInfo (pathToDocument) : null;
     }
 
-    private string CreateText (string inputText)
+    /// <summary>
+    ///   Replaces the name of expandable properties by their respective values, if they can be created.
+    /// </summary>
+    /// <param name="inputText">The text for which the occurring expandable property tokens should be replaced.</param>
+    /// <returns>
+    ///   Returns a string that is equivalent to <paramref name="inputText" /> with all expandable properties having
+    ///   been replaced for which the <see cref="DocumentHeaderProperty.CanCreateValue" /> method evaluated to
+    ///   <see langword="true" />.
+    /// </returns>
+    private string ExpandProperties (string inputText)
     {
       if (inputText == null)
         return null;

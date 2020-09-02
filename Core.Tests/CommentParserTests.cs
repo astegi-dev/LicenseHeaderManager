@@ -28,15 +28,15 @@ namespace LicenseHeaderManager.Test
       if (header.Length > 0 && text.Length > 0)
         headerString += Environment.NewLine;
 
-      var parser = new CommentParser ("//", "/*", "*/", "#region", "#endregion");
-      Assert.AreEqual (headerString, parser.Parse (headerString + textString));
+      var parser = new CommentParser("//", "/*", "*/", "#region", "#endregion");
+      Assert.AreEqual(headerString, parser.Parse(headerString + textString));
     }
 
     private void TestError (string[] text)
     {
       var textString = string.Join (Environment.NewLine, text);
-      var parser = new CommentParser ("//", "/*", "*/", "#region", "#endregion");
-      Assert.Throws<ParseException> (() => parser.Parse (textString));
+      var parser = new CommentParser("//", "/*", "*/", "#region", "#endregion");
+      Assert.Throws<ParseException>(() => parser.Parse(textString));
     }
 
     [Test]
@@ -98,8 +98,8 @@ namespace LicenseHeaderManager.Test
 
       headerString += Environment.NewLine;
 
-      var parser = new CommentParser ("//", "/*", "*/", "#Region", "#End Region");
-      Assert.AreEqual (headerString, parser.Parse (headerString));
+      var parser = new CommentParser("//", "/*", "*/", "#Region", "#End Region");
+      Assert.AreEqual(headerString, parser.Parse(headerString));
     }
 
     [Test]

@@ -24,7 +24,7 @@ namespace LicenseHeaderManager.Options.Converters
     private const string c_linkedCommands = "LinkedCommands";
     private const string c_command = "Command";
     private const string c_guid = "Languages";
-    private const string c_id = "Extension";
+    private const string c_id = "HeaderDefinitionExtension";
     private const string c_name = "Name";
     private const string c_executionTime = "ExecutionTime";
 

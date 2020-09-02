@@ -19,10 +19,19 @@ using System.Linq;
 
 namespace Core
 {
+  /// <summary>
+  ///   Encapsulates multiple <see cref="DocumentHeaderProperty" /> objects in an enumerable data structure.
+  /// </summary>
   internal class DocumentHeaderProperties : IEnumerable<DocumentHeaderProperty>
   {
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 
+    /// <summary>
+    ///   Initializes this <see cref="DocumentHeaderProperties" /> instance with a given range of
+    ///   <see cref="AdditionalProperty" /> objects. Other properties that can be expanded by the Core itself, are created in
+    ///   the process as well.
+    /// </summary>
+    /// <param name="additionalProperties">The additional properties to be used for initialization.</param>
     public DocumentHeaderProperties (IEnumerable<AdditionalProperty> additionalProperties = null)
     {
       _properties = CreateProperties (additionalProperties);
@@ -38,6 +47,19 @@ namespace Core
       return GetEnumerator();
     }
 
+    /// <summary>
+    ///   Creates all properties that are used while inserting/replacing/removing license headers via a
+    ///   <see cref="LicenseHeaderReplacer" /> instance. This also entails predefined properties that can be expanded by the
+    ///   Core itself.
+    /// </summary>
+    /// <param name="additionalProperties">
+    ///   The additional properties to be used when updating license headers that cannot be
+    ///   replaced by the Core itself.
+    /// </param>
+    /// <returns>
+    ///   Returns a <see cref="IEnumerable{T}" /> whose generic type argument is <see cref="DocumentHeaderProperty" />
+    ///   that may used to provide an enumerator for this <see cref="DocumentHeaderProperties" /> instance.
+    /// </returns>
     private IEnumerable<DocumentHeaderProperty> CreateProperties (IEnumerable<AdditionalProperty> additionalProperties)
     {
       var properties = new List<DocumentHeaderProperty>
@@ -93,14 +115,12 @@ namespace Core
                        };
 
       if (additionalProperties != null)
-      {
         properties.AddRange (
             additionalProperties.Select (
                 property => new DocumentHeaderProperty (
                     property.Token,
                     documentHeader => true,
                     documentHeader => property.Value)));
-      }
 
       return properties;
     }
@@ -111,12 +131,8 @@ namespace Core
       {
         return PathUtility.GetProperFilePathCapitalization (fileInfo);
       }
-      catch (Exception e)
+      catch (Exception)
       {
-        /*OutputWindowHandler.WriteMessage ("Could not get proper file path capitalization.");
-        OutputWindowHandler.WriteMessage ("Falling back to path as we receive it from 'FileInfo'.");
-        OutputWindowHandler.WriteMessage (e.ToString());*/
-
         //Use the FilePath in the same capitalization as we got it
         return fileInfo.FullName;
       }
@@ -128,12 +144,8 @@ namespace Core
       {
         return Path.GetFileName (PathUtility.GetProperFilePathCapitalization (fileInfo));
       }
-      catch (Exception e)
+      catch (Exception)
       {
-        /*OutputWindowHandler.WriteMessage ("Could not get proper file name capitalization.");
-        OutputWindowHandler.WriteMessage ("Falling back to name as we receive it from 'FileInfo'.");
-        OutputWindowHandler.WriteMessage (e.ToString());*/
-
         //Use the FileName in the same capitalization as we got it
         return fileInfo.Name;
       }

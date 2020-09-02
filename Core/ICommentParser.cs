@@ -15,8 +15,18 @@ using System;
 
 namespace Core
 {
-  public interface ICommentParser
+  internal interface ICommentParser
   {
+    /// <summary>
+    ///   Parses a given text according to a language-specific comment syntax. Given a text, it extracts the comments.
+    /// </summary>
+    /// <param name="text">The text to be parsed.</param>
+    /// <returns>Returns the comments contained in <paramref name="text" />, according to the language-specific comment syntax.</returns>
+    /// <exception cref="ParseException">Thrown if parsing comments fails due to invalid syntax.</exception>
+    /// <remarks>
+    ///   The language-specific comment syntax may be configured using the constructor of an
+    ///   <see cref="ICommentParser" /> implementation.
+    /// </remarks>
     string Parse (string text);
   }
 }

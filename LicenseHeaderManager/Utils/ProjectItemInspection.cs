@@ -13,6 +13,7 @@
 
 using System;
 using System.Linq;
+using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 
@@ -22,13 +23,12 @@ namespace LicenseHeaderManager.Utils
   {
     public static bool IsPhysicalFile (ProjectItem projectItem)
     {
-      return projectItem.Kind == Constants.vsProjectItemKindPhysicalFile ||
-             projectItem.Kind == "{" + Guids.guidItemTypePhysicalFile + "}";
+      return projectItem.Kind == Constants.vsProjectItemKindPhysicalFile || projectItem.Kind == "{" + Guids.guidItemTypePhysicalFile + "}";
     }
 
     public static bool IsLicenseHeader (ProjectItem projectItem)
     {
-      return projectItem.Name.Contains (LicenseHeader.Extension);
+      return projectItem.Name.Contains (LicenseHeaderReplacer.HeaderDefinitionExtension);
     }
 
     public static bool IsLink (ProjectItem projectItem)

@@ -15,6 +15,9 @@ using System;
 
 namespace Core
 {
+  /// <summary>
+  ///   Encapsulates information to be passed as argument to a <see cref="IProgress{T}" /> callback.
+  /// </summary>
   public class ReplacerProgressReport
   {
     /// <summary>
@@ -30,17 +33,13 @@ namespace Core
 
     /// <summary>
     ///   Gets the overall number of files that are to be updated over the course of one invocation of the
-    ///   <see
-    ///     cref="LicenseHeaderReplacer.RemoveOrReplaceHeader(System.Collections.Generic.ICollection{LicenseHeaderPathInput}, IProgress{ReplacerProgressReport}, Func{string, bool})" />
-    ///   method.
+    ///   <see cref="LicenseHeaderReplacer" />.
     /// </summary>
     public int TotalFileCount { get; }
 
     /// <summary>
     ///   Gets the number of file that have already been processed over the course of one invocation of the
-    ///   <see
-    ///     cref="LicenseHeaderReplacer.RemoveOrReplaceHeader(System.Collections.Generic.ICollection{LicenseHeaderPathInput}, IProgress{ReplacerProgressReport}, Func{string, bool})" />
-    ///   method.
+    ///   <see cref="LicenseHeaderReplacer" />.
     /// </summary>
     public int ProcessedFileCount { get; }
   }

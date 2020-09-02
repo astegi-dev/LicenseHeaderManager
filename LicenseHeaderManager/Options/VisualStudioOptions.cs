@@ -13,7 +13,6 @@
 
 using Core.Options;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -21,13 +20,16 @@ using System.Threading.Tasks;
 
 namespace LicenseHeaderManager.Options
 {
+  /// <summary>
+  /// Encapsulates members that represent the configuration affecting the behaviour of the License Header Manager Visual Studio HeaderDefinitionExtension.
+  /// </summary>
   [LicenseHeaderManagerOptions]
   internal class VisualStudioOptions
   {
     public const bool c_defaultInsertInNewFiles = false;
 
     public static readonly ObservableCollection<LinkedCommand> s_defaultLinkedCommands = new ObservableCollection<LinkedCommand>();
-    public ObservableCollection<LinkedCommand> _linkedCommands;
+    private ObservableCollection<LinkedCommand> _linkedCommands;
 
     public VisualStudioOptions ()
     {
@@ -42,8 +44,20 @@ namespace LicenseHeaderManager.Options
         InitializeValues();
     }
 
+    /// <summary>
+    ///   Gets or sets whether license headers are automatically inserted into new files.
+    /// </summary>
     public virtual bool InsertInNewFiles { get; set; }
 
+    /// <summary>
+    /// Gets or sets the version of the License Header Manager Visual Studio HeaderDefinitionExtension.
+    /// </summary>
+    public virtual string Version { get; set; }
+
+    /// <summary>
+    ///   Gets or sets commands provided by Visual Studio before or after which the "Add License Header" command should be
+    ///   automatically executed.
+    /// </summary>
     public virtual ObservableCollection<LinkedCommand> LinkedCommands
     {
       get => _linkedCommands;
@@ -64,6 +78,10 @@ namespace LicenseHeaderManager.Options
       }
     }
 
+    /// <summary>
+    ///   Creates a deep copy of the current <see cref="VisualStudioOptions"/> instance.
+    /// </summary>
+    /// <returns>A deep copy of the this <see cref="VisualStudioOptions"/> instance.</returns>
     public virtual VisualStudioOptions Clone ()
     {
       var clonedObject = new VisualStudioOptions
@@ -74,6 +92,9 @@ namespace LicenseHeaderManager.Options
       return clonedObject;
     }
 
+    /// <summary>
+    /// Is triggered when the contents of the collection held by <see cref="LinkedCommands"/> has changed.
+    /// </summary>
     public virtual event EventHandler<NotifyCollectionChangedEventArgs> LinkedCommandsChanged;
 
     /// <summary>

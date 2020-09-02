@@ -56,9 +56,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       if (project == null && projectItem == null)
         return new AddLicenseHeaderToAllFilesResult (countSubLicenseHeadersFound, true, linkedItems);
 
-      _licenseHeaderExtension.LicenseHeaderReplacer.ResetExtensionsWithInvalidHeaders();
       ProjectItems projectItems;
-
       var fileOpenedStatus = new Dictionary<string, bool>();
       if (project != null)
       {

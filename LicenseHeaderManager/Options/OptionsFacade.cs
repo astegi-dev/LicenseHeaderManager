@@ -12,6 +12,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -21,18 +22,28 @@ using Core.Options;
 
 namespace LicenseHeaderManager.Options
 {
+  /// <summary>
+  /// Provides a facade around an <see cref="CoreOptions"/> and a <see cref="VisualStudioOptions"/> instance for unified access.
+  /// </summary>
+  /// <seealso cref="CoreOptions"/>
+  /// <seealso cref="VisualStudioOptions"/>
   public class OptionsFacade
   {
     private readonly CoreOptions _coreOptions;
 
     private readonly VisualStudioOptions _visualStudioOptions;
 
-    public static readonly string DefaultCoreOptionsPath = Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\CoreOptions.json");
-    public static readonly string DefaultVisualStudioOptionsPath = Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\VisualStudioOptions.json");
-    public static readonly string DefaultLogPath = Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\logs_lhm");
+    public static readonly string DefaultCoreOptionsPath =
+        Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\CoreOptions.json");
+
+    public static readonly string DefaultVisualStudioOptionsPath =
+        Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\VisualStudioOptions.json");
+
+    public static readonly string DefaultLogPath =
+        Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\logs_lhm");
 
     /// <summary>
-    ///   Gets or sets the currently up-to-date configuration of the License Header Manager Extension, along
+    ///   Gets or sets the currently up-to-date configuration of the License Header Manager HeaderDefinitionExtension, along
     ///   with the corresponding options for the Core.
     /// </summary>
     public static OptionsFacade CurrentOptions { get; set; }
@@ -42,7 +53,7 @@ namespace LicenseHeaderManager.Options
       CurrentOptions = new OptionsFacade();
     }
 
-    public OptionsFacade ()
+    private OptionsFacade ()
     {
       _coreOptions = new CoreOptions();
       _visualStudioOptions = new VisualStudioOptions();
@@ -56,46 +67,73 @@ namespace LicenseHeaderManager.Options
       _visualStudioOptions.LinkedCommandsChanged += InvokeLinkedCommandsChanged;
     }
 
+    /// <summary>
+    ///   Gets or sets whether license header comments should be removed only if they contain at least one of the keywords
+    ///   specified by <see cref="RequiredKeywords" />.
+    /// </summary>
     public virtual bool UseRequiredKeywords
     {
       get => _coreOptions.UseRequiredKeywords;
       set => _coreOptions.UseRequiredKeywords = value;
     }
 
+    /// <summary>
+    ///   If <see cref="UseRequiredKeywords" /> is <see langword="true" />, only license header comments that contain at
+    ///   least one of the words specified by this property (separated by "," and possibly whitespaces) are removed.
+    /// </summary>
     public virtual string RequiredKeywords
     {
       get => _coreOptions.RequiredKeywords;
       set => _coreOptions.RequiredKeywords = value;
     }
 
+    /// <summary>
+    ///   Gets or sets the text for new license header definition files.
+    /// </summary>
     public virtual string LicenseHeaderFileText
     {
       get => _coreOptions.LicenseHeaderFileText;
       set => _coreOptions.LicenseHeaderFileText = value;
     }
 
+    /// <summary>
+    ///   Gets or sets a list of <see cref="Core.Language" /> objects that represents the
+    ///   languages for which the <see cref="Core.LicenseHeaderReplacer" /> is configured to use.
+    /// </summary>
     public virtual ObservableCollection<Language> Languages
     {
       get => _coreOptions.Languages;
       set => _coreOptions.Languages = value;
     }
 
+    /// <summary>
+    ///   Gets or sets whether license headers are automatically inserted into new files.
+    /// </summary>
     public virtual bool InsertInNewFiles
     {
       get => _visualStudioOptions.InsertInNewFiles;
       set => _visualStudioOptions.InsertInNewFiles = value;
     }
 
+    /// <summary>
+    ///   Gets or sets commands provided by Visual Studio before or after which the "Add License Header" command should be
+    ///   automatically executed.
+    /// </summary>
+    /// <remarks>Note that upon setter invocation, a copy of the supplied <see cref="ICollection{T}"/> is created. Hence, future updates to this
+    /// initial collection are not reflected in this property.</remarks>
     public virtual ObservableCollection<LinkedCommand> LinkedCommands
     {
       get => _visualStudioOptions.LinkedCommands;
       set => _visualStudioOptions.LinkedCommands = _visualStudioOptions.LinkedCommands != null ? new ObservableCollection<LinkedCommand> (value) : null;
     }
 
+    /// <summary>
+    /// Gets or sets the version of the License Header Manager Visual Studio HeaderDefinitionExtension.
+    /// </summary>
     public virtual string Version
     {
-      get => _coreOptions.Version;
-      set => _coreOptions.Version = value;
+      get => _visualStudioOptions.Version;
+      set => _visualStudioOptions.Version = value;
     }
 
     /// <summary>
@@ -147,8 +185,15 @@ namespace LicenseHeaderManager.Options
       return new OptionsFacade (coreOptions, visualStudioOptions);
     }
 
+    /// <summary>
+    /// Is triggered when the contents of the collection held by <see cref="LinkedCommands"/> has changed.
+    /// </summary>
     public virtual event EventHandler<NotifyCollectionChangedEventArgs> LinkedCommandsChanged;
 
+    /// <summary>
+    ///   Creates a deep copy of the current <see cref="OptionsFacade"/> instance.
+    /// </summary>
+    /// <returns>A deep copy of the this <see cref="OptionsFacade"/> instance.</returns>
     public virtual OptionsFacade Clone ()
     {
       var clonedObject = new OptionsFacade
@@ -156,7 +201,7 @@ namespace LicenseHeaderManager.Options
                              UseRequiredKeywords = UseRequiredKeywords,
                              RequiredKeywords = RequiredKeywords,
                              LicenseHeaderFileText = LicenseHeaderFileText,
-                             Languages = new ObservableCollection<Language>(Languages.Select (x => x.Clone())),
+                             Languages = new ObservableCollection<Language> (Languages.Select (x => x.Clone())),
                              InsertInNewFiles = InsertInNewFiles,
                              LinkedCommands = new ObservableCollection<LinkedCommand> (LinkedCommands.Select (x => x.Clone()))
                          };

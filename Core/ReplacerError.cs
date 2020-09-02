@@ -15,8 +15,20 @@ using System;
 
 namespace Core
 {
-  public class ReplacerError<TInput> where TInput : LicenseHeaderInput
+  /// <summary>
+  ///   Represents an error that occurred during updating license headers, along with the input that provoked it.
+  /// </summary>
+  /// <seealso cref="LicenseHeaderReplacer" />
+  /// <typeparam name="TInput">Type of input the <see cref="LicenseHeaderReplacer" />was invoked with.</typeparam>
+  public class ReplacerError<TInput>
+      where TInput : LicenseHeaderInput
   {
+    /// <summary>
+    ///   Initializes a new <see cref="ReplacerError{TInput}" /> instance.
+    /// </summary>
+    /// <param name="input">The input the <see cref="LicenseHeaderReplacer" />was invoked with.</param>
+    /// <param name="type">The type of error that occurred.</param>
+    /// <param name="description">A description of the error that occurred.</param>
     public ReplacerError (TInput input, ReplacerErrorType type, string description)
     {
       Input = input;
@@ -24,12 +36,18 @@ namespace Core
       Description = description;
     }
 
+    /// <summary>
+    ///   The type of error that occurred.
+    /// </summary>
     public ReplacerErrorType Type { get; }
 
+    /// <summary>
+    ///   A description of the error that occurred.
+    /// </summary>
     public string Description { get; }
 
     /// <summary>
-    /// Gets the <see cref="LicenseHeaderPathInput"/> instance the <see cref="LicenseHeaderReplacer"/> was invoked with.
+    ///   Gets the <see cref="TInput" /> instance the <see cref="LicenseHeaderReplacer" /> was invoked with.
     /// </summary>
     public TInput Input { get; }
   }

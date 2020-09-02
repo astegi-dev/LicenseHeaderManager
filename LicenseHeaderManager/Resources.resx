@@ -244,7 +244,7 @@
     <value>The selected license header definition file already exists in this project. It is not possible to add a link to an item that already exists in the project.</value>
   </data>
   <data name="Warning_InvalidLicenseHeader" xml:space="preserve">
-    <value>Extension: {0}\n\nThe header definition for {0} files contains non-comment text.\nIf you insert this header, you will not be able to remove or replace the header automatically!\n\nDo you really want to add this header to the file?</value>
+    <value>HeaderDefinitionExtension: {0}\n\nThe header definition for {0} files contains non-comment text.\nIf you insert this header, you will not be able to remove or replace the header automatically!\n\nDo you really want to add this header to the file?</value>
   </data>
   <data name="WpfDefaultLicenseHeaderDialogTitle" xml:space="preserve">
     <value>Edit default header definition</value>
