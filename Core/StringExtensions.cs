@@ -18,6 +18,25 @@ namespace Core
   internal static class StringExtensions
   {
     /// <summary>
+    ///   Given a string representing a file extensions, inserts a dot at the beginning, if it does not already start with a
+    ///   period ".".
+    /// </summary>
+    /// <param name="extension">The string representing a file extension.</param>
+    /// <returns>
+    ///   Returns a <see cref="string" /> that starts with a period "." in any case. If <paramref name="extension" />
+    ///   already had a period as its first character, it is returned without any changes. However, if its first character is
+    ///   anything other than a period ".", a new <see cref="string" /> based on <paramref name="extension" /> with a period at
+    ///   the first position (index 0) is returned.
+    /// </returns>
+    internal static string InsertDotIfNecessary (this string extension)
+    {
+      if (extension.StartsWith ("."))
+        return extension;
+
+      return "." + extension;
+    }
+
+    /// <summary>
     ///   Replaces occurrences of "\n" in a string by new line characters.
     /// </summary>
     /// <returns>A <see cref="string" /> where all occurrences of "\n" have been replaced by new line characters</returns>

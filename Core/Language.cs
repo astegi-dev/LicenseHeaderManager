@@ -108,15 +108,7 @@ namespace Core
     /// </summary>
     public void NormalizeExtensions ()
     {
-      Extensions = Extensions.Where (e => !string.IsNullOrWhiteSpace (e)).Select (e => AddDot (e).ToLower());
-    }
-
-    private static string AddDot (string extension)
-    {
-      if (extension.StartsWith ("."))
-        return extension;
-
-      return "." + extension;
+      Extensions = Extensions.Where (e => !string.IsNullOrWhiteSpace (e)).Select (e => e.InsertDotIfNecessary().ToLower());
     }
   }
 }

@@ -28,6 +28,8 @@ namespace LicenseHeaderManager.Interfaces
     /// </summary>
     LicenseHeaderReplacer LicenseHeaderReplacer { get; }
 
+    ILicenseHeaderExtractor LicenseHeaderExtractor { get; }
+
     /// <summary>
     /// Gets the <see cref="IDefaultLicenseHeaderPageModel"/> instance representing the current options regarding the default text for license header definition files.
     /// </summary>

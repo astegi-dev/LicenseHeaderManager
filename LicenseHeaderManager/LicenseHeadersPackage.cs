@@ -58,12 +58,9 @@ namespace LicenseHeaderManager
   /// </summary>
   // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
   // a package.
-  [PackageRegistration (UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-  // This attribute is used to register the information needed to show the this package
-  // in the Help/About dialog of Visual Studio.
-  [InstalledProductRegistration ("#110", "#112", Version, IconResourceID = 400)]
-  // This attribute is needed to let the shell know that this package exposes some menus.
-  [ProvideMenuResource ("Menus.ctmenu", 1)]
+  [PackageRegistration (UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)] // register the information needed to show the this package
+  [InstalledProductRegistration ("#110", "#112", Version, IconResourceID = 400)] // Help/About dialog of Visual Studio.
+  [ProvideMenuResource ("Menus.ctmenu", 1)] // let the shell know that this package exposes some menus.
   [ProvideOptionPage (typeof (OptionsPage), c_licenseHeaders, c_general, 0, 0, true)]
   [ProvideOptionPage (typeof (DefaultLicenseHeaderPage), c_licenseHeaders, c_defaultLicenseHeader, 0, 0, true)]
   [ProvideOptionPage (typeof (LanguagesPage), c_licenseHeaders, c_languages, 0, 0, true)]
@@ -72,7 +69,6 @@ namespace LicenseHeaderManager
   [ProvideProfile (typeof (LanguagesPage), c_licenseHeaders, c_languages, 0, 0, true)]
   [ProvideAutoLoad (VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
   [Guid (c_guidLicenseHeadersPkgString)]
-  [ProvideMenuResource ("Menus.ctmenu", 1)]
   public sealed class LicenseHeadersPackage : AsyncPackage, ILicenseHeaderExtension
   {
     /// <summary>
@@ -127,6 +123,8 @@ namespace LicenseHeaderManager
       }
     }
 
+    public ILicenseHeaderExtractor LicenseHeaderExtractor { get; private set; }
+
     public void ShowLanguagesPage ()
     {
       ShowOptionPage (typeof (LanguagesPage));
@@ -159,6 +157,8 @@ namespace LicenseHeaderManager
     /// </summary>
     protected override async Task InitializeAsync (CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
     {
+      LicenseHeaderExtractor = new LicenseHeaderExtractor();
+
       await base.InitializeAsync (cancellationToken, progress);
       await JoinableTaskFactory.SwitchToMainThreadAsync (cancellationToken);
 

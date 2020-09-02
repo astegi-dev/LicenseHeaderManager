@@ -86,6 +86,8 @@
     <Compile Include="DocumentHeader.cs" />
     <Compile Include="DocumentHeaderProperties.cs" />
     <Compile Include="DocumentHeaderProperty.cs" />
+    <Compile Include="ILicenseHeaderExtractor.cs" />
+    <Compile Include="LicenseHeaderExtractor.cs" />
     <Compile Include="LicenseHeaderInput.cs" />
     <Compile Include="LicenseHeaderContentInput.cs" />
     <Compile Include="LicenseHeaderInputMode.cs" />

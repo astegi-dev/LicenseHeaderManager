@@ -23,7 +23,7 @@ namespace LicenseHeaderManager.Options.Model
     public ObservableCollection<Language> Languages { get; set; }
     public void Reset ()
     {
-      Languages = CoreOptions._defaultLanguages;
+      Languages = CoreOptions.DefaultLanguages;
     }
   }
 }
