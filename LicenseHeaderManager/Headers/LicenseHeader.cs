@@ -26,16 +26,13 @@ namespace LicenseHeaderManager.Headers
     /// <summary>
     /// Gets the name for the new License Header Definition File.
     /// </summary>
-    /// <param name="project"></param>
-    /// <returns></returns>
+    /// <param name="project">The project where the License Header Definition File is located.</param>
+    /// <returns>The file name of the License Header Definition File.</returns>
     private static string GetNewFullName(Project project)
     {
       //This is just to check if activeProject.FullName contains the FullName as expected. 
       //If an Project Type uses this Property incorrectly, we try generating the .licenseheader filename with the .FileName Property
-      if (string.IsNullOrEmpty(Path.GetDirectoryName(project.FullName)))
-        return GetNewFullName(project.FileName);
-
-      return GetNewFullName(project.FullName);
+      return GetNewFullName(string.IsNullOrEmpty(Path.GetDirectoryName(project.FullName)) ? project.FileName : project.FullName);
     }
 
     /// <summary>

@@ -27,7 +27,7 @@ namespace LicenseHeaderManager.Options
   /// </summary>
   /// <seealso cref="CoreOptions"/>
   /// <seealso cref="VisualStudioOptions"/>
-  public sealed class OptionsFacade
+  public class OptionsFacade
   {
     private readonly CoreOptions _coreOptions;
     private readonly VisualStudioOptions _visualStudioOptions;
