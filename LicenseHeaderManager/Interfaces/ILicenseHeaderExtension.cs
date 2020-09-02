@@ -11,28 +11,81 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
 using Core;
+using EnvDTE;
 using EnvDTE80;
-using LicenseHeaderManager.Options;
 using LicenseHeaderManager.Options.Model;
 
 namespace LicenseHeaderManager.Interfaces
 {
+  /// <summary>
+  /// Provides members contained within the package representing the LHM Visual Studio extension that might need to be accessed from other classes. 
+  /// </summary>
   public interface ILicenseHeaderExtension
   {
+    /// <summary>
+    /// Gets a <see cref="Core.LicenseHeaderReplacer"/> instance used by the package to update license headers.
+    /// </summary>
     LicenseHeaderReplacer LicenseHeaderReplacer { get; }
 
+    /// <summary>
+    /// Gets the <see cref="IDefaultLicenseHeaderPageModel"/> instance representing the current options regarding the default text for license header definition files.
+    /// </summary>
     IDefaultLicenseHeaderPageModel DefaultLicenseHeaderPageModel { get; }
 
+    /// <summary>
+    /// Gets the <see cref="ILanguagesPageModel"/> instance representing the current options regarding languages, their extensions and comment syntax.
+    /// </summary>
     ILanguagesPageModel LanguagesPageModel { get; }
 
+    /// <summary>
+    /// Gets the <see cref="IGeneralOptionsPageModel"/> instance representing the current options regarding general configuration properties.
+    /// </summary>
     IGeneralOptionsPageModel GeneralOptionsPageModel { get; }
 
+    /// <summary>
+    /// Determines whether there exists a solution-wide license header definition file.
+    /// </summary>
+    /// <returns>Returns <see langword="true"/> if a solution-wide license header definition file exists, otherwise <see langword="false"/>.</returns>
+    bool SolutionHeaderDefinitionExists ();
+
+    /// <summary>
+    /// Determines whether a Core invocation was implicitly triggered by the execution of a linked command .
+    /// </summary>
     bool IsCalledByLinkedCommand { get; }
 
+    /// <summary>
+    /// Gets the <see cref="EnvDTE80.DTE2"/> object that was acquired when initializing the VS package.
+    /// </summary>
     DTE2 Dte2 { get; }
 
+    /// <summary>
+    /// Opens the options page that is responsible for configuring languages.
+    /// </summary>
     void ShowLanguagesPage ();
+
+    /// <summary>
+    /// Opens the options page that is responsible for configuring general options.
+    /// </summary>
+    void ShowOptionsPage ();
+
+    /// <summary>
+    /// Determines the <see cref="ProjectItem"/> that is currently active ("opened and selected") in the document well.
+    /// </summary>
+    /// <returns>The <see cref="ProjectItem"/> instance representing the file that is currently active ("opened and selected") in the document well.</returns>
+    public ProjectItem GetActiveProjectItem ();
+
+    /// <summary>
+    /// Determines the <see cref="ProjectItem"/> currently selected in the solution explorer.
+    /// </summary>
+    /// <returns>The <see cref="ProjectItem"/> instance representing the file that is currently selected in the solution explorer.</returns>
+    public object GetSolutionExplorerItem ();
+
+    /// <summary>
+    /// Determines whether the License Header Manager Context Menu should be visible for a given <see cref="ProjectItem"/>.
+    /// </summary>
+    /// <param name="item">The <see cref="ProjectItem"/> that was right-clicked on.</param>
+    /// <returns>Returns <see langword="true"/> if the LHM Context Menu should be visible, otherwise <see langword="false"/>.</returns>
+    public bool ShouldBeVisible (ProjectItem item);
   }
 }

@@ -29,7 +29,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 {
   internal static class FolderProjectMenuHelper
   {
-    public static void AddExistingLicenseHeaderDefinitionFile (LicenseHeadersPackage serviceProvider)
+    public static void AddExistingLicenseHeaderDefinitionFile (ILicenseHeaderExtension serviceProvider)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -55,7 +55,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     public static async Task AddLicenseHeaderToAllFilesAsync (
         CancellationToken cancellationToken,
-        LicenseHeadersPackage serviceProvider,
+        ILicenseHeaderExtension serviceProvider,
         BaseUpdateViewModel folderProjectUpdateViewModel)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -76,7 +76,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           folderProjectUpdateViewModel);
     }
 
-    public static void AddNewLicenseHeaderDefinitionFile (LicenseHeadersPackage serviceProvider)
+    public static void AddNewLicenseHeaderDefinitionFile (ILicenseHeaderExtension serviceProvider)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
@@ -96,7 +96,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     private static async Task HandleAddLicenseHeaderToAllFilesInProjectResultAsync (
         CancellationToken cancellationToken,
-        LicenseHeadersPackage serviceProvider,
+        ILicenseHeaderExtension serviceProvider,
         object obj,
         AddLicenseHeaderToAllFilesResult addResult,
         BaseUpdateViewModel baseUpdateViewModel)

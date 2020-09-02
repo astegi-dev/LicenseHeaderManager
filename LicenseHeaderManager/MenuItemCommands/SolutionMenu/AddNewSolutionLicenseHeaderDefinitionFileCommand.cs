@@ -17,6 +17,7 @@ using System.IO;
 using System.Text;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
+using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.Utils;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
@@ -31,12 +32,12 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     /// <summary>
     ///   Command ID.
     /// </summary>
-    public const int CommandId = 4132;
+    private const int c_commandId = 4132;
 
     /// <summary>
     ///   Command menu group (command set GUID).
     /// </summary>
-    public static readonly Guid CommandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
+    private static readonly Guid s_commandSet = new Guid ("1a75d6da-3b30-4ec9-81ae-72b8b7eba1a0");
 
     private readonly Func<string> _defaultHeaderDefinitionFunc;
 
@@ -60,13 +61,13 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
         Solution solution,
         Func<string> defaultHeaderDefinitionFunc)
     {
-      ServiceProvider = (LicenseHeadersPackage) package ?? throw new ArgumentNullException (nameof(package));
+      ServiceProvider = (ILicenseHeaderExtension) package ?? throw new ArgumentNullException (nameof(package));
       commandService = commandService ?? throw new ArgumentNullException (nameof(commandService));
 
       _solution = solution;
       _defaultHeaderDefinitionFunc = defaultHeaderDefinitionFunc;
 
-      var menuCommandID = new CommandID (CommandSet, CommandId);
+      var menuCommandID = new CommandID (s_commandSet, c_commandId);
       _menuItem = new OleMenuCommand (Execute, menuCommandID);
       _menuItem.BeforeQueryStatus += OnQuerySolutionCommandStatus;
       commandService.AddCommand (_menuItem);
@@ -80,7 +81,7 @@ namespace LicenseHeaderManager.MenuItemCommands.SolutionMenu
     /// <summary>
     ///   Gets the service provider from the owner package.
     /// </summary>
-    private LicenseHeadersPackage ServiceProvider { get; }
+    private ILicenseHeaderExtension ServiceProvider { get; }
 
     private void OnQuerySolutionCommandStatus (object sender, EventArgs e)
     {

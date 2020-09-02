@@ -46,7 +46,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
 
     public override async Task DoWorkAsync (CancellationToken cancellationToken, BaseUpdateViewModel viewModel)
     {
-      await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync (cancellationToken, (LicenseHeadersPackage) _licenseHeaderExtension, viewModel);
+      await FolderProjectMenuHelper.AddLicenseHeaderToAllFilesAsync (cancellationToken, _licenseHeaderExtension, viewModel);
     }
   }
 }
