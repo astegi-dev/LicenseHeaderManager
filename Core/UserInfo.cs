@@ -27,9 +27,9 @@ namespace Core
     private static readonly object s_displayNameLock = new object();
     private static string s_name;
 
-    private static string _displayName = "";
-    private static DateTime _lastPropertyCall = DateTime.MinValue;
-    private static bool _lookupSuccessful;
+    private static string s_displayName = "";
+    private static DateTime s_lastPropertyCall = DateTime.MinValue;
+    private static bool s_lookupSuccessful;
 
     /// <summary>
     ///   Gets name (login) of the current user.
@@ -56,11 +56,11 @@ namespace Core
       {
         lock (s_displayNameLock)
         {
-          if (!_lookupSuccessful && LastLookupAttemptTooOld())
+          if (!s_lookupSuccessful && LastLookupAttemptTooOld())
             TryLookupNow();
 
-          _lastPropertyCall = DateTime.Now;
-          return _displayName;
+          s_lastPropertyCall = DateTime.Now;
+          return s_displayName;
         }
       }
     }
@@ -68,20 +68,20 @@ namespace Core
     private static bool LastLookupAttemptTooOld ()
     {
       // Use _lastPropertyCall to stop lookups in case of BatchOperations as well.
-      return DateTime.Now.Subtract (_lastPropertyCall).TotalSeconds > Resources.Constant_DisplayNameLookup_TimeDifferenceInSecondsBeforeTooOld;
+      return DateTime.Now.Subtract (s_lastPropertyCall).TotalSeconds > Resources.Constant_DisplayNameLookup_TimeDifferenceInSecondsBeforeTooOld;
     }
 
     private static void TryLookupNow ()
     {
       try
       {
-        _displayName = UserPrincipal.Current.DisplayName;
-        _lookupSuccessful = true;
+        s_displayName = UserPrincipal.Current.DisplayName;
+        s_lookupSuccessful = true;
       }
       catch (Exception)
       {
-        _displayName = Resources.UserInfo_UnknownDisplayNameString;
-        _lookupSuccessful = false;
+        s_displayName = Resources.UserInfo_UnknownDisplayNameString;
+        s_lookupSuccessful = false;
       }
     }
   }

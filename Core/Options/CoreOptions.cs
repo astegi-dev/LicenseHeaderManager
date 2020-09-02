@@ -33,7 +33,7 @@ namespace Core.Options
     public const string c_defaultRequiredKeywords = "license, copyright, (c), ©";
     public static readonly string _defaultLicenseHeaderFileText = GetDefaultLicenseHeader();
 
-    public static readonly ObservableCollection<Language> _defaultLanguages = new ObservableCollection<Language>
+    public static readonly ObservableCollection<Language> DefaultLanguages = new ObservableCollection<Language>
                                                                               {
                                                                                   new Language
                                                                                   {
@@ -141,44 +141,6 @@ namespace Core.Options
     public virtual ObservableCollection<Language> Languages { get; set; }
 
     /// <summary>
-    ///   Sets all public members of this <see cref="CoreOptions" /> instance to pre-configured default values.
-    /// </summary>
-    /// <remarks>The default values are implementation-dependent.</remarks>
-    private void SetDefaultValues ()
-    {
-      UseRequiredKeywords = c_defaultUseRequiredKeywords;
-      RequiredKeywords = c_defaultRequiredKeywords;
-      LicenseHeaderFileText = _defaultLicenseHeaderFileText;
-      Languages = new ObservableCollection<Language> (_defaultLanguages);
-    }
-
-    /// <summary>
-    ///   Initializes all public members of this <see cref="CoreOptions" /> instance.
-    /// </summary>
-    /// <remarks>The default values are implementation-dependent.</remarks>
-    private void InitializeValues ()
-    {
-      Languages = new ObservableCollection<Language> (_defaultLanguages);
-    }
-
-    /// <summary>
-    ///   Creates a deep copy of the current <see cref="CoreOptions" /> instance.
-    /// </summary>
-    /// <returns>A deep copy of the this <see cref="CoreOptions" /> instance.</returns>
-    public virtual CoreOptions Clone ()
-    {
-      var clonedObject = new CoreOptions
-                         {
-                             UseRequiredKeywords = UseRequiredKeywords,
-                             RequiredKeywords = RequiredKeywords,
-                             LicenseHeaderFileText = LicenseHeaderFileText,
-                             Languages = new ObservableCollection<Language> (Languages.Select (x => x.Clone()).ToList())
-                         };
-
-      return clonedObject;
-    }
-
-    /// <summary>
     ///   Serializes an <see cref="CoreOptions" /> instance to a file in the file system.
     /// </summary>
     /// <param name="options">The <see cref="CoreOptions" /> instance to serialize.</param>
@@ -203,6 +165,44 @@ namespace Core.Options
     public static async Task<CoreOptions> LoadAsync (string filePath)
     {
       return await JsonOptionsManager.DeserializeAsync<CoreOptions> (filePath);
+    }
+
+    /// <summary>
+    ///   Creates a deep copy of the current <see cref="CoreOptions" /> instance.
+    /// </summary>
+    /// <returns>A deep copy of the this <see cref="CoreOptions" /> instance.</returns>
+    public virtual CoreOptions Clone ()
+    {
+      var clonedObject = new CoreOptions
+                         {
+                             UseRequiredKeywords = UseRequiredKeywords,
+                             RequiredKeywords = RequiredKeywords,
+                             LicenseHeaderFileText = LicenseHeaderFileText,
+                             Languages = new ObservableCollection<Language> (Languages.Select (x => x.Clone()).ToList())
+                         };
+
+      return clonedObject;
+    }
+
+    /// <summary>
+    ///   Sets all public members of this <see cref="CoreOptions" /> instance to pre-configured default values.
+    /// </summary>
+    /// <remarks>The default values are implementation-dependent.</remarks>
+    private void SetDefaultValues ()
+    {
+      UseRequiredKeywords = c_defaultUseRequiredKeywords;
+      RequiredKeywords = c_defaultRequiredKeywords;
+      LicenseHeaderFileText = _defaultLicenseHeaderFileText;
+      Languages = new ObservableCollection<Language> (DefaultLanguages);
+    }
+
+    /// <summary>
+    ///   Initializes all public members of this <see cref="CoreOptions" /> instance.
+    /// </summary>
+    /// <remarks>The default values are implementation-dependent.</remarks>
+    private void InitializeValues ()
+    {
+      Languages = new ObservableCollection<Language> (DefaultLanguages);
     }
 
     private static string GetDefaultLicenseHeader ()

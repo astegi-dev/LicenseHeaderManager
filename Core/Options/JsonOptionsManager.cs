@@ -28,7 +28,7 @@ namespace Core.Options
   /// <seealso cref="LicenseHeaderManagerOptionsAttribute" />
   public static class JsonOptionsManager
   {
-    public static readonly JsonSerializerOptions SerializerDefaultOptions =
+    public static JsonSerializerOptions SerializerDefaultOptions =>
         new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,

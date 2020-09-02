@@ -76,22 +76,6 @@ namespace Core
       _commentParser = new CommentParser (language.LineComment, language.BeginComment, language.EndComment, language.BeginRegion, language.EndRegion);
     }
 
-    private async Task<DocumentHeader> GetHeader ()
-    {
-      if (_headerCache != default)
-        return _headerCache;
-
-      var headerText = await CreateHeaderText (_headerLines);
-      _headerCache = new DocumentHeader (_licenseHeaderInput.DocumentPath, headerText, new DocumentHeaderProperties (_additionalProperties));
-      return _headerCache;
-    }
-
-    private async Task<string> GetLineEndingInDocument ()
-    {
-      _lineEndingInDocumentCache ??= NewLineManager.DetectMostFrequentLineEnd (await GetText());
-      return _lineEndingInDocumentCache;
-    }
-
     /// <summary>
     ///   Determines whether the header of this <see cref="Document" /> instance is valid, i. e. either empty or equal to the
     ///   result of a <see cref="ICommentParser.Parse" /> invocation.
@@ -176,6 +160,16 @@ namespace Core
       }
     }
 
+    private async Task<DocumentHeader> GetHeader ()
+    {
+      if (_headerCache != default)
+        return _headerCache;
+
+      var headerText = await CreateHeaderText (_headerLines);
+      _headerCache = new DocumentHeader (_licenseHeaderInput.DocumentPath, headerText, new DocumentHeaderProperties (_additionalProperties));
+      return _headerCache;
+    }
+
     private async Task<string> CreateHeaderText (string[] headerLines)
     {
       if (headerLines == null)
@@ -193,6 +187,12 @@ namespace Core
         await RefreshText();
 
       return _documentTextCache;
+    }
+
+    private async Task<string> GetLineEndingInDocument ()
+    {
+      _lineEndingInDocumentCache ??= NewLineManager.DetectMostFrequentLineEnd (await GetText());
+      return _lineEndingInDocumentCache;
     }
 
     private async Task RefreshText ()

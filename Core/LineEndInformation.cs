@@ -38,13 +38,13 @@ namespace Core
     public int Index { get; }
 
     /// <summary>
-    ///   Line ending (CR, LR or CR+LF).
-    /// </summary>
-    private string LineEnd { get; }
-
-    /// <summary>
     ///   Length of the line ending this <see cref="LineEndInformation" /> was initialized with.
     /// </summary>
     public int LineEndLength => LineEnd.Length;
+
+    /// <summary>
+    ///   Line ending (CR, LR or CR+LF).
+    /// </summary>
+    private string LineEnd { get; }
   }
 }

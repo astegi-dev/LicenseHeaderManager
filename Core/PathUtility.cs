@@ -21,15 +21,6 @@ namespace Core
   /// </summary>
   internal static class PathUtility
   {
-    private static string GetProperDirectoryCapitalization (DirectoryInfo dirInfo)
-    {
-      var parentDirInfo = dirInfo.Parent;
-
-      return null == parentDirInfo
-          ? dirInfo.Root.FullName
-          : Path.Combine (GetProperDirectoryCapitalization (parentDirInfo), parentDirInfo.GetDirectories (dirInfo.Name)[0].Name);
-    }
-
     /// <summary>
     ///   Determines the correct capitalization of a file path based on a <see cref="FileInfo" /> object.
     /// </summary>
@@ -44,6 +35,15 @@ namespace Core
 
       var properDirectory = GetProperDirectoryCapitalization (dirInfo);
       return Path.Combine (properDirectory, dirInfo?.GetFiles (fileInfo.Name)[0].Name ?? string.Empty);
+    }
+
+    private static string GetProperDirectoryCapitalization (DirectoryInfo dirInfo)
+    {
+      var parentDirInfo = dirInfo.Parent;
+
+      return null == parentDirInfo
+          ? dirInfo.Root.FullName
+          : Path.Combine (GetProperDirectoryCapitalization (parentDirInfo), parentDirInfo.GetDirectories (dirInfo.Name)[0].Name);
     }
   }
 }
