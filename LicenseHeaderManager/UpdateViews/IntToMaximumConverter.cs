@@ -19,7 +19,15 @@ namespace LicenseHeaderManager.UpdateViews
 {
   internal class IntToMaximumConverter : IValueConverter
   {
-    public object Convert (object value, Type targetType, object parameter, CultureInfo culture)
+    /// <summary>
+    /// Converts an integer value for the progress bars.
+    /// </summary>
+    /// <param name="value">The value to be converted.</param>
+    /// <param name="targetType">The type of the binding target property.</param>
+    /// <param name="parameter">The converter parameter to use.</param>
+    /// <param name="culture">The culture to use in the converter.</param>
+    /// <returns>A <see cref="object" /> where the value is 1 if <see cref="value"/> is 0 and <see cref="value"/> otherwise.</returns>
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
       if (!(value is int intValue))
         return 0;
@@ -27,7 +35,7 @@ namespace LicenseHeaderManager.UpdateViews
       return intValue == 0 ? 1 : intValue;
     }
 
-    public object ConvertBack (object value, Type targetType, object parameter, CultureInfo culture)
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
       throw new NotImplementedException();
     }

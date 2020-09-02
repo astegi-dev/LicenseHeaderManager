@@ -12,10 +12,9 @@
  */
 
 using System;
-using Core;
 using NUnit.Framework;
 
-namespace LicenseHeaderManager.Test
+namespace Core.Tests
 {
   [TestFixture]
   public class CommentParserTests

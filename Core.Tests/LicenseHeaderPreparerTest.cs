@@ -12,11 +12,10 @@
  */
 
 using System;
-using Core;
 using NUnit.Framework;
 using Rhino.Mocks;
 
-namespace LicenseHeaderManager.Test
+namespace Core.Tests
 {
   [TestFixture]
   public class LicenseHeaderPreparerTest

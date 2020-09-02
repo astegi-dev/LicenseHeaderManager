@@ -15,10 +15,24 @@ using System;
 
 namespace LicenseHeaderManager.Headers
 {
+  /// <summary>
+  ///   Contains new line constants.
+  /// </summary>
   public class NewLineConst
   {
+    /// <summary>
+    ///   Carriage Return.
+    /// </summary>
     public const string CR = "\r";
+
+    /// <summary>
+    ///   Line feed.
+    /// </summary>
     public const string LF = "\n";
+
+    /// <summary>
+    ///   Carriage return, followed by line feed.
+    /// </summary>
     public const string CRLF = "\r\n";
   }
 }

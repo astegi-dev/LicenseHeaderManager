@@ -17,8 +17,17 @@ using EnvDTE;
 
 namespace LicenseHeaderManager.ResultObjects
 {
+  /// <summary>
+  ///   Represents result information of a folder and project wide invocation of "AddLicenseHeadersToAllFiles".
+  /// </summary>
   public class AddLicenseHeaderToAllFilesResult
   {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="countSubLicenseHeadersFound"></param>
+    /// <param name="baseHeaderFound"></param>
+    /// <param name="linkedItems"></param>
     public AddLicenseHeaderToAllFilesResult (int countSubLicenseHeadersFound, bool baseHeaderFound, List<ProjectItem> linkedItems)
     {
       CountSubLicenseHeadersFound = countSubLicenseHeadersFound;
