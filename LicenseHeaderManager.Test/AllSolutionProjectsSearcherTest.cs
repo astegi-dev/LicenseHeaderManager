@@ -70,7 +70,7 @@ namespace LicenseHeaderManager.Test
       var returnedProjects = allSolutionProjectsSearcher.GetAllProjects (solution);
 
 
-      Assert.Contains (projectInSolutionFolder, returnedProjects);
+      Assert.Contains (projectInSolutionFolder, returnedProjects.ToList());
     }
 
     [Test]

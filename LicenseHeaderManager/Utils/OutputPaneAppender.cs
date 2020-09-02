@@ -32,7 +32,7 @@ namespace LicenseHeaderManager.Utils
       ThreadHelper.ThrowIfNotOnUIThread();
 
       Threshold = threshold;
-      outputPane.GetPane(ref Guids.guidOutputPaneAppender, out _licenseHeaderManagerPane);
+      outputPane.GetPane(ref LicenseHeadersPackage.GuidOutputPaneAppender, out _licenseHeaderManagerPane);
     }
 
     protected override void Append(LoggingEvent loggingEvent)

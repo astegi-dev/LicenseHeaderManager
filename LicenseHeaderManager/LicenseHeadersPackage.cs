@@ -71,11 +71,17 @@ namespace LicenseHeaderManager
   [ProvideProfile (typeof (DefaultLicenseHeaderPage), c_licenseHeaders, c_defaultLicenseHeader, 0, 0, true)]
   [ProvideProfile (typeof (LanguagesPage), c_licenseHeaders, c_languages, 0, 0, true)]
   [ProvideAutoLoad (VSConstants.UICONTEXT.SolutionOpening_string, PackageAutoLoadFlags.BackgroundLoad)]
-  [Guid (Guids.guidLicenseHeadersPkgString)]
+  [Guid (c_guidLicenseHeadersPkgString)]
   [ProvideMenuResource ("Menus.ctmenu", 1)]
   public sealed class LicenseHeadersPackage : AsyncPackage, ILicenseHeaderExtension
   {
+    /// <summary>
+    /// GUID representing the output pane the <see cref="OutputPaneAppender"/> logs to.
+    /// </summary>
+    public static Guid GuidOutputPaneAppender = new Guid ("f5fb81c5-39f2-4c51-bbfd-9b5d83c13e1c");
+
     public const string Version = "3.1.0";
+    private const string c_guidLicenseHeadersPkgString = "4c570677-8476-4d33-bd0c-da36c89287c8";
 
     private const string c_licenseHeaders = "License Header Manager";
     private const string c_general = "General";
@@ -417,7 +423,7 @@ namespace LicenseHeaderManager
         return;
       }
 
-      _outputPane.CreatePane (ref Guids.guidOutputPaneAppender, "LicenseHeaderManager", 1, 1);
+      _outputPane.CreatePane (ref GuidOutputPaneAppender, "LicenseHeaderManager", 1, 1);
       _outputPaneAppender = new OutputPaneAppender (_outputPane, Level.Info);
       _outputPaneAppender.ActivateOptions();
 

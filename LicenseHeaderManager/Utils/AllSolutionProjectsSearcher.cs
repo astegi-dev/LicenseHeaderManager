@@ -18,9 +18,19 @@ using EnvDTE80;
 
 namespace LicenseHeaderManager.Utils
 {
+
+  /// <summary>
+  /// Searches a solution for the projects it contains.
+  /// </summary>
   internal class AllSolutionProjectsSearcher
   {
-    public List<Project> GetAllProjects (Solution solution)
+
+    /// <summary>
+    /// Retrieves all projects belonging to a solution.
+    /// </summary>
+    /// <param name="solution">The <see cref="Solution"/> object whose projects should be found.</param>
+    /// <returns>Returns a collection of all <see cref="Project"/> objects that are associated with <paramref name="solution"/></returns>
+    public ICollection<Project> GetAllProjects (Solution solution)
     {
       var projectList = new List<Project>();
       PopulateProjectsList (solution, projectList);
@@ -31,20 +41,22 @@ namespace LicenseHeaderManager.Utils
     private void PopulateProjectsList (Solution solution, List<Project> projectList)
     {
       foreach (Project project in solution)
+      {
         if (project.Kind == ProjectKinds.vsProjectKindSolutionFolder)
           projectList.AddRange (GetSolutionFolderProjects (project));
         else if (IsValid (project))
           projectList.Add (project);
+      }
     }
 
     private bool IsValid (Project project)
     {
+      // If project is not loaded, it doesn't count.
       if (string.Equals (project.Kind, Constants.vsProjectKindUnmodeled, StringComparison.OrdinalIgnoreCase))
-          // If project is not loaded, it doesn't count.
         return false;
 
+      // If project is "miscellaneous items", it doesn't count.
       if (string.Equals (project.Kind, Constants.vsProjectKindMisc, StringComparison.OrdinalIgnoreCase))
-          // If project is "miscellaneous items", it doesn't count.
         return false;
 
       return true;

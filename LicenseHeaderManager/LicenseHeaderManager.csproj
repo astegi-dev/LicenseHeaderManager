@@ -294,7 +294,6 @@
     <Compile Include="Headers\NewLineConst.cs" />
     <Compile Include="MenuItemCommands\Common\AddLicenseHeaderToAllFilesInProjectHelper.cs" />
     <Compile Include="MenuItemButtonHandler\Helpers\AddLicenseHeaderToAllFilesInSolutionHelper.cs" />
-    <Compile Include="Guids.cs" />
     <Compile Include="Headers\LicenseHeaderFinder.cs" />
     <Compile Include="Headers\LicenseHeader.cs" />
     <Compile Include="Interfaces\ILicenseHeaderExtension.cs" />
