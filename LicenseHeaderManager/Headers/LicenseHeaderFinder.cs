@@ -153,6 +153,11 @@ namespace LicenseHeaderManager.Headers
       };
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="projectItems"></param>
+    /// <returns></returns>
     private static string SearchItemsDirectlyGetHeaderDefinitionFileName (ProjectItems projectItems)
     {
       if (projectItems == null)
