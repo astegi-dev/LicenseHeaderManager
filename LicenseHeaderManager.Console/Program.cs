@@ -4,6 +4,7 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Core;
 using Core.Options;
 
@@ -11,8 +12,6 @@ namespace LicenseHeaderManager.Console
 {
   public static class Program
   {
-    private const string c_defaultMode = "add";
-
     private enum UpdateMode
     {
       Add = 0,
@@ -25,7 +24,7 @@ namespace LicenseHeaderManager.Console
                         {
                             new Option<string> (
                                 new[] { "-m", "--mode" },
-                                () => c_defaultMode,
+                                () => "add",
                                 "Specifies whether license headers should be added or removed. Must be \"add\" or \"remove\" (case-insensitive)."),
                             new Option<FileInfo> (
                                 new[] { "-c", "--configuration" },
@@ -49,10 +48,9 @@ namespace LicenseHeaderManager.Console
 
       // Note that the parameters of the handler method are matched according to the names of the options
       rootCommand.Handler = CommandHandler.Create<string, FileInfo, FileInfo[], DirectoryInfo, bool?>(
-          (modeString, configuration, files, directory, recursive) =>
+          (mode, configuration, files, directory, recursive) =>
           {
-            modeString = modeString ?? c_defaultMode;
-            if (!modeString.Equals("add", StringComparison.OrdinalIgnoreCase) && !modeString.Equals("remove", StringComparison.OrdinalIgnoreCase))
+            if (!mode.Equals("add", StringComparison.OrdinalIgnoreCase) && !mode.Equals("remove", StringComparison.OrdinalIgnoreCase))
             {
               System.Console.WriteLine("Invalid mode");
               Exit(false);
@@ -73,10 +71,10 @@ namespace LicenseHeaderManager.Console
               Exit(false);
             }
 
-            var mode = modeString.Equals("add", StringComparison.OrdinalIgnoreCase) ? UpdateMode.Add : UpdateMode.Remove;
+            var modeEnum = mode.Equals("add", StringComparison.OrdinalIgnoreCase) ? UpdateMode.Add : UpdateMode.Remove;
             try
             {
-              UpdateLicenseHeaders(mode, configuration, files, directory, recursive);
+              UpdateLicenseHeaders(modeEnum, configuration, files, directory, recursive);
             }
             catch (Exception ex)
             {
@@ -92,8 +90,8 @@ namespace LicenseHeaderManager.Console
 
     private static void UpdateLicenseHeaders(
         UpdateMode mode = UpdateMode.Add,
-        FileInfo configuration = null,
-        FileInfo[] files = null,
+        FileSystemInfo configuration = null,
+        IReadOnlyList<FileInfo> files = null,
         DirectoryInfo directory = null,
         bool? recursive = false)
     {
@@ -118,9 +116,10 @@ namespace LicenseHeaderManager.Console
         UpdateLicenseHeadersForMultipleFiles(mode, headerDefinitionFile.FullName, files.Select(x => x.FullName));
     }
 
-    private static void UpdateLicenseHeadersForDirectory(UpdateMode mode, FileInfo headerDefinitionFile, DirectoryInfo directory, bool recursive)
+    private static void UpdateLicenseHeadersForDirectory(UpdateMode mode, FileSystemInfo headerDefinitionFile, DirectoryInfo directory, bool recursive)
     {
       var files = directory.EnumerateFiles("*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+      UpdateLicenseHeadersForMultipleFiles(mode, headerDefinitionFile.FullName, files.Select(x => x.FullName));
     }
 
     private static void UpdateLicenseHeaderForOneFile(UpdateMode mode, string definitionFilePath, string filePath)
@@ -144,9 +143,33 @@ namespace LicenseHeaderManager.Console
       Exit(true);
     }
 
-    private static void UpdateLicenseHeadersForMultipleFiles(UpdateMode mode, string definitionFilePath, IEnumerable<string> filePath)
+    private static void UpdateLicenseHeadersForMultipleFiles(UpdateMode mode, string definitionFilePath, IEnumerable<string> filePaths)
     {
-      throw new NotImplementedException();
+      var headerExtractor = new LicenseHeaderExtractor();
+      var defaultCoreSettings = new CoreOptions(true);
+      var replacer = new LicenseHeaderReplacer(defaultCoreSettings.Languages, CoreOptions.RequiredKeywordsAsEnumerable(defaultCoreSettings.RequiredKeywords));
+
+      var headers = mode == UpdateMode.Add ? headerExtractor.ExtractHeaderDefinitions(definitionFilePath) : null;
+      var replacerInput = filePaths.Select(x => new LicenseHeaderPathInput(x, headers));
+
+      var replacerResult = replacer.RemoveOrReplaceHeader(
+          replacerInput.ToList(), 
+          new ConsoleProgress<ReplacerProgressReport> (progress =>
+          {
+            System.Console.WriteLine ($"{progress.ProcessedFileCount} of {progress.TotalFileCount} files have been updated.");
+          }), 
+          new CancellationToken()).Result;
+
+      if (replacerResult.IsSuccess)
+      {
+        System.Console.WriteLine($"\n{(mode == UpdateMode.Add ? "Adding/Replacing" : "Removing")} succeeded.");
+        Exit(true);
+      }
+
+      foreach (var error in replacerResult.Error)
+        System.Console.WriteLine($"\nAn error of type '{error.Type}' occurred: '{error.Description}'");
+
+      Exit(false);
     }
 
     private static void Exit(bool success)
