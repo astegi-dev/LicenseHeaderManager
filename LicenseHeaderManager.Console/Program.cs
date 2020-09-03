@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.IO;
+using System.Linq;
 using Core;
 using Core.Options;
 
@@ -6,104 +11,155 @@ namespace LicenseHeaderManager.Console
 {
   public static class Program
   {
-    /* Should soon support the following CLI arguments
-       add -c <licenseHeaderDefinitionFilePath> -f <filePath> [<filePath2>...]
-       add -c <licenseHeaderDefinitionFilePath> -d <directoryPath>
-       add -c <licenseHeaderDefinitionFilePath> -d -r <directoryPath> (recursive)
-       remove -c <licenseHeaderDefinitionFilePath> -f <filePath1> [<filePath2>...]
-       remove -c <licenseHeaderDefinitionFilePath> -d <directoryPath>
-       remove -c <licenseHeaderDefinitionFilePath> -d -r <directoryPath> (recursive)
-     */
+    private const string c_defaultMode = "add";
 
-    public static void Main (string[] args)
+    private enum UpdateMode
     {
-      try
-      {
-        var definitionFile = GetOneFileFromInput ("Enter the path of a license header definition file:", true);
-        var singleFile = GetBoolFromInput ("Do you want to update the license headers of a single (Y) or multiple files (N)?");
-
-        if (singleFile)
-          InsertIntoOneFile (definitionFile);
-        else
-          InsertIntoMultipleFiles (definitionFile);
-
-        Exit (true);
-      }
-      catch (Exception ex)
-      {
-        System.Console.WriteLine ("\nEncountered an unhandled error:");
-        System.Console.WriteLine (ex);
-        Exit (false);
-      }
+      Add = 0,
+      Remove = 1
     }
 
-    private static void Exit (bool success)
+    public static int Main(string[] args)
     {
-      System.Console.WriteLine ("\nPress any key to exit.");
+      var rootCommand = new RootCommand
+                        {
+                            new Option<string> (
+                                new[] { "-m", "--mode" },
+                                () => c_defaultMode,
+                                "Specifies whether license headers should be added or removed. Must be \"add\" or \"remove\" (case-insensitive)."),
+                            new Option<FileInfo> (
+                                new[] { "-c", "--configuration" },
+                                () => null,
+                                "Specifies the path to the license header definition file to be used for the update operations. Must be present."),
+                            new Option<FileInfo[]> (
+                                new[] { "-f", "--files" },
+                                () => null,
+                                "Specifies the path (or paths) to the files whose headers should be updated. Must not be present if \"directory\" is present."),
+                            new Option<DirectoryInfo> (
+                                new[] { "-d", "--directory" },
+                                () => null,
+                                "Specifies the path of the directory containing the files whose headers should be updated. Must not be present if \"files\" is present."),
+                            new Option<bool?> (
+                                new[] { "-r", "--recursive" },
+                                () => null,
+                                "Specifies whether the directory represented by \"directory\" should be searched recursively. Is ignored if \"files\" is present.")
+                        };
 
-      // read and intercept ("suppress") available keys in the input stream (possibly stemming from mistakenly pasting multiline text into the console)
-      while (System.Console.KeyAvailable)
-        System.Console.ReadKey (true);
+      rootCommand.Description = "Updates license headers for files";
 
-      // wait for the "actually intended" key press by the user, then exit
-      System.Console.ReadKey();
-      Environment.Exit (success ? 0 : 1);
+      // Note that the parameters of the handler method are matched according to the names of the options
+      rootCommand.Handler = CommandHandler.Create<string, FileInfo, FileInfo[], DirectoryInfo, bool?>(
+          (modeString, configuration, files, directory, recursive) =>
+          {
+            modeString = modeString ?? c_defaultMode;
+            if (!modeString.Equals("add", StringComparison.OrdinalIgnoreCase) && !modeString.Equals("remove", StringComparison.OrdinalIgnoreCase))
+            {
+              System.Console.WriteLine("Invalid mode");
+              Exit(false);
+            }
+
+            if (files != null && directory != null || files == null && directory == null)
+            {
+              System.Console.WriteLine("Exactly one of the arguments \"files\" and \"directory\" must be present.");
+              Exit(false);
+            }
+
+            if (files != null && recursive.HasValue)
+              System.Console.WriteLine("Since \"files\" is present, option \"recursive\" is ignored");
+
+            if (directory != null && !recursive.HasValue)
+            {
+              System.Console.WriteLine("Since \"directory\" is present, option \"recursive\" must be present");
+              Exit(false);
+            }
+
+            var mode = modeString.Equals("add", StringComparison.OrdinalIgnoreCase) ? UpdateMode.Add : UpdateMode.Remove;
+            try
+            {
+              UpdateLicenseHeaders(mode, configuration, files, directory, recursive);
+            }
+            catch (Exception ex)
+            {
+              System.Console.WriteLine("\nEncountered an unhandled error:");
+              System.Console.WriteLine(ex);
+              Exit(false);
+            }
+          });
+
+      // Parse the incoming args and invoke the handler
+      return rootCommand.InvokeAsync(args).Result;
     }
 
-    private static void InsertIntoOneFile (string licenseHeaderDefinitionFilePath)
+    private static void UpdateLicenseHeaders(
+        UpdateMode mode = UpdateMode.Add,
+        FileInfo configuration = null,
+        FileInfo[] files = null,
+        DirectoryInfo directory = null,
+        bool? recursive = false)
+    {
+      if (files != null && directory == null)
+        UpdateLicenseHeadersForFiles(mode, configuration, files);
+
+      if (!recursive.HasValue)
+        throw new ArgumentNullException(nameof(recursive));
+
+      if (directory != null && files == null)
+        UpdateLicenseHeadersForDirectory(mode, configuration, directory, recursive.Value);
+
+      Exit(true);
+    }
+
+    private static void UpdateLicenseHeadersForFiles(UpdateMode mode, FileSystemInfo headerDefinitionFile, IReadOnlyList<FileInfo> files)
+    {
+      if (files.Count == 1)
+        UpdateLicenseHeaderForOneFile(mode, headerDefinitionFile.FullName, files[0].FullName);
+
+      if (files.Count > 1)
+        UpdateLicenseHeadersForMultipleFiles(mode, headerDefinitionFile.FullName, files.Select(x => x.FullName));
+    }
+
+    private static void UpdateLicenseHeadersForDirectory(UpdateMode mode, FileInfo headerDefinitionFile, DirectoryInfo directory, bool recursive)
+    {
+      var files = directory.EnumerateFiles("*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+    }
+
+    private static void UpdateLicenseHeaderForOneFile(UpdateMode mode, string definitionFilePath, string filePath)
     {
       var headerExtractor = new LicenseHeaderExtractor();
-      var defaultCoreSettings = new CoreOptions (true);
-      var replacer = new LicenseHeaderReplacer (defaultCoreSettings.Languages, CoreOptions.RequiredKeywordsAsEnumerable (defaultCoreSettings.RequiredKeywords));
-      var filePath = GetOneFileFromInput ("\nSpecify the file whose license headers should be updated:", true);
+      var defaultCoreSettings = new CoreOptions(true);
+      var replacer = new LicenseHeaderReplacer(defaultCoreSettings.Languages, CoreOptions.RequiredKeywordsAsEnumerable(defaultCoreSettings.RequiredKeywords));
 
-      var add = GetBoolFromInput ("Should headers be added (Y) or removed (N)?");
-      var headers = add ? headerExtractor.ExtractHeaderDefinitions (licenseHeaderDefinitionFilePath) : null;
-      var replacerInput = new LicenseHeaderPathInput (filePath, headers);
+      var headers = mode == UpdateMode.Add ? headerExtractor.ExtractHeaderDefinitions(definitionFilePath) : null;
+      var replacerInput = new LicenseHeaderPathInput(filePath, headers);
 
-      var replacerResult = replacer.RemoveOrReplaceHeader (replacerInput).GetAwaiter().GetResult();
+      var replacerResult = replacer.RemoveOrReplaceHeader(replacerInput).GetAwaiter().GetResult();
 
       if (!replacerResult.IsSuccess)
       {
-        System.Console.WriteLine ($"\nAn error of type '{replacerResult.Error.Type}' occurred: '{replacerResult.Error.Description}'");
-        Exit (false);
+        System.Console.WriteLine($"\nAn error of type '{replacerResult.Error.Type}' occurred: '{replacerResult.Error.Description}'");
+        Exit(false);
       }
 
-      System.Console.WriteLine ($"\n{(add ? "Adding/Replacing" : "Removing")} succeeded.");
-      Exit (true);
+      System.Console.WriteLine($"\n{(mode == UpdateMode.Add ? "Adding/Replacing" : "Removing")} succeeded.");
+      Exit(true);
     }
 
-    private static void InsertIntoMultipleFiles (string licenseHeaderDefinitionFilePath)
+    private static void UpdateLicenseHeadersForMultipleFiles(UpdateMode mode, string definitionFilePath, IEnumerable<string> filePath)
     {
       throw new NotImplementedException();
     }
 
-    private static bool GetBoolFromInput (string prompt = "Enter yes or no.")
+    private static void Exit(bool success)
     {
-      string result;
-      do
-      {
-        System.Console.WriteLine ($"\n{prompt} (Y/N)");
-        result = System.Console.ReadLine();
-      } while (result?.Equals ("y", StringComparison.OrdinalIgnoreCase) != true && result?.Equals ("n", StringComparison.OrdinalIgnoreCase) != true);
+      System.Console.WriteLine("\nPress any key to exit.");
 
-      return result.Equals ("y", StringComparison.OrdinalIgnoreCase);
-    }
+      // read and intercept ("suppress") available keys in the input stream (possibly stemming from mistakenly pasting multiline text into the console)
+      while (System.Console.KeyAvailable)
+        System.Console.ReadKey(true);
 
-    private static string GetOneFileFromInput (string prompt = "Enter file path", bool exitOnFailure = false)
-    {
-      System.Console.WriteLine (prompt);
-      var filePath = System.Console.ReadLine()?.Trim ('\"');
-
-      if (!string.IsNullOrWhiteSpace (filePath))
-        return filePath;
-
-      System.Console.WriteLine ("The path must point to a file that actually exists!");
-      System.Console.WriteLine ($"You entered: \"{filePath}\"");
-      if (exitOnFailure)
-        Exit (false);
-
-      return null;
+      // wait for the "actually intended" key press by the user, then exit
+      System.Console.ReadKey();
+      Environment.Exit(success ? 0 : 1);
     }
   }
 }
