@@ -107,7 +107,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
         return;
 
       var item = args.InValue as ProjectItem ?? ServiceProvider.GetSolutionExplorerItem() as ProjectItem;
-      if (item != null && Path.GetExtension (item.Name) != LicenseHeaderReplacer.HeaderDefinitionExtension)
+      if (item != null && Path.GetExtension (item.Name) != LicenseHeaderExtractor.HeaderDefinitionExtension)
         ExecuteInternalAsync (item).FireAndForget();
     }
 

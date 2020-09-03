@@ -29,7 +29,7 @@ namespace LicenseHeaderManager.Utils
 
     public static bool IsLicenseHeader (ProjectItem projectItem)
     {
-      return projectItem.Name.Contains (LicenseHeaderReplacer.HeaderDefinitionExtension);
+      return projectItem.Name.Contains (LicenseHeaderExtractor.HeaderDefinitionExtension);
     }
 
     public static bool IsLink (ProjectItem projectItem)

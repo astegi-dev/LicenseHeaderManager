@@ -32,8 +32,8 @@ namespace Core
     /// <exception cref="FileNotFoundException">If the file represented by <paramref name="definitionFilePath"/> does not exists.</exception>
     /// <returns>
     ///   Returns a <see cref="Dictionary{TKey,TValue}" /> whose keys are extensions identifying a language and whose
-    ///   values represent the license header definition for the corresponding language, or <see langword="null" /> if a
-    ///   respective file's header should be removed.
+    ///   values represent the license header definition for the corresponding language. If the dictionary is <see langword="null" />, a
+    ///   respective file's header is to be removed.
     /// </returns>
     Dictionary<string, string[]> ExtractHeaderDefinitions (string definitionFilePath);
   }

@@ -49,10 +49,10 @@ namespace LicenseHeaderManager.Headers
       }
 
       var projectName = directory.Substring(directory.LastIndexOf('\\') + 1);
-      var fileName = Path.Combine(directory, projectName) + LicenseHeaderReplacer.HeaderDefinitionExtension;
+      var fileName = Path.Combine(directory, projectName) + LicenseHeaderExtractor.HeaderDefinitionExtension;
 
       for (var i = 2; File.Exists(fileName); i++)
-        fileName = Path.Combine(directory, projectName) + i + LicenseHeaderReplacer.HeaderDefinitionExtension;
+        fileName = Path.Combine(directory, projectName) + i + LicenseHeaderExtractor.HeaderDefinitionExtension;
 
       return fileName;
     }
@@ -61,7 +61,7 @@ namespace LicenseHeaderManager.Headers
     {
       var solutionDirectory = Path.GetDirectoryName(solution.FullName);
       var solutionFileName = Path.GetFileName(solution.FullName);
-      return Path.Combine(solutionDirectory, solutionFileName + LicenseHeaderReplacer.HeaderDefinitionExtension);
+      return Path.Combine(solutionDirectory, solutionFileName + LicenseHeaderExtractor.HeaderDefinitionExtension);
     }
 
     public static bool ShowQuestionForAddingLicenseHeaderFile(Project activeProject, IDefaultLicenseHeaderPageModel pageModel)

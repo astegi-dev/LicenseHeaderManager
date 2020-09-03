@@ -12,6 +12,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -34,88 +35,115 @@ namespace Core.Options
     public static readonly string _defaultLicenseHeaderFileText = GetDefaultLicenseHeader();
 
     public static readonly ObservableCollection<Language> DefaultLanguages = new ObservableCollection<Language>
-                                                                              {
-                                                                                  new Language
-                                                                                  {
-                                                                                      Extensions = new[] { ".cs" }, LineComment = "//", BeginComment = "/*",
-                                                                                      EndComment = "*/", BeginRegion = "#region", EndRegion = "#endregion"
-                                                                                  },
-                                                                                  new Language
-                                                                                  {
-                                                                                      Extensions = new[] { ".c", ".cpp", ".cxx", ".h", ".hpp" },
-                                                                                      LineComment = "//", BeginComment = "/*", EndComment = "*/"
-                                                                                  },
-                                                                                  new Language
-                                                                                  {
-                                                                                      Extensions = new[] { ".vb" }, LineComment = "'", BeginRegion = "#Region",
-                                                                                      EndRegion = "#End Region"
-                                                                                  },
-                                                                                  new Language
-                                                                                  {
-                                                                                      Extensions = new[] { ".aspx", ".ascx" }, BeginComment = "<%--",
-                                                                                      EndComment = "--%>"
-                                                                                  },
-                                                                                  new Language
-                                                                                  {
-                                                                                      Extensions = new[]
-                                                                                                   {
-                                                                                                       ".htm", ".html", ".xhtml", ".xml", ".xaml", ".resx",
-                                                                                                       ".config", ".xsd"
-                                                                                                   },
-                                                                                      BeginComment = "<!--", EndComment = "-->",
-                                                                                      SkipExpression =
-                                                                                          @"(<\?xml(.|\s)*?\?>)?(\s*<!DOCTYPE(.|\s)*?>)?( |\t)*(\n|\r\n|\r)?"
-                                                                                  },
-                                                                                  new Language { Extensions = new[] { ".css" }, BeginComment = "/*", EndComment = "*/" },
-                                                                                  new Language
-                                                                                  {
-                                                                                      Extensions = new[] { ".js", ".ts" }, LineComment = "//", BeginComment = "/*",
-                                                                                      EndComment = "*/",
-                                                                                      SkipExpression = @"(/// *<reference.*/>( |\t)*(\n|\r\n|\r)?)*"
-                                                                                  },
-                                                                                  new Language
-                                                                                  {
-                                                                                      Extensions = new[] { ".sql" }, BeginComment = "/*", EndComment = "*/",
-                                                                                      LineComment = "--"
-                                                                                  },
-                                                                                  new Language
-                                                                                  {
-                                                                                      Extensions = new[] { ".php" }, BeginComment = "/*", EndComment = "*/",
-                                                                                      LineComment = "//"
-                                                                                  },
-                                                                                  new Language
-                                                                                  {
-                                                                                      Extensions = new[] { ".wxs", ".wxl", ".wxi" }, BeginComment = "<!--",
-                                                                                      EndComment = "-->"
-                                                                                  },
-                                                                                  new Language
-                                                                                  {
-                                                                                      Extensions = new[] { ".py" }, BeginComment = "\"\"\"",
-                                                                                      EndComment = "\"\"\""
-                                                                                  },
-                                                                                  new Language
-                                                                                  {
-                                                                                      Extensions = new[] { ".fs" }, BeginComment = "(*", EndComment = "*)",
-                                                                                      LineComment = "//"
-                                                                                  },
-                                                                                  new Language
-                                                                                  {
-                                                                                      Extensions = new[] { ".cshtml", ".vbhtml" }, BeginComment = "@*",
-                                                                                      EndComment = "*@"
-                                                                                  }
-                                                                              };
+                                                                             {
+                                                                                 new Language
+                                                                                 {
+                                                                                     Extensions = new[] { ".cs" }, LineComment = "//", BeginComment = "/*",
+                                                                                     EndComment = "*/", BeginRegion = "#region", EndRegion = "#endregion"
+                                                                                 },
+                                                                                 new Language
+                                                                                 {
+                                                                                     Extensions = new[] { ".c", ".cpp", ".cxx", ".h", ".hpp" },
+                                                                                     LineComment = "//", BeginComment = "/*", EndComment = "*/"
+                                                                                 },
+                                                                                 new Language
+                                                                                 {
+                                                                                     Extensions = new[] { ".vb" }, LineComment = "'", BeginRegion = "#Region",
+                                                                                     EndRegion = "#End Region"
+                                                                                 },
+                                                                                 new Language
+                                                                                 {
+                                                                                     Extensions = new[] { ".aspx", ".ascx" }, BeginComment = "<%--",
+                                                                                     EndComment = "--%>"
+                                                                                 },
+                                                                                 new Language
+                                                                                 {
+                                                                                     Extensions = new[]
+                                                                                                  {
+                                                                                                      ".htm", ".html", ".xhtml", ".xml", ".xaml", ".resx",
+                                                                                                      ".config", ".xsd"
+                                                                                                  },
+                                                                                     BeginComment = "<!--", EndComment = "-->",
+                                                                                     SkipExpression =
+                                                                                         @"(<\?xml(.|\s)*?\?>)?(\s*<!DOCTYPE(.|\s)*?>)?( |\t)*(\n|\r\n|\r)?"
+                                                                                 },
+                                                                                 new Language { Extensions = new[] { ".css" }, BeginComment = "/*", EndComment = "*/" },
+                                                                                 new Language
+                                                                                 {
+                                                                                     Extensions = new[] { ".js", ".ts" }, LineComment = "//", BeginComment = "/*",
+                                                                                     EndComment = "*/",
+                                                                                     SkipExpression = @"(/// *<reference.*/>( |\t)*(\n|\r\n|\r)?)*"
+                                                                                 },
+                                                                                 new Language
+                                                                                 {
+                                                                                     Extensions = new[] { ".sql" }, BeginComment = "/*", EndComment = "*/",
+                                                                                     LineComment = "--"
+                                                                                 },
+                                                                                 new Language
+                                                                                 {
+                                                                                     Extensions = new[] { ".php" }, BeginComment = "/*", EndComment = "*/",
+                                                                                     LineComment = "//"
+                                                                                 },
+                                                                                 new Language
+                                                                                 {
+                                                                                     Extensions = new[] { ".wxs", ".wxl", ".wxi" }, BeginComment = "<!--",
+                                                                                     EndComment = "-->"
+                                                                                 },
+                                                                                 new Language
+                                                                                 {
+                                                                                     Extensions = new[] { ".py" }, BeginComment = "\"\"\"",
+                                                                                     EndComment = "\"\"\""
+                                                                                 },
+                                                                                 new Language
+                                                                                 {
+                                                                                     Extensions = new[] { ".fs" }, BeginComment = "(*", EndComment = "*)",
+                                                                                     LineComment = "//"
+                                                                                 },
+                                                                                 new Language
+                                                                                 {
+                                                                                     Extensions = new[] { ".cshtml", ".vbhtml" }, BeginComment = "@*",
+                                                                                     EndComment = "*@"
+                                                                                 }
+                                                                             };
 
+    /// <summary>
+    ///   Initializes a new <see cref="CoreOptions" /> instance with its default values.
+    /// </summary>
     public CoreOptions ()
     {
       SetDefaultValues();
     }
 
+    /// <summary>
+    ///   Initializes a new <see cref="CoreOptions" /> instance.
+    /// </summary>
+    /// <param name="initializeWithDefaultValues">
+    ///   Determines whether default values as specified by static members of this
+    ///   class should be used or if type-specific initialization values should be used (e. g. empty list for empty list for
+    ///   enumerable types, <see langword="default(T)" /> for other types).
+    /// </param>
     public CoreOptions (bool initializeWithDefaultValues)
     {
       if (initializeWithDefaultValues)
         SetDefaultValues();
       else
         InitializeValues();
+    }
+
+    /// <summary>
+    ///   Generates an <see cref="IEnumerable{T}"/> whose generic type argument is <see cref="string"/> that represent all keywords
+    ///   in a specifiable string, with each recognized keyword being one entry in the enumerable.
+    /// </summary>
+    /// <param name="requiredKeywords">
+    ///   The string containing keywords to be converted to an enumerable. Keywords are separated by "," and possibly whitespaces.
+    /// </param>
+    /// <returns>
+    ///   Returns an <see cref="IEnumerable{T}"/> whose generic type argument is <see cref="string"/> that represent all keywords
+    ///   recognized in <paramref name="requiredKeywords"/>.
+    /// </returns>
+    public static IEnumerable<string> RequiredKeywordsAsEnumerable (string requiredKeywords)
+    {
+      return requiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim());
     }
 
     /// <summary>

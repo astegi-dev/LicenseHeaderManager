@@ -42,11 +42,11 @@ namespace Core
         while (!reader.EndOfStream)
         {
           var line = reader.ReadLine();
-          if (line != null && line.StartsWith (LicenseHeaderReplacer.ExtensionKeyword))
+          if (line != null && line.StartsWith (ExtensionKeyword))
           {
             UpdateHeaders (headers, extensions, header);
 
-            extensions = line.Substring (LicenseHeaderReplacer.ExtensionKeyword.Length).Split (new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+            extensions = line.Substring (ExtensionKeyword.Length).Split (new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select (extension => extension.InsertDotIfNecessary());
             header.Clear();
           }
@@ -72,5 +72,16 @@ namespace Core
       foreach (var extension in extensions)
         headers[extension] = array;
     }
+
+    /// <summary>
+    ///   The file extension of License Header Definition files.
+    /// </summary>
+    public const string HeaderDefinitionExtension = ".licenseheader";
+
+    /// <summary>
+    ///   The text representing the start of the listing of extensions belonging to one license header definition within a
+    ///   license header definition file.
+    /// </summary>
+    internal const string ExtensionKeyword = "extensions:";
   }
 }

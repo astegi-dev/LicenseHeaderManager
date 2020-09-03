@@ -94,7 +94,7 @@ namespace LicenseHeaderManager.Headers
       var solutionDirectory = Path.GetDirectoryName (solution.FullName);
       var solutionFileName = Path.GetFileName (solution.FullName);
 
-      var solutionHeaderFilePath = Path.Combine (solutionDirectory, solutionFileName + LicenseHeaderReplacer.HeaderDefinitionExtension);
+      var solutionHeaderFilePath = Path.Combine (solutionDirectory, solutionFileName + LicenseHeaderExtractor.HeaderDefinitionExtension);
       return File.Exists (solutionHeaderFilePath) ? LicenseHeadersPackage.Instance.LicenseHeaderExtractor.ExtractHeaderDefinitions (solutionHeaderFilePath) : null;
     }
 
@@ -181,7 +181,7 @@ namespace LicenseHeaderManager.Headers
             //
           }
 
-          if (fileName != null && Path.GetExtension (fileName).ToLowerInvariant() == LicenseHeaderReplacer.HeaderDefinitionExtension)
+          if (fileName != null && Path.GetExtension (fileName).ToLowerInvariant() == LicenseHeaderExtractor.HeaderDefinitionExtension)
             return fileName;
         }
 

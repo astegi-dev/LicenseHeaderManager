@@ -50,6 +50,16 @@ namespace Core
     /// <summary>
     ///   Specifies that the header definition for the file's language is null or empty.
     /// </summary>
-    EmptyHeader
+    EmptyHeader,
+
+    /// <summary>
+    /// Specifies that the file could not be found, i. e. it does not exist.
+    /// </summary>
+    FileNotFound,
+
+    /// <summary>
+    /// Specifies that the operation was cancelled because the file is a license header definition document.
+    /// </summary>
+    LicenseHeaderDocument
   }
 }

@@ -27,17 +27,6 @@ namespace Core
   /// </summary>
   public class LicenseHeaderReplacer
   {
-    /// <summary>
-    ///   The file extension of License Header Definition files.
-    /// </summary>
-    public const string HeaderDefinitionExtension = ".licenseheader";
-
-    /// <summary>
-    ///   The text representing the start of the listing of extensions belonging to one license header definition within a
-    ///   license header definition file.
-    /// </summary>
-    public const string ExtensionKeyword = "extensions:";
-
     private readonly IEnumerable<string> _keywords;
     private readonly IEnumerable<Language> _languages;
     private readonly SemaphoreSlim _progressReportSemaphore;
@@ -311,17 +300,20 @@ namespace Core
             return errorSupplier (licenseHeaderInput, ReplacerErrorType.LanguageNotFound, message);
 
           case CreateDocumentResult.EmptyHeader:
-            message = string.Format (Resources.Error_HeaderNullOrEmpty, licenseHeaderInput.Extension);
+            message = string.Format (Resources.Error_HeaderNullOrEmpty, licenseHeaderInput.Extension).ReplaceNewLines();
             return errorSupplier (licenseHeaderInput, ReplacerErrorType.EmptyHeader, message);
 
           case CreateDocumentResult.NoHeaderFound:
-            message = string.Format (Resources.Error_NoHeaderFound).ReplaceNewLines();
+            message = string.Format (Resources.Error_NoHeaderFound, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
             return errorSupplier (licenseHeaderInput, ReplacerErrorType.NoHeaderFound, message);
 
           case CreateDocumentResult.LicenseHeaderDocument:
-            message = string.Format (HeaderDefinitionExtension).ReplaceNewLines();
-            return errorSupplier (licenseHeaderInput, ReplacerErrorType.Miscellaneous, message);
+            message = string.Format (Resources.Error_LicenseHeaderDefinition_InvalidTarget, Path.GetExtension (licenseHeaderInput.DocumentPath)).ReplaceNewLines();
+            return errorSupplier (licenseHeaderInput, ReplacerErrorType.LicenseHeaderDocument, message);
 
+          case CreateDocumentResult.FileNotFound:
+            message = string.Format (Resources.Error_FileNotFound, licenseHeaderInput.DocumentPath).ReplaceNewLines();
+            return errorSupplier (licenseHeaderInput, ReplacerErrorType.FileNotFound, message);
           default:
             throw new ArgumentOutOfRangeException();
         }
@@ -389,7 +381,10 @@ namespace Core
     {
       document = null;
 
-      if (licenseHeaderInput.Extension == HeaderDefinitionExtension)
+      if (licenseHeaderInput is LicenseHeaderPathInput pathInput && !File.Exists (pathInput.DocumentPath))
+        return CreateDocumentResult.FileNotFound;
+
+      if (licenseHeaderInput.Extension == LicenseHeaderExtractor.HeaderDefinitionExtension)
         return CreateDocumentResult.LicenseHeaderDocument;
 
       var language = GetLanguageFromExtension (licenseHeaderInput.Extension);
@@ -499,6 +494,11 @@ namespace Core
       ///   Document was created successfully.
       /// </summary>
       DocumentCreated,
+
+      /// <summary>
+      /// The file that denotes the basis of the document does not exists.
+      /// </summary>
+      FileNotFound,
 
       /// <summary>
       ///   The <see cref="LicenseHeaderReplacer" /> instance was not initialized with a <see cref="Language" /> instance

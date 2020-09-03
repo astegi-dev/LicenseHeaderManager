@@ -63,9 +63,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
                           {
                               CheckFileExists = true,
                               CheckPathExists = true,
-                              DefaultExt = LicenseHeaderReplacer.HeaderDefinitionExtension,
+                              DefaultExt = LicenseHeaderExtractor.HeaderDefinitionExtension,
                               DereferenceLinks = true,
-                              Filter = "License Header Definitions|*" + LicenseHeaderReplacer.HeaderDefinitionExtension,
+                              Filter = "License Header Definitions|*" + LicenseHeaderExtractor.HeaderDefinitionExtension,
                               InitialDirectory = Path.GetDirectoryName (fileName)
                           };
       var result = dialog.ShowDialog();

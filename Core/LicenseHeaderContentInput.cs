@@ -30,8 +30,8 @@ namespace Core
     /// <param name="documentPath">The path of the file whose headers are to be modified.</param>
     /// <param name="headers">
     ///   The header definitions of the file whose headers are to be modified. Keys are language
-    ///   extensions, values represent the definition for the respective language - one line per array index. Value should be
-    ///   null if headers are only to be removed.
+    ///   extensions, values represent the definition for the respective language - one line per array index. The dictionary
+    ///   should be null if the headers are to be removed.
     /// </param>
     /// <param name="additionalProperties">
     ///   Additional properties that cannot be expanded by the Core whose tokens should be

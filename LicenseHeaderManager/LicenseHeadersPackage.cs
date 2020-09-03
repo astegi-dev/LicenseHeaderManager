@@ -20,6 +20,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Core;
+using Core.Options;
 using EnvDTE;
 using EnvDTE80;
 using LicenseHeaderManager.Headers;
@@ -116,9 +117,7 @@ namespace LicenseHeaderManager
     {
       get
       {
-        var keywords = GeneralOptionsPageModel.UseRequiredKeywords
-            ? GeneralOptionsPageModel.RequiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim())
-            : null;
+        var keywords = GeneralOptionsPageModel.UseRequiredKeywords ? CoreOptions.RequiredKeywordsAsEnumerable (GeneralOptionsPageModel.RequiredKeywords) : null;
         return new LicenseHeaderReplacer (LanguagesPageModel.Languages, keywords);
       }
     }
