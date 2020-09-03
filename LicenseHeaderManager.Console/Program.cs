@@ -131,7 +131,7 @@ namespace LicenseHeaderManager.Console
       var headers = mode == UpdateMode.Add ? headerExtractor.ExtractHeaderDefinitions(definitionFilePath) : null;
       var replacerInput = new LicenseHeaderPathInput(filePath, headers);
 
-      var replacerResult = replacer.RemoveOrReplaceHeader(replacerInput).GetAwaiter().GetResult();
+      var replacerResult = replacer.RemoveOrReplaceHeader(replacerInput).Result;
 
       if (!replacerResult.IsSuccess)
       {
@@ -156,7 +156,7 @@ namespace LicenseHeaderManager.Console
           replacerInput.ToList(), 
           new ConsoleProgress<ReplacerProgressReport> (progress =>
           {
-            System.Console.WriteLine ($"{progress.ProcessedFileCount} of {progress.TotalFileCount} files have been updated.");
+            System.Console.WriteLine ($"File '{progress.ProcessedFilePath}' updated ({progress.ProcessedFileCount}/{progress.TotalFileCount})");
           }), 
           new CancellationToken()).Result;
 
