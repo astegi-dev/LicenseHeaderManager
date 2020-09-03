@@ -17,6 +17,11 @@ using System.Windows.Data;
 
 namespace LicenseHeaderManager.UpdateViews
 {
+  /// <summary>
+  /// This class is used to convert the values of a progress bar.
+  /// To prevent the progress bar from initially setting to 100% when 0 files have been
+  /// processed (because '0/0 files processed' will result in a full progress bar), a value of 0 will return 1.
+  /// </summary>
   internal class IntToMaximumConverter : IValueConverter
   {
     /// <summary>

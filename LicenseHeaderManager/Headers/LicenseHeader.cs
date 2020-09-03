@@ -23,16 +23,23 @@ namespace LicenseHeaderManager.Headers
 {
   public static class LicenseHeader
   {
+    /// <summary>
+    /// Gets the name for the new License Header Definition File.
+    /// </summary>
+    /// <param name="project">The project where the License Header Definition File is located.</param>
+    /// <returns>The file name of the License Header Definition File.</returns>
     private static string GetNewFullName(Project project)
     {
       //This is just to check if activeProject.FullName contains the FullName as expected. 
       //If an Project Type uses this Property incorrectly, we try generating the .licenseheader filename with the .FileName Property
-      if (string.IsNullOrEmpty(Path.GetDirectoryName(project.FullName)))
-        return GetNewFullName(project.FileName);
-
-      return GetNewFullName(project.FullName);
+      return GetNewFullName(string.IsNullOrEmpty(Path.GetDirectoryName(project.FullName)) ? project.FileName : project.FullName);
     }
 
+    /// <summary>
+    /// Gets the name for the new License Header Definition File.
+    /// </summary>
+    /// <param name="name">The name of the active project.</param>
+    /// <returns>The file name of the License Header Definition File.</returns>
     private static string GetNewFullName(string name)
     {
       var directory = Path.GetDirectoryName(name);
@@ -57,6 +64,11 @@ namespace LicenseHeaderManager.Headers
       return fileName;
     }
 
+    /// <summary>
+    /// Gets the file path to the License Header Definition File in the active solution.
+    /// </summary>
+    /// <param name="solution">The solution in which the definition file should be located.</param>
+    /// <returns>The full file path to the License Header Definition File.</returns>
     public static string GetHeaderDefinitionFilePathForSolution(Solution solution)
     {
       var solutionDirectory = Path.GetDirectoryName(solution.FullName);
@@ -64,6 +76,12 @@ namespace LicenseHeaderManager.Headers
       return Path.Combine(solutionDirectory, solutionFileName + LicenseHeaderExtractor.HeaderDefinitionExtension);
     }
 
+    /// <summary>
+    /// Shows a message box that asks if a new License Header Definition File should be added to the active project.
+    /// </summary>
+    /// <param name="activeProject">The project where the definition file will be inserted.</param>
+    /// <param name="pageModel">The page model where the license header definition text is stored.</param>
+    /// <returns>True if a new License Header Definition file should be added to the current project, otherwise false.</returns>
     public static bool ShowQuestionForAddingLicenseHeaderFile(Project activeProject, IDefaultLicenseHeaderPageModel pageModel)
     {
       var message = string.Format(Resources.Error_NoHeaderDefinition, activeProject.Name).ReplaceNewLines();
@@ -77,9 +95,12 @@ namespace LicenseHeaderManager.Headers
     /// <summary>
     ///   Adds a new License Header Definition file to the active project.
     /// </summary>
+    /// <param name="activeProject">The project where the defintion file will be inserted.</param>
+    /// <param name="pageModel">The page model where the license header definition text is stored.</param>
+    /// <returns></returns>
     public static ProjectItem AddHeaderDefinitionFile(Project activeProject, IDefaultLicenseHeaderPageModel pageModel)
     {
-      if (IsValidProject(activeProject))
+      if (IsInvalidProject(activeProject))
         return null;
 
       var fileName = GetNewFullName(activeProject);
@@ -95,16 +116,23 @@ namespace LicenseHeaderManager.Headers
       return newProjectItem;
     }
 
-    private static bool IsValidProject(Project activeProject)
+    /// <summary>
+    /// Checks if the given project is invalid.
+    /// </summary>
+    /// <param name="activeProject">The project to be checked.</param>
+    /// <returns>True if the given project is invalid, false if it is valid (exists).</returns>
+    private static bool IsInvalidProject(Project activeProject)
     {
-      return activeProject == null ||
-             string.IsNullOrEmpty(activeProject.FullName)
-             && string.IsNullOrEmpty(activeProject.FileName); //It is possible that we receive a Project which is missing the Path property entirely.
+      //It is possible that we receive a Project which is missing the Path property entirely.
+      return activeProject == null || string.IsNullOrEmpty(activeProject.FullName) && string.IsNullOrEmpty(activeProject.FileName);
     }
 
     /// <summary>
-    ///   Adds a new License Header Definition file to a folder
+    ///   Adds a new License Header Definition file to the active folder.
     /// </summary>
+    /// <param name="folder">The folder where the file will be inserted.</param>
+    /// <param name="pageModel">The page model where the license header definition text is stored.</param>
+    /// <returns></returns>
     public static ProjectItem AddLicenseHeaderDefinitionFile(ProjectItem folder, IDefaultLicenseHeaderPageModel pageModel)
     {
       if (folder == null || folder.Kind != Constants.vsProjectItemKindPhysicalFolder)
@@ -120,6 +148,11 @@ namespace LicenseHeaderManager.Headers
       return newProjectItem;
     }
 
+    /// <summary>
+    /// Opens the given project item in a new window.
+    /// </summary>
+    /// <param name="newProjectItem">The project item to be opened in a new window.</param>
+    /// <returns>True if the project item can be opened in a window, otherwise false.</returns>
     private static bool OpenNewProjectItem(ProjectItem newProjectItem)
     {
       if (newProjectItem != null)
@@ -134,6 +167,11 @@ namespace LicenseHeaderManager.Headers
       return false;
     }
 
+    /// <summary>
+    /// Adds a dot to a string if the string does not start with a dot.
+    /// </summary>
+    /// <param name="extension">The string where the dot will be added.</param>
+    /// <returns>The string with one leading dot.</returns>
     public static string AddDot(string extension)
     {
       if (extension.StartsWith("."))
