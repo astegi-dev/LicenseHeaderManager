@@ -29,16 +29,10 @@ namespace Core
     /// <param name="processedFilePath">The path of the file that has just been processed.</param>
     /// <param name="processFileNewContent">The new content of the file that has just been processed.</param>
     public ReplacerProgressContentReport (int totalFileCount, int processedFileCount, string processedFilePath, string processFileNewContent)
-        : base (totalFileCount, processedFileCount)
+        : base (totalFileCount, processedFileCount, processedFilePath)
     {
-      ProcessedFilePath = processedFilePath;
       ProcessFileNewContent = processFileNewContent;
     }
-
-    /// <summary>
-    ///   Gets the path of the file that has just been processed.
-    /// </summary>
-    public string ProcessedFilePath { get; }
 
     /// <summary>
     ///   Gets the new content of the file that has just been processed.

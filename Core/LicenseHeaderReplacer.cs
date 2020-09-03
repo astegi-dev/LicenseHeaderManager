@@ -421,7 +421,7 @@ namespace Core
       cancellationToken.ThrowIfCancellationRequested();
       if (TryCreateDocument (licenseHeaderInput, out var document) != CreateDocumentResult.DocumentCreated)
       {
-        await ReportProgress (progress, cancellationToken);
+        await ReportProgress (progress, licenseHeaderInput.DocumentPath, cancellationToken);
         return;
       }
 
@@ -433,7 +433,7 @@ namespace Core
         errors.Enqueue (new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, ReplacerErrorType.NonCommentText, message));
 
         cancellationToken.ThrowIfCancellationRequested();
-        await ReportProgress (progress, cancellationToken);
+        await ReportProgress (progress, licenseHeaderInput.DocumentPath, cancellationToken);
         return;
       }
 
@@ -448,7 +448,7 @@ namespace Core
         errors.Enqueue (new ReplacerError<LicenseHeaderPathInput> (licenseHeaderInput, ReplacerErrorType.ParsingError, message));
       }
 
-      await ReportProgress (progress, cancellationToken);
+      await ReportProgress (progress, licenseHeaderInput.DocumentPath, cancellationToken);
     }
 
     private void ResetProgress (int totalFileCount)
@@ -457,13 +457,13 @@ namespace Core
       _totalFileCount = totalFileCount;
     }
 
-    private async Task ReportProgress (IProgress<ReplacerProgressReport> progress, CancellationToken cancellationToken)
+    private async Task ReportProgress (IProgress<ReplacerProgressReport> progress, string filePath, CancellationToken cancellationToken)
     {
       await _progressReportSemaphore.WaitAsync (cancellationToken);
       try
       {
         _processedFileCount++;
-        progress.Report (new ReplacerProgressReport (_totalFileCount, _processedFileCount));
+        progress.Report (new ReplacerProgressReport (_totalFileCount, _processedFileCount, filePath));
       }
       finally
       {

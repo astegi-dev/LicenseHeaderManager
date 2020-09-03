@@ -25,11 +25,18 @@ namespace Core
     /// </summary>
     /// <param name="totalFileCount">The overall number of files that are to be updated.</param>
     /// <param name="processedFileCount">The number of file that have already been processed.</param>
-    public ReplacerProgressReport (int totalFileCount, int processedFileCount)
+    /// <param name="processedFilePath">The path of the file that has just been processed.</param>
+    public ReplacerProgressReport (int totalFileCount, int processedFileCount, string processedFilePath)
     {
       TotalFileCount = totalFileCount;
       ProcessedFileCount = processedFileCount;
+      ProcessedFilePath = processedFilePath;
     }
+
+    /// <summary>
+    ///   Gets the path of the file that has just been processed.
+    /// </summary>
+    public string ProcessedFilePath { get; }
 
     /// <summary>
     ///   Gets the overall number of files that are to be updated over the course of one invocation of the
