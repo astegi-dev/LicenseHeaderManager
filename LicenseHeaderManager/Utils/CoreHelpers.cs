@@ -56,13 +56,7 @@ namespace LicenseHeaderManager.Utils
         return;
 
       baseUpdateViewModel.FileCountCurrentProject = progress.TotalFileCount;
-
-      // IProgress relies on SynchronizationContext. Thus, in the current architecture, OnProgressReportAsync callbacks are not always guaranteed to be executed
-      // in the same order as they are reported from the Core (especially if reports happen at the same time). Countering that, the ProgressBar value is updated
-      // only if reported value is higher than last one (or on reset). The resulting drawback that some progress "steps" might be skipped is negligible and not
-      // detrimental to the user feedback (for instance, it happens if a few Core threads being responsible for small files finish at roughly the same time).
-      if (progress.ProcessedFileCount <= 1 || progress.ProcessedFileCount > baseUpdateViewModel.ProcessedFilesCountCurrentProject)
-        baseUpdateViewModel.ProcessedFilesCountCurrentProject = progress.ProcessedFileCount;
+      baseUpdateViewModel.ProcessedFilesCountCurrentProject = progress.ProcessedFileCount;
 
       if (baseUpdateViewModel is SolutionUpdateViewModel solutionUpdateViewModel)
         solutionUpdateViewModel.CurrentProject = projectName;
@@ -70,7 +64,7 @@ namespace LicenseHeaderManager.Utils
 
     public static IProgress<ReplacerProgressContentReport> CreateProgress(BaseUpdateViewModel viewModel, string projectName, IDictionary<string, bool> fileOpenedStatus, CancellationToken cancellationToken)
     {
-      return new Progress<ReplacerProgressContentReport>(report => OnProgressReportedAsync(report, viewModel, projectName, fileOpenedStatus, cancellationToken).FireAndForget());
+      return new ReplacerProgress<ReplacerProgressContentReport>(report => OnProgressReportedAsync(report, viewModel, projectName, fileOpenedStatus, cancellationToken).FireAndForget());
     }
 
     public static ICollection<LicenseHeaderContentInput> GetFilesToProcess(
@@ -129,7 +123,7 @@ namespace LicenseHeaderManager.Utils
     {
       if (result.IsSuccess)
       {
-        ProcessSuccess(result.Success, extension, isOpen);
+        ProcessSuccess (result.Success, extension, isOpen);
         return;
       }
 
@@ -155,13 +149,20 @@ namespace LicenseHeaderManager.Utils
           break;
 
         case ReplacerErrorType.LanguageNotFound:
-          // TODO possible threading issue: languages page is opened but window closes immediately after showing
-          if (MessageBoxHelper.AskYesNo(error.Description, Resources.Error))
-            extension.ShowLanguagesPage();
+          // TODO possible feature: show languages page if language is not found
+          // in below code, languages page closes immediately after opening because we return from the method -> remedy for this would be needed 
+          // var showLanguagePage = MessageBoxHelper.AskYesNo (error.Description, Resources.Error);
+          // if (showLanguagePage) extension.ShowLanguagesPage();
           return;
+        
+        case ReplacerErrorType.LicenseHeaderDocument:
+          return; // ignore such an error (i. e. do not propagate to user)
+
+        default:
+          throw new ArgumentOutOfRangeException();
       }
 
-      s_log.Error($"File '{error.Input.DocumentPath}' failed: {error.Description}");
+      s_log.Error($"File '{error.Input.DocumentPath}' failed with error '{error.Type}': {error.Description}");
       MessageBoxHelper.ShowError($"An unexpected error has occurred: {error.Description}");
     }
 
@@ -202,7 +203,7 @@ namespace LicenseHeaderManager.Utils
       }
 
       // collect other errors and the ones that occurred while "force-inserting" headers with non-comment-text
-      var overallErrors = errors.Where(x => x.Type != ReplacerErrorType.NonCommentText).ToList();
+      var overallErrors = errors.Where(x => x.Type != ReplacerErrorType.NonCommentText && x.Type != ReplacerErrorType.LicenseHeaderDocument).ToList();
       if (inputIgnoringNonCommentText.Count > 0)
       {
         viewModel.FileCountCurrentProject = inputIgnoringNonCommentText.Count;
@@ -223,7 +224,7 @@ namespace LicenseHeaderManager.Utils
         s_log.Error($"File '{otherError.Input.DocumentPath}' failed: {otherError.Description}");
     }
 
-    public static bool TrySetContent(string itemPath, Solution solution, string content, bool wasOpen, ILicenseHeaderExtension extension)
+    private static bool TrySetContent(string itemPath, Solution solution, string content, bool wasOpen, ILicenseHeaderExtension extension)
     {
       var item = solution.FindProjectItem(itemPath);
       if (item == null)

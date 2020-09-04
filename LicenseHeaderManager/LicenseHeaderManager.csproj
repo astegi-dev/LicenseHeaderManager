@@ -354,6 +354,7 @@
     <Compile Include="Utils\MessageBoxHelper.cs" />
     <Compile Include="Utils\ProjectItemInspection.cs" />
     <Compile Include="Utils\Extensions.cs" />
+    <Compile Include="Utils\ReplacerProgress.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
