@@ -21,6 +21,9 @@ using Window = System.Windows.Window;
 
 namespace LicenseHeaderManager.MenuItemButtonHandler
 {
+  /// <summary>
+  /// Acts as a type work to be done by a <see cref="IMenuItemButtonHandler"/> instance can be delegated to.
+  /// </summary>
   public abstract class MenuItemButtonHandlerHelper
   {
     internal const string UnsupportedOverload =
@@ -36,6 +39,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
     ///   Carries out the work that the corresponding <see cref="IMenuItemButtonHandler" /> instance wants to delegate to this
     ///   <see cref="MenuItemButtonHandlerHelper" /> instance.
     /// </summary>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests</param>
     /// <param name="viewModel">
     ///   The view model this helper needs to update in order to reflect process in the corresponding
     ///   dialog window.
@@ -58,6 +62,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
     ///   Carries out the work that the corresponding <see cref="IMenuItemButtonHandler" />  instance wants to delegate to this
     ///   <see cref="MenuItemButtonHandlerHelper" /> instance.
     /// </summary>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests</param>
     /// <param name="viewModel">
     ///   The view model this helper needs to update in order to reflect process in the corresponding
     ///   dialog window.
@@ -76,6 +81,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
     ///   Carries out the work that the corresponding <see cref="IMenuItemButtonHandler" />
     ///   instance wants to delegate to this <see cref="MenuItemButtonHandlerHelper" /> instance.
     /// </summary>
+    /// <param name="cancellationToken">The token to monitor for cancellation requests</param>
     /// <param name="viewModel">
     ///   The view model this helper needs to update in order to reflect process in the corresponding
     ///   dialog window.

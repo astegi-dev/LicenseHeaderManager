@@ -17,8 +17,29 @@ using LicenseHeaderManager.MenuItemButtonHandler.Helpers;
 
 namespace LicenseHeaderManager.MenuItemButtonHandler
 {
+  /// <summary>
+  ///   Represents static factory class providing static methods facilitating the instantiation of types implementing the
+  ///   <see cref="IMenuItemButtonHandler" /> interface.
+  /// </summary>
   internal static class MenuItemButtonHandlerFactory
   {
+    /// <summary>
+    ///   Creates an instance of the type implementing the <see cref="IMenuItemButtonHandler" /> interface that fits the given
+    ///   parameters.
+    /// </summary>
+    /// <param name="level">The level the <see cref="IMenuItemButtonHandler" /> instance to be created should operate on.</param>
+    /// <param name="mode">
+    ///   The license header insertion mode to be used by the <see cref="IMenuItemButtonHandler" /> instance
+    ///   to be created.
+    /// </param>
+    /// <param name="licenseHeadersPackage">
+    ///   The <see cref="ILicenseHeaderExtension" /> instance the
+    ///   <see cref="IMenuItemButtonHandler" /> instance to be created may use for its operations.
+    /// </param>
+    /// <returns>
+    ///   Returns a´n <see cref="IMenuItemButtonHandler" /> instance operating on the level specified by
+    ///   <paramref name="level" /> and executing operations of the mode specified by <paramref name="mode" />.
+    /// </returns>
     public static IMenuItemButtonHandler CreateHandler (MenuItemButtonLevel level, MenuItemButtonOperation mode, ILicenseHeaderExtension licenseHeadersPackage)
     {
       return level switch

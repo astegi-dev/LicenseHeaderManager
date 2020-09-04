@@ -42,7 +42,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       _baseUpdateViewModel = baseUpdateViewModel;
     }
 
-    public async Task<AddLicenseHeaderToAllFilesResult> ExecuteAsync (object projectOrProjectItem)
+    public async Task<AddLicenseHeaderToAllFilesResult> RemoveOrReplaceHeadersAsync (object projectOrProjectItem)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var project = projectOrProjectItem as Project;
