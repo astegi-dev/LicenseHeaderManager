@@ -28,6 +28,9 @@ using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.Utils
 {
+  /// <summary>
+  /// This class provides methods regarding the license header extensions.
+  /// </summary>
   internal static class Extensions
   {
     private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
@@ -77,6 +80,13 @@ namespace LicenseHeaderManager.Utils
       return new AdditionalProperty (token, canCreateValue() ? createValue() : token);
     }
 
+    /// <summary>
+    /// Adds the license header text for the specified extension to the given project item.
+    /// </summary>
+    /// <param name="item">Specifies the project item in which the license header text is to be inserted.</param>
+    /// <param name="extension">Specifies the extension of the language whose content should be added to the project item.</param>
+    /// <param name="calledByUser">Specifies whether this method was called explicitly by the user or by the program.</param>
+    /// <returns></returns>
     public static async Task AddLicenseHeaderToItemAsync (
         this ProjectItem item,
         ILicenseHeaderExtension extension,
@@ -103,6 +113,13 @@ namespace LicenseHeaderManager.Utils
         await AddLicenseHeaderToItemAsync (item, extension, true);
     }
 
+    /// <summary>
+    /// Returns the document content of the given project item that has the language of the given extension and returns it as string.
+    /// </summary>
+    /// <param name="item">Specifies the project item whose specific content should be returned.</param>
+    /// <param name="wasAlreadyOpen">Specifies whether the project item was already open before this method was called.</param>
+    /// <param name="extension">Specifies the extension of the language whose content should be returned.</param>
+    /// <returns></returns>
     public static string GetContent (this ProjectItem item, out bool wasAlreadyOpen, ILicenseHeaderExtension extension)
     {
       wasAlreadyOpen = item.IsOpen();
@@ -129,6 +146,11 @@ namespace LicenseHeaderManager.Utils
       return content;
     }
 
+    /// <summary>
+    /// Checks whether the given project item is open.
+    /// </summary>
+    /// <param name="item">Specifies the project item to be checked if it is open.</param>
+    /// <returns></returns>
     public static bool IsOpen (this ProjectItem item)
     {
       return item.IsOpen[Constants.vsViewKindTextView];

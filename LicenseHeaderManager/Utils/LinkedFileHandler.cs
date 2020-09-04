@@ -32,6 +32,11 @@ namespace LicenseHeaderManager.Utils
 
     public string Message { get; private set; }
 
+    /// <summary>
+    /// Applies the license headers on the linked files in the linked file filter.
+    /// </summary>
+    /// <param name="linkedFileFilter">Specifies the linked file filter that holds the project items.</param>
+    /// <returns></returns>
     public async Task HandleAsync (ILinkedFileFilter linkedFileFilter)
     {
       foreach (var projectItem in linkedFileFilter.ToBeProgressed)

@@ -62,6 +62,14 @@ namespace LicenseHeaderManager.Utils
         solutionUpdateViewModel.CurrentProject = projectName;
     }
 
+    /// <summary>
+    /// Creates a replacer progress that represents the progress of updated files in folders and projects.
+    /// </summary>
+    /// <param name="viewModel">Specifies the view model that contains the progress bar whose update progress should be visualized.</param>
+    /// <param name="projectName">Specifies the name of the project that is updated.</param>
+    /// <param name="fileOpenedStatus">Specifies what files are currently open in the current project.</param>
+    /// <param name="cancellationToken">Specifies the cancellation token that indicates if the current updating progress has been cancelled by the user.</param>
+    /// <returns></returns>
     public static IProgress<ReplacerProgressContentReport> CreateProgress(BaseUpdateViewModel viewModel, string projectName, IDictionary<string, bool> fileOpenedStatus, CancellationToken cancellationToken)
     {
       return new ReplacerProgress<ReplacerProgressContentReport>(report => OnProgressReportedAsync(report, viewModel, projectName, fileOpenedStatus, cancellationToken).FireAndForget());
@@ -115,6 +123,14 @@ namespace LicenseHeaderManager.Utils
       return files;
     }
 
+    /// <summary>
+    /// Handles the given result object and shows the corresponding message box if an error occurred.
+    /// </summary>
+    /// <param name="result">Specifies the replacer result. Indicates whether the specific operation succeeded or failed.</param>
+    /// <param name="extension">Specifies the extension of the language.</param>
+    /// <param name="isOpen">Specifies if the current file is currently open.</param>
+    /// <param name="calledByUser">Specifies whether this method was called explicitly by the user or by the program.</param>
+    /// <returns></returns>
     public static async Task HandleResultAsync(
         ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> result,
         ILicenseHeaderExtension extension,
