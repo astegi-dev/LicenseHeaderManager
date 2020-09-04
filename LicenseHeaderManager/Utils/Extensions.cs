@@ -47,12 +47,17 @@ namespace LicenseHeaderManager.Utils
     /// <summary>
     ///   Replaces occurrences of "\n" in a string by new line characters.
     /// </summary>
-    /// <returns>A <see cref="string" /> where all occurrences of "\n" have been replaced by new line characters</returns>
+    /// <returns>A <see cref="string" /> where all occurrences of "\n" have been replaced by new line characters.</returns>
     public static string ReplaceNewLines (this string input)
     {
       return input.Replace (@"\n", "\n");
     }
 
+    /// <summary>
+    /// Returns a list of <see cref="AdditionalProperty"/> based on the given project item.
+    /// </summary>
+    /// <param name="item">Specifies the project item of which the additional properties should be extracted.</param>
+    /// <returns></returns>
     public static IEnumerable<AdditionalProperty> GetAdditionalProperties (this ProjectItem item)
     {
       // ThreadHelper.ThrowIfNotOnUIThread();

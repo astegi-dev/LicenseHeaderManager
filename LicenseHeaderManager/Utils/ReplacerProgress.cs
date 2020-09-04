@@ -15,6 +15,10 @@ using System;
 
 namespace LicenseHeaderManager.Utils
 {
+  /// <summary>
+  /// This class ensures that the files are processed and displayed in the correct order in the progress bar.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
   public class ReplacerProgress<T> : IProgress<T>
   {
     private readonly Action<T> _action;
