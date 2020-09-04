@@ -15,6 +15,10 @@ using System;
 
 namespace LicenseHeaderManager.Console
 {
+  /// <summary>
+  /// This class ensures that the files are processed and printed in the correct order to the console.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
   public class ConsoleProgress<T> : IProgress<T>
   {
     private readonly Action<T> _action;
