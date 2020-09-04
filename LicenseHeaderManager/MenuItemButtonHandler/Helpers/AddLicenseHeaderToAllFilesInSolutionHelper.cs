@@ -136,7 +136,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
 
       foreach (var project in projectsInSolution)
       {
-        await addAllLicenseHeadersCommand.ExecuteAsync (project);
+        await addAllLicenseHeadersCommand.RemoveOrReplaceHeadersAsync (project);
         await IncrementProjectCountAsync (viewModel).ConfigureAwait (true);
       }
     }

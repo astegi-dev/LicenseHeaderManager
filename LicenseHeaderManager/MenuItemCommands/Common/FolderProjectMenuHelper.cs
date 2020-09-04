@@ -65,7 +65,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
           serviceProvider,
           folderProjectUpdateViewModel);
 
-      var addLicenseHeaderToAllFilesResult = await addLicenseHeaderToAllFilesCommand.ExecuteAsync (obj);
+      var addLicenseHeaderToAllFilesResult = await addLicenseHeaderToAllFilesCommand.RemoveOrReplaceHeadersAsync (obj);
 
       await HandleLinkedFilesAndShowMessageBoxAsync (serviceProvider, addLicenseHeaderToAllFilesResult.LinkedItems);
       await HandleAddLicenseHeaderToAllFilesInProjectResultAsync (
