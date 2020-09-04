@@ -28,6 +28,9 @@ namespace LicenseHeaderManager.Interfaces
     /// </summary>
     LicenseHeaderReplacer LicenseHeaderReplacer { get; }
 
+    /// <summary>
+    /// Gets a <see cref="Core.LicenseHeaderExtractor"/> instance used by the package to extract license header definition from a license header definiton file.
+    /// </summary>
     ILicenseHeaderExtractor LicenseHeaderExtractor { get; }
 
     /// <summary>
