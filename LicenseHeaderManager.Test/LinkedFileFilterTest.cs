@@ -65,6 +65,8 @@ namespace LicenseHeaderManager.Test
       licenseHeaderFile.Expect (x => x.FileCount).Return (1);
       licenseHeaderFile.Expect (x => x.FileNames[0]).Return (licenseHeaderFileName);
 
+      
+
       using (var writer = new StreamWriter (licenseHeaderFileName))
       {
         writer.WriteLine ("extension: .cs");
@@ -83,7 +85,9 @@ namespace LicenseHeaderManager.Test
       linkedFile.Expect (x => x.Name).Return ("linkedFile.cs");
       solution.Expect (x => x.FindProjectItem ("linkedFile.cs")).Return (linkedFile);
 
-
+      // resolve NullReferenceException:
+      // mock LicenseHeadersPackage.Instance.LicenseHeaderExtractor to return a (new) instance of LicenseHeaderExtractor
+      // => no NRE in LicenseHeaderFinder.ExtractHeaderDefinitions (headerFile) any more
       var linkedFileFilter = new LinkedFileFilter (solution);
       linkedFileFilter.Filter (new List<ProjectItem> { linkedFile });
 
