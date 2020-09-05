@@ -20,6 +20,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Forms;
 using EnvDTE;
+using Microsoft.VisualStudio.Shell;
 using Window = System.Windows.Window;
 
 namespace LicenseHeaderManager.Options.DialogPageControls
@@ -32,10 +33,10 @@ namespace LicenseHeaderManager.Options.DialogPageControls
     {
       InitializeComponent();
 
-      _timer = new Timer();
-      _timer.Interval = 200;
+      _timer = new Timer { Interval = 200 };
       _timer.Tick += OnTick;
 
+      ThreadHelper.ThrowIfNotOnUIThread();
       Command = command;
       Commands = from Command c in allCommands
           where !string.IsNullOrEmpty (c.Name)
@@ -60,12 +61,13 @@ namespace LicenseHeaderManager.Options.DialogPageControls
         //select the currently attached command
         try
         {
+          ThreadHelper.ThrowIfNotOnUIThread();
+
           var selected = allCommands.Item (command.Guid, command.Id);
-          if (selected != null)
-          {
-            commands.SelectedItem = selected;
-            commands.ScrollIntoView (selected);
-          }
+          if (selected == null)
+            return;
+          commands.SelectedItem = selected;
+          commands.ScrollIntoView (selected);
         }
         catch (ArgumentException)
         {
@@ -92,22 +94,22 @@ namespace LicenseHeaderManager.Options.DialogPageControls
     public LinkedCommand Command
     {
       get => DataContext as LinkedCommand;
-      set => DataContext = value;
+      private set => DataContext = value;
     }
 
     private void OkButton_Click (object sender, RoutedEventArgs e)
     {
-      var command = commands.SelectedItem as Command;
-      if (command != null)
-      {
-        Command.Name = command.Name;
-        Command.ExecutionTime = before.IsChecked.Value ? ExecutionTime.Before : ExecutionTime.After;
-        Command.Guid = command.Guid;
-        Command.Id = command.ID;
+      ThreadHelper.ThrowIfNotOnUIThread();
+      if (!(commands.SelectedItem is Command command))
+        return;
 
-        DialogResult = true;
-        Close();
-      }
+      Command.Name = command.Name;
+      Command.ExecutionTime = before.IsChecked != null && before.IsChecked.Value ? ExecutionTime.Before : ExecutionTime.After;
+      Command.Guid = command.Guid;
+      Command.Id = command.ID;
+
+      DialogResult = true;
+      Close();
     }
 
     private void OnTick (object sender, EventArgs e)
@@ -125,16 +127,14 @@ namespace LicenseHeaderManager.Options.DialogPageControls
 
     private bool Filter (object item)
     {
-      var command = item as Command;
-      if (command != null)
-      {
-        var chars = new[] { ' ', '.' };
-        var parts = command.Name.Split (chars, StringSplitOptions.RemoveEmptyEntries);
-        var queries = search.Text.Split (chars, StringSplitOptions.RemoveEmptyEntries);
-        return queries.All (q => parts.Any (p => p.ToLower().Contains (q.ToLower())));
-      }
+      ThreadHelper.ThrowIfNotOnUIThread();
+      if (!(item is Command command))
+        return false;
 
-      return false;
+      var chars = new[] { ' ', '.' };
+      var parts = command.Name.Split (chars, StringSplitOptions.RemoveEmptyEntries);
+      var queries = search.Text.Split (chars, StringSplitOptions.RemoveEmptyEntries);
+      return queries.All (q => parts.Any (p => p.ToLower().Contains (q.ToLower())));
     }
 
     private void OnSelectionChanged (object sender, SelectionChangedEventArgs e)

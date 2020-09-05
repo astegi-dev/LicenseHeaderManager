@@ -82,6 +82,7 @@ namespace LicenseHeaderManager.Utils
         out IDictionary<string, bool> fileOpenedStatus,
         bool searchForLicenseHeaders = true)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       fileOpenedStatus = new Dictionary<string, bool>();
       var files = new List<LicenseHeaderContentInput>();
       countSubLicenseHeaders = 0;
@@ -184,6 +185,7 @@ namespace LicenseHeaderManager.Utils
 
     private static void ProcessSuccess(ReplacerSuccess replacerSuccess, ILicenseHeaderExtension extension, bool isOpen)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       if (!File.Exists(replacerSuccess.FilePath) || TrySetContent(replacerSuccess.FilePath, extension.Dte2.Solution, replacerSuccess.NewContent, isOpen, extension))
         return;
 
@@ -242,6 +244,7 @@ namespace LicenseHeaderManager.Utils
 
     private static bool TrySetContent(string itemPath, Solution solution, string content, bool wasOpen, ILicenseHeaderExtension extension)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       var item = solution.FindProjectItem(itemPath);
       if (item == null)
         return false;
@@ -271,6 +274,8 @@ namespace LicenseHeaderManager.Utils
     {
       try
       {
+        ThreadHelper.ThrowIfNotOnUIThread();
+
         // Opening files potentially having non-text content (.png, .snk) might result in a Visual Studio error "Some bytes have been replaced with the
         // Unicode substitution character while loading file ...". In order to avoid this, files with unknown extensions are not opened. However, in order
         // to keep such files eligible as Core input, still return true
@@ -293,6 +298,7 @@ namespace LicenseHeaderManager.Utils
 
     public static void SaveAndCloseIfNecessary(ProjectItem item, bool wasOpen, bool wasSaved)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       if (wasOpen)
       {
         // if document had no unsaved changes before, it should not have any now (analogously for when it did have unsaved changes)

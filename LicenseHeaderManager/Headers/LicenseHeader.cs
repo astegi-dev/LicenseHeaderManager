@@ -18,6 +18,7 @@ using LicenseHeaderManager.Utils;
 using System;
 using System.IO;
 using System.Text;
+using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.Headers
 {
@@ -33,6 +34,7 @@ namespace LicenseHeaderManager.Headers
     /// <returns>The full file path to the License Header Definition File.</returns>
     public static string GetHeaderDefinitionFilePathForSolution(Solution solution)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       var solutionDirectory = Path.GetDirectoryName(solution.FullName);
       var solutionFileName = Path.GetFileName(solution.FullName);
       return Path.Combine(solutionDirectory, solutionFileName + LicenseHeaderExtractor.HeaderDefinitionExtension);
@@ -46,6 +48,7 @@ namespace LicenseHeaderManager.Headers
     /// <returns>True if a new License Header Definition file should be added to the current project, otherwise false.</returns>
     public static bool ShowQuestionForAddingLicenseHeaderFile(Project activeProject, IDefaultLicenseHeaderPageModel pageModel)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       var message = string.Format(Resources.Error_NoHeaderDefinition, activeProject.Name).ReplaceNewLines();
       if (!MessageBoxHelper.AskYesNo(message, Resources.Error))
         return false;
@@ -62,6 +65,8 @@ namespace LicenseHeaderManager.Headers
     /// <returns></returns>
     public static ProjectItem AddHeaderDefinitionFile(Project activeProject, IDefaultLicenseHeaderPageModel pageModel)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       if (IsInvalidProject(activeProject))
         return null;
 
@@ -86,6 +91,8 @@ namespace LicenseHeaderManager.Headers
     /// <returns></returns>
     public static ProjectItem AddLicenseHeaderDefinitionFile(ProjectItem folder, IDefaultLicenseHeaderPageModel pageModel)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       if (folder == null || folder.Kind != Constants.vsProjectItemKindPhysicalFolder)
         return null;
 
@@ -147,6 +154,8 @@ namespace LicenseHeaderManager.Headers
     /// <returns>True if the given project is invalid, false if it is valid (exists).</returns>
     private static bool IsInvalidProject(Project activeProject)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       //It is possible that we receive a Project which is missing the Path property entirely.
       return activeProject == null || string.IsNullOrEmpty(activeProject.FullName) && string.IsNullOrEmpty(activeProject.FileName);
     }
@@ -158,6 +167,8 @@ namespace LicenseHeaderManager.Headers
     /// <returns>The file name of the License Header Definition File.</returns>
     private static string GetNewFullName(Project project)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       //This is just to check if activeProject.FullName contains the FullName as expected. 
       //If an Project Type uses this Property incorrectly, we try generating the .licenseheader filename with the .FileName Property
       return GetNewFullName(string.IsNullOrEmpty(Path.GetDirectoryName(project.FullName)) ? project.FileName : project.FullName);
@@ -170,6 +181,7 @@ namespace LicenseHeaderManager.Headers
     /// <returns>True if the project item can be opened in a window, otherwise false.</returns>
     private static bool OpenNewProjectItem(ProjectItem newProjectItem)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       if (newProjectItem != null)
       {
         var window = newProjectItem.Open(Constants.vsViewKindCode);

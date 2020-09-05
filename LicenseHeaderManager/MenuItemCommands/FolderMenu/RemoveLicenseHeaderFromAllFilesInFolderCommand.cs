@@ -69,7 +69,7 @@ namespace LicenseHeaderManager.MenuItemCommands.FolderMenu
     private void OnQueryAllFilesCommandStatus (object sender, EventArgs e)
     {
       bool visible;
-
+      ThreadHelper.ThrowIfNotOnUIThread();
       var obj = ServiceProvider.GetSolutionExplorerItem();
       if (obj is ProjectItem item)
         visible = ProjectItemInspection.IsFolder (item) || ServiceProvider.ShouldBeVisible (item);

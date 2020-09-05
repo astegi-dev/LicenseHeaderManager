@@ -20,6 +20,7 @@ using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Utils;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.Win32;
 using Thread = System.Threading.Thread;
 
@@ -30,12 +31,13 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
     public static ProjectItem AddDefinitionFileToOneProject (string fileName, ProjectItems projectItems)
     {
       var licenseHeaderDefinitionFileName = OpenFileDialogForExistingFile (fileName);
-
+      ThreadHelper.ThrowIfNotOnUIThread();
       return licenseHeaderDefinitionFileName == string.Empty ? null : AddFileToProject (projectItems, licenseHeaderDefinitionFileName);
     }
 
     public static void AddDefinitionFileToMultipleProjects (List<Project> projects)
     {
+      Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
       var licenseHeaderDefinitionFileName = OpenFileDialogForExistingFile (projects.First().DTE.Solution.FullName);
       if (licenseHeaderDefinitionFileName == string.Empty)
         return;
@@ -46,6 +48,8 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
 
     private static ProjectItem AddFileToProject (ProjectItems projectItems, string licenseHeaderDefinitionFileName)
     {
+      Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+
       var fileCountBefore = projectItems.Count;
       var newProjectItem = projectItems.AddFromFile (licenseHeaderDefinitionFileName);
 

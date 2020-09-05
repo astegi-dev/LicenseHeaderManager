@@ -18,6 +18,7 @@ using System.Runtime.InteropServices;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Utils;
+using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.Headers
 {
@@ -33,6 +34,8 @@ namespace LicenseHeaderManager.Headers
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
     public static IDictionary<string, string[]> GetHeaderDefinitionForItem (ProjectItem projectItem)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       // First search for the definition within the project, then look for the solution-level definition
       var headerDefinition = SearchWithinProjectGetHeaderDefinitionForItem (projectItem);
       return headerDefinition ?? GetHeaderDefinitionForSolution (projectItem.DTE.Solution);
@@ -45,6 +48,7 @@ namespace LicenseHeaderManager.Headers
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
     public static IDictionary<string, string[]> SearchItemsDirectlyGetHeaderDefinition (ProjectItems projectItems)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       // Check for License-file within this level
       var headerFileName = SearchItemsDirectlyGetHeaderDefinitionFileName (projectItems);
       if (!string.IsNullOrEmpty (headerFileName))
@@ -59,6 +63,8 @@ namespace LicenseHeaderManager.Headers
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
     public static IDictionary<string, string[]> GetHeaderDefinitionForProjectWithFallback (Project project)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       // First look for a header definition for the project, then look for the solution-level definition
       var definition = GetHeaderDefinitionForProjectWithoutFallback (project);
       return definition ?? GetHeaderDefinitionForSolution (project.DTE.Solution);
@@ -71,6 +77,8 @@ namespace LicenseHeaderManager.Headers
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
     public static IDictionary<string, string[]> GetHeaderDefinitionForProjectWithoutFallback (Project project)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       var headerFile = SearchItemsDirectlyGetHeaderDefinitionFileName (project.ProjectItems);
       return LicenseHeadersPackage.Instance.LicenseHeaderExtractor.ExtractHeaderDefinitions (headerFile);
     }
@@ -82,6 +90,8 @@ namespace LicenseHeaderManager.Headers
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
     public static IDictionary<string, string[]> GetHeaderDefinitionForSolution (Solution solution)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       var solutionDirectory = Path.GetDirectoryName (solution.FullName);
       var solutionFileName = Path.GetFileName (solution.FullName);
 
@@ -96,6 +106,7 @@ namespace LicenseHeaderManager.Headers
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
     private static IDictionary<string, string[]> GetHeaderDefinitionDirectlyOnProject (Project project)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       string headerFile;
       try
       {
@@ -117,6 +128,8 @@ namespace LicenseHeaderManager.Headers
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
     private static IDictionary<string, string[]> SearchWithinProjectGetHeaderDefinitionForItem (ProjectItem projectItem)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       //Check for License-file within this level
       string headerFile;
       try
@@ -145,6 +158,8 @@ namespace LicenseHeaderManager.Headers
     /// <returns>A dictionary, which contains the extensions and the corresponding lines</returns>
     private static IDictionary<string, string[]> SearchWithinProjectGetHeaderDefinitionForProjectOrItem (object projectOrItem)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       return projectOrItem switch
       {
           Project parentAsProject => GetHeaderDefinitionDirectlyOnProject (parentAsProject), // We are on the top --> load project License file if it exists
@@ -157,6 +172,8 @@ namespace LicenseHeaderManager.Headers
     {
       if (projectItems == null)
         return null;
+
+      ThreadHelper.ThrowIfNotOnUIThread();
 
       foreach (ProjectItem item in projectItems)
         if (item.FileCount == 1)

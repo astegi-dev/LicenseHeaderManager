@@ -70,6 +70,7 @@ namespace LicenseHeaderManager.MenuItemCommands.FolderMenu
     {
       bool visible;
 
+      ThreadHelper.ThrowIfNotOnUIThread();
       var obj = ServiceProvider.GetSolutionExplorerItem();
       if (obj is ProjectItem item)
         visible = ProjectItemInspection.IsFolder (item) || ServiceProvider.ShouldBeVisible (item);

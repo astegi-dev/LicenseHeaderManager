@@ -247,14 +247,17 @@ namespace LicenseHeaderManager
 
     public bool SolutionHeaderDefinitionExists ()
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (Dte2.Solution);
       return File.Exists (solutionHeaderDefinitionFilePath);
     }
 
     public bool ShouldBeVisible (ProjectItem item)
     {
-      var visible = false;
+      ThreadHelper.ThrowIfNotOnUIThread();
 
+      var visible = false;
       if (ProjectItemInspection.IsPhysicalFile (item))
         visible = LicenseHeaderReplacer.IsValidPathInput (item.FileNames[1]);
 
@@ -276,6 +279,8 @@ namespace LicenseHeaderManager
 
     public object GetSolutionExplorerItem ()
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       var monitorSelection = (IVsMonitorSelection) GetGlobalService (typeof (SVsShellMonitorSelection));
       monitorSelection.GetCurrentSelection (out var hierarchyPtr, out var projectItemId, out _, out _);
 
@@ -324,6 +329,7 @@ namespace LicenseHeaderManager
           }
       }
 
+      ThreadHelper.ThrowIfNotOnUIThread();
       if (e.NewItems != null)
       {
         foreach (LinkedCommand command in e.NewItems)
@@ -359,6 +365,7 @@ namespace LicenseHeaderManager
       if (page == null || !page.InsertInNewFiles || item == null)
         return;
 
+      ThreadHelper.ThrowIfNotOnUIThread();
       //Normally the header should be inserted here, but that might interfere with the command
       //currently being executed, so we wait until it is finished.
       _currentCommandEvents = Dte2.Events.CommandEvents[_currentCommandGuid, _currentCommandId];

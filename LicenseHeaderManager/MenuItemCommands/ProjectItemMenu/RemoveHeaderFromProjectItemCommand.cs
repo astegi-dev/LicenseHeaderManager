@@ -71,7 +71,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
     private void OnQueryProjectItemCommandStatus (object sender, EventArgs e)
     {
       var visible = false;
-
+      ThreadHelper.ThrowIfNotOnUIThread();
       if (ServiceProvider.GetSolutionExplorerItem() is ProjectItem item)
         visible = ServiceProvider.ShouldBeVisible (item);
 

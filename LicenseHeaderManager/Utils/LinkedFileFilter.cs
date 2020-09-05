@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
+using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.Utils
 {
@@ -38,6 +39,7 @@ namespace LicenseHeaderManager.Utils
 
     public void Filter (IEnumerable<ProjectItem> projectItems)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       foreach (var projectItem in projectItems)
       {
         var foundProjectItem = solution.FindProjectItem (projectItem.Name);
@@ -50,6 +52,7 @@ namespace LicenseHeaderManager.Utils
 
     private void CheckForLicenseHeaderFile (ProjectItem projectItem)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       var headers = LicenseHeaderFinder.GetHeaderDefinitionForItem (projectItem);
       if (headers == null)
         NoLicenseHeaderFile.Add (projectItem);

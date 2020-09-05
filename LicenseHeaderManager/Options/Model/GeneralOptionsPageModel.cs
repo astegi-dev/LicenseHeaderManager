@@ -57,10 +57,24 @@ namespace LicenseHeaderManager.Options.Model
 
     public bool InsertInNewFiles { get; set; }
 
-    private DTE2 Dte => ServiceProvider.GlobalProvider.GetService (typeof (DTE)) as DTE2;
+    private DTE2 Dte
+    {
+      get
+      {
+        ThreadHelper.ThrowIfNotOnUIThread();
+        return ServiceProvider.GlobalProvider.GetService (typeof (DTE)) as DTE2;
+      }
+    }
 
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
-    public Commands Commands => Dte.Commands;
+    public Commands Commands
+    {
+      get
+      {
+        ThreadHelper.ThrowIfNotOnUIThread();
+        return Dte.Commands;
+      }
+    }
 
     public event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
 
@@ -76,6 +90,5 @@ namespace LicenseHeaderManager.Options.Model
     {
       LinkedCommandsChanged?.Invoke (sender, e);
     }
-
   }
 }

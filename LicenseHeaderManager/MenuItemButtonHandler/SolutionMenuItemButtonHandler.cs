@@ -58,6 +58,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
 
       _dialog = new SolutionUpdateDialog (solutionUpdateViewModel) { WindowStartupLocation = WindowStartupLocation.CenterOwner };
       _dialog.Closing += DialogOnClosing;
+      ThreadHelper.ThrowIfNotOnUIThread();
       _reSharperSuspended = CommandUtility.TryExecuteCommand ("ReSharper_Suspend", _dte2);
 
       Task.Run (() => HandleButtonInternalAsync (_dte2.Solution, _handler, solutionUpdateViewModel)).FireAndForget();

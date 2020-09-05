@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using EnvDTE;
 using EnvDTE80;
+using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.Utils
 {
@@ -32,6 +33,7 @@ namespace LicenseHeaderManager.Utils
     /// <returns>Returns a collection of all <see cref="Project"/> objects that are associated with <paramref name="solution"/></returns>
     public ICollection<Project> GetAllProjects (Solution solution)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       var projectList = new List<Project>();
       PopulateProjectsList (solution, projectList);
 
@@ -40,6 +42,7 @@ namespace LicenseHeaderManager.Utils
 
     private void PopulateProjectsList (Solution solution, List<Project> projectList)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       foreach (Project project in solution)
       {
         if (project.Kind == ProjectKinds.vsProjectKindSolutionFolder)
@@ -51,6 +54,7 @@ namespace LicenseHeaderManager.Utils
 
     private bool IsValid (Project project)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       // If project is not loaded, it doesn't count.
       if (string.Equals (project.Kind, Constants.vsProjectKindUnmodeled, StringComparison.OrdinalIgnoreCase))
         return false;
@@ -64,6 +68,7 @@ namespace LicenseHeaderManager.Utils
 
     private IEnumerable<Project> GetSolutionFolderProjects (Project project)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       var list = new List<Project>();
       for (var i = 1; i <= project.ProjectItems.Count; i++)
       {

@@ -16,6 +16,7 @@ using System.Linq;
 using System.Reflection;
 using EnvDTE;
 using log4net;
+using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.Utils
 {
@@ -25,20 +26,18 @@ namespace LicenseHeaderManager.Utils
 
     public static object GetProjectItemParent(ProjectItem projectItem)
     {
-      if (IsEndlessRecursion(projectItem))
-        return GetProjectItemParentViaReflection(projectItem);
-
-      return GetParent(projectItem);
+      ThreadHelper.ThrowIfNotOnUIThread();
+      return IsEndlessRecursion(projectItem) ? GetProjectItemParentViaReflection(projectItem) : GetParent(projectItem);
     }
 
     //Some custom project types return the current item instead of the parent which lead to an endless recursion.
     private static bool IsEndlessRecursion(ProjectItem projectItem)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       var projectItemPath = GetPath(projectItem);
-      var projectItemParent = GetParent(projectItem) as ProjectItem;
 
       //ProjectItemParent is no ProjectItem --> 100% no endless recursion
-      if (projectItemParent == null)
+      if (!(GetParent(projectItem) is ProjectItem projectItemParent))
         return false;
 
       var parentProjectItemPath = GetPath(projectItemParent);
@@ -53,11 +52,10 @@ namespace LicenseHeaderManager.Utils
 
     private static object GetProjectItemParentViaReflection(ProjectItem projectItem)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       try
       {
-        object projectItemParentViaReflection;
-
-        if (TryGetProjectItemParentViaReflection(projectItem, out projectItemParentViaReflection))
+        if (TryGetProjectItemParentViaReflection(projectItem, out var projectItemParentViaReflection))
           return projectItemParentViaReflection;
       }
       catch (Exception ex)
@@ -65,7 +63,7 @@ namespace LicenseHeaderManager.Utils
         //We catch everything as a multitude of Exceptions can be thrown if the projectItem.Object is not structured as we assume
         s_log.Error($"Exception got thrown when searching for the LicenseHeaderFile on ProjectItem of Type '{projectItem.GetType().FullName}' with the name '{projectItem.Name}'. ", ex);
       }
-
+      
       s_log.Info($"Could not find .licenseheaderfile for {projectItem.Name}." + "This is probably due to a custom project type."
                                                                               + "Please report the issue and include the type of your project in the description.");
       return null;
@@ -73,6 +71,7 @@ namespace LicenseHeaderManager.Utils
 
     private static bool TryGetProjectItemParentViaReflection(ProjectItem projectItem, out object projectItemParentViaReflection)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       if (projectItem.Object != null)
       {
         var parentProperty = projectItem.Object.GetType().GetProperty("Parent").GetValue(projectItem.Object, null);
@@ -105,17 +104,19 @@ namespace LicenseHeaderManager.Utils
 
     private static string GetPath(ProjectItem projectItem)
     {
-      if (projectItem.Properties == null)
-        return string.Empty;
+      ThreadHelper.ThrowIfNotOnUIThread();
 
-      var fullPathProperty = projectItem.Properties.Cast<Property>().FirstOrDefault(property => property.Name == "FullPath");
-      if (fullPathProperty != null && fullPathProperty.Value != null)
-        return fullPathProperty.Value.ToString();
-      return string.Empty;
+      var fullPathProperty = projectItem.Properties?.Cast<Property>().FirstOrDefault(property =>
+      {
+        ThreadHelper.ThrowIfNotOnUIThread();
+        return property.Name == "FullPath";
+      });
+      return fullPathProperty?.Value != null ? fullPathProperty.Value.ToString() : string.Empty;
     }
 
     private static object GetParent(ProjectItem projectItem)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       return projectItem.Collection.Parent;
     }
   }

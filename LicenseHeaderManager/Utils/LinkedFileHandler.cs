@@ -13,10 +13,11 @@
 
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Core;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
+using Microsoft.VisualStudio.Shell;
+using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.Utils
 {
@@ -54,7 +55,11 @@ namespace LicenseHeaderManager.Utils
       if (linkedFileFilter.NoLicenseHeaderFile.Any() || linkedFileFilter.NotInSolution.Any())
       {
         var notProgressedItems = linkedFileFilter.NoLicenseHeaderFile.Concat (linkedFileFilter.NotInSolution).ToList();
-        var notProgressedNames = notProgressedItems.Select (x => x.Name).ToList();
+        var notProgressedNames = notProgressedItems.Select (x =>
+        {
+          ThreadHelper.ThrowIfNotOnUIThread();
+          return x.Name;
+        });
 
         Message += string.Format (Resources.LinkedFileUpdateInformation, string.Join ("\n", notProgressedNames)).ReplaceNewLines();
       }

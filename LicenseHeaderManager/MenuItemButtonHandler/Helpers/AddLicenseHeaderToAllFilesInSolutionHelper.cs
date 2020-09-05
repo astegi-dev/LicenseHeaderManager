@@ -116,12 +116,26 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
 
       if (projectsWithoutLicenseHeaderFile.Count > MaxProjectsWithoutDefinitionFileShownInMessage)
       {
-        projects = string.Join ("\n", projectsWithoutLicenseHeaderFile.Select (x => x.Name).Take (5).ToList());
+        projects = string.Join (
+            "\n",
+            projectsWithoutLicenseHeaderFile.Select (
+                x =>
+                {
+                  ThreadHelper.ThrowIfNotOnUIThread();
+                  return x.Name;
+                }).Take (5));
         projects += "\n...";
       }
       else
       {
-        projects = string.Join ("\n", projectsWithoutLicenseHeaderFile.Select (x => x.Name).ToList());
+        projects = string.Join (
+            "\n",
+            projectsWithoutLicenseHeaderFile.Select (
+                x =>
+                {
+                  ThreadHelper.ThrowIfNotOnUIThread();
+                  return x.Name;
+                }));
       }
 
       var message = string.Format (errorResourceString, projects).ReplaceNewLines();

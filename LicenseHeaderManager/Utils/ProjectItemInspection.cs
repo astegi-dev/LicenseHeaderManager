@@ -15,6 +15,7 @@ using Core;
 using EnvDTE;
 using System;
 using System.Linq;
+using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.Utils
 {
@@ -32,6 +33,7 @@ namespace LicenseHeaderManager.Utils
     /// <returns></returns>
     public static bool IsPhysicalFile (ProjectItem projectItem)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       return projectItem.Kind == Constants.vsProjectItemKindPhysicalFile || projectItem.Kind == "{" + c_guidItemTypePhysicalFile + "}";
     }
 
@@ -42,6 +44,7 @@ namespace LicenseHeaderManager.Utils
     /// <returns></returns>
     public static bool IsLicenseHeader (ProjectItem projectItem)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       return projectItem.Name.Contains (LicenseHeaderExtractor.HeaderDefinitionExtension);
     }
 
@@ -52,14 +55,19 @@ namespace LicenseHeaderManager.Utils
     /// <returns></returns>
     public static bool IsLink (ProjectItem projectItem)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       if (projectItem.Properties == null)
         return false;
 
       Property isLinkProperty;
-
+      
       try
       {
-        isLinkProperty = projectItem.Properties.Cast<Property>().FirstOrDefault (property => property.Name == "IsLink");
+        isLinkProperty = projectItem.Properties.Cast<Property>().FirstOrDefault (property =>
+        {
+          ThreadHelper.ThrowIfNotOnUIThread();
+          return property.Name == "IsLink";
+        });
       }
       catch (ArgumentException)
       {
@@ -76,6 +84,7 @@ namespace LicenseHeaderManager.Utils
     /// <returns></returns>
     public static bool IsFolder (ProjectItem projectItem)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       return string.Equals (projectItem.Kind, Constants.vsProjectItemKindPhysicalFolder, StringComparison.InvariantCultureIgnoreCase) ||
              string.Equals (projectItem.Kind, Constants.vsProjectItemKindVirtualFolder, StringComparison.InvariantCultureIgnoreCase);
     }

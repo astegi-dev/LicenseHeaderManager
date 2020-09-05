@@ -18,6 +18,7 @@ using System.Runtime.InteropServices;
 using EnvDTE;
 using EnvDTE80;
 using log4net;
+using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.Utils
 {
@@ -36,7 +37,11 @@ namespace LicenseHeaderManager.Utils
     /// <returns>Returns <see langword="true"/> if the command was executed successfully, otherwise <see langword="false"/>.</returns>
     public static bool TryExecuteCommand (string command, DTE2 dte)
     {
-      if (dte.Commands.Cast<Command>().All (dteCommand => dteCommand.Name != command))
+      if (dte.Commands.Cast<Command>().All (dteCommand =>
+      {
+        ThreadHelper.ThrowIfNotOnUIThread();
+        return dteCommand.Name != command;
+      }))
         return false;
 
       try

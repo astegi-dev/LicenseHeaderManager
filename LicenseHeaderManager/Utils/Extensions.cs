@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
@@ -63,15 +62,42 @@ namespace LicenseHeaderManager.Utils
     /// <returns></returns>
     public static IEnumerable<AdditionalProperty> GetAdditionalProperties (this ProjectItem item)
     {
-      // ThreadHelper.ThrowIfNotOnUIThread();
+      ThreadHelper.ThrowIfNotOnUIThread();
 
       return new List<AdditionalProperty>
              {
-                 CreateAdditionalProperty ("%Project%", () => item.ContainingProject != null, () => item.ContainingProject.Name),
+                 CreateAdditionalProperty (
+                     "%Project%",
+                     () =>
+                     {
+                       ThreadHelper.ThrowIfNotOnUIThread();
+                       return item.ContainingProject != null;
+                     },
+                     () =>
+                     {
+                       ThreadHelper.ThrowIfNotOnUIThread();
+                       return item.ContainingProject.Name;
+                     }),
                  CreateAdditionalProperty (
                      "%Namespace%",
-                     () => item.FileCodeModel != null && item.FileCodeModel.CodeElements.Cast<CodeElement>().Any (ce => ce.Kind == vsCMElement.vsCMElementNamespace),
-                     () => item.FileCodeModel.CodeElements.Cast<CodeElement>().First (ce => ce.Kind == vsCMElement.vsCMElementNamespace).Name)
+                     () =>
+                     {
+                       ThreadHelper.ThrowIfNotOnUIThread();
+                       return item.FileCodeModel != null && item.FileCodeModel.CodeElements.Cast<CodeElement>().Any (ce =>
+                       {
+                         ThreadHelper.ThrowIfNotOnUIThread();
+                         return ce.Kind == vsCMElement.vsCMElementNamespace;
+                       });
+                     },
+                     () =>
+                     {
+                       ThreadHelper.ThrowIfNotOnUIThread();
+                       return item.FileCodeModel.CodeElements.Cast<CodeElement>().First (ce =>
+                       {
+                         ThreadHelper.ThrowIfNotOnUIThread();
+                         return ce.Kind == vsCMElement.vsCMElementNamespace;
+                       }).Name;
+                     })
              };
     }
 
@@ -122,6 +148,8 @@ namespace LicenseHeaderManager.Utils
     /// <returns></returns>
     public static string GetContent (this ProjectItem item, out bool wasAlreadyOpen, ILicenseHeaderExtension extension)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
       wasAlreadyOpen = item.IsOpen();
 
       if (!wasAlreadyOpen && !CoreHelpers.TryOpenDocument (item, extension))
@@ -153,6 +181,7 @@ namespace LicenseHeaderManager.Utils
     /// <returns></returns>
     public static bool IsOpen (this ProjectItem item)
     {
+      ThreadHelper.ThrowIfNotOnUIThread();
       return item.IsOpen[Constants.vsViewKindTextView];
     }
 
