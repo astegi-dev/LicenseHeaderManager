@@ -36,7 +36,7 @@ namespace LicenseHeaderManager.Utils
     public List<ProjectItem> NoLicenseHeaderFile { get; }
     public List<ProjectItem> NotInSolution { get; }
 
-    public void Filter (List<ProjectItem> projectItems)
+    public void Filter (IEnumerable<ProjectItem> projectItems)
     {
       foreach (var projectItem in projectItems)
       {

@@ -135,9 +135,9 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
       }
     }
 
-    private static async Task HandleLinkedFilesAndShowMessageBoxAsync (ILicenseHeaderExtension serviceProvider, List<ProjectItem> linkedItems)
+    private static async Task HandleLinkedFilesAndShowMessageBoxAsync (ILicenseHeaderExtension serviceProvider, IEnumerable<ProjectItem> linkedItems)
     {
-      var linkedFileFilter = new LinkedFileFilter (serviceProvider.Dte2.Solution);
+      ILinkedFileFilter linkedFileFilter = new LinkedFileFilter (serviceProvider.Dte2.Solution);
       linkedFileFilter.Filter (linkedItems);
 
       var linkedFileHandler = new LinkedFileHandler (serviceProvider);
