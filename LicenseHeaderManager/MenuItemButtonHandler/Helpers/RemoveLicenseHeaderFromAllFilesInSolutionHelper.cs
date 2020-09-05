@@ -50,6 +50,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
       if (!(viewModel is SolutionUpdateViewModel updateViewModel))
         throw new ArgumentException ($"Argument {nameof(viewModel)} must be of type {nameof(SolutionUpdateViewModel)}");
 
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
       var projectsInSolution = allSolutionProjectsSearcher.GetAllProjects (solution);
 

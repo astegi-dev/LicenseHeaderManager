@@ -101,6 +101,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         AddLicenseHeaderToAllFilesResult addResult,
         BaseUpdateViewModel baseUpdateViewModel)
     {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var project = obj as Project;
       var projectItem = obj as ProjectItem;
       if (project == null && projectItem == null)
@@ -129,7 +130,7 @@ namespace LicenseHeaderManager.MenuItemCommands.Common
         else
         {
           // If no project has a license header, offer to add one for the solution.
-          if (MessageBoxHelper.AskYesNo (Resources.Question_AddNewLicenseHeaderDefinitionForSolution))
+          if (MessageBoxHelper.AskYesNo (Resources.Question_AddNewLicenseHeaderDefinitionForSolution.ReplaceNewLines()))
             AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (serviceProvider.Dte2.Solution);
         }
       }

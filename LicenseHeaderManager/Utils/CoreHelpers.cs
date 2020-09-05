@@ -140,6 +140,7 @@ namespace LicenseHeaderManager.Utils
     {
       if (result.IsSuccess)
       {
+        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
         ProcessSuccess (result.Success, extension, isOpen);
         return;
       }

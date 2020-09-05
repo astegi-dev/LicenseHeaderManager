@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
@@ -51,6 +50,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
       if (!(viewModel is SolutionUpdateViewModel updateViewModel))
         throw new ArgumentException ($"Argument {nameof(viewModel)} must be of type {nameof(SolutionUpdateViewModel)}");
 
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var solutionHeaderDefinitions = LicenseHeaderFinder.GetHeaderDefinitionForSolution (solution);
 
       var allSolutionProjectsSearcher = new AllSolutionProjectsSearcher();
@@ -85,7 +85,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler.Helpers
         else
         {
           // No projects have definition. Ask the user if they want to add a solution level header definition.
-          if (await MessageBoxHelper.AskYesNoAsync (window, Resources.Question_AddNewLicenseHeaderDefinitionForSolution).ConfigureAwait (true))
+          if (await MessageBoxHelper.AskYesNoAsync (window, Resources.Question_AddNewLicenseHeaderDefinitionForSolution.ReplaceNewLines()).ConfigureAwait (true))
           {
             AddNewSolutionLicenseHeaderDefinitionFileCommand.Instance.Invoke (solution);
 

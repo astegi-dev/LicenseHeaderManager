@@ -68,6 +68,8 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
 
     private async Task HandleButtonInternalAsync (object solutionObject, MenuItemButtonHandlerHelper handler, BaseUpdateViewModel solutionUpdateViewModel)
     {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
       if (!(solutionObject is Solution solution))
         return;
 

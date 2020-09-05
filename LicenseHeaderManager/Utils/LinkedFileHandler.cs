@@ -40,6 +40,8 @@ namespace LicenseHeaderManager.Utils
     /// <returns></returns>
     public async Task HandleAsync (ILinkedFileFilter linkedFileFilter)
     {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
       foreach (var projectItem in linkedFileFilter.ToBeProgressed)
       {
         var content = projectItem.GetContent(out var wasAlreadyOpen, _licenseHeaderExtension);

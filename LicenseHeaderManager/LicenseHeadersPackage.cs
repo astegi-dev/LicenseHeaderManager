@@ -15,7 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -380,6 +379,7 @@ namespace LicenseHeaderManager
 
     private async Task FinishedAddingItemAsync ()
     {
+      await JoinableTaskFactory.SwitchToMainThreadAsync();
       //Now we can finally insert the header into the new item.
       while (_addedItems.Count > 0)
       {

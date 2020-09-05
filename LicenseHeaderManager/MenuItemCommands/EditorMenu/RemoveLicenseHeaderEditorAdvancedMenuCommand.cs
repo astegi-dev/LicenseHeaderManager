@@ -115,6 +115,7 @@ namespace LicenseHeaderManager.MenuItemCommands.EditorMenu
       if (content == null)
         return;
 
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var result = await ServiceProvider.LicenseHeaderReplacer.RemoveOrReplaceHeader (new LicenseHeaderContentInput (content, item.FileNames[1], null));
       await CoreHelpers.HandleResultAsync (result, ServiceProvider, wasAlreadyOpen, true);
     }

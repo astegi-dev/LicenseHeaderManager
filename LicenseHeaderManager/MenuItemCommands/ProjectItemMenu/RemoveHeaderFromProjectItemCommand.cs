@@ -113,6 +113,7 @@ namespace LicenseHeaderManager.MenuItemCommands.ProjectItemMenu
 
     private async Task ExecuteInternalAsync (ProjectItem item)
     {
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
       var cancellationToken = new CancellationToken();
       var replacerInput = CoreHelpers.GetFilesToProcess (item, null, out _, out var fileOpenedStatus, false);
       replacerInput.IgnoreNonCommentText();
