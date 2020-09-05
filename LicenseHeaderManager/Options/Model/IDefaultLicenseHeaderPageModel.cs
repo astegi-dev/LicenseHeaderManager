@@ -19,6 +19,6 @@ namespace LicenseHeaderManager.Options.Model
   {
     string LicenseHeaderFileText { get; set; }
 
-    void Reset();
+    void Reset ();
   }
 }

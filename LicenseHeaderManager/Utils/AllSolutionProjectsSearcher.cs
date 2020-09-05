@@ -19,18 +19,19 @@ using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.Utils
 {
-
   /// <summary>
-  /// Searches a solution for the projects it contains.
+  ///   Searches a solution for the projects it contains.
   /// </summary>
   internal class AllSolutionProjectsSearcher
   {
-
     /// <summary>
-    /// Retrieves all projects belonging to a solution.
+    ///   Retrieves all projects belonging to a solution.
     /// </summary>
-    /// <param name="solution">The <see cref="Solution"/> object whose projects should be found.</param>
-    /// <returns>Returns a collection of all <see cref="Project"/> objects that are associated with <paramref name="solution"/></returns>
+    /// <param name="solution">The <see cref="Solution" /> object whose projects should be found.</param>
+    /// <returns>
+    ///   Returns a collection of all <see cref="Project" /> objects that are associated with
+    ///   <paramref name="solution" />
+    /// </returns>
     public ICollection<Project> GetAllProjects (Solution solution)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
@@ -44,12 +45,10 @@ namespace LicenseHeaderManager.Utils
     {
       ThreadHelper.ThrowIfNotOnUIThread();
       foreach (Project project in solution)
-      {
         if (project.Kind == ProjectKinds.vsProjectKindSolutionFolder)
           projectList.AddRange (GetSolutionFolderProjects (project));
         else if (IsValid (project))
           projectList.Add (project);
-      }
     }
 
     private bool IsValid (Project project)

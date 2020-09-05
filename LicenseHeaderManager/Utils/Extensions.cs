@@ -16,30 +16,37 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Core;
 using EnvDTE;
 using LicenseHeaderManager.Headers;
 using LicenseHeaderManager.Interfaces;
 using log4net;
 using Microsoft.VisualStudio.Shell;
-using LicenseHeader = LicenseHeaderManager.Headers.LicenseHeader;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.Utils
 {
   /// <summary>
-  /// This class provides methods regarding the license header extensions.
+  ///   This class provides methods regarding the license header extensions.
   /// </summary>
   internal static class Extensions
   {
     private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
 
     /// <summary>
-    /// Sets the <see cref="LicenseHeaderPathInput.IgnoreNonCommentText"/> property to <see langword="true" /> for all element of the enumerable.
+    ///   Sets the <see cref="LicenseHeaderPathInput.IgnoreNonCommentText" /> property to <see langword="true" /> for all
+    ///   element of the enumerable.
     /// </summary>
-    /// <param name="inputs">The <see cref="IEnumerable{T}"/> whose generic type parameter is <see cref="LicenseHeaderPathInput"/> whose items should be mutated.</param>
-    /// <remarks>This operation might be useful if the license header input represented by <paramref name="inputs"/> is used only for remove operations. In that case,
-    /// no confirmations regarding non-comment text are needed.</remarks>
+    /// <param name="inputs">
+    ///   The <see cref="IEnumerable{T}" /> whose generic type parameter is
+    ///   <see cref="LicenseHeaderPathInput" /> whose items should be mutated.
+    /// </param>
+    /// <remarks>
+    ///   This operation might be useful if the license header input represented by <paramref name="inputs" /> is used only for
+    ///   remove operations. In that case,
+    ///   no confirmations regarding non-comment text are needed.
+    /// </remarks>
     public static void IgnoreNonCommentText (this IEnumerable<LicenseHeaderContentInput> inputs)
     {
       foreach (var licenseHeaderInput in inputs)
@@ -56,7 +63,7 @@ namespace LicenseHeaderManager.Utils
     }
 
     /// <summary>
-    /// Returns a list of <see cref="AdditionalProperty"/> based on the given project item.
+    ///   Returns a list of <see cref="AdditionalProperty" /> based on the given project item.
     /// </summary>
     /// <param name="item">Specifies the project item of which the additional properties should be extracted.</param>
     /// <returns></returns>
@@ -83,20 +90,22 @@ namespace LicenseHeaderManager.Utils
                      () =>
                      {
                        ThreadHelper.ThrowIfNotOnUIThread();
-                       return item.FileCodeModel != null && item.FileCodeModel.CodeElements.Cast<CodeElement>().Any (ce =>
-                       {
-                         ThreadHelper.ThrowIfNotOnUIThread();
-                         return ce.Kind == vsCMElement.vsCMElementNamespace;
-                       });
+                       return item.FileCodeModel != null && item.FileCodeModel.CodeElements.Cast<CodeElement>().Any (
+                           ce =>
+                           {
+                             ThreadHelper.ThrowIfNotOnUIThread();
+                             return ce.Kind == vsCMElement.vsCMElementNamespace;
+                           });
                      },
                      () =>
                      {
                        ThreadHelper.ThrowIfNotOnUIThread();
-                       return item.FileCodeModel.CodeElements.Cast<CodeElement>().First (ce =>
-                       {
-                         ThreadHelper.ThrowIfNotOnUIThread();
-                         return ce.Kind == vsCMElement.vsCMElementNamespace;
-                       }).Name;
+                       return item.FileCodeModel.CodeElements.Cast<CodeElement>().First (
+                           ce =>
+                           {
+                             ThreadHelper.ThrowIfNotOnUIThread();
+                             return ce.Kind == vsCMElement.vsCMElementNamespace;
+                           }).Name;
                      })
              };
     }
@@ -107,7 +116,7 @@ namespace LicenseHeaderManager.Utils
     }
 
     /// <summary>
-    /// Adds the license header text for the specified extension to the given project item.
+    ///   Adds the license header text for the specified extension to the given project item.
     /// </summary>
     /// <param name="item">Specifies the project item in which the license header text is to be inserted.</param>
     /// <param name="extension">Specifies the extension of the language whose content should be added to the project item.</param>
@@ -140,7 +149,8 @@ namespace LicenseHeaderManager.Utils
     }
 
     /// <summary>
-    /// Returns the document content of the given project item that has the language of the given extension and returns it as string.
+    ///   Returns the document content of the given project item that has the language of the given extension and returns it as
+    ///   string.
     /// </summary>
     /// <param name="item">Specifies the project item whose specific content should be returned.</param>
     /// <param name="wasAlreadyOpen">Specifies whether the project item was already open before this method was called.</param>
@@ -175,14 +185,23 @@ namespace LicenseHeaderManager.Utils
     }
 
     /// <summary>
-    /// Checks whether the given project item is open.
+    ///   Checks whether the given project item is open.
     /// </summary>
     /// <param name="item">Specifies the project item to be checked if it is open.</param>
     /// <returns></returns>
-    public static bool IsOpen (this ProjectItem item)
+    private static bool IsOpen (this ProjectItem item)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
-      return item.IsOpen[Constants.vsViewKindTextView];
+
+      try
+      {
+        return item.IsOpen[Constants.vsViewKindTextView];
+      }
+      catch (COMException ex)
+      {
+        s_log.Error ("Could not determine if project item is open. Assuming it is closed.", ex);
+        return false;
+      }
     }
 
     public static void FireAndForget (this Task task)

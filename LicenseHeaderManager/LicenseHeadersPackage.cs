@@ -42,7 +42,6 @@ using Microsoft;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using LicenseHeader = LicenseHeaderManager.Headers.LicenseHeader;
 using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager
@@ -71,11 +70,6 @@ namespace LicenseHeaderManager
   [Guid (c_guidLicenseHeadersPkgString)]
   public sealed class LicenseHeadersPackage : AsyncPackage, ILicenseHeaderExtension
   {
-    /// <summary>
-    /// GUID representing the output pane the <see cref="OutputPaneAppender"/> logs to.
-    /// </summary>
-    public static Guid GuidOutputPaneAppender = new Guid ("f5fb81c5-39f2-4c51-bbfd-9b5d83c13e1c");
-
     public const string Version = "3.1.0";
     private const string c_guidLicenseHeadersPkgString = "4c570677-8476-4d33-bd0c-da36c89287c8";
 
@@ -84,9 +78,12 @@ namespace LicenseHeaderManager
     private const string c_languages = "Languages";
     private const string c_defaultLicenseHeader = "Default Header";
 
+    /// <summary>
+    ///   GUID representing the output pane the <see cref="OutputPaneAppender" /> logs to.
+    /// </summary>
+    public static Guid GuidOutputPaneAppender = new Guid ("f5fb81c5-39f2-4c51-bbfd-9b5d83c13e1c");
+
     private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
-    private FileAppender _fileAppender;
-    private IVsOutputWindow _outputPane;
 
     private Stack<ProjectItem> _addedItems;
     private CommandEvents _commandEvents;
@@ -94,10 +91,12 @@ namespace LicenseHeaderManager
 
     private string _currentCommandGuid;
     private int _currentCommandId;
+    private FileAppender _fileAppender;
+    private IVsOutputWindow _outputPane;
+    private OutputPaneAppender _outputPaneAppender;
 
     private ProjectItemsEvents _projectItemEvents;
     private ProjectItemsEvents _websiteItemEvents;
-    private OutputPaneAppender _outputPaneAppender;
 
     /// <summary>
     ///   Default constructor of the package.
@@ -111,6 +110,12 @@ namespace LicenseHeaderManager
       Instance = this;
       _addedItems = new Stack<ProjectItem>();
     }
+
+    /// <summary>
+    ///   Gets the <see cref="ILicenseHeaderExtension" /> instance that was created upon initializing the package.
+    /// </summary>
+    /// <remarks>The actual type of this property is <see cref="LicenseHeadersPackage" />.</remarks>
+    public static ILicenseHeaderExtension Instance { get; private set; }
 
     public LicenseHeaderReplacer LicenseHeaderReplacer
     {
@@ -133,12 +138,6 @@ namespace LicenseHeaderManager
       ShowOptionPage (typeof (OptionsPage));
     }
 
-    /// <summary>
-    /// Gets the <see cref="ILicenseHeaderExtension"/> instance that was created upon initializing the package.
-    /// </summary>
-    /// <remarks>The actual type of this property is <see cref="LicenseHeadersPackage"/>.</remarks>
-    public static ILicenseHeaderExtension Instance { get; private set; }
-
     public IDefaultLicenseHeaderPageModel DefaultLicenseHeaderPageModel => Options.Model.DefaultLicenseHeaderPageModel.Instance;
 
     public ILanguagesPageModel LanguagesPageModel => Options.Model.LanguagesPageModel.Instance;
@@ -148,6 +147,52 @@ namespace LicenseHeaderManager
     public DTE2 Dte2 { get; private set; }
 
     public bool IsCalledByLinkedCommand { get; private set; }
+
+    public bool SolutionHeaderDefinitionExists ()
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (Dte2.Solution);
+      return File.Exists (solutionHeaderDefinitionFilePath);
+    }
+
+    public bool ShouldBeVisible (ProjectItem item)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      var visible = false;
+      if (ProjectItemInspection.IsPhysicalFile (item))
+        visible = LicenseHeaderReplacer.IsValidPathInput (item.FileNames[1]);
+
+      return visible;
+    }
+
+    public ProjectItem GetActiveProjectItem ()
+    {
+      try
+      {
+        var activeDocument = Dte2.ActiveDocument;
+        return activeDocument?.ProjectItem;
+      }
+      catch (ArgumentException)
+      {
+        return null;
+      }
+    }
+
+    public object GetSolutionExplorerItem ()
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      var monitorSelection = (IVsMonitorSelection) GetGlobalService (typeof (SVsShellMonitorSelection));
+      monitorSelection.GetCurrentSelection (out var hierarchyPtr, out var projectItemId, out _, out _);
+
+      if (!(Marshal.GetTypedObjectForIUnknown (hierarchyPtr, typeof (IVsHierarchy)) is IVsHierarchy hierarchy))
+        return null;
+
+      hierarchy.GetProperty (projectItemId, (int) __VSHPROPID.VSHPROPID_ExtObject, out var item);
+      return item;
+    }
 
     /// <summary>
     ///   Initialization of the package; this method is called right after the package is sited, so this is the
@@ -244,52 +289,6 @@ namespace LicenseHeaderManager
       }
     }
 
-    public bool SolutionHeaderDefinitionExists ()
-    {
-      ThreadHelper.ThrowIfNotOnUIThread();
-
-      var solutionHeaderDefinitionFilePath = LicenseHeader.GetHeaderDefinitionFilePathForSolution (Dte2.Solution);
-      return File.Exists (solutionHeaderDefinitionFilePath);
-    }
-
-    public bool ShouldBeVisible (ProjectItem item)
-    {
-      ThreadHelper.ThrowIfNotOnUIThread();
-
-      var visible = false;
-      if (ProjectItemInspection.IsPhysicalFile (item))
-        visible = LicenseHeaderReplacer.IsValidPathInput (item.FileNames[1]);
-
-      return visible;
-    }
-
-    public ProjectItem GetActiveProjectItem ()
-    {
-      try
-      {
-        var activeDocument = Dte2.ActiveDocument;
-        return activeDocument?.ProjectItem;
-      }
-      catch (ArgumentException)
-      {
-        return null;
-      }
-    }
-
-    public object GetSolutionExplorerItem ()
-    {
-      ThreadHelper.ThrowIfNotOnUIThread();
-
-      var monitorSelection = (IVsMonitorSelection) GetGlobalService (typeof (SVsShellMonitorSelection));
-      monitorSelection.GetCurrentSelection (out var hierarchyPtr, out var projectItemId, out _, out _);
-
-      if (!(Marshal.GetTypedObjectForIUnknown (hierarchyPtr, typeof (IVsHierarchy)) is IVsHierarchy hierarchy))
-        return null;
-
-      hierarchy.GetProperty (projectItemId, (int) __VSHPROPID.VSHPROPID_ExtObject, out var item);
-      return item;
-    }
-
     private void BeforeLinkedCommandExecuted (string guid, int id, object customIn, object customOut, ref bool cancelDefault)
     {
       InvokeAddLicenseHeaderCommandFromLinkedCmd();
@@ -313,7 +312,6 @@ namespace LicenseHeaderManager
         return;
 
       if (e.OldItems != null)
-      {
         foreach (LinkedCommand command in e.OldItems)
           switch (command.ExecutionTime)
           {
@@ -326,11 +324,9 @@ namespace LicenseHeaderManager
             default:
               throw new ArgumentOutOfRangeException();
           }
-      }
 
       ThreadHelper.ThrowIfNotOnUIThread();
       if (e.NewItems != null)
-      {
         foreach (LinkedCommand command in e.NewItems)
         {
           command.Events = Dte2.Events.CommandEvents[command.Guid, command.Id];
@@ -347,7 +343,6 @@ namespace LicenseHeaderManager
               throw new ArgumentOutOfRangeException();
           }
         }
-      }
     }
 
     private void BeforeAnyCommandExecuted (string guid, int id, object customIn, object customOut, ref bool cancelDefault)

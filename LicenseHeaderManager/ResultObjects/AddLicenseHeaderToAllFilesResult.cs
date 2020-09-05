@@ -23,7 +23,6 @@ namespace LicenseHeaderManager.ResultObjects
   public class AddLicenseHeaderToAllFilesResult
   {
     /// <summary>
-    /// 
     /// </summary>
     /// <param name="countSubLicenseHeadersFound"></param>
     /// <param name="baseHeaderFound"></param>

@@ -21,7 +21,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN 
         d:DesignHeight="300" d:DesignWidth="300"
         Title="{x:Static lh:Resources.WpfDefaultLicenseHeaderDialogTitle}">
   <DockPanel>
-    <WrapPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Grid.Row="7" Grid.ColumnSpan="2" HorizontalAlignment="Center">
+    <WrapPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
       <Button TabIndex="1" Name="ok" Content="{x:Static lh:Resources.Ok}" Margin="2" Width="50" IsDefault="True" Click="OKButtonClick" />
       <Button TabIndex="2" Name="cancel" Content="{x:Static lh:Resources.Cancel}" Margin="2" Width="50" IsCancel="True" />
     </WrapPanel>

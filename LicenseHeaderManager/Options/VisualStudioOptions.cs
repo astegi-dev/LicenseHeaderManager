@@ -11,17 +11,18 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using Core.Options;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Options;
 
 namespace LicenseHeaderManager.Options
 {
   /// <summary>
-  /// Encapsulates members that represent the configuration affecting the behaviour of the License Header Manager Visual Studio HeaderDefinitionExtension.
+  ///   Encapsulates members that represent the configuration affecting the behaviour of the License Header Manager Visual
+  ///   Studio HeaderDefinitionExtension.
   /// </summary>
   [LicenseHeaderManagerOptions]
   internal class VisualStudioOptions
@@ -50,7 +51,7 @@ namespace LicenseHeaderManager.Options
     public virtual bool InsertInNewFiles { get; set; }
 
     /// <summary>
-    /// Gets or sets the version of the License Header Manager Visual Studio HeaderDefinitionExtension.
+    ///   Gets or sets the version of the License Header Manager Visual Studio HeaderDefinitionExtension.
     /// </summary>
     public virtual string Version { get; set; }
 
@@ -79,9 +80,9 @@ namespace LicenseHeaderManager.Options
     }
 
     /// <summary>
-    ///   Creates a deep copy of the current <see cref="VisualStudioOptions"/> instance.
+    ///   Creates a deep copy of the current <see cref="VisualStudioOptions" /> instance.
     /// </summary>
-    /// <returns>A deep copy of the this <see cref="VisualStudioOptions"/> instance.</returns>
+    /// <returns>A deep copy of the this <see cref="VisualStudioOptions" /> instance.</returns>
     public virtual VisualStudioOptions Clone ()
     {
       var clonedObject = new VisualStudioOptions
@@ -93,7 +94,7 @@ namespace LicenseHeaderManager.Options
     }
 
     /// <summary>
-    /// Is triggered when the contents of the collection held by <see cref="LinkedCommands"/> has changed.
+    ///   Is triggered when the contents of the collection held by <see cref="LinkedCommands" /> has changed.
     /// </summary>
     public virtual event EventHandler<NotifyCollectionChangedEventArgs> LinkedCommandsChanged;
 

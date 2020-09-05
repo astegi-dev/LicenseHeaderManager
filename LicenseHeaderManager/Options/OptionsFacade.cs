@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Core;
@@ -23,29 +24,15 @@ using Core.Options;
 namespace LicenseHeaderManager.Options
 {
   /// <summary>
-  /// Provides a facade around an <see cref="CoreOptions"/> and a <see cref="VisualStudioOptions"/> instance for unified access.
+  ///   Provides a facade around an <see cref="CoreOptions" /> and a <see cref="VisualStudioOptions" /> instance for unified
+  ///   access.
   /// </summary>
-  /// <seealso cref="CoreOptions"/>
-  /// <seealso cref="VisualStudioOptions"/>
+  /// <seealso cref="CoreOptions" />
+  /// <seealso cref="VisualStudioOptions" />
   public class OptionsFacade
   {
     private readonly CoreOptions _coreOptions;
     private readonly VisualStudioOptions _visualStudioOptions;
-
-    public static string DefaultCoreOptionsPath =>
-        Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\CoreOptions.json");
-
-    public static string DefaultVisualStudioOptionsPath =>
-        Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\VisualStudioOptions.json");
-
-    public static string DefaultLogPath =>
-        Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\logs_lhm");
-
-    /// <summary>
-    ///   Gets or sets the currently up-to-date configuration of the License Header Manager HeaderDefinitionExtension, along
-    ///   with the corresponding options for the Core.
-    /// </summary>
-    public static OptionsFacade CurrentOptions { get; set; }
 
     static OptionsFacade ()
     {
@@ -65,6 +52,21 @@ namespace LicenseHeaderManager.Options
       _visualStudioOptions = visualStudioOptions;
       _visualStudioOptions.LinkedCommandsChanged += InvokeLinkedCommandsChanged;
     }
+
+    public static string DefaultCoreOptionsPath =>
+        Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\CoreOptions.json");
+
+    public static string DefaultVisualStudioOptionsPath =>
+        Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\VisualStudioOptions.json");
+
+    public static string DefaultLogPath =>
+        Environment.ExpandEnvironmentVariables ($@"%APPDATA%\rubicon\LicenseHeaderManager\{LicenseHeadersPackage.Instance.Dte2.Version}\logs_lhm");
+
+    /// <summary>
+    ///   Gets or sets the currently up-to-date configuration of the License Header Manager HeaderDefinitionExtension, along
+    ///   with the corresponding options for the Core.
+    /// </summary>
+    public static OptionsFacade CurrentOptions { get; set; }
 
     /// <summary>
     ///   Gets or sets whether license header comments should be removed only if they contain at least one of the keywords
@@ -118,8 +120,11 @@ namespace LicenseHeaderManager.Options
     ///   Gets or sets commands provided by Visual Studio before or after which the "Add License Header" command should be
     ///   automatically executed.
     /// </summary>
-    /// <remarks>Note that upon setter invocation, a copy of the supplied <see cref="ICollection{T}"/> is created. Hence, future updates to this
-    /// initial collection are not reflected in this property.</remarks>
+    /// <remarks>
+    ///   Note that upon setter invocation, a copy of the supplied <see cref="ICollection{T}" /> is created. Hence, future
+    ///   updates to this
+    ///   initial collection are not reflected in this property.
+    /// </remarks>
     public virtual ObservableCollection<LinkedCommand> LinkedCommands
     {
       get => _visualStudioOptions.LinkedCommands;
@@ -127,7 +132,7 @@ namespace LicenseHeaderManager.Options
     }
 
     /// <summary>
-    /// Gets or sets the version of the License Header Manager Visual Studio HeaderDefinitionExtension.
+    ///   Gets or sets the version of the License Header Manager Visual Studio HeaderDefinitionExtension.
     /// </summary>
     public virtual string Version
     {
@@ -137,12 +142,15 @@ namespace LicenseHeaderManager.Options
 
     /// <summary>
     ///   Serializes an <see cref="OptionsFacade" /> instance along with its underlying
-    ///   <see cref="CoreOptions"/> and <see cref="VisualStudioOptions"/> instances into separate files
+    ///   <see cref="CoreOptions" /> and <see cref="VisualStudioOptions" /> instances into separate files
     ///   in the file system.
     /// </summary>
     /// <param name="options">The <see cref="OptionsFacade" /> instance to serialize.</param>
-    /// <param name="coreOptionsFilePath">The path to which the <see cref="CoreOptions"/> should be serialized.</param>
-    /// <param name="visualStudioOptionsFilePath">The path to which the <see cref="VisualStudioOptions"/> should be serialized.</param>
+    /// <param name="coreOptionsFilePath">The path to which the <see cref="CoreOptions" /> should be serialized.</param>
+    /// <param name="visualStudioOptionsFilePath">
+    ///   The path to which the <see cref="VisualStudioOptions" /> should be
+    ///   serialized.
+    /// </param>
     public static async Task SaveAsync (OptionsFacade options, string coreOptionsFilePath = null, string visualStudioOptionsFilePath = null)
     {
       await JsonOptionsManager.SerializeAsync (options._coreOptions, coreOptionsFilePath ?? DefaultCoreOptionsPath);
@@ -151,7 +159,7 @@ namespace LicenseHeaderManager.Options
 
     /// <summary>
     ///   Deserializes an <see cref="OptionsFacade" /> instance from files representing
-    ///   <see cref="CoreOptions"/> and <see cref="VisualStudioOptions"/> instances in the file system.
+    ///   <see cref="CoreOptions" /> and <see cref="VisualStudioOptions" /> instances in the file system.
     /// </summary>
     /// <param name="coreOptionsFilePath">
     ///   The path to an options file from which a corresponding <see cref="CoreOptions" /> instance
@@ -172,10 +180,10 @@ namespace LicenseHeaderManager.Options
       var visualStudioPath = visualStudioOptionsFilePath ?? DefaultVisualStudioOptionsPath;
 
       // if either of the option files is not found, create it with default options and save it before loading
-      if (!System.IO.File.Exists (corePath))
+      if (!File.Exists (corePath))
         await CoreOptions.SaveAsync (new CoreOptions(), corePath);
 
-      if (!System.IO.File.Exists (visualStudioPath))
+      if (!File.Exists (visualStudioPath))
         await VisualStudioOptions.SaveAsync (new VisualStudioOptions(), visualStudioPath);
 
       var coreOptions = await CoreOptions.LoadAsync (corePath);
@@ -185,14 +193,14 @@ namespace LicenseHeaderManager.Options
     }
 
     /// <summary>
-    /// Is triggered when the contents of the collection held by <see cref="LinkedCommands"/> has changed.
+    ///   Is triggered when the contents of the collection held by <see cref="LinkedCommands" /> has changed.
     /// </summary>
     public virtual event EventHandler<NotifyCollectionChangedEventArgs> LinkedCommandsChanged;
 
     /// <summary>
-    ///   Creates a deep copy of the current <see cref="OptionsFacade"/> instance.
+    ///   Creates a deep copy of the current <see cref="OptionsFacade" /> instance.
     /// </summary>
-    /// <returns>A deep copy of the this <see cref="OptionsFacade"/> instance.</returns>
+    /// <returns>A deep copy of the this <see cref="OptionsFacade" /> instance.</returns>
     public virtual OptionsFacade Clone ()
     {
       var clonedObject = new OptionsFacade

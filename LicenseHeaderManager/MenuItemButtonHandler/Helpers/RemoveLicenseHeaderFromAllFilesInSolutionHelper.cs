@@ -13,7 +13,6 @@
 
 using System;
 using System.Threading;
-using Core;
 using EnvDTE;
 using LicenseHeaderManager.Interfaces;
 using LicenseHeaderManager.MenuItemCommands.Common;

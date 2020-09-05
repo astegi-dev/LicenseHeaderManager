@@ -11,23 +11,24 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using Core;
-using EnvDTE;
 using System;
 using System.Linq;
+using Core;
+using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 
 namespace LicenseHeaderManager.Utils
 {
   /// <summary>
-  /// This class provides methods to check if a given project item is of type "physical file", "license header", "link" or "folder".
+  ///   This class provides methods to check if a given project item is of type "physical file", "license header", "link" or
+  ///   "folder".
   /// </summary>
   public static class ProjectItemInspection
   {
     private const string c_guidItemTypePhysicalFile = "6bb5f8ee-4483-11d3-8bcf-00c04f8ec28c";
 
     /// <summary>
-    /// Checks whether the given project item is a physical file that lays somewhere in the directory.
+    ///   Checks whether the given project item is a physical file that lays somewhere in the directory.
     /// </summary>
     /// <param name="projectItem">Specifies the project item to be checked if it is a physical file.</param>
     /// <returns></returns>
@@ -38,7 +39,7 @@ namespace LicenseHeaderManager.Utils
     }
 
     /// <summary>
-    /// Checks whether the given project item is a license header definition file and has the ".licenseheader" extension.
+    ///   Checks whether the given project item is a license header definition file and has the ".licenseheader" extension.
     /// </summary>
     /// <param name="projectItem">Specifies the project item to be checked if it is a license header definition file.</param>
     /// <returns></returns>
@@ -49,7 +50,7 @@ namespace LicenseHeaderManager.Utils
     }
 
     /// <summary>
-    /// Checks whether the given project item is a linked file.
+    ///   Checks whether the given project item is a linked file.
     /// </summary>
     /// <param name="projectItem">Specifies the project item to be checked if it is a linked file.</param>
     /// <returns></returns>
@@ -60,14 +61,15 @@ namespace LicenseHeaderManager.Utils
         return false;
 
       Property isLinkProperty;
-      
+
       try
       {
-        isLinkProperty = projectItem.Properties.Cast<Property>().FirstOrDefault (property =>
-        {
-          ThreadHelper.ThrowIfNotOnUIThread();
-          return property.Name == "IsLink";
-        });
+        isLinkProperty = projectItem.Properties.Cast<Property>().FirstOrDefault (
+            property =>
+            {
+              ThreadHelper.ThrowIfNotOnUIThread();
+              return property.Name == "IsLink";
+            });
       }
       catch (ArgumentException)
       {
@@ -78,7 +80,7 @@ namespace LicenseHeaderManager.Utils
     }
 
     /// <summary>
-    /// Checks whether the given project item is a folder.
+    ///   Checks whether the given project item is a folder.
     /// </summary>
     /// <param name="projectItem">Specifies the project item to be checked if it is a folder.</param>
     /// <returns></returns>

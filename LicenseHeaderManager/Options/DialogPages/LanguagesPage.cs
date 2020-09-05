@@ -17,11 +17,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Windows.Forms;
+using Core;
 using LicenseHeaderManager.Options.DialogPageControls;
 using LicenseHeaderManager.Options.Model;
 using LicenseHeaderManager.Utils;
 using log4net;
-using Language = Core.Language;
 
 namespace LicenseHeaderManager.Options.DialogPages
 {
@@ -126,6 +126,7 @@ namespace LicenseHeaderManager.Options.DialogPages
       if (updated)
         MessageBoxHelper.Show (Resources.Update_SkipExpressions_1_2_2.ReplaceNewLines(), Resources.Update);
     }
+
     private void AddXmlXsd_1_3_2 ()
     {
       // Add a default rule for config/xsd
@@ -262,19 +263,19 @@ namespace LicenseHeaderManager.Options.DialogPages
       return OptionsFacade.CurrentOptions.Languages.Any (x => x.Extensions.Contains (extension));
     }
 
-    private void MigrateStorageLocation_3_1_0()
+    private void MigrateStorageLocation_3_1_0 ()
     {
       s_log.Info ($"Start migration to License Header Manager Version 3.1.0 for page {GetType().Name}");
-      if (!System.Version.TryParse(Version, out var version) || version < new Version(3, 1, 0))
+      if (!System.Version.TryParse (Version, out var version) || version < new Version (3, 1, 0))
       {
-        s_log.Debug($"Current version: {Version}");
+        s_log.Debug ($"Current version: {Version}");
         LoadCurrentRegistryValues_3_0_3();
       }
       else
       {
         s_log.Info ("Migration to 3.0.1 with existing languages page");
         var migratedLanguagesPage = new LanguagesPageModel();
-        LoadCurrentRegistryValues_3_0_3(migratedLanguagesPage);
+        LoadCurrentRegistryValues_3_0_3 (migratedLanguagesPage);
 
         OptionsFacade.CurrentOptions.Languages = migratedLanguagesPage.Languages;
       }

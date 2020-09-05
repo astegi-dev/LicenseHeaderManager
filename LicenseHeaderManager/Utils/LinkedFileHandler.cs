@@ -34,7 +34,7 @@ namespace LicenseHeaderManager.Utils
     public string Message { get; private set; }
 
     /// <summary>
-    /// Applies the license headers on the linked files in the linked file filter.
+    ///   Applies the license headers on the linked files in the linked file filter.
     /// </summary>
     /// <param name="linkedFileFilter">Specifies the linked file filter that holds the project items.</param>
     /// <returns></returns>
@@ -44,7 +44,7 @@ namespace LicenseHeaderManager.Utils
 
       foreach (var projectItem in linkedFileFilter.ToBeProgressed)
       {
-        var content = projectItem.GetContent(out var wasAlreadyOpen, _licenseHeaderExtension);
+        var content = projectItem.GetContent (out var wasAlreadyOpen, _licenseHeaderExtension);
         if (content == null)
           continue;
 
@@ -57,11 +57,12 @@ namespace LicenseHeaderManager.Utils
       if (linkedFileFilter.NoLicenseHeaderFile.Any() || linkedFileFilter.NotInSolution.Any())
       {
         var notProgressedItems = linkedFileFilter.NoLicenseHeaderFile.Concat (linkedFileFilter.NotInSolution).ToList();
-        var notProgressedNames = notProgressedItems.Select (x =>
-        {
-          ThreadHelper.ThrowIfNotOnUIThread();
-          return x.Name;
-        });
+        var notProgressedNames = notProgressedItems.Select (
+            x =>
+            {
+              ThreadHelper.ThrowIfNotOnUIThread();
+              return x.Name;
+            });
 
         Message += string.Format (Resources.LinkedFileUpdateInformation, string.Join ("\n", notProgressedNames)).ReplaceNewLines();
       }

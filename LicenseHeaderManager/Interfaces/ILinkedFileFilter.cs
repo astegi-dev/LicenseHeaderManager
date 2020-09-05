@@ -18,27 +18,28 @@ using EnvDTE;
 namespace LicenseHeaderManager.Interfaces
 {
   /// <summary>
-  /// Analyzes linked files and categorizes them into three types: to be processed, not a part of the solution and no associated license header definition file.
+  ///   Analyzes linked files and categorizes them into three types: to be processed, not a part of the solution and no
+  ///   associated license header definition file.
   /// </summary>
   public interface ILinkedFileFilter
   {
     /// <summary>
-    /// Gets a list of linked files that should be included in a license header update operation.
+    ///   Gets a list of linked files that should be included in a license header update operation.
     /// </summary>
     List<ProjectItem> ToBeProgressed { get; }
 
     /// <summary>
-    /// Gets a list of linked files that do not have a license header definition file associated with them.
+    ///   Gets a list of linked files that do not have a license header definition file associated with them.
     /// </summary>
     List<ProjectItem> NoLicenseHeaderFile { get; }
 
     /// <summary>
-    /// Gets a list of linked files that do not belong to the solution.
+    ///   Gets a list of linked files that do not belong to the solution.
     /// </summary>
     List<ProjectItem> NotInSolution { get; }
 
     /// <summary>
-    /// Filters given linked files into the categories represented by the properties provided by this interface.
+    ///   Filters given linked files into the categories represented by the properties provided by this interface.
     /// </summary>
     /// <param name="projectItems">The linked files to be filtered.</param>
     void Filter (IEnumerable<ProjectItem> projectItems);

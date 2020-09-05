@@ -14,10 +14,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using LicenseHeaderManager.Options.DialogPageControls;
-using LicenseHeaderManager.Options.Model;
 using System.Windows.Forms;
 using Core.Options;
+using LicenseHeaderManager.Options.DialogPageControls;
+using LicenseHeaderManager.Options.Model;
 using log4net;
 
 namespace LicenseHeaderManager.Options.DialogPages
@@ -26,41 +26,41 @@ namespace LicenseHeaderManager.Options.DialogPages
   {
     private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
 
+    protected override IWin32Window Window => new WpfHost (new WpfOptions ((IGeneralOptionsPageModel) Model));
+
     public override void ResetSettings ()
     {
       ((IGeneralOptionsPageModel) Model).Reset();
     }
-
-    protected override IWin32Window Window => new WpfHost (new WpfOptions ((IGeneralOptionsPageModel) Model));
 
     protected override IEnumerable<UpdateStep> GetVersionUpdateSteps ()
     {
       yield return new UpdateStep (new Version (3, 1, 0), MigrateStorageLocation_3_1_0);
     }
 
-    private void MigrateStorageLocation_3_1_0()
+    private void MigrateStorageLocation_3_1_0 ()
     {
       s_log.Info ($"Start migration to License Header Manager Version 3.1.0 for page {GetType().Name}");
-      if (!System.Version.TryParse(Version, out var version) || version < new Version(3, 1, 0))
+      if (!System.Version.TryParse (Version, out var version) || version < new Version (3, 1, 0))
       {
-        s_log.Debug($"Current version: {Version}");
+        s_log.Debug ($"Current version: {Version}");
         LoadCurrentRegistryValues_3_0_3();
       }
       else
       {
         s_log.Info ("Migration to 3.0.1 with existing options page");
         var migratedOptionsPage = new GeneralOptionsPageModel();
-        LoadCurrentRegistryValues_3_0_3(migratedOptionsPage);
+        LoadCurrentRegistryValues_3_0_3 (migratedOptionsPage);
 
-        OptionsFacade.CurrentOptions.InsertInNewFiles = ThreeWaySelectionForMigration(
+        OptionsFacade.CurrentOptions.InsertInNewFiles = ThreeWaySelectionForMigration (
             OptionsFacade.CurrentOptions.InsertInNewFiles,
             migratedOptionsPage.InsertInNewFiles,
             VisualStudioOptions.c_defaultInsertInNewFiles);
-        OptionsFacade.CurrentOptions.UseRequiredKeywords = ThreeWaySelectionForMigration(
+        OptionsFacade.CurrentOptions.UseRequiredKeywords = ThreeWaySelectionForMigration (
             OptionsFacade.CurrentOptions.UseRequiredKeywords,
             migratedOptionsPage.UseRequiredKeywords,
             CoreOptions.c_defaultUseRequiredKeywords);
-        OptionsFacade.CurrentOptions.RequiredKeywords = ThreeWaySelectionForMigration(
+        OptionsFacade.CurrentOptions.RequiredKeywords = ThreeWaySelectionForMigration (
             OptionsFacade.CurrentOptions.RequiredKeywords,
             migratedOptionsPage.RequiredKeywords,
             CoreOptions.c_defaultRequiredKeywords);

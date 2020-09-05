@@ -11,18 +11,20 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Threading;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using log4net;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
+using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.Options.Model
 {
   /// <summary>
-  /// A base class for specifying options
+  ///   A base class for specifying options
   /// </summary>
   public abstract class BaseOptionModel<T>
       where T : BaseOptionModel<T>, new()
@@ -35,7 +37,7 @@ namespace LicenseHeaderManager.Options.Model
     }
 
     /// <summary>
-    /// A singleton instance of the options. MUST be called from UI thread only
+    ///   A singleton instance of the options. MUST be called from UI thread only
     /// </summary>
     public static T Instance
     {
@@ -50,12 +52,15 @@ namespace LicenseHeaderManager.Options.Model
     }
 
     /// <summary>
-    /// Get the singleton instance of the options. Thread safe.
+    ///   Get the singleton instance of the options. Thread safe.
     /// </summary>
-    public static Task<T> GetLiveInstanceAsync () => s_liveModel.GetValueAsync();
+    public static Task<T> GetLiveInstanceAsync ()
+    {
+      return s_liveModel.GetValueAsync();
+    }
 
     /// <summary>
-    /// Creates a new instance of the options class and loads the values from the store. For internal use only
+    ///   Creates a new instance of the options class and loads the values from the store. For internal use only
     /// </summary>
     /// <returns></returns>
     public static async Task<T> CreateAsync ()
@@ -66,7 +71,7 @@ namespace LicenseHeaderManager.Options.Model
     }
 
     /// <summary>
-    /// Hydrates the properties from the registry.
+    ///   Hydrates the properties from the registry.
     /// </summary>
     public virtual void Load ()
     {
@@ -74,11 +79,11 @@ namespace LicenseHeaderManager.Options.Model
     }
 
     /// <summary>
-    /// Hydrates the properties from the registry asynchronously.
+    ///   Hydrates the properties from the registry asynchronously.
     /// </summary>
-    public virtual async System.Threading.Tasks.Task LoadAsync ()
+    public virtual async Task LoadAsync ()
     {
-      s_log.Info("Load options from config file");
+      s_log.Info ("Load options from config file");
       OptionsFacade.CurrentOptions = await OptionsFacade.LoadAsync();
 
       foreach (var property in GetOptionProperties())
@@ -93,7 +98,7 @@ namespace LicenseHeaderManager.Options.Model
     }
 
     /// <summary>
-    /// Saves the properties to the registry.
+    ///   Saves the properties to the registry.
     /// </summary>
     public virtual void Save ()
     {
@@ -101,14 +106,14 @@ namespace LicenseHeaderManager.Options.Model
     }
 
     /// <summary>
-    /// Saves the properties to the registry asynchronously.
+    ///   Saves the properties to the registry asynchronously.
     /// </summary>
-    public virtual async System.Threading.Tasks.Task SaveAsync ()
+    public virtual async Task SaveAsync ()
     {
-      s_log.Info("Save options to config file");
+      s_log.Info ("Save options to config file");
       foreach (var property in GetOptionProperties())
       {
-        if ((typeof (OptionsFacade).GetProperty (property.Name)?.PropertyType != property.PropertyType))
+        if (typeof (OptionsFacade).GetProperty (property.Name)?.PropertyType != property.PropertyType)
           continue;
 
         var facadeProperty = typeof (OptionsFacade).GetProperty (property.Name);
@@ -117,12 +122,10 @@ namespace LicenseHeaderManager.Options.Model
 
       await OptionsFacade.SaveAsync (OptionsFacade.CurrentOptions);
 
-      T liveModel = await GetLiveInstanceAsync();
+      var liveModel = await GetLiveInstanceAsync();
 
       if (this != liveModel)
-      {
         await liveModel.LoadAsync();
-      }
     }
 
     private IEnumerable<PropertyInfo> GetOptionProperties ()

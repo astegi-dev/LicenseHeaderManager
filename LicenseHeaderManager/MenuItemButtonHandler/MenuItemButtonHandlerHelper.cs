@@ -22,7 +22,7 @@ using Window = System.Windows.Window;
 namespace LicenseHeaderManager.MenuItemButtonHandler
 {
   /// <summary>
-  /// Acts as a type work to be done by a <see cref="IMenuItemButtonHandler"/> instance can be delegated to.
+  ///   Acts as a type work to be done by a <see cref="IMenuItemButtonHandler" /> instance can be delegated to.
   /// </summary>
   public abstract class MenuItemButtonHandlerHelper
   {

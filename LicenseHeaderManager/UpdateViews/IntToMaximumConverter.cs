@@ -18,21 +18,21 @@ using System.Windows.Data;
 namespace LicenseHeaderManager.UpdateViews
 {
   /// <summary>
-  /// This class is used to convert the values of a progress bar.
-  /// To prevent the progress bar from initially setting to 100% when 0 files have been
-  /// processed (because '0/0 files processed' will result in a full progress bar), a value of 0 will return 1.
+  ///   This class is used to convert the values of a progress bar.
+  ///   To prevent the progress bar from initially setting to 100% when 0 files have been
+  ///   processed (because '0/0 files processed' will result in a full progress bar), a value of 0 will return 1.
   /// </summary>
   internal class IntToMaximumConverter : IValueConverter
   {
     /// <summary>
-    /// Converts an integer value for the progress bars.
+    ///   Converts an integer value for the progress bars.
     /// </summary>
     /// <param name="value">The value to be converted.</param>
     /// <param name="targetType">The type of the binding target property.</param>
     /// <param name="parameter">The converter parameter to use.</param>
     /// <param name="culture">The culture to use in the converter.</param>
-    /// <returns>A <see cref="object" /> where the value is 1 if <see cref="value"/> is 0 and <see cref="value"/> otherwise.</returns>
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    /// <returns>A <see cref="object" /> where the value is 1 if <see cref="value" /> is 0 and <see cref="value" /> otherwise.</returns>
+    public object Convert (object value, Type targetType, object parameter, CultureInfo culture)
     {
       if (!(value is int intValue))
         return 0;
@@ -40,7 +40,7 @@ namespace LicenseHeaderManager.UpdateViews
       return intValue == 0 ? 1 : intValue;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object ConvertBack (object value, Type targetType, object parameter, CultureInfo culture)
     {
       throw new NotImplementedException();
     }

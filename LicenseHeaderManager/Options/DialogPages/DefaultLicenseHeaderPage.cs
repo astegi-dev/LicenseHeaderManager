@@ -14,9 +14,9 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using LicenseHeaderManager.Options.DialogPageControls;
 using System.Windows.Forms;
 using Core.Options;
+using LicenseHeaderManager.Options.DialogPageControls;
 using LicenseHeaderManager.Options.Model;
 using log4net;
 
@@ -24,39 +24,39 @@ namespace LicenseHeaderManager.Options.DialogPages
 {
   public class DefaultLicenseHeaderPage : BaseOptionPage<DefaultLicenseHeaderPageModel>
   {
-    private static readonly ILog s_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
 
-    public DefaultLicenseHeaderPage()
+    public DefaultLicenseHeaderPage ()
     {
     }
 
-    public override void ResetSettings()
+    protected override IWin32Window Window => new WpfHost (new WpfDefaultLicenseHeader ((IDefaultLicenseHeaderPageModel) Model));
+
+    public override void ResetSettings ()
     {
-      ((IDefaultLicenseHeaderPageModel)Model).Reset();
+      ((IDefaultLicenseHeaderPageModel) Model).Reset();
     }
 
-    protected override IWin32Window Window => new WpfHost(new WpfDefaultLicenseHeader((IDefaultLicenseHeaderPageModel)Model));
-
-    protected override IEnumerable<UpdateStep> GetVersionUpdateSteps()
+    protected override IEnumerable<UpdateStep> GetVersionUpdateSteps ()
     {
-      yield return new UpdateStep(new Version(3, 1, 0), MigrateStorageLocation_3_1_0);
+      yield return new UpdateStep (new Version (3, 1, 0), MigrateStorageLocation_3_1_0);
     }
 
-    private void MigrateStorageLocation_3_1_0()
+    private void MigrateStorageLocation_3_1_0 ()
     {
-      s_log.Info($"Start migration to License Header Manager Version 3.1.0 for page {GetType().Name}");
-      if (!System.Version.TryParse(Version, out var version) || version < new Version(3, 1, 0))
+      s_log.Info ($"Start migration to License Header Manager Version 3.1.0 for page {GetType().Name}");
+      if (!System.Version.TryParse (Version, out var version) || version < new Version (3, 1, 0))
       {
-        s_log.Debug($"Current version: {Version}");
+        s_log.Debug ($"Current version: {Version}");
         LoadCurrentRegistryValues_3_0_3();
       }
       else
       {
-        s_log.Info("Migration to 3.0.1 with existing default license header text page");
+        s_log.Info ("Migration to 3.0.1 with existing default license header text page");
         var migratedDefaultLicenseHeaderTextPage = new DefaultLicenseHeaderPageModel();
-        LoadCurrentRegistryValues_3_0_3(migratedDefaultLicenseHeaderTextPage);
+        LoadCurrentRegistryValues_3_0_3 (migratedDefaultLicenseHeaderTextPage);
 
-        OptionsFacade.CurrentOptions.LicenseHeaderFileText = ThreeWaySelectionForMigration(
+        OptionsFacade.CurrentOptions.LicenseHeaderFileText = ThreeWaySelectionForMigration (
             OptionsFacade.CurrentOptions.LicenseHeaderFileText,
             migratedDefaultLicenseHeaderTextPage.LicenseHeaderFileText,
             CoreOptions._defaultLicenseHeaderFileText);

@@ -57,15 +57,6 @@ namespace LicenseHeaderManager.Options.Model
 
     public bool InsertInNewFiles { get; set; }
 
-    private DTE2 Dte
-    {
-      get
-      {
-        ThreadHelper.ThrowIfNotOnUIThread();
-        return ServiceProvider.GlobalProvider.GetService (typeof (DTE)) as DTE2;
-      }
-    }
-
     [DesignerSerializationVisibility (DesignerSerializationVisibility.Hidden)]
     public Commands Commands
     {
@@ -84,6 +75,15 @@ namespace LicenseHeaderManager.Options.Model
       RequiredKeywords = CoreOptions.c_defaultRequiredKeywords;
       LinkedCommands = VisualStudioOptions.s_defaultLinkedCommands;
       InsertInNewFiles = VisualStudioOptions.c_defaultInsertInNewFiles;
+    }
+
+    private DTE2 Dte
+    {
+      get
+      {
+        ThreadHelper.ThrowIfNotOnUIThread();
+        return ServiceProvider.GlobalProvider.GetService (typeof (DTE)) as DTE2;
+      }
     }
 
     protected virtual void InvokeLinkedCommandsChanged (object sender, NotifyCollectionChangedEventArgs e)

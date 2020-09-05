@@ -23,25 +23,29 @@ using Microsoft.VisualStudio.Shell;
 namespace LicenseHeaderManager.Utils
 {
   /// <summary>
-  /// Provides utility methods for Visual Studio Commands
+  ///   Provides utility methods for Visual Studio Commands
   /// </summary>
   public static class CommandUtility
   {
     private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
 
     /// <summary>
-    /// Tries to execute a Visual Studio command.
+    ///   Tries to execute a Visual Studio command.
     /// </summary>
     /// <param name="command">The text identifying the command that should be executed.</param>
-    /// <param name="dte">The <see cref="DTE2"/> that is used to execute the command identified by <paramref name="command"/>.</param>
-    /// <returns>Returns <see langword="true"/> if the command was executed successfully, otherwise <see langword="false"/>.</returns>
+    /// <param name="dte">
+    ///   The <see cref="DTE2" /> that is used to execute the command identified by <paramref name="command" />
+    ///   .
+    /// </param>
+    /// <returns>Returns <see langword="true" /> if the command was executed successfully, otherwise <see langword="false" />.</returns>
     public static bool TryExecuteCommand (string command, DTE2 dte)
     {
-      if (dte.Commands.Cast<Command>().All (dteCommand =>
-      {
-        ThreadHelper.ThrowIfNotOnUIThread();
-        return dteCommand.Name != command;
-      }))
+      if (dte.Commands.Cast<Command>().All (
+          dteCommand =>
+          {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            return dteCommand.Name != command;
+          }))
         return false;
 
       try
@@ -59,10 +63,14 @@ namespace LicenseHeaderManager.Utils
     }
 
     /// <summary>
-    /// Executes a commands, swallowing possibly occurring exceptions (e. g. if command name does not exist or the command execution fails).
+    ///   Executes a commands, swallowing possibly occurring exceptions (e. g. if command name does not exist or the command
+    ///   execution fails).
     /// </summary>
     /// <param name="command">The text identifying the command that should be executed.</param>
-    /// <param name="dte">The <see cref="DTE2"/> that is used to execute the command identified by <paramref name="command"/>.</param>
+    /// <param name="dte">
+    ///   The <see cref="DTE2" /> that is used to execute the command identified by <paramref name="command" />
+    ///   .
+    /// </param>
     public static void ExecuteCommand (string command, DTE2 dte)
     {
       try

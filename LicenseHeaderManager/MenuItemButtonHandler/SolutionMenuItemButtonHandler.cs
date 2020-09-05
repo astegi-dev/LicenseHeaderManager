@@ -31,14 +31,13 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
 {
   internal class SolutionMenuItemButtonHandler : IMenuItemButtonHandler
   {
+    private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
     private readonly DTE2 _dte2;
     private readonly MenuItemButtonHandlerHelper _handler;
     private CancellationTokenSource _cancellationTokenSource;
 
     private SolutionUpdateDialog _dialog;
     private bool _reSharperSuspended;
-
-    private static readonly ILog s_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
     public SolutionMenuItemButtonHandler (DTE2 dte2, MenuItemButtonOperation mode, MenuItemButtonHandlerHelper handler)
     {
@@ -87,7 +86,7 @@ namespace LicenseHeaderManager.MenuItemButtonHandler
       {
         MessageBoxHelper.ShowMessage (
             $"The operation '{handler.Description}' failed with the exception '{ex.Message}'. See Visual Studio Output Window for Details.");
-        s_log.Error($"The operation '{handler.Description}' failed.", ex);
+        s_log.Error ($"The operation '{handler.Description}' failed.", ex);
       }
 
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

@@ -21,6 +21,7 @@ namespace LicenseHeaderManager.Options.Model
   public class LanguagesPageModel : BaseOptionModel<LanguagesPageModel>, ILanguagesPageModel
   {
     public ObservableCollection<Language> Languages { get; set; }
+
     public void Reset ()
     {
       Languages = CoreOptions.DefaultLanguages;

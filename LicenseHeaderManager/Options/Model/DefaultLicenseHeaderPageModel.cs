@@ -19,6 +19,7 @@ namespace LicenseHeaderManager.Options.Model
   public class DefaultLicenseHeaderPageModel : BaseOptionModel<DefaultLicenseHeaderPageModel>, IDefaultLicenseHeaderPageModel
   {
     public string LicenseHeaderFileText { get; set; }
+
     public void Reset ()
     {
       LicenseHeaderFileText = CoreOptions._defaultLicenseHeaderFileText;

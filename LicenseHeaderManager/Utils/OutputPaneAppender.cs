@@ -12,9 +12,6 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using log4net.Appender;
 using log4net.Core;
 using Microsoft.VisualStudio.Shell;
@@ -23,31 +20,31 @@ using Task = System.Threading.Tasks.Task;
 
 namespace LicenseHeaderManager.Utils
 {
-  class OutputPaneAppender : AppenderSkeleton
+  internal class OutputPaneAppender : AppenderSkeleton
   {
     private readonly IVsOutputWindowPane _licenseHeaderManagerPane;
 
-    public OutputPaneAppender(IVsOutputWindow outputPane, Level threshold)
+    public OutputPaneAppender (IVsOutputWindow outputPane, Level threshold)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
 
       Threshold = threshold;
-      outputPane.GetPane(ref LicenseHeadersPackage.GuidOutputPaneAppender, out _licenseHeaderManagerPane);
+      outputPane.GetPane (ref LicenseHeadersPackage.GuidOutputPaneAppender, out _licenseHeaderManagerPane);
     }
 
-    protected override void Append(LoggingEvent loggingEvent)
+    protected override void Append (LoggingEvent loggingEvent)
     {
-      LogMessageAsync(loggingEvent).FireAndForget();
+      LogMessageAsync (loggingEvent).FireAndForget();
     }
 
-    private async Task LogMessageAsync(LoggingEvent loggingEvent)
+    private async Task LogMessageAsync (LoggingEvent loggingEvent)
     {
       await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-      _licenseHeaderManagerPane.OutputStringThreadSafe(
+      _licenseHeaderManagerPane.OutputStringThreadSafe (
           $"{loggingEvent.TimeStamp:yyyy-MM-dd HH:mm:ss,fff} [{loggingEvent.Level}] {loggingEvent.LoggerName}: {loggingEvent.RenderedMessage}\n");
       if (loggingEvent.ExceptionObject != null)
-        _licenseHeaderManagerPane.OutputStringThreadSafe(loggingEvent.GetExceptionString() + "\n");
+        _licenseHeaderManagerPane.OutputStringThreadSafe (loggingEvent.GetExceptionString() + "\n");
     }
   }
 }

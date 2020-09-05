@@ -21,6 +21,6 @@ namespace LicenseHeaderManager.Options.Model
   {
     ObservableCollection<Language> Languages { get; set; }
 
-    void Reset();
+    void Reset ();
   }
 }

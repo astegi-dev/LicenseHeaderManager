@@ -14,9 +14,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using LicenseHeaderManager.Options.Converters;
@@ -29,48 +27,47 @@ using Microsoft.Win32;
 namespace LicenseHeaderManager.Options.DialogPages
 {
   /// <summary>
-  /// A base class for a DialogPage to show in Tools -> Options.
+  ///   A base class for a DialogPage to show in Tools -> Options.
   /// </summary>
   public class BaseOptionPage<T> : DialogPage
       where T : BaseOptionModel<T>, new()
   {
-    protected readonly BaseOptionModel<T> Model;
-
     private static bool s_firstDialogPageLoaded = true;
-    private static readonly ILog s_log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-    public string Version { get; private set; }
+    private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
 
     private static OptionsStoreMode s_optionsStoreMode = OptionsStoreMode.RegistryStore_3_0_3;
+    protected readonly BaseOptionModel<T> Model;
 
-    public BaseOptionPage()
+    public BaseOptionPage ()
     {
 #pragma warning disable VSTHRD104 // Offer async methods
-      Model = ThreadHelper.JoinableTaskFactory.Run(BaseOptionModel<T>.CreateAsync);
+      Model = ThreadHelper.JoinableTaskFactory.Run (BaseOptionModel<T>.CreateAsync);
 #pragma warning restore VSTHRD104 // Offer async methods
     }
 
+    public string Version { get; private set; }
+
     public override object AutomationObject => Model;
 
-    public override void LoadSettingsFromStorage()
+    public override void LoadSettingsFromStorage ()
     {
       Model.Load();
     }
 
-    public void MigrateOptions()
+    public void MigrateOptions ()
     {
       //Could happen if you install a LicenseHeaderManager (LHM) version which is older than the ever installed highest version
       //Should only happen to developers of LHM, but could theoretically also happen if someone downgrades LHM.
 
       var parsedVersion = GetParsedVersion();
       var currentlyInstalledVersion = GetCurrentlyInstalledVersion();
-      s_log.Debug($"Parsed version: {parsedVersion}, currently installed version: {currentlyInstalledVersion}");
+      s_log.Debug ($"Parsed version: {parsedVersion}, currently installed version: {currentlyInstalledVersion}");
 
       if (parsedVersion > currentlyInstalledVersion)
       {
         if (s_firstDialogPageLoaded)
         {
-          MessageBoxHelper.ShowMessage(
+          MessageBoxHelper.ShowMessage (
               "We detected that you are downgrading LicenseHeaderManager from a higher version." + Environment.NewLine +
               "As we don't know what you did to get to that state, it is possible that you missed an update for the Language Settings."
               + Environment.NewLine +
@@ -89,30 +86,30 @@ namespace LicenseHeaderManager.Options.DialogPages
         var saveRequired = false;
 
         foreach (var updateStep in GetVersionUpdateSteps())
-          saveRequired |= Update(updateStep);
+          saveRequired |= Update (updateStep);
 
         if (Version != LicenseHeadersPackage.Version)
-          saveRequired |= Update(new UpdateStep(currentlyInstalledVersion));
+          saveRequired |= Update (new UpdateStep (currentlyInstalledVersion));
 
         if (saveRequired)
           Model.Save();
       }
     }
 
-    public override void SaveSettingsToStorage()
+    public override void SaveSettingsToStorage ()
     {
       Model.Save();
     }
 
-    protected virtual IEnumerable<UpdateStep> GetVersionUpdateSteps()
+    protected virtual IEnumerable<UpdateStep> GetVersionUpdateSteps ()
     {
       return Enumerable.Empty<UpdateStep>();
     }
 
-    private bool Update(UpdateStep updateStep)
+    private bool Update (UpdateStep updateStep)
     {
       var version = GetParsedVersion();
-      s_log.Info($"Executing update step. Version: {version}, target version: {updateStep.TargetVersion}");
+      s_log.Info ($"Executing update step. Version: {version}, target version: {updateStep.TargetVersion}");
       if (version >= updateStep.TargetVersion)
         return false;
 
@@ -122,22 +119,23 @@ namespace LicenseHeaderManager.Options.DialogPages
       return true;
     }
 
-    private Version GetParsedVersion()
+    private Version GetParsedVersion ()
     {
-      s_log.Info($"Retrieving version for page {GetType().Name}");
+      s_log.Info ($"Retrieving version for page {GetType().Name}");
 
       switch (s_optionsStoreMode)
       {
         case OptionsStoreMode.RegistryStore_3_0_3:
-          var key = GetRegistryKey(@$"ApplicationPrivateSettings\LicenseHeaderManager\Options\{GetType().Name}");
+          var key = GetRegistryKey (@$"ApplicationPrivateSettings\LicenseHeaderManager\Options\{GetType().Name}");
           if (key != null)
           {
-            s_log.Debug($"Retrieved registry version key: {key.Name}");
-            var version = Registry.GetValue(key.Name, "Version", "failure").ToString();
+            s_log.Debug ($"Retrieved registry version key: {key.Name}");
+            var version = Registry.GetValue (key.Name, "Version", "failure").ToString();
             var converter = TypeDescriptor
-                .GetProperties(this).Cast<PropertyDescriptor>().First(x => x.Name == "Version").Converter;
-            Version = DeserializeValue(converter, version).ToString();
+                .GetProperties (this).Cast<PropertyDescriptor>().First (x => x.Name == "Version").Converter;
+            Version = DeserializeValue (converter, version).ToString();
           }
+
           break;
 
         case OptionsStoreMode.JsonStore:
@@ -148,23 +146,23 @@ namespace LicenseHeaderManager.Options.DialogPages
           throw new ArgumentOutOfRangeException();
       }
 
-      s_log.Info($"Retrieved version: {Version}");
-      System.Version.TryParse(Version, out var result);
+      s_log.Info ($"Retrieved version: {Version}");
+      System.Version.TryParse (Version, out var result);
       return result;
     }
 
-    private Version GetCurrentlyInstalledVersion()
+    private Version GetCurrentlyInstalledVersion ()
     {
-      return System.Version.Parse(LicenseHeadersPackage.Version);
+      return System.Version.Parse (LicenseHeadersPackage.Version);
     }
 
     #region migration to 3.1.0
 
-    protected void LoadCurrentRegistryValues_3_0_3(BaseOptionModel<T> dialogPage = null)
+    protected void LoadCurrentRegistryValues_3_0_3 (BaseOptionModel<T> dialogPage = null)
     {
-      using var currentRegistryKey = GetRegistryKey(@$"ApplicationPrivateSettings\LicenseHeaderManager\Options\{GetType().Name}");
+      using var currentRegistryKey = GetRegistryKey (@$"ApplicationPrivateSettings\LicenseHeaderManager\Options\{GetType().Name}");
 
-      s_log.Info($"Loading values from registry key: {currentRegistryKey.Name}");
+      s_log.Info ($"Loading values from registry key: {currentRegistryKey.Name}");
 
       foreach (var property in GetVisibleProperties())
       {
@@ -178,9 +176,9 @@ namespace LicenseHeaderManager.Options.DialogPages
             _ => property.Name
         };
 
-        var converter = GetPropertyConverterOrDefault(property);
-        var registryValue = GetRegistryValue(currentRegistryKey, propertyName);
-        s_log.Debug($"Property {propertyName} with value '{registryValue}' read from registry");
+        var converter = GetPropertyConverterOrDefault (property);
+        var registryValue = GetRegistryValue (currentRegistryKey, propertyName);
+        s_log.Debug ($"Property {propertyName} with value '{registryValue}' read from registry");
 
         if (registryValue == null)
           continue;
@@ -188,43 +186,44 @@ namespace LicenseHeaderManager.Options.DialogPages
         try
         {
           var deserializedValue = DeserializeValue (converter, registryValue);
-          property.SetValue(dialogPage ?? AutomationObject, deserializedValue);
-          s_log.Debug($"Deserialized value: '{deserializedValue}'");
+          property.SetValue (dialogPage ?? AutomationObject, deserializedValue);
+          s_log.Debug ($"Deserialized value: '{deserializedValue}'");
         }
         catch (Exception ex)
         {
-          s_log.Error($"Could not restore registry value for {propertyName}", ex);
+          s_log.Error ($"Could not restore registry value for {propertyName}", ex);
         }
       }
+
       s_optionsStoreMode = OptionsStoreMode.JsonStore;
     }
 
     #endregion
 
-    private RegistryKey GetRegistryKey(string path)
+    private RegistryKey GetRegistryKey (string path)
     {
-      s_log.Debug($"Get registry key from path '{path}'");
+      s_log.Debug ($"Get registry key from path '{path}'");
       RegistryKey subKey = null;
       try
       {
-        var service = (AsyncPackage)GetService(typeof(AsyncPackage));
-        subKey = service?.UserRegistryRoot.OpenSubKey(path);
+        var service = (AsyncPackage) GetService (typeof (AsyncPackage));
+        subKey = service?.UserRegistryRoot.OpenSubKey (path);
       }
       catch (Exception ex)
       {
-        s_log.Error($"Could not retrieve registry key from path '{path}'", ex);
+        s_log.Error ($"Could not retrieve registry key from path '{path}'", ex);
       }
 
-      s_log.Debug($"Returned registry key: {subKey}");
+      s_log.Debug ($"Returned registry key: {subKey}");
       return subKey;
     }
 
-    private IEnumerable<PropertyDescriptor> GetVisibleProperties()
+    private IEnumerable<PropertyDescriptor> GetVisibleProperties ()
     {
-      return TypeDescriptor.GetProperties(AutomationObject).Cast<PropertyDescriptor>();
+      return TypeDescriptor.GetProperties (AutomationObject).Cast<PropertyDescriptor>();
     }
 
-    private TypeConverter GetPropertyConverterOrDefault(PropertyDescriptor propertyDescriptor)
+    private TypeConverter GetPropertyConverterOrDefault (PropertyDescriptor propertyDescriptor)
     {
       return propertyDescriptor.Name switch
       {
@@ -234,26 +233,26 @@ namespace LicenseHeaderManager.Options.DialogPages
       };
     }
 
-    private string GetRegistryValue(RegistryKey key, string subKeyName)
+    private string GetRegistryValue (RegistryKey key, string subKeyName)
     {
-      return key?.GetValue(subKeyName)?.ToString();
+      return key?.GetValue (subKeyName)?.ToString();
     }
 
-    private object DeserializeValue(TypeConverter converter, string value)
+    private object DeserializeValue (TypeConverter converter, string value)
     {
       if (value == null)
         return null;
 
-      var actualValue = string.Join("*", value.Split('*').Skip(2));
-      return converter.ConvertFromInvariantString(actualValue);
+      var actualValue = string.Join ("*", value.Split ('*').Skip (2));
+      return converter.ConvertFromInvariantString (actualValue);
     }
 
-    protected U ThreeWaySelectionForMigration<U>(U currentValue, U migratedValue, U defaultValue)
+    protected U ThreeWaySelectionForMigration<U> (U currentValue, U migratedValue, U defaultValue)
     {
       if (defaultValue is ICollection)
-        throw new InvalidOperationException("ThreeWaySelectionForMigration does currently not support ICollections.");
+        throw new InvalidOperationException ("ThreeWaySelectionForMigration does currently not support ICollections.");
 
-      return currentValue.Equals(defaultValue) ? migratedValue : currentValue;
+      return currentValue.Equals (defaultValue) ? migratedValue : currentValue;
     }
   }
 }

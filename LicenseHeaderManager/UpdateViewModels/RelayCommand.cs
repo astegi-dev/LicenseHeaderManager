@@ -19,8 +19,8 @@ namespace LicenseHeaderManager.UpdateViewModels
 {
   public class RelayCommand : ICommand
   {
-    private readonly Action<object> _execute;
     private readonly Predicate<object> _canExecute;
+    private readonly Action<object> _execute;
 
     public RelayCommand (Action<object> execute)
         : this (execute, null)
