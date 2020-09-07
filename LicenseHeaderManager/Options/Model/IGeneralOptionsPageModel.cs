@@ -12,26 +12,54 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using EnvDTE;
 
 namespace LicenseHeaderManager.Options.Model
 {
+  /// <summary>
+  ///   Provides options for the options page regarding Keywords and Linked Commands.
+  /// </summary>
   public interface IGeneralOptionsPageModel
   {
+    /// <summary>
+    ///   Gets or sets whether license header comments should be removed only if they contain at least one of the keywords
+    ///   specified by <see cref="RequiredKeywords" />.
+    /// </summary>
     bool UseRequiredKeywords { get; set; }
 
+    /// <summary>
+    ///   If <see cref="UseRequiredKeywords" /> is <see langword="true" />, only license header comments that contain at
+    ///   least one of the words specified by this property (separated by "," and possibly whitespaces) are removed.
+    /// </summary>
     string RequiredKeywords { get; set; }
 
+    /// <summary>
+    ///   Gets or sets commands provided by Visual Studio before or after which the "Add License Header" command should be
+    ///   automatically executed.
+    /// </summary>
     ObservableCollection<LinkedCommand> LinkedCommands { get; set; }
 
+    /// <summary>
+    ///   Gets or sets whether license headers are automatically inserted into new files.
+    /// </summary>
     bool InsertInNewFiles { get; set; }
 
+    /// <summary>
+    /// Gets the full list of available commands of EnvDTE.
+    /// </summary>
     Commands Commands { get; }
 
+    /// <summary>
+    ///   Is triggered when the contents of the collection held by <see cref="LinkedCommands" /> has changed.
+    /// </summary>
     event NotifyCollectionChangedEventHandler LinkedCommandsChanged;
 
+    /// <summary>
+    /// Resets the options on this page to the default values.
+    /// </summary>
     void Reset ();
   }
 }

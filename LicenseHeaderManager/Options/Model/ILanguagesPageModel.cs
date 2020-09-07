@@ -17,10 +17,20 @@ using Core;
 
 namespace LicenseHeaderManager.Options.Model
 {
+  /// <summary>
+  ///   Provides options for the options page regarding Languages.
+  /// </summary>
   public interface ILanguagesPageModel
   {
+    /// <summary>
+    ///   Gets or sets a list of <see cref="Core.Language" /> objects that represents the
+    ///   languages for which the <see cref="Core.LicenseHeaderReplacer" /> is configured to use.
+    /// </summary>
     ObservableCollection<Language> Languages { get; set; }
 
+    /// <summary>
+    /// Resets the options on this page to the default values.
+    /// </summary>
     void Reset ();
   }
 }

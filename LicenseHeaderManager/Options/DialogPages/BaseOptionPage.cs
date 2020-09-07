@@ -49,11 +49,17 @@ namespace LicenseHeaderManager.Options.DialogPages
 
     public override object AutomationObject => Model;
 
+    /// <summary>
+    /// Loads the current options from the configuration files.
+    /// </summary>
     public override void LoadSettingsFromStorage ()
     {
       Model.Load();
     }
 
+    /// <summary>
+    /// Migrates the options from the storage of older LHM versions to the storage of new versions.
+    /// </summary>
     public void MigrateOptions ()
     {
       //Could happen if you install a LicenseHeaderManager (LHM) version which is older than the ever installed highest version
@@ -96,11 +102,18 @@ namespace LicenseHeaderManager.Options.DialogPages
       }
     }
 
+    /// <summary>
+    /// Saves the current options to the configuration files.
+    /// </summary>
     public override void SaveSettingsToStorage ()
     {
       Model.Save();
     }
 
+    /// <summary>
+    /// Gets a new collection of type <see cref="Enumerable"/> for update steps.
+    /// </summary>
+    /// <returns></returns>
     protected virtual IEnumerable<UpdateStep> GetVersionUpdateSteps ()
     {
       return Enumerable.Empty<UpdateStep>();
@@ -158,6 +171,10 @@ namespace LicenseHeaderManager.Options.DialogPages
 
     #region migration to 3.1.0
 
+    /// <summary>
+    /// Loads the option values from the registry and deserializes them so that they can be stored in configuration files.
+    /// </summary>
+    /// <param name="dialogPage">Specifies the dialog page to which the deserialized values belong.</param>
     protected void LoadCurrentRegistryValues_3_0_3 (BaseOptionModel<T> dialogPage = null)
     {
       using var currentRegistryKey = GetRegistryKey (@$"ApplicationPrivateSettings\LicenseHeaderManager\Options\{GetType().Name}");
@@ -247,6 +264,14 @@ namespace LicenseHeaderManager.Options.DialogPages
       return converter.ConvertFromInvariantString (actualValue);
     }
 
+    /// <summary>
+    /// Compares three values and returns the migrated value if current and default value are equal. Otherwise the current value is returned.
+    /// </summary>
+    /// <typeparam name="U">The type of the values to compare.</typeparam>
+    /// <param name="currentValue">The current value.</param>
+    /// <param name="migratedValue">The migrated value.</param>
+    /// <param name="defaultValue">The default value.</param>
+    /// <returns></returns>
     protected U ThreeWaySelectionForMigration<U> (U currentValue, U migratedValue, U defaultValue)
     {
       if (defaultValue is ICollection)
