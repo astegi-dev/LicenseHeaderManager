@@ -39,7 +39,7 @@ namespace LicenseHeaderManager.Utils
     }
 
     /// <summary>
-    ///   Checks whether the given project item is a license header definition file and has the ".licenseheader" extension.
+    ///   Checks whether the given project item is a license header definition file and has the <see cref="LicenseHeaderExtractor.HeaderDefinitionExtension"/> extension.
     /// </summary>
     /// <param name="projectItem">Specifies the project item to be checked if it is a license header definition file.</param>
     /// <returns></returns>
