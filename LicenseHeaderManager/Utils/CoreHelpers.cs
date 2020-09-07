@@ -98,7 +98,7 @@ namespace LicenseHeaderManager.Utils
       var files = new List<LicenseHeaderContentInput>();
       countSubLicenseHeaders = 0;
 
-      if (item.ProjectItems == null)
+      if (item == null)
         return files;
 
       if (item.FileCount == 1 && File.Exists (item.FileNames[1]))
@@ -110,6 +110,10 @@ namespace LicenseHeaderManager.Utils
           fileOpenedStatus[item.FileNames[1]] = wasAlreadyOpen;
         }
       }
+
+
+      if (item.ProjectItems == null)
+        return files;
 
       var childHeaders = headers;
       if (searchForLicenseHeaders)

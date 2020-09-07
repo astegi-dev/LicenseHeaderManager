@@ -121,7 +121,15 @@ namespace LicenseHeaderManager.Utils
     private static object GetParent (ProjectItem projectItem)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
-      return projectItem.Collection.Parent;
+      try
+      {
+        return projectItem.Collection.Parent;
+      }
+      catch (Exception ex)
+      {
+        s_log.Error ($"Could not determine parent of project item {projectItem.FileNames[1]}. Assuming it does not have parent.", ex);
+        return null;
+      }
     }
   }
 }
