@@ -33,35 +33,6 @@ namespace LicenseHeaderManager.Utils
   {
     private static readonly ILog s_log = LogManager.GetLogger (MethodBase.GetCurrentMethod().DeclaringType);
 
-    private static async Task OnProgressReportedAsync (
-        ReplacerProgressContentReport progress,
-        BaseUpdateViewModel baseUpdateViewModel,
-        string projectName,
-        IDictionary<string, bool> fileOpenedStatus,
-        CancellationToken cancellationToken)
-    {
-      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-      if (!cancellationToken.IsCancellationRequested)
-      {
-        var result = new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
-            new ReplacerSuccess (progress.ProcessedFilePath, progress.ProcessFileNewContent));
-        if (fileOpenedStatus.TryGetValue (progress.ProcessedFilePath, out var wasOpen))
-          await HandleResultAsync (result, LicenseHeadersPackage.Instance, wasOpen, false);
-        else
-          await HandleResultAsync (result, LicenseHeadersPackage.Instance, false, false);
-      }
-
-      if (baseUpdateViewModel == null)
-        return;
-
-      baseUpdateViewModel.FileCountCurrentProject = progress.TotalFileCount;
-      baseUpdateViewModel.ProcessedFilesCountCurrentProject = progress.ProcessedFileCount;
-
-      if (baseUpdateViewModel is SolutionUpdateViewModel solutionUpdateViewModel)
-        solutionUpdateViewModel.CurrentProject = projectName;
-    }
-
     /// <summary>
     ///   Creates a replacer progress that represents the progress of updated files in folders and projects.
     /// </summary>
@@ -75,7 +46,6 @@ namespace LicenseHeaderManager.Utils
     ///   Specifies the cancellation token that indicates if the current updating progress has
     ///   been cancelled by the user.
     /// </param>
-    /// <returns></returns>
     public static IProgress<ReplacerProgressContentReport> CreateProgress (
         BaseUpdateViewModel viewModel,
         string projectName,
@@ -86,6 +56,36 @@ namespace LicenseHeaderManager.Utils
           report => OnProgressReportedAsync (report, viewModel, projectName, fileOpenedStatus, cancellationToken).FireAndForget());
     }
 
+    /// <summary>
+    ///   Determines a collection of <see cref="LicenseHeaderContentInput" /> instance to be processed, based on a
+    ///   <see cref="ProjectItem" /> and its child items.
+    /// </summary>
+    /// <param name="item">
+    ///   The <see cref="ProjectItem" /> to be used as starting point when looking for child items whose
+    ///   license headers should also be updated.
+    /// </param>
+    /// <param name="headers">
+    ///   The parsed headers based on a license header definition file. Keys are file extensions, values
+    ///   represent the header, one line per array-element.
+    /// </param>
+    /// <param name="countSubLicenseHeaders">
+    ///   Number of license header definition files found in child
+    ///   <see cref="ProjectItem" />s
+    /// </param>
+    /// <param name="fileOpenedStatus">
+    ///   Provides information on which files (full path, dictionary key) are currently opened
+    ///   (values)
+    /// </param>
+    /// <param name="searchForLicenseHeaders">
+    ///   Determines whether child <see cref="ProjectItem" />s should also be searched for
+    ///   license header definition files and its corresponding header definitions. If <see langword="false" />, only the
+    ///   license header definitions represented by <paramref name="headers" /> are used, even for all child items.
+    /// </param>
+    /// <returns>
+    ///   Returns a <see cref="ICollection{T}" /> whose generic type parameter is
+    ///   <see cref="LicenseHeaderContentInput" /> that encompasses the input for a <see cref="LicenseHeaderReplacer" />
+    ///   instance based on the given parameters.
+    /// </returns>
     public static ICollection<LicenseHeaderContentInput> GetFilesToProcess (
         ProjectItem item,
         IDictionary<string, string[]> headers,
@@ -136,13 +136,19 @@ namespace LicenseHeaderManager.Utils
     }
 
     /// <summary>
-    ///   Handles the given result object and shows the corresponding message box if an error occurred.
+    ///   Processes the given <see cref="ReplacerResult{TSuccess,TError}" /> object, including handling errors that possibly
+    ///   occurred.
     /// </summary>
     /// <param name="result">Specifies the replacer result. Indicates whether the specific operation succeeded or failed.</param>
-    /// <param name="extension">Specifies the extension of the language.</param>
+    /// <param name="extension">
+    ///   A <see cref="ILicenseHeaderExtension" /> instance used to access members exposed by the LHM
+    ///   Extension Package.
+    /// </param>
     /// <param name="isOpen">Specifies if the current file is currently open.</param>
-    /// <param name="calledByUser">Specifies whether this method was called explicitly by the user or by the program.</param>
-    /// <returns></returns>
+    /// <param name="calledByUser">
+    ///   Specifies whether this method was called explicitly by the user or implicitly by the
+    ///   program.
+    /// </param>
     public static async Task HandleResultAsync (
         ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> result,
         ILicenseHeaderExtension extension,
@@ -195,16 +201,38 @@ namespace LicenseHeaderManager.Utils
       MessageBoxHelper.ShowError ($"An unexpected error has occurred: {error.Description}");
     }
 
-    private static void ProcessSuccess (ReplacerSuccess replacerSuccess, ILicenseHeaderExtension extension, bool isOpen)
-    {
-      ThreadHelper.ThrowIfNotOnUIThread();
-      if (!File.Exists (replacerSuccess.FilePath) || TrySetContent (replacerSuccess.FilePath, extension.Dte2.Solution, replacerSuccess.NewContent, isOpen, extension))
-        return;
+    ///// <summary>
+    /////   Handles the given result object and shows the corresponding message box if an error occurred.
+    ///// </summary>
+    ///// <param name="result">Specifies the replacer result. Indicates whether the specific operation succeeded or failed.</param>
+    ///// <param name="extension">Specifies the extension of the language.</param>
+    ///// <param name="isOpen">Specifies if the current file is currently open.</param>
+    ///// <param name="calledByUser">Specifies whether this method was called explicitly by the user or by the program.</param>
 
-      s_log.Error ($"Updating license header for file {replacerSuccess.FilePath} failed.");
-      MessageBoxHelper.ShowError ($"Updating license header for file {replacerSuccess.FilePath} failed.");
-    }
-
+    /// <summary>
+    ///   Processes a range of <see cref="ReplacerResult{TSuccess,TError}" /> objects, including possible error handling.
+    /// </summary>
+    /// <param name="result">Specifies the replacer result. Indicates whether the specific operation succeeded or failed.</param>
+    /// <param name="licenseHeaderExtension">
+    ///   A <see cref="ILicenseHeaderExtension" /> instance used to access members exposed
+    ///   by the LHM Extension Package.
+    /// </param>
+    /// <param name="viewModel">
+    ///   A <see cref="BaseUpdateViewModel" /> instance used to update progress indicator properties if a
+    ///   <see cref="LicenseHeaderReplacer" /> newly needs to be invoked.
+    /// </param>
+    /// <param name="projectName">
+    ///   The name of the project the files updated by a <see cref="LicenseHeaderReplacer" /> operation
+    ///   belong to.
+    /// </param>
+    /// <param name="fileOpenedStatus">
+    ///   Provides information on which files (full path, dictionary key) are currently opened
+    ///   (values).
+    /// </param>
+    /// <param name="cancellationToken">
+    ///   A <see cref="CancellationToken" /> that can be used to cancel pending Core operations
+    ///   if they have not been started yet.
+    /// </param>
     public static async Task HandleResultAsync (
         IEnumerable<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>> result,
         ILicenseHeaderExtension licenseHeaderExtension,
@@ -254,6 +282,79 @@ namespace LicenseHeaderManager.Utils
         s_log.Error ($"File '{otherError.Input.DocumentPath}' failed: {otherError.Description}");
     }
 
+    /// <summary>
+    ///   Tries to open a <see cref="ProjectItem" /> such that content modification operations are possible.
+    /// </summary>
+    /// <param name="item">The <see cref="ProjectItem" /> to be opened.</param>
+    /// <param name="extension">
+    ///   The <see cref="ILicenseHeaderExtension" /> instance used to access the currently configured
+    ///   language definitions.
+    /// </param>
+    /// <returns>
+    ///   Returns <see langword="true" /> if opening <paramref name="item" /> succeeded or was not necessary, otherwise
+    ///   <see langword="false" />.
+    /// </returns>
+    public static bool TryOpenDocument (ProjectItem item, ILicenseHeaderExtension extension)
+    {
+      try
+      {
+        ThreadHelper.ThrowIfNotOnUIThread();
+
+        // Opening files potentially having non-text content (.png, .snk) might result in a Visual Studio error "Some bytes have been replaced with the
+        // Unicode substitution character while loading file ...". In order to avoid this, files with unknown extensions are not opened. However, in order
+        // to keep such files eligible as Core input, still return true
+        var languageForExtension = extension.LicenseHeaderReplacer.GetLanguageFromExtension (Path.GetExtension (item.FileNames[1]));
+        if (languageForExtension == null)
+          return true;
+
+        item.Open (Constants.vsViewKindTextView);
+        return true;
+      }
+      catch (COMException)
+      {
+        return false;
+      }
+      catch (IOException)
+      {
+        return false;
+      }
+    }
+
+    /// <summary>
+    ///   Saves the current content of <see cref="ProjectItem" /> if it was saved before and closes it afterwards, if it not
+    ///   opened before.
+    /// </summary>
+    /// <param name="item">The item whose content should be saved.</param>
+    /// <param name="wasOpen">Determines whether the <paramref name="item" /> is currently opened.</param>
+    /// <param name="wasSaved">
+    ///   Determines whether the contents of <paramref name="item" /> were initially saved before they
+    ///   have been updated.
+    /// </param>
+    public static void SaveAndCloseIfNecessary (ProjectItem item, bool wasOpen, bool wasSaved)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+      if (wasOpen)
+      {
+        // if document had no unsaved changes before, it should not have any now (analogously for when it did have unsaved changes)
+        if (wasSaved)
+          item.Document.Save();
+      }
+      else
+      {
+        item.Document.Close (vsSaveChanges.vsSaveChangesYes);
+      }
+    }
+
+    private static void ProcessSuccess (ReplacerSuccess replacerSuccess, ILicenseHeaderExtension extension, bool isOpen)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+      if (!File.Exists (replacerSuccess.FilePath) || TrySetContent (replacerSuccess.FilePath, extension.Dte2.Solution, replacerSuccess.NewContent, isOpen, extension))
+        return;
+
+      s_log.Error ($"Updating license header for file {replacerSuccess.FilePath} failed.");
+      MessageBoxHelper.ShowError ($"Updating license header for file {replacerSuccess.FilePath} failed.");
+    }
+
     private static bool TrySetContent (string itemPath, Solution solution, string content, bool wasOpen, ILicenseHeaderExtension extension)
     {
       ThreadHelper.ThrowIfNotOnUIThread();
@@ -282,45 +383,33 @@ namespace LicenseHeaderManager.Utils
       return true;
     }
 
-    public static bool TryOpenDocument (ProjectItem item, ILicenseHeaderExtension extension)
+    private static async Task OnProgressReportedAsync (
+        ReplacerProgressContentReport progress,
+        BaseUpdateViewModel baseUpdateViewModel,
+        string projectName,
+        IDictionary<string, bool> fileOpenedStatus,
+        CancellationToken cancellationToken)
     {
-      try
-      {
-        ThreadHelper.ThrowIfNotOnUIThread();
+      await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-        // Opening files potentially having non-text content (.png, .snk) might result in a Visual Studio error "Some bytes have been replaced with the
-        // Unicode substitution character while loading file ...". In order to avoid this, files with unknown extensions are not opened. However, in order
-        // to keep such files eligible as Core input, still return true
-        var languageForExtension = extension.LicenseHeaderReplacer.GetLanguageFromExtension (Path.GetExtension (item.FileNames[1]));
-        if (languageForExtension == null)
-          return true;
+      if (!cancellationToken.IsCancellationRequested)
+      {
+        var result = new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (
+            new ReplacerSuccess (progress.ProcessedFilePath, progress.ProcessFileNewContent));
+        if (fileOpenedStatus.TryGetValue (progress.ProcessedFilePath, out var wasOpen))
+          await HandleResultAsync (result, LicenseHeadersPackage.Instance, wasOpen, false);
+        else
+          await HandleResultAsync (result, LicenseHeadersPackage.Instance, false, false);
+      }
 
-        item.Open (Constants.vsViewKindTextView);
-        return true;
-      }
-      catch (COMException)
-      {
-        return false;
-      }
-      catch (IOException)
-      {
-        return false;
-      }
-    }
+      if (baseUpdateViewModel == null)
+        return;
 
-    public static void SaveAndCloseIfNecessary (ProjectItem item, bool wasOpen, bool wasSaved)
-    {
-      ThreadHelper.ThrowIfNotOnUIThread();
-      if (wasOpen)
-      {
-        // if document had no unsaved changes before, it should not have any now (analogously for when it did have unsaved changes)
-        if (wasSaved)
-          item.Document.Save();
-      }
-      else
-      {
-        item.Document.Close (vsSaveChanges.vsSaveChangesYes);
-      }
+      baseUpdateViewModel.FileCountCurrentProject = progress.TotalFileCount;
+      baseUpdateViewModel.ProcessedFilesCountCurrentProject = progress.ProcessedFileCount;
+
+      if (baseUpdateViewModel is SolutionUpdateViewModel solutionUpdateViewModel)
+        solutionUpdateViewModel.CurrentProject = projectName;
     }
   }
 }
