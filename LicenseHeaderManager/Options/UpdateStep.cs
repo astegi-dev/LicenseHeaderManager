@@ -15,18 +15,39 @@ using System;
 
 namespace LicenseHeaderManager.Options
 {
+  /// <summary>
+  ///   Encapsulates logic to be executed when upgrading from an earlier LHM version to a newer one.
+  /// </summary>
   public class UpdateStep
   {
+    /// <summary>
+    ///   Initializes a new <see cref="UpdateStep" /> instance.
+    /// </summary>
+    /// <param name="targetVersion">The version this <see cref="UpdateStep" /> updates to.</param>
+    /// <param name="customUpdateActions">
+    ///   The actions to be taken in order to achieve the update to the version specified by
+    ///   <paramref name="targetVersion" />.
+    /// </param>
     public UpdateStep (Version targetVersion, params Action[] customUpdateActions)
     {
       TargetVersion = targetVersion;
       CustomUpdateActions = customUpdateActions;
     }
 
+    /// <summary>
+    ///   The target version this <see cref="UpdateStep" /> instance updates to.
+    /// </summary>
     public Version TargetVersion { get; }
 
+    /// <summary>
+    ///   The actions that need to be taken in order to perform the update to the version specified by
+    ///   <see cref="TargetVersion" />.
+    /// </summary>
     public Action[] CustomUpdateActions { get; }
 
+    /// <summary>
+    ///   Executes all update actions required for the update, as specified by <see cref="CustomUpdateActions" />
+    /// </summary>
     public void ExecuteActions ()
     {
       foreach (var customUpdateStep in CustomUpdateActions)

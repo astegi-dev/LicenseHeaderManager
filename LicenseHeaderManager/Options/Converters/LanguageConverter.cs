@@ -20,13 +20,16 @@ using Core;
 
 namespace LicenseHeaderManager.Options.Converters
 {
+  /// <summary>
+  ///   Provides means of converting an enumerable range of <see cref="Language" /> objects to and from XML.
+  /// </summary>
   internal class LanguageConverter : XmlTypeConverter<IEnumerable<Language>>
   {
     private const string c_language = "Language";
     private const string c_languages = "Languages";
     private const string c_extension = "HeaderDefinitionExtension";
     private const string c_extensions = "Extensions";
-    private const string c_linecomment = "LineComment";
+    private const string c_lineComment = "LineComment";
     private const string c_beginComment = "BeginComment";
     private const string c_endComment = "EndComment";
     private const string c_beginRegion = "BeginRegion";
@@ -44,7 +47,7 @@ namespace LicenseHeaderManager.Options.Converters
                     c_extensions,
                     from e in l.Extensions
                     select new XElement (c_extension, e)),
-                new XAttribute (c_linecomment, l.LineComment ?? string.Empty),
+                new XAttribute (c_lineComment, l.LineComment ?? string.Empty),
                 new XAttribute (c_beginComment, l.BeginComment ?? string.Empty),
                 new XAttribute (c_endComment, l.EndComment ?? string.Empty),
                 new XAttribute (c_beginRegion, l.BeginRegion ?? string.Empty),
@@ -69,7 +72,7 @@ namespace LicenseHeaderManager.Options.Converters
                        Extensions =
                            from e in l.Descendants (c_extension)
                            select e.Value,
-                       LineComment = GetAttributeValue (l, c_linecomment),
+                       LineComment = GetAttributeValue (l, c_lineComment),
                        BeginComment = GetAttributeValue (l, c_beginComment),
                        EndComment = GetAttributeValue (l, c_endComment),
                        BeginRegion = GetAttributeValue (l, c_beginRegion),

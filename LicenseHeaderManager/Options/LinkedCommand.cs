@@ -18,24 +18,46 @@ using EnvDTE;
 
 namespace LicenseHeaderManager.Options
 {
+  /// <summary>
+  ///   Provides members that define the point in time a <see cref="LinkedCommand" /> is executed.
+  /// </summary>
   public enum ExecutionTime
   {
+    /// <summary>
+    ///   The <see cref="LinkedCommand" /> is executed before the Visual Studio Command it refers to is executed.
+    /// </summary>
     Before = 0,
+
+    /// <summary>
+    ///   The <see cref="LinkedCommand" /> is executed after the Visual Studio Command it refers to is executed.
+    /// </summary>
     After = 1
   }
 
+  /// <summary>
+  ///   Represents a
+  /// </summary>
   public class LinkedCommand : INotifyPropertyChanged
   {
     private ExecutionTime _executionTime;
 
     private string _name;
 
+    /// <summary>
+    ///   Gets the internal GUID of the Visual Studio Command this <see cref="LinkedCommand" /> instance refers to.
+    /// </summary>
     public string Guid { get; set; }
 
+    /// <summary>
+    ///   Gets the internal ID of the Visual Studio Command this <see cref="LinkedCommand" /> instance refers to.
+    /// </summary>
     public int Id { get; set; }
 
     [JsonIgnore] public CommandEvents Events { get; set; }
 
+    /// <summary>
+    ///   Gets the name this <see cref="LinkedCommand" /> instance refers to.
+    /// </summary>
     public string Name
     {
       get => _name;
@@ -49,6 +71,9 @@ namespace LicenseHeaderManager.Options
       }
     }
 
+    /// <summary>
+    ///   Denotes the point in time this <see cref="LinkedCommand" /> instance is executed.
+    /// </summary>
     public ExecutionTime ExecutionTime
     {
       get => _executionTime;
@@ -69,6 +94,10 @@ namespace LicenseHeaderManager.Options
       PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (propertyName));
     }
 
+    /// <summary>
+    ///   Performs a copy of the current <see cref="LinkedCommand" /> instance.
+    /// </summary>
+    /// <returns>Returns a copy of the current <see cref="LinkedCommand" /> instance that is equal to it.</returns>
     public LinkedCommand Clone ()
     {
       return new LinkedCommand

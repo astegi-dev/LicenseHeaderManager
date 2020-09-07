@@ -18,6 +18,12 @@ using System.Xml.Linq;
 
 namespace LicenseHeaderManager.Options.Converters
 {
+  /// <summary>
+  ///   Provides a <see cref="TypeConverter" /> subtype that converts instances of the type of its generic type parameter
+  ///   <typeparamref name="T" /> to and from equivalent XML representations. This is used in order to read and write complex
+  ///   data structures from/write the Windows Registry (which only supports basic data types).
+  /// </summary>
+  /// <typeparam name="T">The type that should be converted to and from XML.</typeparam>
   internal abstract class XmlTypeConverter<T> : TypeConverter
   {
     public override bool CanConvertFrom (ITypeDescriptorContext context, Type sourceType)
@@ -47,17 +53,15 @@ namespace LicenseHeaderManager.Options.Converters
 
     private object Convert (object value)
     {
-      if (value is string)
-        return FromXml (value as string);
+      if (value is string valueXmlString)
+        return FromXml (valueXmlString);
       return ToXml ((T) value);
     }
 
     protected string GetAttributeValue (XElement element, string name)
     {
       var attribute = element.Attribute (name);
-      if (attribute != null)
-        return attribute.Value;
-      return null;
+      return attribute?.Value;
     }
 
     public abstract T FromXml (string xml);

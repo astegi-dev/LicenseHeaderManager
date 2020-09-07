@@ -18,6 +18,10 @@ using System.Windows.Data;
 
 namespace LicenseHeaderManager.Options.Converters
 {
+  /// <summary>
+  ///   Joins an enumerable range of <see cref="string" /> instances using a predefined separator and converts such a joined
+  ///   <see cref="string" /> back to an <see cref="IEnumerable{T}" /> whose generic type parameter is <see cref="string" />.
+  /// </summary>
   internal class ExtensionConverter : IValueConverter
   {
     public ExtensionConverter ()
@@ -25,12 +29,14 @@ namespace LicenseHeaderManager.Options.Converters
       Separator = Environment.NewLine;
     }
 
+    /// <summary>
+    ///   The separator to be used to join and split the converter inputs.
+    /// </summary>
     public string Separator { get; set; }
 
     public object Convert (object value, Type targetType, object parameter, CultureInfo culture)
     {
-      var strings = value as IEnumerable<string>;
-      if (strings == null)
+      if (!(value is IEnumerable<string> strings))
         return value;
 
       return string.Join (Separator, strings);
@@ -38,8 +44,7 @@ namespace LicenseHeaderManager.Options.Converters
 
     public object ConvertBack (object value, Type targetType, object parameter, CultureInfo culture)
     {
-      var s = value as string;
-      if (s == null)
+      if (!(value is string s))
         return value;
 
       return s.Split (new[] { Separator }, StringSplitOptions.None);
