@@ -19,6 +19,9 @@ using System.Xml.Linq;
 
 namespace LicenseHeaderManager.Options.Converters
 {
+  /// <summary>
+  ///   Provides means of converting an enumerable range of <see cref="LinkedCommand" /> objects to and from XML.
+  /// </summary>
   internal class LinkedCommandConverter : XmlTypeConverter<IEnumerable<LinkedCommand>>
   {
     private const string c_linkedCommands = "LinkedCommands";
