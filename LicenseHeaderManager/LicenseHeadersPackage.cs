@@ -162,7 +162,7 @@ namespace LicenseHeaderManager
 
       var visible = false;
       if (ProjectItemInspection.IsPhysicalFile (item))
-        visible = LicenseHeaderReplacer.IsValidPathInput (item.FileNames[1]);
+        visible = LicenseHeaderReplacer.IsValidPathInput (item.FileNames[1]) && item.CanBeOpened();
 
       return visible;
     }

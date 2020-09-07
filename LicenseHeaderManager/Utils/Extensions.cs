@@ -204,9 +204,43 @@ namespace LicenseHeaderManager.Utils
       {
         return item.IsOpen[Constants.vsViewKindTextView];
       }
-      catch (COMException ex)
+      catch (Exception ex)
       {
-        s_log.Error("Could not determine if project item is open. Assuming it is closed.", ex);
+        s_log.Error($"Could not determine if project item {item.FileNames[1]} is open. Assuming it is closed.", ex);
+        return false;
+      }
+    }
+
+    /// <summary>
+    /// Determines whether a <see cref="ProjectItem" /> can be opened.
+    /// </summary>
+    /// <param name="item">The project item for which it should be established if it can be opened.</param>
+    /// <returns>Returns <see langword="true" /> if <paramref name="item"/> can be opened, otherwise <see langword="false"/>.</returns>
+    /// <remarks>
+    /// For certain project templates, the ProjectItem objects are implemented such that certain methods cannot be
+    /// called as for other project types, which leads to numerous problems (content cannot be retrieved nor updated, parent
+    /// item cannot be found). For instance, calling the IsOpen method might lead to a NotImplementedException
+    /// => "License Headers" right click menu should not be visible for such ProjectItems
+    /// </remarks>
+    public static bool CanBeOpened(this ProjectItem item)
+    {
+      ThreadHelper.ThrowIfNotOnUIThread();
+
+      try
+      {
+        var isOpen = item.IsOpen[Constants.vsViewKindTextView];
+        if (isOpen)
+          return true;
+
+        item.Open (Constants.vsViewKindTextView);
+        if (item.Document == null)
+          return false;
+
+        item.Document.Close (vsSaveChanges.vsSaveChangesYes);
+        return true;
+      }
+      catch (Exception)
+      {
         return false;
       }
     }
