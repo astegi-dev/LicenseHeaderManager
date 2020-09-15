@@ -22,7 +22,7 @@ namespace Core
   ///   Represents the license header of a <see cref="Document" />.
   /// </summary>
   /// <seealso cref="Document" />
-  internal class DocumentHeader
+  internal class DocumentHeader : IDocumentHeader
   {
     private readonly IEnumerable<DocumentHeaderProperty> _properties;
 
@@ -37,21 +37,10 @@ namespace Core
       Text = ExpandProperties (text);
     }
 
-    /// <summary>
-    ///   Gets a value denoting the header represented by this <see cref="DocumentHeader" /> is non-existing, i. e. if the
-    ///   <see cref="Text" /> property is null.
-    /// </summary>
     public bool IsEmpty => Text == null;
 
-    /// <summary>
-    ///   Gets the <see cref="FileInfo" /> object associated with the file this <see cref="DocumentHeader" /> refers to.
-    /// </summary>
     public FileInfo FileInfo { get; }
 
-    /// <summary>
-    ///   Gets the effective text denoting the license header text represented by this <see cref="DocumentHeader" /> instance,
-    ///   with expandable properties having been replaced.
-    /// </summary>
     public string Text { get; }
 
     private FileInfo CreateFileInfo (string pathToDocument)

@@ -12,21 +12,31 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Core
 {
-  public interface ICommentParser
+  public interface IDocumentHeader
   {
     /// <summary>
-    ///   Parses a given text according to a language-specific comment syntax. Given a text, it extracts the comments.
+    ///   Gets a value denoting the header represented by this <see cref="DocumentHeader" /> is non-existing, i. e. if the
+    ///   <see cref="Text" /> property is null.
     /// </summary>
-    /// <param name="text">The text to be parsed.</param>
-    /// <returns>Returns the comments contained in <paramref name="text" />, according to the language-specific comment syntax.</returns>
-    /// <exception cref="ParseException">Thrown if parsing comments fails due to invalid syntax.</exception>
-    /// <remarks>
-    ///   The language-specific comment syntax may be configured using the constructor of an
-    ///   <see cref="ICommentParser" /> implementation.
-    /// </remarks>
-    string Parse (string text);
+    bool IsEmpty { get; }
+
+    /// <summary>
+    ///   Gets the <see cref="FileInfo" /> object associated with the file this <see cref="DocumentHeader" /> refers to.
+    /// </summary>
+    FileInfo FileInfo { get; }
+
+    /// <summary>
+    ///   Gets the effective text denoting the license header text represented by this <see cref="DocumentHeader" /> instance,
+    ///   with expandable properties having been replaced.
+    /// </summary>
+    string Text { get; }
   }
 }

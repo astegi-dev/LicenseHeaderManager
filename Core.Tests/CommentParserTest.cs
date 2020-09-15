@@ -17,9 +17,9 @@ using NUnit.Framework;
 namespace Core.Tests
 {
   [TestFixture]
-  public class CommentParserTests
+  public class CommentParserTest
   {
-    private void Test (string[] header, string[] text)
+    private void Test_Positive (string[] header, string[] text)
     {
       var headerString = string.Join (Environment.NewLine, header);
       var textString = string.Join (Environment.NewLine, text);
@@ -28,18 +28,18 @@ namespace Core.Tests
         headerString += Environment.NewLine;
 
       var parser = new CommentParser("//", "/*", "*/", "#region", "#endregion");
-      Assert.AreEqual(headerString, parser.Parse(headerString + textString));
+      Assert.That(headerString, Is.EqualTo(parser.Parse(headerString + textString)));
     }
 
-    private void TestError (string[] text)
+    private void Test_Negative (string[] text)
     {
       var textString = string.Join (Environment.NewLine, text);
       var parser = new CommentParser("//", "/*", "*/", "#region", "#endregion");
-      Assert.Throws<ParseException>(() => parser.Parse(textString));
+      Assert.That (() => parser.Parse (textString), Throws.InstanceOf<ParseException>());
     }
 
     [Test]
-    public void TestCommentBeforeRegionWithText ()
+    public void Parse_CommentBeforeRegionWithText_ReturnsHeaderWithoutNonCommentTextWithEndingNewLine ()
     {
       var header = new[]
                    {
@@ -55,20 +55,20 @@ namespace Core.Tests
                      "#endregion"
                  };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestEmptyFile ()
+    public void Parse_EmptyFile_ReturnsEmptyString ()
     {
       var header = new string[0];
       var text = new string[0];
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestEmptyLinesBeforeComment ()
+    public void Parse_EmptyLinesBeforeComment_ReturnsHeaderWithoutNonCommentTextWithEndingNewLine ()
     {
       var header = new[]
                    {
@@ -80,11 +80,11 @@ namespace Core.Tests
       var text = new[]
                  { "This is not a comment." };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestEndRegionWithSpace ()
+    public void Parse_EndRegionWithSpace_ReturnsHeaderWithEndingNewLine ()
     {
       var header = new[]
                    {
@@ -98,11 +98,11 @@ namespace Core.Tests
       headerString += Environment.NewLine;
 
       var parser = new CommentParser("//", "/*", "*/", "#Region", "#End Region");
-      Assert.AreEqual(headerString, parser.Parse(headerString));
+      Assert.That(headerString, Is.EqualTo(parser.Parse(headerString)));
     }
 
     [Test]
-    public void TestEverything ()
+    public void Parse_EveryCommentPossible_ReturnsHeaderWithoutNonCommentText ()
     {
       var header = new[]
                    {
@@ -127,22 +127,22 @@ namespace Core.Tests
       var text = new[]
                  { "This is not a comment." };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestHeaderOnly ()
+    public void Parse_HeaderOnly_ReturnsHeader ()
     {
       var header = new[]
                    { "//This is a comment." };
 
       var text = new string[0];
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestHeaderOnlyWithEmptyLines ()
+    public void Parse_HeaderOnlyWithEmptyLines_ReturnsHeader ()
     {
       var header = new[]
                    {
@@ -155,11 +155,11 @@ namespace Core.Tests
 
       var text = new string[0];
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestMissingEndComment ()
+    public void Parse_MissingEndComment_ThrowsParseException ()
     {
       var text = new[]
                  {
@@ -167,11 +167,11 @@ namespace Core.Tests
                      "This is not a comment."
                  };
 
-      TestError (text);
+      Test_Negative (text);
     }
 
     [Test]
-    public void TestMissingEndRegion ()
+    public void Parse_MissingEndRegion_ReturnsEmptyString ()
     {
       var header = new string[0];
 
@@ -182,11 +182,11 @@ namespace Core.Tests
                      "This is not a comment."
                  };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestMixedComments ()
+    public void Parse_MixedComments_ReturnsHeaderWithEndingNewLine ()
     {
       var header = new[]
                    {
@@ -199,11 +199,11 @@ namespace Core.Tests
       var text = new[]
                  { "//This is another comment." };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestMultiLineBeginEndComment ()
+    public void Parse_MultiLineBeginEndComment_ReturnsHeaderWithoutNonCommentTextWithEndingNewLine()
     {
       var header = new[]
                    {
@@ -214,11 +214,11 @@ namespace Core.Tests
       var text = new[]
                  { "This is not a comment." };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestMultiLineHeaderOnly ()
+    public void Parse_MultiLineHeaderOnly_ReturnsHeaderWithoutEndingNewLine ()
     {
       var header = new[]
                    {
@@ -230,11 +230,11 @@ namespace Core.Tests
 
       var text = new string[0];
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestMultipleBeginEndComments ()
+    public void Parse_MultipleBeginEndComments_ReturnsHeaderWithoutNonCommentTextWithEndingNewLine()
     {
       var header = new[]
                    {
@@ -245,11 +245,11 @@ namespace Core.Tests
       var text = new[]
                  { "This is not a comment." };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestMultipleLineBeginEndCommentsWithEmptyLine ()
+    public void Parse_MultipleLineBeginEndCommentsWithEmptyLine_ReturnsHeaderWithEndingNewLine ()
     {
       var header = new[]
                    {
@@ -261,11 +261,11 @@ namespace Core.Tests
       var text = new[]
                  { "/* This is another comment. */" };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestMultipleLineComments ()
+    public void Parse_MultipleLineComments_ReturnsHeaderWithoutNonCommentText ()
     {
       var header = new[]
                    {
@@ -276,11 +276,11 @@ namespace Core.Tests
       var text = new[]
                  { "This is not a comment." };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestMultipleLineCommentsWithEmptyLine ()
+    public void Parse_MultipleLineCommentsWithEmptyLine_ReturnsHeaderWithEndingNewLine ()
     {
       var header = new[]
                    {
@@ -292,11 +292,11 @@ namespace Core.Tests
       var text = new[]
                  { "//This is another comment." };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestMultipleRegions ()
+    public void Parse_MultipleRegions_ReturnsHeaderWithoutNonCommentText ()
     {
       var header = new[]
                    {
@@ -312,11 +312,11 @@ namespace Core.Tests
       var text = new[]
                  { "This is not a comment." };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestNestedMissingEndRegion ()
+    public void Parse_NestedMissingEndRegion_ReturnsEmptyString ()
     {
       var header = new string[0];
 
@@ -330,11 +330,11 @@ namespace Core.Tests
                      "This is not a comment."
                  };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestNestedRegions ()
+    public void Parse_NestedRegions_ReturnsHeaderWithEndingNewLine ()
     {
       var header = new[]
                    {
@@ -350,11 +350,11 @@ namespace Core.Tests
       var text = new[]
                  { "This is not a comment." };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestNoHeader ()
+    public void Parse_NoHeader_ReturnsEmptyString ()
     {
       var header = new string[0];
 
@@ -364,11 +364,11 @@ namespace Core.Tests
                      "//This is not part of the header."
                  };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestNoHeaderButNormalRegion ()
+    public void Parse_NoHeaderButNormalRegion_ReturnsEmptyString ()
     {
       var header = new string[0];
 
@@ -379,11 +379,11 @@ namespace Core.Tests
                      "#endregion"
                  };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestNoHeaderWithEmptyLines ()
+    public void Parse_NoHeaderWithEmptyLines_ReturnsEmptyString ()
     {
       var header = new string[0];
 
@@ -395,11 +395,11 @@ namespace Core.Tests
                      "//This is not part of the header."
                  };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestRegion ()
+    public void Parse_Region_ReturnsHeaderWithoutNonCommentTextWithEndingNewLine ()
     {
       var header = new[]
                    {
@@ -411,11 +411,11 @@ namespace Core.Tests
       var text = new[]
                  { "This is not a comment." };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestRegionWithEmptyLines ()
+    public void Parse_RegionWithEmptyLines_ReturnsHeaderWithEndingNewLine ()
     {
       var header = new[]
                    {
@@ -430,11 +430,11 @@ namespace Core.Tests
       var text = new[]
                  { "//This is another comment." };
 
-      Test (header, text);
+      Test_Positive (header, text);
     }
 
     [Test]
-    public void TestTextInRegion ()
+    public void Parse_TextInRegion_ReturnsEmptyString ()
     {
       var header = new string[0];
 
@@ -446,7 +446,39 @@ namespace Core.Tests
                      "#endregion"
                  };
 
-      Test (header, text);
+      Test_Positive (header, text);
+    }
+
+    [Test]
+    public void Parse_RegionsInText_ReturnsHeaderWithEndingNewLine()
+    {
+      var header = new[]
+                   {
+                       "#region copyright",
+                       "#region something",
+                       "",
+                       "#endregion",
+                       "#endregion"
+                   };
+
+      var text = new[]
+                 {
+                     "#region something",
+                     "#region something"
+                 };
+
+      Test_Positive(header, text);
+    }
+    
+    [Test]
+    public void Parse_EndRegionWithoutRegion_ThrowsParseException()
+    {
+      var header = new[]
+                   {
+                       "#endregion"
+                   };
+
+      Test_Negative(header);
     }
   }
 }

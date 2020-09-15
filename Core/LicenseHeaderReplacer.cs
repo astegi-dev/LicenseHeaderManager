@@ -25,7 +25,7 @@ namespace Core
   /// <summary>
   ///   Updates (i. e. replaces, adds, removes) license headers from files.
   /// </summary>
-  public class LicenseHeaderReplacer
+  public class LicenseHeaderReplacer : ILicenseHeaderReplacer
   {
     private readonly IEnumerable<string> _keywords;
     private readonly IEnumerable<Language> _languages;
@@ -34,6 +34,7 @@ namespace Core
 
     private int _processedFileCount;
     private int _totalFileCount;
+
 
     /// <summary>
     ///   Initializes a new <see cref="LicenseHeaderReplacer" /> instance.
@@ -56,32 +57,16 @@ namespace Core
       _taskStartSemaphore = new SemaphoreSlim (maxParallelism, maxParallelism);
     }
 
+    public LicenseHeaderReplacer() { }
+
     public Language GetLanguageFromExtension (string extension)
     {
+      if (_languages == null)
+        return default;
+
       return _languages.FirstOrDefault (x => x.Extensions.Any (y => extension.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
     }
 
-    /// <summary>
-    ///   Determines whether a file is a generally valid input file for
-    ///   <see cref="RemoveOrReplaceHeader(LicenseHeaderPathInput)" /> or
-    ///   <see
-    ///     cref="RemoveOrReplaceHeader(ICollection{LicenseHeaderPathInput},IProgress{ReplacerProgressReport},CancellationToken)" />
-    ///   .
-    /// </summary>
-    /// <param name="path">The path to the file to be examined.</param>
-    /// <returns>
-    ///   Returns <see langword="true" /> if the file specified by <paramref name="path" /> is a valid path input,
-    ///   otherwise false.
-    /// </returns>
-    /// <remarks>
-    ///   A return value of <see langword="true" /> does not necessarily mean that an invocation of
-    ///   <see cref="RemoveOrReplaceHeader(LicenseHeaderPathInput)" /> or
-    ///   <see
-    ///     cref="RemoveOrReplaceHeader(ICollection{LicenseHeaderPathInput},IProgress{ReplacerProgressReport},CancellationToken)" />
-    ///   would not yield a <see cref="ReplacerErrorType.NonCommentText" /> or <see cref="ReplacerErrorType.ParsingError" />
-    ///   error, but only that is a fundamentally valid input - i. e. the file exists and this
-    ///   <see cref="LicenseHeaderReplacer" /> instance is able to interpret it in the way required.
-    /// </remarks>
     public bool IsValidPathInput (string path)
     {
       return File.Exists (path) && TryCreateDocument (new LicenseHeaderPathInput (path, null), out _) == CreateDocumentResult.DocumentCreated;
@@ -112,17 +97,6 @@ namespace Core
               new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>> (new ReplacerError<LicenseHeaderContentInput> (input, errorType, message)));
     }
 
-    /// <summary>
-    ///   Updates license headers in a file based on its path, i. e. the new content is written directly to the file.
-    /// </summary>
-    /// <param name="licenseHeaderInput">
-    ///   An <see cref="LicenseHeaderContentInput" /> instance representing the file whose
-    ///   license headers are to be updated.
-    /// </param>
-    /// <returns>
-    ///   Returns a <see cref="ReplacerResult{TSuccess,TError}" /> instance containing information about the success or
-    ///   error of the operation.
-    /// </returns>
     public async Task<ReplacerResult<ReplacerError<LicenseHeaderPathInput>>> RemoveOrReplaceHeader (LicenseHeaderPathInput licenseHeaderInput)
     {
       return await RemoveOrReplaceHeader (
@@ -136,23 +110,6 @@ namespace Core
               new ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderPathInput>> (new ReplacerError<LicenseHeaderPathInput> (input, errorType, message)));
     }
 
-    /// <summary>
-    ///   Updates license headers of files based on their contents, i. e. the new contents are returned. Setting the new
-    ///   contents is the caller's responsibility.
-    /// </summary>
-    /// <param name="licenseHeaderInputs">
-    ///   An range of <see cref="LicenseHeaderContentInput" /> instances representing the files
-    ///   whose license headers are to be updated.
-    /// </param>
-    /// <param name="progress">
-    ///   A <see cref="IProgress{T}" /> whose generic type parameter is
-    ///   <see cref="ReplacerProgressContentReport" /> that invokes callbacks for each reported progress value.
-    /// </param>
-    /// <param name="cancellationToken">A cancellation token that can be used to cancel the work.</param>
-    /// <returns>
-    ///   Returns a range of <see cref="ReplacerResult{TSuccess,TError}" /> instances containing information about the
-    ///   success or error of the operations.
-    /// </returns>
     public async Task<IEnumerable<ReplacerResult<ReplacerSuccess, ReplacerError<LicenseHeaderContentInput>>>> RemoveOrReplaceHeader (
         ICollection<LicenseHeaderContentInput> licenseHeaderInputs,
         IProgress<ReplacerProgressContentReport> progress,
@@ -195,22 +152,6 @@ namespace Core
       return results;
     }
 
-    /// <summary>
-    ///   Updates license headers of files based on their paths, i. e. the new contents written directly to the files.
-    /// </summary>
-    /// <param name="licenseHeaderInputs">
-    ///   An range of <see cref="LicenseHeaderPathInput" /> instances representing the files
-    ///   whose license headers are to be updated.
-    /// </param>
-    /// <param name="progress">
-    ///   A <see cref="IProgress{T}" /> whose generic type parameter is
-    ///   <see cref="ReplacerProgressReport" /> that invokes callbacks for each reported progress value.
-    /// </param>
-    /// <param name="cancellationToken">A cancellation token that can be used to cancel the work.</param>
-    /// <returns>
-    ///   Returns a <see cref="ReplacerResult{TSuccess,TError}" /> instance containing information about errors that
-    ///   have potentially occurred during the update operations.
-    /// </returns>
     public async Task<ReplacerResult<IEnumerable<ReplacerError<LicenseHeaderPathInput>>>> RemoveOrReplaceHeader (
         ICollection<LicenseHeaderPathInput> licenseHeaderInputs,
         IProgress<ReplacerProgressReport> progress,
@@ -377,7 +318,7 @@ namespace Core
     ///   Returns a <see cref="CreateDocumentResult" /> member describing the success status of the document opening
     ///   attempt.
     /// </returns>
-    private CreateDocumentResult TryCreateDocument (LicenseHeaderInput licenseHeaderInput, out Document document)
+    internal virtual CreateDocumentResult TryCreateDocument (LicenseHeaderInput licenseHeaderInput, out Document document)
     {
       document = null;
 
@@ -488,7 +429,7 @@ namespace Core
     /// <summary>
     ///   Represents the result of a <see cref="TryCreateDocument" /> invocation.
     /// </summary>
-    private enum CreateDocumentResult
+    internal enum CreateDocumentResult
     {
       /// <summary>
       ///   Document was created successfully.

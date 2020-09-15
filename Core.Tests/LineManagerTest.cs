@@ -20,43 +20,116 @@ namespace Core.Tests
   public class LineManagerTest
   {
     [Test]
-    public void DetectLineEnd_CRLF ()
+    public void DetectMostFrequentLineEnd_InputTextIsNull_ThrowsArgumentNullException()
     {
-      var text = "test\r\ntest";
-      Assert.AreEqual ("\r\n", NewLineManager.DetectMostFrequentLineEnd (text));
+      string inputText = null;
+
+      Assert.That(() => NewLineManager.DetectMostFrequentLineEnd(inputText), Throws.InstanceOf<ArgumentNullException>());
     }
 
     [Test]
-    public void DetectLineEnd_OnlyCR ()
+    public void DetectMostFrequentLineEnd_CRLF_ReturnsCRLF ()
     {
-      var text = "test\rtest";
-      Assert.AreEqual ("\r", NewLineManager.DetectMostFrequentLineEnd (text));
+      const string textWithCRLF = "test\r\ntest";
+      var actual = NewLineManager.DetectMostFrequentLineEnd (textWithCRLF);
+
+      Assert.That("\r\n", Is.EqualTo(actual));
     }
 
     [Test]
-    public void DetectLineEnd_OnlyLF ()
+    public void DetectMostFrequentLineEnd_CR_ReturnsCR ()
     {
-      var text = "test\ntest";
-      Assert.AreEqual ("\n", NewLineManager.DetectMostFrequentLineEnd (text));
+      const string textWithCR = "test\rtest";
+      var actual = NewLineManager.DetectMostFrequentLineEnd (textWithCR);
+
+      Assert.That("\r", Is.EqualTo(actual));
     }
 
     [Test]
-    public void DetectMostFrequentLineEnd_DetectFullLineEnding ()
+    public void DetectMostFrequentLineEnd_LF_ReturnsLF ()
     {
-      var text = "test\n\r\n\r\n test\r\n te\r restasd";
-      var result = NewLineManager.DetectMostFrequentLineEnd (text);
-      Assert.AreEqual ("\r\n", result);
+      const string textWithLF = "test\ntest";
+      var actual = NewLineManager.DetectMostFrequentLineEnd (textWithLF);
+
+      Assert.That("\n", Is.EqualTo(actual));
     }
 
     [Test]
-    public void ReplaceAllLineEnds_ReplaceFullLineEnding ()
+    public void DetectMostFrequentLineEnd_DifferentCRLF_ReturnsFullLineEnding ()
     {
-      var text1 = "test1";
-      var text2 = "test2";
-      var text3 = "test3";
-      var text4 = "test4";
-      var fulltext = text1 + "\r\n" + text2 + "\n" + text3 + "\r" + text4;
-      Assert.AreEqual (text1 + text2 + text3 + text4, NewLineManager.ReplaceAllLineEnds (fulltext, string.Empty));
+      const string textWithDifferentCRLF = "test\n\r\n\r\n test\r\n te\r restasd";
+      var actual = NewLineManager.DetectMostFrequentLineEnd (textWithDifferentCRLF);
+
+      Assert.That("\r\n", Is.EqualTo(actual));
+    }
+
+    [Test]
+    public void ReplaceAllLineEnds_InputTextIsNull_ThrowsArgumentNullException()
+    {
+      string inputText = null;
+      var newLineEnd = string.Empty;
+
+      Assert.That(() => NewLineManager.ReplaceAllLineEnds(inputText, newLineEnd), Throws.InstanceOf<ArgumentNullException>());
+    }
+
+    [Test]
+    public void ReplaceAllLineEnds_NewLineEndIsNull_ThrowsArgumentNullException()
+    {
+      var inputText = string.Empty;
+      string newLineEnd = null;
+
+      Assert.That(() => NewLineManager.ReplaceAllLineEnds(inputText, newLineEnd), Throws.InstanceOf<ArgumentNullException>());
+    }
+
+    [Test]
+    public void ReplaceAllLineEnds_NewLineEndIsEmpty_ReturnsTextWithoutLineEnds ()
+    {
+      const string text1 = "test1";
+      const string text2 = "test2";
+      const string text3 = "test3";
+      const string text4 = "test4";
+      const string fulltext = text1 + "\r\n" + text2 + "\n" + text3 + "\r" + text4;
+      var actual = NewLineManager.ReplaceAllLineEnds (fulltext, string.Empty);
+
+      Assert.That(text1 + text2 + text3 + text4, Is.EqualTo(actual));
+    }
+
+    [Test]
+    public void NextLineEndPosition_InputTextNull_ThrowsArgumentNullException()
+    {
+      string inputText = null;
+      const int startIndex = -1;
+
+      Assert.That(() => NewLineManager.NextLineEndPosition(inputText, startIndex), Throws.InstanceOf<ArgumentNullException>());
+    }
+
+    [TestCase("testtext\n\rtest\r\n te\r restasd", 0, 8)]
+    [TestCase("testtext\n\rtest\r\n te\r restasd", 13, 14)]
+    public void NextLineEndPosition_GivenStartIndex_ReturnsCorrectPosition(string inputText, int startIndex, int expectedPosition)
+    {
+      var actual = NewLineManager.NextLineEndPosition(inputText, startIndex);
+
+      Assert.That(expectedPosition, Is.EqualTo(actual));
+    }
+
+    [Test]
+    public void NextLineEndPosition_GivenStartIndexAndCountAndInputTextNull_ThrowsArgumentNullException()
+    {
+      string inputText = null;
+      const int startIndex = 0;
+      const int count = -1;
+
+      Assert.That(() => NewLineManager.NextLineEndPosition(inputText, startIndex, count), Throws.InstanceOf<ArgumentNullException>());
+    }
+
+    [Test]
+    public void NextLineEndPositionInformation_GivenStartIndexAndCountAndInputTextNull_ThrowsArgumentNullException()
+    {
+      string inputText = null;
+      const int startIndex = 0;
+      const int count = -1;
+
+      Assert.That(() => NewLineManager.NextLineEndPositionInformation(inputText, startIndex, count), Throws.InstanceOf<ArgumentNullException>());
     }
   }
 }
