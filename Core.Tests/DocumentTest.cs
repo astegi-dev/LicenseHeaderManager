@@ -120,7 +120,7 @@ namespace Core.Tests
     {
       var document = new Document(new LicenseHeaderPathInput(CreateTestFile(), _headers), _language, null);
 
-      Assert.DoesNotThrowAsync(async () => await document.ReplaceHeaderIfNecessaryPath(new CancellationToken()));
+      Assert.That (async () => await document.ReplaceHeaderIfNecessaryPath(new CancellationToken()), Throws.Nothing);
     }
 
     [Test]
@@ -129,7 +129,7 @@ namespace Core.Tests
       var document = new Document(new LicenseHeaderPathInput(CreateTestFile(), _headers), _language, null);
       _language.SkipExpression = "@/";
 
-      Assert.DoesNotThrowAsync(async () => await document.ReplaceHeaderIfNecessaryPath(new CancellationToken()));
+      Assert.That(async () => await document.ReplaceHeaderIfNecessaryPath(new CancellationToken()), Throws.Nothing);
     }
 
     [Test]
@@ -138,7 +138,7 @@ namespace Core.Tests
       var document = new Document(new LicenseHeaderPathInput(CreateTestFile(), _headers), _language, new []{ "test" });
       _language.SkipExpression = "@/";
 
-      Assert.DoesNotThrowAsync(async () => await document.ReplaceHeaderIfNecessaryPath(new CancellationToken()));
+      Assert.That(async () => await document.ReplaceHeaderIfNecessaryPath(new CancellationToken()), Throws.Nothing);
     }
 
     [Test]
@@ -156,7 +156,7 @@ namespace Core.Tests
       var document = new Document(new LicenseHeaderPathInput(CreateTestFile(), _headers), _language, new[] { "test" });
       _language.SkipExpression = "/@";
 
-      Assert.DoesNotThrowAsync(async () => await document.ReplaceHeaderIfNecessaryPath(new CancellationToken()));
+      Assert.That(async () => await document.ReplaceHeaderIfNecessaryPath(new CancellationToken()), Throws.Nothing);
     }
 
     [Test]

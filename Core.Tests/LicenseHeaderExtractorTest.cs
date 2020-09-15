@@ -23,7 +23,7 @@ namespace Core.Tests
   [TestFixture]
   public class LicenseHeaderExtractorTest
   {
-    private List<string> _paths = new List<string>();
+    private readonly List<string> _paths = new List<string>();
 
     [Test]
     public void ExtractHeaderDefinitions_FilePathIsNull_ReturnsNull()

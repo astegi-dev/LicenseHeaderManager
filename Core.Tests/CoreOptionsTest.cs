@@ -28,9 +28,6 @@ namespace Core.Tests
   {
     private List<string> _paths;
     private CoreOptions _options;
-    private bool _useRequiredKeywords;
-    private string _requiredKeywords;
-    private string _licenseHeaderFileText;
     private ObservableCollection<Language> _languages;
 
     [SetUp]
@@ -39,9 +36,6 @@ namespace Core.Tests
       _paths = new List<string>();
       _options = new CoreOptions(true);
       _options = new CoreOptions(false);
-      _useRequiredKeywords = _options.UseRequiredKeywords;
-      _requiredKeywords = _options.RequiredKeywords;
-      _licenseHeaderFileText = _options.LicenseHeaderFileText;
       _languages = _options.Languages;
     }
 
@@ -58,7 +52,7 @@ namespace Core.Tests
     {
       var testFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
       _paths.Add(testFile);
-      Assert.DoesNotThrowAsync(async () => await CoreOptions.SaveAsync(_options, testFile));
+      Assert.That(async () => await CoreOptions.SaveAsync(_options, testFile), Throws.Nothing);
     }
 
     [Test]

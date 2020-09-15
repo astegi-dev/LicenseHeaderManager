@@ -85,16 +85,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalPropertyTest.cs" />
     <Compile Include="CommentParserTest.cs" />
+    <Compile Include="CoreOptionsTest.cs" />
+    <Compile Include="DocumentHeaderTest.cs" />
     <Compile Include="DocumentTest.cs" />
     <Compile Include="IntegrationTest.cs" />
     <Compile Include="JsonOptionsManagerTest.cs" />
+    <Compile Include="LanguageTest.cs" />
     <Compile Include="LicenseHeaderExtractorTest.cs" />
     <Compile Include="LicenseHeaderPreparerTest.cs" />
     <Compile Include="LicenseHeaderReplacerTest.cs" />
     <Compile Include="LineManagerTest.cs" />
     <Compile Include="PathUtilityTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReplacerErrorTest.cs" />
+    <Compile Include="ReplacerProgressContentReportTest.cs" />
+    <Compile Include="ReplacerResultTest.cs" />
+    <Compile Include="ReplacerSuccessTest.cs" />
+    <Compile Include="UserInfoTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\LicenseHeaderManager.sln.licenseheader">

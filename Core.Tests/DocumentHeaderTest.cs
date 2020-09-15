@@ -59,10 +59,10 @@ namespace Core.Tests
                                   documentHeader => "test")
                            };
 
-      Assert.DoesNotThrow(() =>
+      Assert.That(() =>
      {
        var documentHeader = new DocumentHeader(_documentFilePath, _text, _properties);
-     });
+     }, Throws.Nothing);
     }
 
     [Test]
@@ -72,10 +72,10 @@ namespace Core.Tests
       _text = null;
       _properties = new DocumentHeaderProperty[] { };
 
-      Assert.DoesNotThrow(() =>
+      Assert.That(() =>
       {
         var documentHeader = new DocumentHeader(_documentFilePath, _text, _properties);
-      });
+      }, Throws.Nothing);
     }
   }
 }

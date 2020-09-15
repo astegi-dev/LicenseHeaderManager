@@ -98,7 +98,7 @@ namespace Core.Tests
     {
       var testFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
       _paths.Add(testFile);
-      Assert.DoesNotThrowAsync(async () => await JsonOptionsManager.SerializeAsync(_options, testFile));
+      Assert.That(async () => await JsonOptionsManager.SerializeAsync(_options, testFile), Throws.Nothing);
     }
 
     [Test]
