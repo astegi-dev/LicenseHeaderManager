@@ -25,14 +25,16 @@ using NUnit.Framework;
 namespace Core.Tests
 {
   [TestFixture]
-  class JsonOptionsManagerTest
+  public class JsonOptionsManagerTest
   {
     private List<string> _paths;
+    private CoreOptions _options;
 
     [SetUp]
     public void Setup()
     {
       _paths = new List<string>();
+      _options = new CoreOptions ();
     }
 
     [Test]
@@ -59,7 +61,7 @@ namespace Core.Tests
     [Test]
     public void Deserialize_JsonConverterNotFound_ThrowsNotSupportedException()
     {
-      //Assert.That(async () => await JsonOptionsManager.DeserializeAsync<LicenseHeaderManagerOptionsAttribute>(CreateTestFile()),
+      //Assert.That(async () => await JsonOptionsManager.DeserializeAsync<CoreOptions>(CreateTestFile()),
       //    Throws.InstanceOf<SerializationException>().With.Message.EqualTo("At least one JSON converter for deserializing configuration members was not found"));
     }
 
@@ -78,10 +80,47 @@ namespace Core.Tests
     }
 
     [Test]
-    public void Deserialize_EmptyPath_ThrowsException()
+    public void Deserialize_EmptyPath_ThrowsException ()
     {
-      Assert.That(async () => await JsonOptionsManager.DeserializeAsync<CoreOptions>(""),
-          Throws.InstanceOf<SerializationException>().With.Message.EqualTo("An unspecified error occurred while deserializing configuration"));
+      Assert.That (
+          async () => await JsonOptionsManager.DeserializeAsync<CoreOptions> (""),
+          Throws.InstanceOf<SerializationException>().With.Message.EqualTo ("An unspecified error occurred while deserializing configuration"));
+    }
+
+    [Test]
+    public void SerializeAsync_InvalidTypeParameter_ThrowsArgumentException()
+    {
+      Assert.That(async () => await JsonOptionsManager.SerializeAsync("{\r\n}", Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json")), Throws.InstanceOf<ArgumentException>());
+    }
+
+    [Test]
+    public void SerializeAsync_ValidTypeParameter_DoesNotThrowException()
+    {
+      var testFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
+      _paths.Add(testFile);
+      Assert.DoesNotThrowAsync(async () => await JsonOptionsManager.SerializeAsync(_options, testFile));
+    }
+
+    [Test]
+    public void SerializeAsync_NoFileStream_ThrowsArgumentNullException()
+    {
+      //Assert.That(async () => await JsonOptionsManager.SerializeAsync<CoreOptions>(_options, ""),
+      //    Throws.InstanceOf<SerializationException>().With.Message.EqualTo("File stream for deserializing configuration was not present"));
+    }
+
+    [Test]
+    public void SerializeAsync_JsonConverterNotFound_ThrowsNotSupportedException()
+    {
+      //Assert.That(async () => await JsonOptionsManager.SerializeAsync(_options, ""),
+      //    Throws.InstanceOf<SerializationException>().With.Message.EqualTo("At least one JSON converter for deserializing configuration members was not found"));
+    }
+
+    [Test]
+    public void SerializeAsync_EmptyPath_ThrowsException()
+    {
+      Assert.That(
+          async () => await JsonOptionsManager.SerializeAsync(_options, null),
+          Throws.InstanceOf<SerializationException>().With.Message.EqualTo("An unspecified error occurred while serializing configuration"));
     }
 
     [TearDown]
