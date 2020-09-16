@@ -21,7 +21,7 @@ using NUnit.Framework;
 namespace Core.Tests
 {
   [TestFixture]
-  class UserInfoTest
+  public class UserInfoTest
   {
     [Test]
     public void Name_ReturnsName()

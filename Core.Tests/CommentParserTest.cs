@@ -480,5 +480,17 @@ namespace Core.Tests
 
       Test_Negative(header);
     }
+
+    [Test]
+    public void Parse__ThrowsParseException()
+    {
+      var header = new[]
+                   {
+                       "  //",
+                       "   test"
+                   };
+
+      Test_Negative(header);
+    }
   }
 }

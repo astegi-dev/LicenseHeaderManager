@@ -13,36 +13,51 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace Core.Tests
 {
   [TestFixture]
-  internal class IntegrationTest
+  public class DocumentHeaderPropertiesTest
   {
-    [Test]
-    public async Task Test ()
+    private DocumentHeaderProperties _documentHeaderProperties;
+
+    [SetUp]
+    public void Setup()
     {
-      var languages = new List<Language>
-                      {
-                          new Language
-                          {
-                              Extensions = new[] { ".cs" }, LineComment = "//", BeginComment = "/*", EndComment = "*/", BeginRegion = "#region",
-                              EndRegion = "#endregion"
-                          },
-                          new Language
-                          {
-                              Extensions = new[] { ".js", ".ts" }, LineComment = "//", BeginComment = "/*", EndComment = "*/",
-                              SkipExpression = @"(/// *<reference.*/>( |\t)*(\n|\r\n|\r)?)*"
-                          }
-                      };
+      _documentHeaderProperties = new DocumentHeaderProperties();
+    }
 
-      var replacer = new LicenseHeaderReplacer (languages, new[] { "1" });
+    [Test]
+    public void DocumentHeaderProperties_AdditionalProperties_ReturnsAdditionalProperties()
+    {
+      var additionalProperties = new List<AdditionalProperty>
+                                 {
+                                     new AdditionalProperty ("%AdditionalProperty1%","property 1"),
+                                     new AdditionalProperty ("%AdditionalProperty2%","property 2")
+                                 };
 
-      var headers = new Dictionary<string, string[]> { { ".cs", new[] { "// first line 1", "// second line", "// copyright" } } };
-      var result = await replacer.RemoveOrReplaceHeader (new LicenseHeaderPathInput (@"D:\TestFile.cs", headers));
-      Assert.That (result, Is.Not.Null);
+      _documentHeaderProperties = new DocumentHeaderProperties(additionalProperties);
+      var enumerator = _documentHeaderProperties.GetEnumerator();
+
+      while (enumerator.MoveNext())
+      {
+        var property = enumerator.Current;
+        Assert.That (property, Is.Not.Null);
+      }
+      enumerator.Dispose();
+    }
+
+    [Test]
+    public void GetEnumerator_ObjectOfClassExists_ReturnsEnumerator()
+    {
+      var actual = _documentHeaderProperties.GetEnumerator();
+
+      Assert.That(actual, Is.Not.Null);
+      Assert.That(actual.MoveNext(), Is.True);
     }
   }
 }

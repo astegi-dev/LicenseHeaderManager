@@ -13,36 +13,62 @@
 
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Text;
 using NUnit.Framework;
+using Rhino.Mocks;
 
 namespace Core.Tests
 {
   [TestFixture]
-  internal class IntegrationTest
+  public class PathUtilityTest
   {
-    [Test]
-    public async Task Test ()
+    private List<string> _paths;
+
+    [SetUp]
+    public void Setup()
     {
-      var languages = new List<Language>
-                      {
-                          new Language
-                          {
-                              Extensions = new[] { ".cs" }, LineComment = "//", BeginComment = "/*", EndComment = "*/", BeginRegion = "#region",
-                              EndRegion = "#endregion"
-                          },
-                          new Language
-                          {
-                              Extensions = new[] { ".js", ".ts" }, LineComment = "//", BeginComment = "/*", EndComment = "*/",
-                              SkipExpression = @"(/// *<reference.*/>( |\t)*(\n|\r\n|\r)?)*"
-                          }
-                      };
+      _paths = new List<string>();
+    }
 
-      var replacer = new LicenseHeaderReplacer (languages, new[] { "1" });
 
-      var headers = new Dictionary<string, string[]> { { ".cs", new[] { "// first line 1", "// second line", "// copyright" } } };
-      var result = await replacer.RemoveOrReplaceHeader (new LicenseHeaderPathInput (@"D:\TestFile.cs", headers));
-      Assert.That (result, Is.Not.Null);
+    [Test]
+    public void GetProperFilePathCapitalization_InputIsNull_ThrowsArgumentNullException()
+    {
+      FileInfo fileInfo = null;
+
+      Assert.Throws<ArgumentNullException>(() => PathUtility.GetProperFilePathCapitalization(fileInfo));
+    }
+
+    [Test]
+    public void GetProperFilePathCapitalization_ValidFileInfo_ReturnsFilePath()
+    {
+      var fileInfo = new FileInfo(CreateTestFile());
+
+      var actual = PathUtility.GetProperFilePathCapitalization (fileInfo);
+
+      Assert.That(actual, Is.EqualTo(fileInfo.FullName));
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+      foreach (var path in _paths)
+        File.Delete(path);
+    }
+
+    private string CreateTestFile()
+    {
+      var testFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".cs");
+      _paths.Add(testFile);
+
+      using (var fs = File.Create(testFile))
+      {
+        var content = Encoding.UTF8.GetBytes("");
+        fs.Write(content, 0, content.Length);
+      }
+      return testFile;
     }
   }
 }
