@@ -55,7 +55,7 @@ namespace Core.Tests
 
     private string CreateLicenseHeaderDefinitionFile()
     {
-      var licenseHeaderDefinitionFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".licenseheader");
+      var licenseHeaderDefinitionFile = GetPath(".licenseheader");
       _paths.Add(licenseHeaderDefinitionFile);
 
       using (var fs = File.Create(licenseHeaderDefinitionFile))
@@ -65,6 +65,11 @@ namespace Core.Tests
         fs.Write(content, 0, content.Length);
       }
       return licenseHeaderDefinitionFile;
+    }
+
+    private string GetPath(string filename)
+    {
+      return Path.Combine(Path.GetTempPath(), Guid.NewGuid() + filename);
     }
   }
 }

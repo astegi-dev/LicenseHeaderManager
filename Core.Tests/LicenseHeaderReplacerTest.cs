@@ -13,8 +13,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Rhino.Mocks;
@@ -25,6 +27,28 @@ namespace Core.Tests
   [TestFixture]
   public class LicenseHeaderReplacerTest
   {
+    private List<string> _paths;
+    private List<Language> _languages;
+
+    [SetUp]
+    public void Setup ()
+    {
+      _paths = new List<string>();
+      _languages = new List<Language>
+                   {
+                       new Language
+                       {
+                           Extensions = new[] { ".cs" }, LineComment = "//", BeginComment = "/*", EndComment = "*/", BeginRegion = "#region",
+                           EndRegion = "#endregion"
+                       },
+                       new Language
+                       {
+                           Extensions = new[] { ".js", ".ts" }, LineComment = "//", BeginComment = "/*", EndComment = "*/",
+                           SkipExpression = @"(/// *<reference.*/>( |\t)*(\n|\r\n|\r)?)*"
+                       }
+                   };
+    }
+
     [Test]
     public void GetLanguageFromExtension_LanguagesAreEmpty_ReturnsNull()
     {
@@ -32,15 +56,18 @@ namespace Core.Tests
 
       var language = replacer.GetLanguageFromExtension(".cs");
 
-      Assert.That (language, Is.Null);
+      Assert.That(language, Is.Null);
     }
 
     [Test]
-    public void GetLanguageFromExtension_LanguagesAreNull_DoesNotThrowException()
+    public void GetLanguageFromExtension_LanguagesAreNull_DoesNotThrowExceptionAndReturnsNull()
     {
       var replacer = new LicenseHeaderReplacer(null, Enumerable.Empty<string>());
 
-      Assert.That (() => replacer.GetLanguageFromExtension(".cs"), Throws.Nothing);
+      Language language = null;
+
+      Assert.That(() => language = replacer.GetLanguageFromExtension(".cs"), Throws.Nothing);
+      Assert.That(language, Is.Null);
     }
 
     [Test]
@@ -48,14 +75,14 @@ namespace Core.Tests
     {
       var filePath = @"C:\Windows\explorer.exe";
       var replacer = new ReplacerStub();
-      replacer.InitializeStub (filePath, true);
+      replacer.InitializeStub(filePath, true);
 
       var isValid = replacer.IsValidPathInput(filePath);
       Assert.That(isValid, Is.True);
     }
 
     [Test]
-    public void IsValidPathInput_FileExistsInvalidDocument_ReturnsTrue()
+    public void IsValidPathInput_FileExistsInvalidDocument_ReturnsFalse()
     {
       var filePath = @"C:\Windows\explorer.exe";
       var replacer = new ReplacerStub();
@@ -66,20 +93,164 @@ namespace Core.Tests
     }
 
     [Test]
-    public async Task RemoveOrReplaceHeader_PathIsNull_ReturnsReplacerResultWithFileNotFound()
+    public async Task RemoveOrReplaceHeader_PathIsNull_ReturnsReplacerResultFileNotFound()
     {
       var replacer = new LicenseHeaderReplacer(Enumerable.Empty<Language>(), Enumerable.Empty<string>());
+
       var actual = await replacer.RemoveOrReplaceHeader(new LicenseHeaderPathInput(null, null));
-      Assert.That (actual.Error.Type, Is.EqualTo (ReplacerErrorType.FileNotFound));
+
+      Assert.That(actual.Error.Type, Is.EqualTo(ReplacerErrorType.FileNotFound));
     }
 
     [Test]
-    public async Task RemoveOrReplaceHeader_DocumentIsLicenseHeaderFile_ReturnsReplacerResultWithLicenseHeaderDocument()
+    public async Task RemoveOrReplaceHeader_DocumentIsLicenseHeaderFile_ReturnsReplacerResultLicenseHeaderDocument()
     {
       var replacer = new LicenseHeaderReplacer(Enumerable.Empty<Language>(), Enumerable.Empty<string>());
-      var path = "";
+      var path = CreateTestFile();
+
       var actual = await replacer.RemoveOrReplaceHeader(new LicenseHeaderPathInput(path, null));
-      Assert.That(actual.Error.Type, Is.EqualTo(ReplacerErrorType.FileNotFound));
+
+      Assert.That(actual.Error.Type, Is.EqualTo(ReplacerErrorType.LicenseHeaderDocument));
+    }
+
+    [Test]
+    public async Task RemoveOrReplaceHeader_PathInputWithoutHeader_ReturnsReplacerResultNoHeaderFound()
+    {
+      var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
+      var path = CreateTestFile(".cs");
+
+      var actual = await replacer.RemoveOrReplaceHeader(new LicenseHeaderPathInput(path, new Dictionary<string, string[]>()));
+
+      Assert.That(actual.Error.Type, Is.EqualTo(ReplacerErrorType.NoHeaderFound));
+    }
+
+    [Test]
+    public async Task RemoveOrReplaceHeader_PathInputEmptyHeader_ReturnsReplacerResultEmptyHeader()
+    {
+      var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
+      var path = CreateTestFile(".cs");
+      var headers = new Dictionary<string, string[]> { { ".cs", new[] { "" } } };
+
+      var actual = await replacer.RemoveOrReplaceHeader(new LicenseHeaderPathInput(path, headers));
+
+      Assert.That(actual.Error.Type, Is.EqualTo(ReplacerErrorType.EmptyHeader));
+    }
+
+    [Test]
+    public async Task RemoveOrReplaceHeader_LanguageNotPresent_ReturnsReplacerResultLanguageNotFound()
+    {
+      var replacer = new LicenseHeaderReplacer(Enumerable.Empty<Language>(), Enumerable.Empty<string>());
+      var path = CreateTestFile(".cs");
+
+      var actual = await replacer.RemoveOrReplaceHeader(new LicenseHeaderPathInput(path, null));
+
+      Assert.That(actual.Error.Type, Is.EqualTo(ReplacerErrorType.LanguageNotFound));
+    }
+
+    [Test]
+    public void RemoveOrReplaceHeader_ValidInput_DoesNotThrowExceptionAndReturnsSuccess()
+    {
+      var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
+      var path = CreateTestFile(".cs");
+      var headers = new Dictionary<string, string[]> { { ".cs", new[] { "// first line 1", "// second line", "// copyright" } } };
+
+      ReplacerResult actual = null;
+
+      Assert.That(async () => actual = await replacer.RemoveOrReplaceHeader(new LicenseHeaderPathInput(path, headers)), Throws.Nothing);
+      Assert.That(actual.IsSuccess, Is.True);
+    }
+
+    [Test]
+    public async Task RemoveOrReplaceHeader_HeadersWithNonCommentText_ReturnsReplacerResultNonCommentText()
+    {
+      var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
+      var path = CreateTestFile(".cs");
+      var headers = new Dictionary<string, string[]> { { ".cs", new[] { "// first line 1", "// second line", "copyright" } } };
+
+      var actual = await replacer.RemoveOrReplaceHeader(new LicenseHeaderPathInput(path, headers));
+      Assert.That(actual.Error.Type, Is.EqualTo(ReplacerErrorType.NonCommentText));
+    }
+
+    [Test]
+    public async Task RemoveOrReplaceHeader_ValidContentInput_DoesNotThrowExceptionAndReturnsSuccess()
+    {
+      var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
+      var path = CreateTestFile(".cs");
+      var headers = new Dictionary<string, string[]> { { ".cs", new[] { "// first line", "// copyright" } } };
+
+      var actual = await replacer.RemoveOrReplaceHeader(new LicenseHeaderContentInput("test content", path, headers));
+
+      Assert.That(actual.IsSuccess, Is.True);
+    }
+
+    [Test]
+    public async Task RemoveOrReplaceHeader_ContentInputWithoutHeader_ReturnsReplacerResultNoHeaderFound()
+    {
+      var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
+      var path = CreateTestFile(".cs");
+
+      var actual = await replacer.RemoveOrReplaceHeader(new LicenseHeaderContentInput("test content", path, new Dictionary<string, string[]>()));
+
+      Assert.That(actual.Error.Type, Is.EqualTo(ReplacerErrorType.NoHeaderFound));
+    }
+
+    [Test]
+    public async Task RemoveOrReplaceHeader_LicenseHeaderContentInputsValid_ReturnsReplacerResultSuccess ()
+    {
+      var replacer = new LicenseHeaderReplacer (_languages, Enumerable.Empty<string>());
+      var headers = new Dictionary<string, string[]>
+                    {
+                        { ".cs", new[] { "// first line", "// copyright" } },
+                        { ".ts", new[] { "// first line", "// copyright" } }
+                    };
+      var licenseHeaderInputs = new List<LicenseHeaderContentInput>
+                                {
+                                    new LicenseHeaderContentInput ("test content1", CreateTestFile (".cs"), headers),
+                                    new LicenseHeaderContentInput ("test content2", CreateTestFile (".ts"), headers)
+                                };
+
+      var actualResults = (await replacer.RemoveOrReplaceHeader (licenseHeaderInputs, new Progress<ReplacerProgressContentReport>(), new CancellationToken())).ToList();
+
+      Assert.That (actualResults.Count, Is.EqualTo (2));
+      foreach (var result in actualResults)
+        Assert.That(result.IsSuccess, Is.True);
+    }
+
+    [Test]
+    public async Task RemoveOrReplaceHeader_LicenseHeaderContentInputsInvalid_ReturnsNoReplacerResult()
+    {
+      var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
+      var licenseHeaderInputs = new List<LicenseHeaderContentInput>
+                                {
+                                    new LicenseHeaderContentInput ("test content3", CreateTestFile (".js"), new Dictionary<string, string[]>())
+                                };
+
+      var actualResults = (await replacer.RemoveOrReplaceHeader(licenseHeaderInputs, new Progress<ReplacerProgressContentReport>(), new CancellationToken())).ToList();
+
+      Assert.That(actualResults.Count, Is.EqualTo(0));
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+      foreach (var path in _paths)
+        File.Delete(path);
+    }
+
+    private string CreateTestFile(string extension = null)
+    {
+      if (extension == null)
+        extension = ".licenseheader";
+
+      var testFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + extension);
+      _paths.Add(testFile);
+
+      using (var fs = File.Create(testFile))
+      {
+        var content = Encoding.UTF8.GetBytes("");
+        fs.Write(content, 0, content.Length);
+      }
+      return testFile;
     }
   }
 
