@@ -20,8 +20,8 @@ namespace Core
   /// </summary>
   internal class DocumentHeaderProperty
   {
-    private readonly Predicate<DocumentHeader> _canCreateValue;
-    private readonly Func<DocumentHeader, string> _createValue;
+    private readonly Predicate<IDocumentHeader> _canCreateValue;
+    private readonly Func<IDocumentHeader, string> _createValue;
 
     /// <summary>
     ///   Initializes a new <see cref="DocumentHeaderProperty" /> instance.
@@ -38,7 +38,7 @@ namespace Core
     ///   A func that provides the value to replace <paramref name="token" /> with, given that
     ///   <paramref name="canCreateValue" /> is satisfied.
     /// </param>
-    public DocumentHeaderProperty (string token, Predicate<DocumentHeader> canCreateValue, Func<DocumentHeader, string> createValue)
+    public DocumentHeaderProperty (string token, Predicate<IDocumentHeader> canCreateValue, Func<IDocumentHeader, string> createValue)
     {
       Token = token;
       _canCreateValue = canCreateValue;
@@ -63,7 +63,7 @@ namespace Core
     ///   Returns <see langword="true" /> if the value of this <see cref="DocumentHeaderProperty" /> can be created,
     ///   otherwise <see langword="false" />.
     /// </returns>
-    public bool CanCreateValue (DocumentHeader documentHeader)
+    public bool CanCreateValue (IDocumentHeader documentHeader)
     {
       return _canCreateValue (documentHeader);
     }
@@ -77,7 +77,7 @@ namespace Core
     ///   return value
     /// </param>
     /// <returns>Returns the value of this <see cref="DocumentHeaderProperty" />.</returns>
-    public string CreateValue (DocumentHeader documentHeader)
+    public string CreateValue (IDocumentHeader documentHeader)
     {
       return _createValue (documentHeader);
     }

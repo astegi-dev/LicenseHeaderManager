@@ -373,7 +373,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\default.licenseheader" />
     <None Include="..\LicenseHeaderManager.sln.licenseheader">
       <Link>LicenseHeaderManager.sln.licenseheader</Link>
     </None>

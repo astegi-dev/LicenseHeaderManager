@@ -235,7 +235,7 @@ namespace Core.Options
 
     private static string GetDefaultLicenseHeader ()
     {
-      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream (typeof (CoreOptions), "default.licenseheader");
+      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream ("Core.Resources.default.licenseheader");
       if (resource == null)
         return string.Empty;
 

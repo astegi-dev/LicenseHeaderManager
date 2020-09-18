@@ -31,40 +31,49 @@ namespace Core.Tests
     private ObservableCollection<Language> _languages;
 
     [SetUp]
-    public void Setup()
+    public void Setup ()
     {
       _paths = new List<string>();
-      _options = new CoreOptions(true);
-      _options = new CoreOptions(false);
+      _options = new CoreOptions (false);
       _languages = _options.Languages;
     }
 
     [Test]
-    public void RequiredKeywordsAsEnumerable_ValidInput_ReturnsListOfRequiredKeywords()
+    public void CoreOptions_ConstructorInitializeWithDefaultValues_ReturnsDefaultLicenseHeader ()
+    {
+      _options = new CoreOptions (true);
+      Assert.That (
+          _options.LicenseHeaderFileText,
+          Is.EqualTo (
+              "extensions: designer.cs generated.cs\r\nextensions: .cs .cpp .h\r\n// Copyright (c) 2011 rubicon IT GmbH\r\nextensions: .aspx .ascx\r\n<%-- \r\nCopyright (c) 2011 rubicon IT GmbH\r\n--%>\r\nextensions: .vb\r\n'Sample license text.\r\nextensions:  .xml .config .xsd\r\n<!--\r\nSample license text.\r\n-->"));
+    }
+
+    [Test]
+    public void RequiredKeywordsAsEnumerable_ValidInput_ReturnsListOfRequiredKeywords ()
     {
       IEnumerable<string> keywords = new List<string> { "copyright", "test" };
-      var actual = CoreOptions.RequiredKeywordsAsEnumerable("copyright, test");
-      Assert.That(keywords, Is.EqualTo(actual));
+      var actual = CoreOptions.RequiredKeywordsAsEnumerable ("copyright, test");
+      Assert.That (keywords, Is.EqualTo (actual));
     }
 
     [Test]
-    public void SaveAsync_ValidInput_DoesNotThrowException()
+    public void SaveAsync_ValidInput_DoesNotThrowException ()
     {
-      var testFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
-      _paths.Add(testFile);
-      Assert.That(async () => await CoreOptions.SaveAsync(_options, testFile), Throws.Nothing);
+      var testFile = Path.Combine (Path.GetTempPath(), Guid.NewGuid() + ".json");
+      _paths.Add (testFile);
+      Assert.That (async () => await CoreOptions.SaveAsync (_options, testFile), Throws.Nothing);
     }
 
     [Test]
-    public async Task LoadAsync_ValidInput_DoesNotThrowException()
+    public async Task LoadAsync_ValidInput_DoesNotThrowException ()
     {
-      var options = await CoreOptions.LoadAsync(CreateTestFile());
-      Assert.That(options, Is.TypeOf(typeof(CoreOptions)));
-      Assert.That(options.UseRequiredKeywords, Is.False);
+      var options = await CoreOptions.LoadAsync (CreateTestFile());
+      Assert.That (options, Is.TypeOf (typeof (CoreOptions)));
+      Assert.That (options.UseRequiredKeywords, Is.False);
     }
 
     [Test]
-    public void Clone_ReturnsClonedOptions()
+    public void Clone_ReturnsClonedOptions ()
     {
       _options.UseRequiredKeywords = false;
       _options.RequiredKeywords = "new, keywords";
@@ -72,31 +81,32 @@ namespace Core.Tests
       _options.Languages = _languages;
 
       var actual = _options.Clone();
-      Assert.That(_options.UseRequiredKeywords, Is.EqualTo(actual.UseRequiredKeywords));
-      Assert.That(_options.RequiredKeywords, Is.EqualTo(actual.RequiredKeywords));
-      Assert.That(_options.LicenseHeaderFileText, Is.EqualTo(actual.LicenseHeaderFileText));
-      Assert.That(_options.Languages.Count, Is.EqualTo(actual.Languages.Count));
+      Assert.That (_options.UseRequiredKeywords, Is.EqualTo (actual.UseRequiredKeywords));
+      Assert.That (_options.RequiredKeywords, Is.EqualTo (actual.RequiredKeywords));
+      Assert.That (_options.LicenseHeaderFileText, Is.EqualTo (actual.LicenseHeaderFileText));
+      Assert.That (_options.Languages.Count, Is.EqualTo (actual.Languages.Count));
     }
 
     [TearDown]
-    public void TearDown()
+    public void TearDown ()
     {
       foreach (var path in _paths)
-        File.Delete(path);
+        File.Delete (path);
     }
 
-    private string CreateTestFile(string text = null)
+    private string CreateTestFile (string text = null)
     {
-      var testFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json");
-      _paths.Add(testFile);
+      var testFile = Path.Combine (Path.GetTempPath(), Guid.NewGuid() + ".json");
+      _paths.Add (testFile);
 
-      using (var fs = File.Create(testFile))
+      using (var fs = File.Create (testFile))
       {
         if (text == null)
           text = "{\r\n\"useRequiredKeywords\": false\r\n}";
-        var content = Encoding.UTF8.GetBytes(text);
-        fs.Write(content, 0, content.Length);
+        var content = Encoding.UTF8.GetBytes (text);
+        fs.Write (content, 0, content.Length);
       }
+
       return testFile;
     }
   }

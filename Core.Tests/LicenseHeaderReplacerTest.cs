@@ -161,7 +161,7 @@ namespace Core.Tests
     }
 
     [Test]
-    public async Task RemoveOrReplaceHeader_HeadersWithNonCommentText_ReturnsReplacerResultNonCommentText()
+    public async Task RemoveOrReplaceHeader_PathInputHeadersWithNonCommentText_ReturnsReplacerResultNonCommentText()
     {
       var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
       var path = CreateTestFile(".cs");
@@ -169,6 +169,27 @@ namespace Core.Tests
 
       var actual = await replacer.RemoveOrReplaceHeader(new LicenseHeaderPathInput(path, headers));
       Assert.That(actual.Error.Type, Is.EqualTo(ReplacerErrorType.NonCommentText));
+    }
+
+    [Test]
+    public async Task RemoveOrReplaceHeader_ContentInputHeadersWithNonCommentText_ReturnsReplacerResultNonCommentText ()
+    {
+      var replacer = new LicenseHeaderReplacer (_languages, Enumerable.Empty<string>());
+      var headers = new Dictionary<string, string[]> { { ".cs", new[] { "// first line 1", "// second line", "copyright" } } };
+      var licenseHeaderInputs = new List<LicenseHeaderContentInput>
+                                {
+                                    new LicenseHeaderContentInput ("test content1", CreateTestFile (".cs"), headers)
+                                };
+
+      var actualResults = (await replacer.RemoveOrReplaceHeader (licenseHeaderInputs, new Progress<ReplacerProgressContentReport>(), new CancellationToken())).ToList();
+
+      Assert.That (actualResults.Count, Is.EqualTo (1));
+
+      foreach (var result in actualResults)
+      {
+        Assert.That (result.IsSuccess, Is.False);
+        Assert.That (result.Error.Type, Is.EqualTo(ReplacerErrorType.NonCommentText));
+      }
     }
 
     [Test]
@@ -228,6 +249,25 @@ namespace Core.Tests
       var actualResults = (await replacer.RemoveOrReplaceHeader(licenseHeaderInputs, new Progress<ReplacerProgressContentReport>(), new CancellationToken())).ToList();
 
       Assert.That(actualResults.Count, Is.EqualTo(0));
+    }
+
+    [Test]
+    public async Task Test()
+    {
+      var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
+      var path = CreateTestFile(".cs");
+      var headers = new Dictionary<string, string[]> { { ".cs", new[] { "// first line 1", "// second line", "// copyright" } } };
+
+      var licenseHeaderInputs = new List<LicenseHeaderPathInput>
+                                {
+                                    new LicenseHeaderPathInput(path, headers)
+                                };
+
+      var actualResults = await replacer.RemoveOrReplaceHeader(licenseHeaderInputs, new Progress<ReplacerProgressReport>(), new CancellationToken());
+
+      Assert.That(actualResults.Error, Is.Null);
+      Assert.That(actualResults.IsSuccess, Is.True);
+
     }
 
     [TearDown]

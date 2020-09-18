@@ -13,31 +13,40 @@
 
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Linq;
+using Rhino.Mocks;
 
 namespace Core.Tests
 {
   [TestFixture]
   public class DocumentHeaderPropertiesTest
   {
-    private DocumentHeaderProperties _documentHeaderProperties;
-
-    [SetUp]
-    public void Setup()
+    [Test]
+    public void Test()
     {
-      _documentHeaderProperties = new DocumentHeaderProperties();
+      var documentHeaderProperties = new DocumentHeaderProperties();
+      var arr = documentHeaderProperties.ToArray();
+
+      var property = arr[0];
+      Assert.That(property.Token, Is.EqualTo("%FullFileName%"));
+
+      var documentHeaderStub = MockRepository.GenerateStub<IDocumentHeader>();
+
+      var result = property.CreateValue (documentHeaderStub);
     }
 
     [Test]
     public void DocumentHeaderProperties_AdditionalProperties_ReturnsAdditionalProperties()
     {
+      var documentHeaderProperties = new DocumentHeaderProperties();
       var additionalProperties = new List<AdditionalProperty>
                                  {
                                      new AdditionalProperty ("%AdditionalProperty1%","property 1"),
                                      new AdditionalProperty ("%AdditionalProperty2%","property 2")
                                  };
 
-      _documentHeaderProperties = new DocumentHeaderProperties(additionalProperties);
-      var enumerator = _documentHeaderProperties.GetEnumerator();
+      documentHeaderProperties = new DocumentHeaderProperties(additionalProperties);
+      var enumerator = documentHeaderProperties.GetEnumerator();
 
       while (enumerator.MoveNext())
       {
@@ -50,7 +59,8 @@ namespace Core.Tests
     [Test]
     public void GetEnumerator_ObjectOfClassExists_ReturnsEnumerator()
     {
-      var actual = _documentHeaderProperties.GetEnumerator();
+      var documentHeaderProperties = new DocumentHeaderProperties();
+      var actual = documentHeaderProperties.GetEnumerator();
 
       Assert.That(actual, Is.Not.Null);
       Assert.That(actual.MoveNext(), Is.True);
