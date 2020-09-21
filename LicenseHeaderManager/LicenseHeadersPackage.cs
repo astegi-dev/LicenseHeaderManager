@@ -121,7 +121,7 @@ namespace LicenseHeaderManager
     {
       get
       {
-        var keywords = GeneralOptionsPageModel.UseRequiredKeywords ? CoreOptions.RequiredKeywordsAsEnumerable(GeneralOptionsPageModel.RequiredKeywords) : null;
+        var keywords = GeneralOptionsPageModel.UseRequiredKeywords ? CoreOptionsRepository.RequiredKeywordsAsEnumerable(GeneralOptionsPageModel.RequiredKeywords) : null;
         return new LicenseHeaderReplacer(LanguagesPageModel.Languages, keywords);
       }
     }

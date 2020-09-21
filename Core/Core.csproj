@@ -93,6 +93,7 @@
     <Compile Include="LicenseHeaderInput.cs" />
     <Compile Include="LicenseHeaderContentInput.cs" />
     <Compile Include="LicenseHeaderInputMode.cs" />
+    <Compile Include="Options\CoreOptionsRepository.cs" />
     <Compile Include="ReplacerErrorType.cs" />
     <Compile Include="ICommentParser.cs" />
     <Compile Include="Language.cs" />

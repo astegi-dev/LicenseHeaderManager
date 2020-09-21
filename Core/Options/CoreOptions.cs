@@ -32,7 +32,7 @@ namespace Core.Options
   {
     public const bool c_defaultUseRequiredKeywords = true;
     public const string c_defaultRequiredKeywords = "license, copyright, (c), ©";
-    public static readonly string _defaultLicenseHeaderFileText = GetDefaultLicenseHeader();
+    public static readonly string _defaultLicenseHeaderFileText = CoreOptionsRepository.GetDefaultLicenseHeader();
 
     public static readonly ObservableCollection<Language> DefaultLanguages = new ObservableCollection<Language>
                                                                              {
@@ -131,22 +131,6 @@ namespace Core.Options
     }
 
     /// <summary>
-    ///   Generates an <see cref="IEnumerable{T}"/> whose generic type argument is <see cref="string"/> that represent all keywords
-    ///   in a specifiable string, with each recognized keyword being one entry in the enumerable.
-    /// </summary>
-    /// <param name="requiredKeywords">
-    ///   The string containing keywords to be converted to an enumerable. Keywords are separated by "," and possibly whitespaces.
-    /// </param>
-    /// <returns>
-    ///   Returns an <see cref="IEnumerable{T}"/> whose generic type argument is <see cref="string"/> that represent all keywords
-    ///   recognized in <paramref name="requiredKeywords"/>.
-    /// </returns>
-    public static IEnumerable<string> RequiredKeywordsAsEnumerable (string requiredKeywords)
-    {
-      return requiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim());
-    }
-
-    /// <summary>
     ///   Gets or sets whether license header comments should be removed only if they contain at least one of the keywords
     ///   specified by <see cref="RequiredKeywords" />.
     /// </summary>
@@ -167,33 +151,6 @@ namespace Core.Options
     ///   Gets or sets whether license headers are automatically inserted into new files.
     /// </summary>
     public virtual ObservableCollection<Language> Languages { get; set; }
-
-    /// <summary>
-    ///   Serializes an <see cref="CoreOptions" /> instance to a file in the file system.
-    /// </summary>
-    /// <param name="options">The <see cref="CoreOptions" /> instance to serialize.</param>
-    /// <param name="filePath">The path to which an options file should be persisted.</param>
-    public static async Task SaveAsync (CoreOptions options, string filePath)
-    {
-      await JsonOptionsManager.SerializeAsync (options, filePath);
-    }
-
-    /// <summary>
-    ///   Deserializes an <see cref="CoreOptions" /> instance from a file in the file system.
-    /// </summary>
-    /// <param name="filePath">
-    ///   The path to an options file from which a corresponding <see cref="CoreOptions" /> instance
-    ///   should be constructed.
-    /// </param>
-    /// <returns>
-    ///   An <see cref="CoreOptions" /> instance that represents to configuration contained in the file specified by
-    ///   <paramref name="filePath" />.
-    ///   If there were errors upon deserialization, <see langword="null" /> is returned.
-    /// </returns>
-    public static async Task<CoreOptions> LoadAsync (string filePath)
-    {
-      return await JsonOptionsManager.DeserializeAsync<CoreOptions> (filePath);
-    }
 
     /// <summary>
     ///   Creates a deep copy of the current <see cref="CoreOptions" /> instance.
@@ -231,16 +188,6 @@ namespace Core.Options
     private void InitializeValues ()
     {
       Languages = new ObservableCollection<Language> (DefaultLanguages);
-    }
-
-    private static string GetDefaultLicenseHeader ()
-    {
-      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream ("Core.Resources.default.licenseheader");
-      if (resource == null)
-        return string.Empty;
-
-      using var reader = new StreamReader (resource, Encoding.UTF8);
-      return reader.ReadToEnd();
     }
   }
 }

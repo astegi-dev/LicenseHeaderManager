@@ -52,7 +52,7 @@ namespace Core.Tests
     public void RequiredKeywordsAsEnumerable_ValidInput_ReturnsListOfRequiredKeywords ()
     {
       IEnumerable<string> keywords = new List<string> { "copyright", "test" };
-      var actual = CoreOptions.RequiredKeywordsAsEnumerable ("copyright, test");
+      var actual = CoreOptionsRepository.RequiredKeywordsAsEnumerable ("copyright, test");
       Assert.That (keywords, Is.EqualTo (actual));
     }
 
@@ -61,13 +61,13 @@ namespace Core.Tests
     {
       var testFile = Path.Combine (Path.GetTempPath(), Guid.NewGuid() + ".json");
       _paths.Add (testFile);
-      Assert.That (async () => await CoreOptions.SaveAsync (_options, testFile), Throws.Nothing);
+      Assert.That (async () => await CoreOptionsRepository.SaveAsync (_options, testFile), Throws.Nothing);
     }
 
     [Test]
     public async Task LoadAsync_ValidInput_DoesNotThrowException ()
     {
-      var options = await CoreOptions.LoadAsync (CreateTestFile());
+      var options = await CoreOptionsRepository.LoadAsync (CreateTestFile());
       Assert.That (options, Is.TypeOf (typeof (CoreOptions)));
       Assert.That (options.UseRequiredKeywords, Is.False);
     }

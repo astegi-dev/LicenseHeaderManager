@@ -181,12 +181,12 @@ namespace LicenseHeaderManager.Options
 
       // if either of the option files is not found, create it with default options and save it before loading
       if (!File.Exists (corePath))
-        await CoreOptions.SaveAsync (new CoreOptions(), corePath);
+        await CoreOptionsRepository.SaveAsync (new CoreOptions(), corePath);
 
       if (!File.Exists (visualStudioPath))
         await VisualStudioOptions.SaveAsync (new VisualStudioOptions(), visualStudioPath);
 
-      var coreOptions = await CoreOptions.LoadAsync (corePath);
+      var coreOptions = await CoreOptionsRepository.LoadAsync (corePath);
       var visualStudioOptions = await VisualStudioOptions.LoadAsync (visualStudioPath);
 
       return new OptionsFacade (coreOptions, visualStudioOptions);
