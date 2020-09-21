@@ -25,27 +25,25 @@ namespace Core.Tests
     public void Test()
     {
       var documentHeaderProperties = new DocumentHeaderProperties();
-      var arr = documentHeaderProperties.ToArray();
 
-      var property = arr[0];
+      var property = documentHeaderProperties.ToArray()[0];
       Assert.That(property.Token, Is.EqualTo("%FullFileName%"));
 
       var documentHeaderStub = MockRepository.GenerateStub<IDocumentHeader>();
 
-      var result = property.CreateValue (documentHeaderStub);
+      //var result = property.CreateValue (documentHeaderStub);
     }
 
     [Test]
     public void DocumentHeaderProperties_AdditionalProperties_ReturnsAdditionalProperties()
     {
-      var documentHeaderProperties = new DocumentHeaderProperties();
       var additionalProperties = new List<AdditionalProperty>
                                  {
                                      new AdditionalProperty ("%AdditionalProperty1%","property 1"),
                                      new AdditionalProperty ("%AdditionalProperty2%","property 2")
                                  };
 
-      documentHeaderProperties = new DocumentHeaderProperties(additionalProperties);
+      var documentHeaderProperties = new DocumentHeaderProperties(additionalProperties);
       var enumerator = documentHeaderProperties.GetEnumerator();
 
       while (enumerator.MoveNext())

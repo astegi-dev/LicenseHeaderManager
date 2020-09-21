@@ -100,6 +100,7 @@
     <Compile Include="LicenseHeaderPreparerTest.cs" />
     <Compile Include="LicenseHeaderReplacerTest.cs" />
     <Compile Include="LineManagerTest.cs" />
+    <Compile Include="NotSupportedOptions.cs" />
     <Compile Include="PathUtilityTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReplacerErrorTest.cs" />

@@ -28,6 +28,12 @@ namespace Core.Options
   /// <seealso cref="LicenseHeaderManagerOptionsAttribute" />
   public static class JsonOptionsManager
   {
+    internal const string c_fileStreamNotPresent = "File stream for deserializing configuration was not present";
+    internal const string c_jsonConverterNotFound = "At least one JSON converter for deserializing configuration members was not found";
+    internal const string c_fileNotFound = "File to deserialize configuration from was not found";
+    internal const string c_fileContentFormatNotValid = "The file content is not in a valid format";
+    internal const string c_unspecifiedError = "An unspecified error occurred while deserializing configuration";
+
     public static JsonSerializerOptions SerializerDefaultOptions =>
         new JsonSerializerOptions
         {
@@ -69,23 +75,23 @@ namespace Core.Options
       }
       catch (ArgumentNullException ex)
       {
-        throw new SerializationException ("File stream for deserializing configuration was not present", ex);
+        throw new SerializationException (c_fileStreamNotPresent, ex);
       }
       catch (NotSupportedException ex)
       {
-        throw new SerializationException ("At least one JSON converter for deserializing configuration members was not found", ex);
+        throw new SerializationException (c_jsonConverterNotFound, ex);
       }
       catch (FileNotFoundException ex)
       {
-        throw new SerializationException ("File to deserialize configuration from was not found", ex);
+        throw new SerializationException (c_fileNotFound, ex);
       }
       catch (JsonException ex)
       {
-        throw new SerializationException ("The file content is not in a valid format", ex);
+        throw new SerializationException (c_fileContentFormatNotValid, ex);
       }
       catch (Exception ex)
       {
-        throw new SerializationException ("An unspecified error occurred while deserializing configuration", ex);
+        throw new SerializationException (c_unspecifiedError, ex);
       }
     }
 
@@ -116,15 +122,15 @@ namespace Core.Options
       }
       catch (ArgumentNullException ex)
       {
-        throw new SerializationException ("File stream for serializing configuration was not present", ex);
+        throw new SerializationException (c_fileStreamNotPresent, ex);
       }
       catch (NotSupportedException ex)
       {
-        throw new SerializationException ("At least one JSON converter for serializing configuration members was not found", ex);
+        throw new SerializationException (c_jsonConverterNotFound, ex);
       }
       catch (Exception ex)
       {
-        throw new SerializationException ("An unspecified error occurred while serializing configuration", ex);
+        throw new SerializationException (c_unspecifiedError, ex);
       }
     }
 
