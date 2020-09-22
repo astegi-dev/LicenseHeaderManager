@@ -482,15 +482,17 @@ namespace Core.Tests
     }
 
     [Test]
-    public void Parse__ThrowsParseException()
+    public void Parse_EndRegionWithoutRegionAndSplitEndregion_ThrowsParseException()
     {
+      var parser = new CommentParser("//", "/*", "*/", "#region", "#end region");
       var header = new[]
                    {
-                       "  //",
-                       "   test"
+                       "#end",
+                       "region"
                    };
 
-      Test_Negative(header);
+      var textString = string.Join(Environment.NewLine, header);
+      Assert.That(() => parser.Parse(textString), Throws.InstanceOf<ParseException>());
     }
   }
 }

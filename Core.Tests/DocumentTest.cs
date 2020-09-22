@@ -142,12 +142,21 @@ namespace Core.Tests
     }
 
     [Test]
-    public void ReplaceHeaderIfNecessaryContent_ContentInputModeAndKeywordsNotNull_DoesNotThrowException()
+    public void ReplaceHeaderIfNecessaryContent_ContentInputModeAndKeywordsNotNullAndContentNotContainingKeyword_ReturnsComment()
     {
-      const string testContent = "test content";
-      var document = new Document(new LicenseHeaderContentInput(testContent, CreateTestFile(), _headers), _language, null, null, new List<string>());
+      const string testContent = "//test content";
+      var document = new Document(new LicenseHeaderContentInput(testContent, CreateTestFile(), _headers), _language, null, null, new List<string>{"copyright"});
 
       Assert.That(async () => await document.ReplaceHeaderIfNecessaryContent(new CancellationToken()), Is.EqualTo(testContent));
+    }
+
+    [Test]
+    public void ReplaceHeaderIfNecessaryContent_ContentInputModeAndKeywordsNotNullAndContentContainsKeyword_ReturnsEmpty()
+    {
+      const string testContent = "//test content copyright";
+      var document = new Document(new LicenseHeaderContentInput(testContent, CreateTestFile(), _headers), _language, null, null, new List<string> { "copyright" });
+
+      Assert.That(async () => await document.ReplaceHeaderIfNecessaryContent(new CancellationToken()), Is.Empty);
     }
 
     [Test]
