@@ -33,7 +33,7 @@ namespace Core.Tests
       const string textWithCRLF = "test\r\ntest";
       var actual = NewLineManager.DetectMostFrequentLineEnd (textWithCRLF);
 
-      Assert.That("\r\n", Is.EqualTo(actual));
+      Assert.That(actual, Is.EqualTo("\r\n"));
     }
 
     [Test]
@@ -42,7 +42,7 @@ namespace Core.Tests
       const string textWithCR = "test\rtest";
       var actual = NewLineManager.DetectMostFrequentLineEnd (textWithCR);
 
-      Assert.That("\r", Is.EqualTo(actual));
+      Assert.That(actual, Is.EqualTo("\r"));
     }
 
     [Test]
@@ -51,7 +51,7 @@ namespace Core.Tests
       const string textWithLF = "test\ntest";
       var actual = NewLineManager.DetectMostFrequentLineEnd (textWithLF);
 
-      Assert.That("\n", Is.EqualTo(actual));
+      Assert.That(actual, Is.EqualTo("\n"));
     }
 
     [Test]
@@ -60,7 +60,7 @@ namespace Core.Tests
       const string textWithDifferentCRLF = "test\n\r\n\r\n test\r\n te\r restasd";
       var actual = NewLineManager.DetectMostFrequentLineEnd (textWithDifferentCRLF);
 
-      Assert.That("\r\n", Is.EqualTo(actual));
+      Assert.That(actual, Is.EqualTo("\r\n"));
     }
 
     [Test]
@@ -91,7 +91,7 @@ namespace Core.Tests
       const string fulltext = text1 + "\r\n" + text2 + "\n" + text3 + "\r" + text4;
       var actual = NewLineManager.ReplaceAllLineEnds (fulltext, string.Empty);
 
-      Assert.That(text1 + text2 + text3 + text4, Is.EqualTo(actual));
+      Assert.That(actual, Is.EqualTo(text1 + text2 + text3 + text4));
     }
 
     [Test]
@@ -109,7 +109,7 @@ namespace Core.Tests
     {
       var actual = NewLineManager.NextLineEndPosition(inputText, startIndex);
 
-      Assert.That(expectedPosition, Is.EqualTo(actual));
+      Assert.That(actual, Is.EqualTo(expectedPosition));
     }
 
     [Test]

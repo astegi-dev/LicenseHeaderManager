@@ -11,11 +11,6 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace Core.Tests
@@ -27,7 +22,7 @@ namespace Core.Tests
     public void AdditionalProperty_ValidInput_ReturnsValidProperties()
     {
       const string token = "%TestToken%";
-      const string value = "A fancy token value";
+      const string value = "Property value";
       var property = new AdditionalProperty(token, value);
 
       var actualToken = property.Token;

@@ -11,13 +11,11 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization;
 using System.Text;
-using NUnit.Framework;
-using Rhino.Mocks;
 
 namespace Core.Tests
 {
@@ -31,7 +29,6 @@ namespace Core.Tests
     {
       _paths = new List<string>();
     }
-
 
     [Test]
     public void GetProperFilePathCapitalization_InputIsNull_ThrowsArgumentNullException()

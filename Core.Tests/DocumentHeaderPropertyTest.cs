@@ -11,12 +11,8 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using NUnit.Framework;
+using Rhino.Mocks;
 
 namespace Core.Tests
 {
@@ -46,7 +42,8 @@ namespace Core.Tests
     [Test]
     public void CanCreateValue_DocumentHeaderPropertyTrue_ReturnsTrue()
     {
-      var actual = _documentHeaderPropertyTrue.CanCreateValue(null);
+      var documentHeader = MockRepository.GenerateStub<IDocumentHeader>();
+      var actual = _documentHeaderPropertyTrue.CanCreateValue(documentHeader);
 
       Assert.That (actual, Is.True);
     }
@@ -54,7 +51,8 @@ namespace Core.Tests
     [Test]
     public void CanCreateValue_DocumentHeaderPropertyFalse_ReturnsFalse()
     {
-      var actual = _documentHeaderPropertyFalse.CanCreateValue(null);
+      var documentHeader = MockRepository.GenerateStub<IDocumentHeader>();
+      var actual = _documentHeaderPropertyFalse.CanCreateValue(documentHeader);
 
       Assert.That(actual, Is.False);
     }
@@ -62,7 +60,8 @@ namespace Core.Tests
     [Test]
     public void CreateValue_DocumentHeaderPropertyTrue_ReturnsDocumentHeader()
     {
-      var actual = _documentHeaderPropertyTrue.CreateValue(null);
+      var documentHeader = MockRepository.GenerateStub<IDocumentHeader>();
+      var actual = _documentHeaderPropertyTrue.CreateValue(documentHeader);
 
       Assert.That(actual, Is.EqualTo("// test header"));
     }
@@ -70,7 +69,8 @@ namespace Core.Tests
     [Test]
     public void CreateValue_DocumentHeaderPropertyFalse_ReturnsNull()
     {
-      var actual = _documentHeaderPropertyFalse.CreateValue(null);
+      var documentHeader = MockRepository.GenerateStub<IDocumentHeader>();
+      var actual = _documentHeaderPropertyFalse.CreateValue(documentHeader);
 
       Assert.That(actual, Is.Null);
     }
