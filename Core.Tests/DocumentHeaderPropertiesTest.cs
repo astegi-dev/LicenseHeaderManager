@@ -31,7 +31,7 @@ namespace Core.Tests
 
       var documentHeaderStub = MockRepository.GenerateStub<IDocumentHeader>();
 
-      //var result = property.CreateValue (documentHeaderStub);
+      var result = property.CreateValue (documentHeaderStub);
     }
 
     [Test]

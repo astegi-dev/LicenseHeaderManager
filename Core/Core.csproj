@@ -134,7 +134,6 @@
       <Link>LicenseHeaderManager.sln.licenseheader</Link>
     </None>
     <None Include="app.config" />
-    <EmbeddedResource Include="Resources\default.licenseheader" />
     <None Include="Key.snk" />
     <None Include="packages.config" />
   </ItemGroup>

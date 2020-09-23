@@ -23,13 +23,6 @@ namespace Core.Options
 {
   public class CoreOptionsRepository
   {
-    internal static string DefaultLicenseHeaderResourcePath { get; set; }
-
-    static CoreOptionsRepository()
-    {
-      DefaultLicenseHeaderResourcePath = "Core.Resources.default.licenseheader";
-    }
-
     /// <summary>
     ///   Generates an <see cref="IEnumerable{T}"/> whose generic type argument is <see cref="string"/> that represent all keywords
     ///   in a specifiable string, with each recognized keyword being one entry in the enumerable.
@@ -41,9 +34,9 @@ namespace Core.Options
     ///   Returns an <see cref="IEnumerable{T}"/> whose generic type argument is <see cref="string"/> that represent all keywords
     ///   recognized in <paramref name="requiredKeywords"/>.
     /// </returns>
-    public static IEnumerable<string> RequiredKeywordsAsEnumerable (string requiredKeywords)
+    public static IEnumerable<string> RequiredKeywordsAsEnumerable(string requiredKeywords)
     {
-      return requiredKeywords.Split (new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select (k => k.Trim());
+      return requiredKeywords.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(k => k.Trim());
     }
 
     /// <summary>
@@ -51,9 +44,9 @@ namespace Core.Options
     /// </summary>
     /// <param name="options">The <see cref="CoreOptions" /> instance to serialize.</param>
     /// <param name="filePath">The path to which an options file should be persisted.</param>
-    public static async Task SaveAsync (CoreOptions options, string filePath)
+    public static async Task SaveAsync(CoreOptions options, string filePath)
     {
-      await JsonOptionsManager.SerializeAsync (options, filePath);
+      await JsonOptionsManager.SerializeAsync(options, filePath);
     }
 
     /// <summary>
@@ -68,19 +61,28 @@ namespace Core.Options
     ///   <paramref name="filePath" />.
     ///   If there were errors upon deserialization, <see langword="null" /> is returned.
     /// </returns>
-    public static async Task<CoreOptions> LoadAsync (string filePath)
+    public static async Task<CoreOptions> LoadAsync(string filePath)
     {
-      return await JsonOptionsManager.DeserializeAsync<CoreOptions> (filePath);
+      return await JsonOptionsManager.DeserializeAsync<CoreOptions>(filePath);
     }
 
-    public static string GetDefaultLicenseHeader ()
+    public static string GetDefaultLicenseHeader()
     {
-      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream (DefaultLicenseHeaderResourcePath);
-      if (resource == null)
-        return string.Empty;
-
-      using var reader = new StreamReader (resource, Encoding.UTF8);
-      return reader.ReadToEnd();
+      var sb = new StringBuilder();
+      sb.AppendLine("extensions: designer.cs generated.cs");
+      sb.AppendLine("extensions: .cs .cpp .h");
+      sb.AppendLine("// Copyright (c) 2011 rubicon IT GmbH");
+      sb.AppendLine("extensions: .aspx .ascx");
+      sb.AppendLine("<%-- ");
+      sb.AppendLine("Copyright (c) 2011 rubicon IT GmbH");
+      sb.AppendLine("--%>");
+      sb.AppendLine("extensions: .vb");
+      sb.AppendLine("'Sample license text.");
+      sb.AppendLine("extensions:  .xml .config .xsd");
+      sb.AppendLine("<!--");
+      sb.AppendLine("Sample license text.");
+      sb.Append("-->");
+      return sb.ToString();
     }
   }
 }

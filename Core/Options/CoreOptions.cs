@@ -26,7 +26,6 @@ namespace Core.Options
   {
     public const bool c_defaultUseRequiredKeywords = true;
     public const string c_defaultRequiredKeywords = "license, copyright, (c), ©";
-    public static string DefaultLicenseHeaderFileText => CoreOptionsRepository.GetDefaultLicenseHeader();
 
     public static readonly ObservableCollection<Language> DefaultLanguages = new ObservableCollection<Language>
                                                                              {
@@ -140,6 +139,8 @@ namespace Core.Options
     ///   Gets or sets the text to be used for newly created license header definition files.
     /// </summary>
     public virtual string LicenseHeaderFileText { get; set; }
+
+    public string DefaultLicenseHeaderFileText { get; } = CoreOptionsRepository.GetDefaultLicenseHeader();
 
     /// <summary>
     ///   Gets or sets whether license headers are automatically inserted into new files.

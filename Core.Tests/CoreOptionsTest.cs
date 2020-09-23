@@ -40,20 +40,10 @@ namespace Core.Tests
     [Test]
     public void CoreOptions_ConstructorInitializeWithDefaultValuesDefaultLicenseHeaderNotExistent_ReturnsDefaultLicenseHeader()
     {
-      CoreOptionsRepository.DefaultLicenseHeaderResourcePath = "Core.Resources.default.licenseheader";
       _options = new CoreOptions();
 
       Assert.That(_options.LicenseHeaderFileText,
           Is.EqualTo("extensions: designer.cs generated.cs\r\nextensions: .cs .cpp .h\r\n// Copyright (c) 2011 rubicon IT GmbH\r\nextensions: .aspx .ascx\r\n<%-- \r\nCopyright (c) 2011 rubicon IT GmbH\r\n--%>\r\nextensions: .vb\r\n'Sample license text.\r\nextensions:  .xml .config .xsd\r\n<!--\r\nSample license text.\r\n-->"));
-    }
-
-    [Test]
-    public void CoreOptions_ConstructorInitializeWithDefaultValues_ReturnsEmptyString()
-    {
-      CoreOptionsRepository.DefaultLicenseHeaderResourcePath = "Core.Resources.nothing.txt";
-      _options = new CoreOptions();
-
-      Assert.That (_options.LicenseHeaderFileText, Is.EqualTo (string.Empty));
     }
 
     [Test]

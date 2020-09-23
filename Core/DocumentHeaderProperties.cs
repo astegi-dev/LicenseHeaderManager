@@ -131,6 +131,10 @@ namespace Core
       {
         return PathUtility.GetProperFilePathCapitalization (fileInfo);
       }
+      catch (ArgumentNullException)
+      {
+        throw;
+      }
       catch (Exception)
       {
         //Use the FilePath in the same capitalization as we got it

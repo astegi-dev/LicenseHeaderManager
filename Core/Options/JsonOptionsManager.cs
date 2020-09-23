@@ -120,10 +120,6 @@ namespace Core.Options
         using var stream = new FileStream (filePath, FileMode.Create, FileAccess.Write, FileShare.None);
         await JsonSerializer.SerializeAsync (stream, options, serializerOptions ?? SerializerDefaultOptions);
       }
-      catch (ArgumentNullException ex)
-      {
-        throw new SerializationException (c_fileStreamNotPresent, ex);
-      }
       catch (NotSupportedException ex)
       {
         throw new SerializationException (c_jsonConverterNotFound, ex);
