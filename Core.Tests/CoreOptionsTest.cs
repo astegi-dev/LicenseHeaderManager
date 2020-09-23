@@ -11,15 +11,14 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+using Core.Options;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Core.Options;
-using NUnit.Framework;
 
 namespace Core.Tests
 {
@@ -34,16 +33,27 @@ namespace Core.Tests
     public void Setup()
     {
       _paths = new List<string>();
-      _options = new CoreOptions(false);
+      _options = new CoreOptions(true);
       _languages = _options.Languages;
     }
 
     [Test]
-    public void CoreOptions_ConstructorInitializeWithDefaultValues_ReturnsDefaultLicenseHeader()
+    public void CoreOptions_ConstructorInitializeWithDefaultValuesDefaultLicenseHeaderNotExistent_ReturnsDefaultLicenseHeader()
     {
-      _options = new CoreOptions(true);
+      CoreOptionsRepository.DefaultLicenseHeaderResourcePath = "Core.Resources.default.licenseheader";
+      _options = new CoreOptions();
+
       Assert.That(_options.LicenseHeaderFileText,
           Is.EqualTo("extensions: designer.cs generated.cs\r\nextensions: .cs .cpp .h\r\n// Copyright (c) 2011 rubicon IT GmbH\r\nextensions: .aspx .ascx\r\n<%-- \r\nCopyright (c) 2011 rubicon IT GmbH\r\n--%>\r\nextensions: .vb\r\n'Sample license text.\r\nextensions:  .xml .config .xsd\r\n<!--\r\nSample license text.\r\n-->"));
+    }
+
+    [Test]
+    public void CoreOptions_ConstructorInitializeWithDefaultValues_ReturnsEmptyString()
+    {
+      CoreOptionsRepository.DefaultLicenseHeaderResourcePath = "Core.Resources.nothing.txt";
+      _options = new CoreOptions();
+
+      Assert.That (_options.LicenseHeaderFileText, Is.EqualTo (string.Empty));
     }
 
     [Test]

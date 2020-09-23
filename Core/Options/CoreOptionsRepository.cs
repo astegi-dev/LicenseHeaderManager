@@ -23,6 +23,13 @@ namespace Core.Options
 {
   public class CoreOptionsRepository
   {
+    internal static string DefaultLicenseHeaderResourcePath { get; set; }
+
+    static CoreOptionsRepository()
+    {
+      DefaultLicenseHeaderResourcePath = "Core.Resources.default.licenseheader";
+    }
+
     /// <summary>
     ///   Generates an <see cref="IEnumerable{T}"/> whose generic type argument is <see cref="string"/> that represent all keywords
     ///   in a specifiable string, with each recognized keyword being one entry in the enumerable.
@@ -68,7 +75,7 @@ namespace Core.Options
 
     public static string GetDefaultLicenseHeader ()
     {
-      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream ("Core.Resources.default.licenseheader");
+      using var resource = Assembly.GetExecutingAssembly().GetManifestResourceStream (DefaultLicenseHeaderResourcePath);
       if (resource == null)
         return string.Empty;
 

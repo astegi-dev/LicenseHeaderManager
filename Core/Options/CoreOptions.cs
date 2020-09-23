@@ -11,14 +11,8 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Options
 {
@@ -32,7 +26,7 @@ namespace Core.Options
   {
     public const bool c_defaultUseRequiredKeywords = true;
     public const string c_defaultRequiredKeywords = "license, copyright, (c), ©";
-    public static readonly string _defaultLicenseHeaderFileText = CoreOptionsRepository.GetDefaultLicenseHeader();
+    public static string DefaultLicenseHeaderFileText => CoreOptionsRepository.GetDefaultLicenseHeader();
 
     public static readonly ObservableCollection<Language> DefaultLanguages = new ObservableCollection<Language>
                                                                              {
@@ -177,7 +171,7 @@ namespace Core.Options
     {
       UseRequiredKeywords = c_defaultUseRequiredKeywords;
       RequiredKeywords = c_defaultRequiredKeywords;
-      LicenseHeaderFileText = _defaultLicenseHeaderFileText;
+      LicenseHeaderFileText = DefaultLicenseHeaderFileText;
       Languages = new ObservableCollection<Language> (DefaultLanguages);
     }
 

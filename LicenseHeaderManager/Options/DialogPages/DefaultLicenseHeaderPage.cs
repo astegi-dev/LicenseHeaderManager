@@ -59,7 +59,7 @@ namespace LicenseHeaderManager.Options.DialogPages
         OptionsFacade.CurrentOptions.LicenseHeaderFileText = ThreeWaySelectionForMigration (
             OptionsFacade.CurrentOptions.LicenseHeaderFileText,
             migratedDefaultLicenseHeaderTextPage.LicenseHeaderFileText,
-            CoreOptions._defaultLicenseHeaderFileText);
+            CoreOptions.DefaultLicenseHeaderFileText);
       }
     }
   }
