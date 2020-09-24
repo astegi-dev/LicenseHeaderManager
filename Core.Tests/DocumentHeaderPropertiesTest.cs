@@ -14,6 +14,7 @@
 using System.Collections;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Rhino.Mocks;
 
@@ -23,7 +24,7 @@ namespace Core.Tests
   public class DocumentHeaderPropertiesTest
   {
     [Test]
-    public void Test()
+    public void GetProperFilePathCapitalization_DocumentHeaderNull_ThrowsArgumentNullException()
     {
       var documentHeaderProperties = new DocumentHeaderProperties();
 
@@ -32,16 +33,16 @@ namespace Core.Tests
 
       var documentHeaderStub = MockRepository.GenerateStub<IDocumentHeader>();
 
-      //var result = property.CreateValue (documentHeaderStub);
+      Assert.That(() => property.CreateValue(documentHeaderStub), Throws.ArgumentNullException);
     }
 
     [Test]
-    public void GetProperFilePathCapitalization_DocumentHeaderNull_ThrowsArgumentNullException()
+    public void GetProperFileNameCapitalization_DocumentHeaderNull_ThrowsArgumentNullException()
     {
       var documentHeaderProperties = new DocumentHeaderProperties();
 
-      var property = documentHeaderProperties.ToArray()[0];
-      Assert.That(property.Token, Is.EqualTo("%FullFileName%"));
+      var property = documentHeaderProperties.ToArray()[1];
+      Assert.That(property.Token, Is.EqualTo("%FileName%"));
 
       var documentHeaderStub = MockRepository.GenerateStub<IDocumentHeader>();
 

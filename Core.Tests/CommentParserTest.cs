@@ -494,18 +494,5 @@ namespace Core.Tests
       var textString = string.Join(Environment.NewLine, header);
       Assert.That(() => parser.Parse(textString), Throws.InstanceOf<ParseException>());
     }
-
-    //[Test]
-    public void Test()
-    {
-      var parser = new CommentParser("//", "/*", "*/", "#region", "#endregion");
-      var header = new[]
-                   {
-                       "#region / r #endregion he \t\xA1"
-                   };
-
-      var textString = string.Join("", header);
-      Assert.That(() => parser.Parse(textString), Throws.InstanceOf<ParseException>());
-    }
   }
 }
