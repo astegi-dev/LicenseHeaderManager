@@ -22,7 +22,7 @@ namespace LicenseHeaderManager.Options.Model
 
     public void Reset ()
     {
-      LicenseHeaderFileText = CoreOptions.DefaultLicenseHeaderFileText;
+      LicenseHeaderFileText = CoreOptions._defaultLicenseHeaderFileText;
     }
   }
 }

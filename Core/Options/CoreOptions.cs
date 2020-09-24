@@ -26,6 +26,7 @@ namespace Core.Options
   {
     public const bool c_defaultUseRequiredKeywords = true;
     public const string c_defaultRequiredKeywords = "license, copyright, (c), ©";
+    public static readonly string _defaultLicenseHeaderFileText = CoreOptionsRepository.GetDefaultLicenseHeader();
 
     public static readonly ObservableCollection<Language> DefaultLanguages = new ObservableCollection<Language>
                                                                              {
@@ -140,7 +141,7 @@ namespace Core.Options
     /// </summary>
     public virtual string LicenseHeaderFileText { get; set; }
 
-    public string DefaultLicenseHeaderFileText { get; } = CoreOptionsRepository.GetDefaultLicenseHeader();
+    //public virtual string DefaultLicenseHeaderFileText { get; } = CoreOptionsRepository.GetDefaultLicenseHeader();
 
     /// <summary>
     ///   Gets or sets whether license headers are automatically inserted into new files.
@@ -172,7 +173,7 @@ namespace Core.Options
     {
       UseRequiredKeywords = c_defaultUseRequiredKeywords;
       RequiredKeywords = c_defaultRequiredKeywords;
-      LicenseHeaderFileText = DefaultLicenseHeaderFileText;
+      LicenseHeaderFileText = _defaultLicenseHeaderFileText;
       Languages = new ObservableCollection<Language> (DefaultLanguages);
     }
 

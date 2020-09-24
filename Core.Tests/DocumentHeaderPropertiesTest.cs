@@ -11,6 +11,7 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+using System.Collections;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,20 @@ namespace Core.Tests
 
       var documentHeaderStub = MockRepository.GenerateStub<IDocumentHeader>();
 
-      var result = property.CreateValue (documentHeaderStub);
+      //var result = property.CreateValue (documentHeaderStub);
+    }
+
+    [Test]
+    public void GetProperFilePathCapitalization_DocumentHeaderNull_ThrowsArgumentNullException()
+    {
+      var documentHeaderProperties = new DocumentHeaderProperties();
+
+      var property = documentHeaderProperties.ToArray()[0];
+      Assert.That(property.Token, Is.EqualTo("%FullFileName%"));
+
+      var documentHeaderStub = MockRepository.GenerateStub<IDocumentHeader>();
+
+      Assert.That(() => property.CreateValue(documentHeaderStub), Throws.ArgumentNullException);
     }
 
     [Test]
@@ -58,7 +72,7 @@ namespace Core.Tests
     public void GetEnumerator_ObjectOfClassExists_ReturnsEnumerator()
     {
       var documentHeaderProperties = new DocumentHeaderProperties();
-      var actual = documentHeaderProperties.GetEnumerator();
+      var actual = ((IEnumerable)documentHeaderProperties).GetEnumerator();
 
       Assert.That(actual, Is.Not.Null);
       Assert.That(actual.MoveNext(), Is.True);

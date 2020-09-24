@@ -11,6 +11,7 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
  */
 
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,9 +19,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using NUnit.Framework;
-using Rhino.Mocks;
-using Rhino.Mocks.Interfaces;
 
 namespace Core.Tests
 {
@@ -235,6 +233,18 @@ namespace Core.Tests
     }
 
     [Test]
+    public async Task RemoveOrReplaceHeader_ContentInputInvalidHeader_ReturnsReplacerResultParsingError()
+    {
+      var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
+      var path = CreateTestFile(".cs", true);
+      var headers = new Dictionary<string, string[]> { { ".cs", new[] { "// first line", "// copyright" } } };
+
+      var actual = await replacer.RemoveOrReplaceHeader(new LicenseHeaderContentInput("#endregion", path, headers) { IgnoreNonCommentText = true });
+
+      Assert.That(actual.Error.Type, Is.EqualTo(ReplacerErrorType.ParsingError));
+    }
+
+    [Test]
     public async Task RemoveOrReplaceHeader_LicenseHeaderContentInputsValid_ReturnsReplacerResultSuccess()
     {
       var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
@@ -273,7 +283,7 @@ namespace Core.Tests
       Assert.That(actualResults.Error, Is.Null);
       Assert.That(actualResults.IsSuccess, Is.True);
     }
-    
+
     [Test]
     public async Task RemoveOrReplaceHeader_LicenseHeaderPathInputsValidLicenseHeaderDefinitionFile_ReturnsReplacerResultSuccess()
     {
@@ -310,7 +320,7 @@ namespace Core.Tests
       Assert.That(actualResults.IsSuccess, Is.False);
       var replacerError = actualResults.Error.GetEnumerator().Current;
       if (replacerError != null)
-        Assert.That (replacerError.Type, Is.EqualTo (ReplacerErrorType.NonCommentText));
+        Assert.That(replacerError.Type, Is.EqualTo(ReplacerErrorType.NonCommentText));
     }
 
     [Test]
@@ -327,20 +337,50 @@ namespace Core.Tests
       Assert.That(actualResults.Count, Is.EqualTo(0));
     }
 
-    /*[Test]
-    public async Task Test()
+    [Test]
+    public async Task RemoveOrReplaceHeader_ContentInputWithInvalidHeader_ReturnsReplacerResultParsingError()
     {
       var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
-      var headers = new Dictionary<string, string[]> { { ".cs", new[] { "// first line 1" } } };
+      var headers = new Dictionary<string, string[]>
+                    {
+                        { ".cs", new[] { "// test header"} }
+                    };
       var licenseHeaderInputs = new List<LicenseHeaderContentInput>
                                 {
-                                    new LicenseHeaderContentInput ("test content3", CreateTestFile (".cs"), headers)
+                                    new LicenseHeaderContentInput ("#endregion", CreateTestFile (".cs"), headers){IgnoreNonCommentText = true}
                                 };
 
       var actualResults = (await replacer.RemoveOrReplaceHeader(licenseHeaderInputs, new Progress<ReplacerProgressContentReport>(), new CancellationToken())).ToList();
+      var replacerResult = actualResults[0];
 
-      Assert.That(actualResults.Count, Is.EqualTo(0));
-    }*/
+      Assert.That(replacerResult.IsSuccess, Is.False);
+      Assert.That(replacerResult.Error.Type, Is.EqualTo(ReplacerErrorType.ParsingError));
+    }
+
+    [Test]
+    public async Task RemoveOrReplaceHeader_PathInputWithInvalidHeader_ReturnsReplacerResultParsingError()
+    {
+      var replacer = new LicenseHeaderReplacer(_languages, Enumerable.Empty<string>());
+      var headers = new Dictionary<string, string[]> { { ".cs", new[] { "// first line" } } };
+      var licenseHeaderInputs = new List<LicenseHeaderPathInput>
+                                {
+                                    new LicenseHeaderPathInput (CreateTestFile (".cs", true), headers) {IgnoreNonCommentText = true}
+                                };
+
+      var actualResults = await replacer.RemoveOrReplaceHeader(licenseHeaderInputs, new Progress<ReplacerProgressReport>(), new CancellationToken());
+      var enumerator = actualResults.Error.GetEnumerator();
+
+      Assert.That(actualResults.IsSuccess, Is.False);
+      Assert.That(enumerator.MoveNext(), Is.True);
+
+      while (enumerator.MoveNext())
+      {
+        var error = enumerator.Current;
+        if (error != null)
+          Assert.That(error.Type, Is.EqualTo(ReplacerErrorType.ParsingError));
+      }
+      enumerator.Dispose();
+    }
 
     [TearDown]
     public void TearDown()
@@ -349,7 +389,7 @@ namespace Core.Tests
         File.Delete(path);
     }
 
-    private string CreateTestFile(string extension = null)
+    private string CreateTestFile(string extension = null, bool withContent = false)
     {
       if (extension == null)
         extension = ".licenseheader";
@@ -359,7 +399,7 @@ namespace Core.Tests
 
       using (var fs = File.Create(testFile))
       {
-        var content = Encoding.UTF8.GetBytes("");
+        var content = Encoding.UTF8.GetBytes(withContent ? "#endregion" : "");
         fs.Write(content, 0, content.Length);
       }
       return testFile;

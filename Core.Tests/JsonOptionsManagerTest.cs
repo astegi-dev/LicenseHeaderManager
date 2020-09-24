@@ -101,13 +101,6 @@ namespace Core.Tests
     }
 
     [Test]
-    public void SerializeAsync_NoFileStream_ThrowsArgumentNullException()
-    {
-      Assert.That(async () => await JsonOptionsManager.SerializeAsync<CoreOptions>(null, Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".json")),
-          Throws.InstanceOf<SerializationException>().With.Message.EqualTo("File stream for deserializing configuration was not present"));
-    }
-
-    [Test]
     public void SerializeAsync_JsonConverterNotFound_ThrowsNotSupportedException()
     {
       var notSupportedOptions = new NotSupportedOptions();
