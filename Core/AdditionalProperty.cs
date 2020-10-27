@@ -51,8 +51,8 @@ namespace Core
     public string Token { get; }
 
     /// <summary>
-    ///   The value which should be used to replace the occurrences of <see cref="Token" /> in license header definitions. E.
-    ///   g.: "Custom Value"
+    ///   The value which should be used to replace the occurrences of <see cref="Token" /> in license header definitions.
+    ///   e.g.: "Custom Value"
     /// </summary>
     public string Value { get; }
   }
