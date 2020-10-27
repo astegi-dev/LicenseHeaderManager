@@ -19,17 +19,17 @@ namespace Core.Tests
   public class AdditionalPropertyTest
   {
     [Test]
-    public void AdditionalProperty_ValidInput_ReturnsValidProperties()
+    public void AdditionalProperty_ValidInput_ReturnsValidProperties ()
     {
       const string token = "%TestToken%";
       const string value = "Property value";
-      var property = new AdditionalProperty(token, value);
+      var property = new AdditionalProperty (token, value);
 
       var actualToken = property.Token;
       var actualValue = property.Value;
 
-      Assert.That(actualToken, Is.EqualTo(token));
-      Assert.That(actualValue, Is.EqualTo(value));
+      Assert.That (actualToken, Is.EqualTo (token));
+      Assert.That (actualValue, Is.EqualTo (value));
     }
   }
 }
