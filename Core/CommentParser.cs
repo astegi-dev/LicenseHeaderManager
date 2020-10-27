@@ -22,6 +22,12 @@ namespace Core
   /// </summary>
   internal class CommentParser : ICommentParser
   {
+    private readonly string _lineComment;
+    private readonly string _beginComment;
+    private readonly string _endComment;
+    private readonly string _beginRegion;
+    private readonly string _endRegion;
+
     private int _position;
     private Stack<int> _regionStarts;
     private bool _started;
@@ -48,22 +54,12 @@ namespace Core
       Contract.Requires (string.IsNullOrWhiteSpace (beginRegion) == string.IsNullOrWhiteSpace (endRegion));
       Contract.Requires (!(string.IsNullOrWhiteSpace (lineComment) && string.IsNullOrWhiteSpace (beginComment)));
 
-      LineComment = string.IsNullOrEmpty (lineComment) ? null : lineComment;
-      BeginComment = string.IsNullOrEmpty (beginComment) ? null : beginComment;
-      EndComment = string.IsNullOrEmpty (endComment) ? null : endComment;
-      BeginRegion = string.IsNullOrEmpty (beginRegion) ? null : beginRegion;
-      EndRegion = string.IsNullOrEmpty (endRegion) ? null : endRegion;
+      _lineComment = string.IsNullOrEmpty (lineComment) ? null : lineComment;
+      _beginComment = string.IsNullOrEmpty (beginComment) ? null : beginComment;
+      _endComment = string.IsNullOrEmpty (endComment) ? null : endComment;
+      _beginRegion = string.IsNullOrEmpty (beginRegion) ? null : beginRegion;
+      _endRegion = string.IsNullOrEmpty (endRegion) ? null : endRegion;
     }
-
-    private string LineComment { get; }
-
-    private string BeginComment { get; }
-
-    private string EndComment { get; }
-
-    private string BeginRegion { get; }
-
-    private string EndRegion { get; }
 
     public string Parse (string text)
     {
@@ -135,35 +131,35 @@ namespace Core
       if (token == null)
         return false;
 
-      if (LineComment != null && token.StartsWith (LineComment))
+      if (_lineComment != null && token.StartsWith (_lineComment))
       {
         SetStarted();
 
         //proceed to end of line
-        _position = NewLineManager.NextLineEndPosition (_text, _position - token.Length + LineComment.Length);
+        _position = NewLineManager.NextLineEndPosition (_text, _position - token.Length + _lineComment.Length);
 
         UpdatePositionIfEndOfFile();
 
         return true;
       }
 
-      if (BeginComment != null && token.StartsWith (BeginComment))
+      if (_beginComment != null && token.StartsWith (_beginComment))
       {
         SetStarted();
 
-        _position = _text.IndexOf (EndComment, _position - token.Length + BeginComment.Length, StringComparison.Ordinal);
+        _position = _text.IndexOf (_endComment, _position - token.Length + _beginComment.Length, StringComparison.Ordinal);
         if (_position < 0)
           throw new ParseException();
-        _position += EndComment.Length;
+        _position += _endComment.Length;
 
         return true;
       }
 
-      if (BeginRegion != null && token == BeginRegion)
+      if (_beginRegion != null && token == _beginRegion)
       {
         SetStarted();
 
-        _regionStarts.Push (_position - BeginRegion.Length);
+        _regionStarts.Push (_position - _beginRegion.Length);
 
 
         _position = NewLineManager.NextLineEndPosition (_text, _position);
@@ -173,7 +169,7 @@ namespace Core
         return true;
       }
 
-      if (EndRegion != null && token == EndRegion)
+      if (_endRegion != null && token == _endRegion)
       {
         SetStarted();
 
@@ -190,14 +186,14 @@ namespace Core
         return true;
       }
 
-      if (EndRegion != null && EndRegion.Contains (token))
+      if (_endRegion != null && _endRegion.Contains (token))
       {
         SetStarted();
 
         var firstPart = token;
         token = GetToken();
 
-        if (firstPart + " " + token == EndRegion)
+        if (firstPart + " " + token == _endRegion)
         {
           if (_regionStarts.Count == 0)
             throw new ParseException();
