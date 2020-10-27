@@ -111,6 +111,7 @@
     <Compile Include="ReplacerProgressContentReportTest.cs" />
     <Compile Include="ReplacerResultTest.cs" />
     <Compile Include="ReplacerSuccessTest.cs" />
+    <Compile Include="StringArrayExtensions.cs" />
     <Compile Include="StringExtensionsTest.cs" />
     <Compile Include="UserInfoTest.cs" />
   </ItemGroup>
