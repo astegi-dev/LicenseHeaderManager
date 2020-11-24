@@ -41,7 +41,7 @@ namespace LicenseHeaderManager.Options
 
     private DTE2 Dte
     {
-      get { return GetService (typeof(DTE)) as DTE2; }
+      get { return GetService(typeof(DTE)) as DTE2; }
     }
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -97,7 +97,7 @@ namespace LicenseHeaderManager.Options
       ResetSettings();
     }
 
-    public override sealed void ResetSettings ()
+    public sealed override void ResetSettings ()
     {
       InsertInNewFiles = c_defaultInsertInNewFiles;
       UseRequiredKeywords = c_defaultUseRequiredKeywords;

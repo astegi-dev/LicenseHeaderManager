@@ -205,9 +205,7 @@ namespace LicenseHeaderManager.Headers
       if (ProjectItemInspection.IsLink (item))
         return CreateDocumentResult.LinkedFile;
 
-      var language = _licenseHeaderExtension.LanguagesPage.Languages
-          .Where (x => x.Extensions.Any (y => item.Name.EndsWith (y, StringComparison.OrdinalIgnoreCase)))
-          .FirstOrDefault();
+      var language = _licenseHeaderExtension.LanguagesPage.Languages.FirstOrDefault(x => x.Extensions.Any (y => item.Name.EndsWith (y, StringComparison.OrdinalIgnoreCase)));
 
       if (language == null)
         return CreateDocumentResult.LanguageNotFound;
@@ -249,9 +247,8 @@ namespace LicenseHeaderManager.Headers
       if (headers != null)
       {
         var extension = headers.Keys
-            .OrderByDescending (x => x.Length)
-            .Where (x => item.Name.EndsWith (x, StringComparison.OrdinalIgnoreCase))
-            .FirstOrDefault();
+          .OrderByDescending (x => x.Length)
+          .FirstOrDefault(x => item.Name.EndsWith (x, StringComparison.OrdinalIgnoreCase));
 
         if (extension == null)
         {
